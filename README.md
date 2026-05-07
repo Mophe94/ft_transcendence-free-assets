@@ -2,7 +2,7 @@
 
 ---
 
-# ft_tranceandance
+# ft_transcendence
 
 ## Table of Contents
 
