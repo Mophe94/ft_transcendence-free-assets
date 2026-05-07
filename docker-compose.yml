@@ -4,9 +4,33 @@ services:
   container_name: nginx
   ports:
    - "8080:80"
-  restart: unless-stopped
+  volumes:
+   - ./nginx_test.conf:/etc/nginx/conf.d/default.conf:ro
   networks:
    - transcendence
+  restart: always
+  depends_on:
+   - kevin_site
+
+ kevin_site:
+  build:
+   context: ./kevin_site
+   dockerfile: Dockerfile
+  container_name: kevin_site
+  restart: always
+  expose:
+   - "5173"
+  networks:
+   - transcendence
+
+# test:
+#  build:
+#   context: ./generic_container
+#   dockerfile: Dockerfile
+#  container_name: test
+#  restart: always
+#  networks:
+#   - transcendence
 
 networks:
  transcendence:
