@@ -1,0 +1,14 @@
+services:
+ nginx:
+  image: nginx:latest
+  container_name: nginx
+  ports:
+   - "8080:80"
+  restart: unless-stopped
+  networks:
+   - transcendence
+
+networks:
+ transcendence:
+  driver: bridge
+  external: false
