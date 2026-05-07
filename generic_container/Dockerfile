@@ -1,7 +1,13 @@
 FROM debian:12-slim
 
-LABEL   org.opencontainers.image.title="transcendance-base" \
+WORKDIR .
+#to be modified
+
+LABEL   version="0.1" \
+		org.opencontainers.image.title="dev-transcendance-base" \
         org.opencontainers.image.description="Base image for all Transcendance microservices"
+
+ONBUILD	apt-get update && apt-get upgrade -y
 
 ENV TZ=Europe/Brussels \
     DEBIAN_FRONTEND=noninteractive
@@ -15,4 +21,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \                    
     && rm -rf /var/lib/apt/lists/*   
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+ENTRYPOINT ["/bin/bash", "-c", "echo coucou from docker"]
