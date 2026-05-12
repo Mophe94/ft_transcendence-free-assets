@@ -1,0 +1,44 @@
+services:
+
+  nginx:
+    image: nginx
+    deploy:
+      replicas: 1
+    hostname: nginx
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+
+    ports:
+#      - "8080:80"
+#      - "8443:443"
+      - target: 80
+        published: 8080
+        protocol: tcp
+        mode: ingress
+
+    networks:
+      - transcendence
+    depends_on:
+      - wordpress
+  wordpress:
+    image: wordpress
+    deploy:
+      replicas: 1
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp
+      WORDPRESS_DB_PASSWORD: wp
+      WORDPRESS_DB_NAME: wp
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME','http://localhost:8080');
+        define('WP_SITEURL','http://localhost:8080');
+
+    networks:
+      - transcendence
+
+#volumes:
+
+networks:
+  transcendence:
+    driver: overlay
