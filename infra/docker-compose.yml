@@ -1,57 +1,44 @@
 services:
 
-  manager:
-    build: ./manager
-    container_name: swarm-manager
-    hostname: manager
-    privileged: true
-
-    environment:
-      SWARM_IP: 10.10.0.2
+  nginx:
+    image: nginx
+    deploy:
+      replicas: 1
+    hostname: nginx
 
     volumes:
-      - swarm-data:/swarm
-      - manager-data:/var/lib/docker
-
-    networks:
-      swarm-net:
-        ipv4_address: 10.10.0.2
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
 
     ports:
-      - "2377:2377"
-      - "7946:7946/tcp"
-      - "7946:7946/udp"
-      - "4789:4789/udp"
-
-  worker:
-    build: ./worker
-    container_name: swarm-worker
-    hostname: worker
-    privileged: true
-
-    environment:
-      SWARM_MANAGER: 10.10.0.2
-
-    depends_on:
-      - manager
-
-    volumes:
-      - swarm-data:/swarm
-      - worker-data:/var/lib/docker
+#      - "8080:80"
+#      - "8443:443"
+      - target: 80
+        published: 8080
+        protocol: tcp
+        mode: ingress
 
     networks:
-      swarm-net:
-        ipv4_address: 10.10.0.3
+      - transcendence
+    depends_on:
+      - wordpress
+  wordpress:
+    image: wordpress
+    deploy:
+      replicas: 1
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp
+      WORDPRESS_DB_PASSWORD: wp
+      WORDPRESS_DB_NAME: wp
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME','http://localhost:8080');
+        define('WP_SITEURL','http://localhost:8080');
 
-volumes:
-  swarm-data:
-  manager-data:
-  worker-data:
+    networks:
+      - transcendence
+
+#volumes:
 
 networks:
-  swarm-net:
-    driver: bridge
-
-    ipam:
-      config:
-        - subnet: 10.10.0.0/24
+  transcendence:
+    driver: overlay
