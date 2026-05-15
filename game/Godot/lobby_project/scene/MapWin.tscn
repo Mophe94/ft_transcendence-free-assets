@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://bxrs5gn6btwhy"]
+
+[ext_resource type="Script" uid="uid://bia5s41k4lkwf" path="res://scipt/map_win.gd" id="1_bcd5s"]
+[ext_resource type="Texture2D" uid="uid://3xh88kkc3o6d" path="res://asset/nobody.jpg" id="1_p22na"]
+
+[node name="MapWin" type="CanvasLayer" unique_id=776320951]
+script = ExtResource("1_bcd5s")
+
+[node name="Control" type="Control" parent="." unique_id=1175114709]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="ColorRect" type="ColorRect" parent="Control" unique_id=89858480]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0, 0, 0, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="Control" unique_id=1303869924]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer" unique_id=1741165254]
+layout_mode = 2
+theme_override_constants/separation = 100
+
+[node name="Label" type="Label" parent="Control/CenterContainer/VBoxContainer" unique_id=1546463314]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "win !"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer" unique_id=1945516456]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="TextureRect" type="TextureRect" parent="Control/CenterContainer/VBoxContainer/VBoxContainer" unique_id=240677722]
+layout_mode = 2
+texture = ExtResource("1_p22na")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Control/CenterContainer/VBoxContainer/VBoxContainer" unique_id=1005830442]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "???????"
+horizontal_alignment = 1
+clip_text = true
