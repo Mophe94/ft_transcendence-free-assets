@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-CERT_DIR="$HOME/registry-certs"
+CERT_DIR= dirname "$0"
 cd "$CERT_DIR"
 
 DAYS=3650
