@@ -6,11 +6,20 @@ DEPLOY_FILE = $(LOCATION)/infra/docker-compose-deploy.yml
 SCRIPTS = $(LOCATION)/infra/scripts
 
 all:
-	chmod 777 $(SCRIPTS)/swarm/launch_swarm.sh
-	$(SCRIPTS)/swarm/launch_swarm.sh
 	@$(MAKE) --no-print-directory swarm-status
+
+swarm_setup:
+	chmod +x $(SCRIPTS)/swarm/launch_swarm.sh
+	$(SCRIPTS)/swarm/launch_swarm.sh $(SCRIPTS)/swarm
+	docker stack deploy -c $(DEPLOY_FILE) transcendence
+
+build: swarm_setup
 	docker compose -f $(BUILD_FILE) build
+
+push: build
 	docker compose -f $(BUILD_FILE) push
+
+up: push
 
 down:
 	chmod 777 $(SCRIPTS)/swarm/end_swarm.sh
