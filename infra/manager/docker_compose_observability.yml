@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prom_data:/prometheus
+    networks:
+      - obs
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - obs
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - obs
+    deploy:
+      mode: global
+
+networks:
+  obs:
+    driver: overlay
+
+volumes:
+  prom_data:
+  grafana_data:
+
+configs:
+  prometheus_config:
+    file: ./prometheus.yml
