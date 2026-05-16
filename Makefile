@@ -3,6 +3,7 @@ STACK_NAME = transcendence
 LOCATION = $(CURDIR)
 BUILD_FILE = $(LOCATION)/infra/docker-compose-build.yml
 DEPLOY_FILE = $(LOCATION)/infra/docker-compose-deploy.yml
+OBSERV_FILE = $(LOCATION)/infra/docker-compose-observability.yml
 SCRIPTS = $(LOCATION)/infra/scripts
 
 all:
@@ -11,7 +12,9 @@ all:
 swarm_setup:
 	chmod +x $(SCRIPTS)/swarm/launch_swarm.sh
 	$(SCRIPTS)/swarm/launch_swarm.sh $(SCRIPTS)/swarm
+	docker network create --driver overlay --attachable shared_net
 	docker stack deploy -c $(DEPLOY_FILE) transcendence
+	docker stack deploy -c $(OBSERV_FILE) transcendence
 
 build: swarm_setup
 	docker compose -f $(BUILD_FILE) build

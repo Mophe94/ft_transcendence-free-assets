@@ -48,6 +48,7 @@ services:
 
     networks:
       - transcendence
+      - shared_net
 
 #volumes:
 
@@ -62,3 +63,5 @@ networks:
     driver: overlay
   registry_net:
     driver: overlay
+  shared_net:
+    external: true

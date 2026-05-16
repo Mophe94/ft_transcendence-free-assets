@@ -16,17 +16,16 @@ services:
 
   grafana:
     image: grafana/grafana
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
       - obs
+      - shared_net
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor
-    ports:
-      - "8080:8080"
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -40,6 +39,9 @@ services:
 networks:
   obs:
     driver: overlay
+    external: false
+  shared_net:
+    external: true
 
 volumes:
   prom_data:
