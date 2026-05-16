@@ -70,6 +70,7 @@ subjectAltName = @alt_names
 
 [alt_names]
 DNS.1 = ${REGISTRY_NAME}
+DNS.2 = transcendence_grafana
 IP.1 = ${REGISTRY_IP}
 EOF
 
@@ -106,6 +107,8 @@ echo "[SWARM] loading secrets"
 create_secret "registry_tls_cert" "tls.crt"
 create_secret "registry_tls_key" "tls.key"
 create_secret "swarm_ca_cert" "ca.crt"
+create_secret "nginx_tls_cert" "tls.crt"
+create_secret "nginx_tls_key" "tls.key"
 
 #clean up
 echo "[CLEAN] removing temp files"
