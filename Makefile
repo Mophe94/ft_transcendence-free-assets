@@ -5,13 +5,14 @@ BUILD_FILE = $(LOCATION)/infra/docker-compose-build.yml
 DEPLOY_FILE = $(LOCATION)/infra/docker-compose-deploy.yml
 OBSERV_FILE = $(LOCATION)/infra/docker-compose-observability.yml
 SCRIPTS = $(LOCATION)/infra/scripts
+IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 
 all:
 	@$(MAKE) --no-print-directory swarm-status
 
 swarm_setup:
-	chmod +x $(SCRIPTS)/swarm/launch_swarm.sh
-	$(SCRIPTS)/swarm/launch_swarm.sh $(SCRIPTS)/swarm
+	@chmod +x $(SCRIPTS)/swarm/launch_swarm.sh
+	@$(SCRIPTS)/swarm/launch_swarm.sh "$(SCRIPTS)/swarm" "$(IP4)"
 	docker network create --driver overlay --attachable shared_net
 	docker stack deploy -c $(DEPLOY_FILE) transcendence
 	docker stack deploy -c $(OBSERV_FILE) transcendence
