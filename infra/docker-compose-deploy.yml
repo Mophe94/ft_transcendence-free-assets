@@ -13,14 +13,14 @@ services:
         delay: 5s
         max_attempts: 3
 
-    secrets:
-      - registry_tls_cert
-      - registry_tls_key
+#    secrets:
+#      - registry_tls_cert
+#      - registry_tls_key
 
     environment:
       REGISTRY_HTTP_ADDR: 0.0.0.0:5000
-      REGISTRY_HTTP_TLS_CERTIFICATE: /run/secrets/registry_tls_cert
-      REGISTRY_HTTP_TLS_KEY: /run/secrets/registry_tls_key
+#      REGISTRY_HTTP_TLS_CERTIFICATE: /run/secrets/registry_tls_cert
+#      REGISTRY_HTTP_TLS_KEY: /run/secrets/registry_tls_key
 
     ports:
       - "5000:5000"
@@ -34,7 +34,7 @@ services:
 
     ports:
       - "8080:80"
-      - "443:443"
+      - "8443:443"
       #- target: 80
       #  published: 8080
       #  protocol: tcp
@@ -47,6 +47,7 @@ services:
     networks:
       - transcendence
       - shared_net
+      - registry_net
 
     deploy:
       replicas: 1
@@ -80,6 +81,6 @@ networks:
   transcendence:
     driver: overlay
   registry_net:
-    driver: overlay
+    external: true
   shared_net:
     external: true

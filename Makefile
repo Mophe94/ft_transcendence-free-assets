@@ -13,7 +13,11 @@ all:
 swarm_setup:
 	@chmod +x $(SCRIPTS)/swarm/launch_swarm.sh
 	@$(SCRIPTS)/swarm/launch_swarm.sh "$(SCRIPTS)/swarm" "$(IP4)"
-	docker network create --driver overlay --attachable shared_net
+	docker network create --driver overlay --attachable --external the_world
+	docker network create --driver overlay --attachable --internal swarm_core
+	docker network create --driver overlay --attachable --internal observ
+	docker network create --driver overlay --attachable --internal game
+	#docker network create --driver overlay --attachable registry_net
 	docker stack deploy -c $(DEPLOY_FILE) transcendence
 	docker stack deploy -c $(OBSERV_FILE) transcendence
 

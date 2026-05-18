@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Safeguard
-set -eo pipefail
+set -euo pipefail
 SCRIPT_NAME="${0##*/}"
 if [ $# -lt 2 ]; then
 	echo "Usage: $SCRIPT_NAME <dir> <ip>"
@@ -17,6 +17,6 @@ docker swarm init --advertise-addr $IP
 
 SECRET_HANDLER=$DIR/secret_handler.sh
 chmod +x $SECRET_HANDLER
-$SECRET_HANDLER $DIR
+$SECRET_HANDLER $DIR $IP
 
 docker service ls

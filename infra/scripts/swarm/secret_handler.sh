@@ -1,15 +1,19 @@
 #!/bin/bash
 
+#Safeguard
 set -euo pipefail
+SCRIPT_NAME="${0##*/}"
+if [ $# -lt 2 ]; then
+	echo "Usage: $SCRIPT_NAME <dir> <ip>"
+	exit 1
+fi
 
 ###CONFIG###
-REGISTRY_NAME="STempels-LIFEBOOK"
-REGISTRY_IP="192.168.1.10"
-USE_IP=true
-
-OVERWRITE=false
-
 CERT_DIR="$1/certs"
+REGISTRY_NAME="Swarm-internal-CA"
+REGISTRY_IP="$2"
+USE_IP=true
+OVERWRITE=false
 
 echo "[SECRETS] Setting up directory"
 rm -rf "$CERT_DIR"
@@ -48,7 +52,7 @@ openssl req -x509 -new -nodes \
 		-sha256 \
 		-days 30 \
 		-out ca.crt \
-		-subj "/CN=swarm-internal-CA"
+		-subj "/CN=${REGISTRY_NAME}"
 
 ### GENERATE SERVER KEY ###
 echo "[CERT] generating server key"

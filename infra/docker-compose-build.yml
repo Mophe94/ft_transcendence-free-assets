@@ -11,5 +11,5 @@ services:
     build:
       context: ./worker
       dockerfile: Dockerfile
-    image: STempels-LIFEBOOK:5000/test:latest
+    image: Swarm-internal-CA:5000/test:latest
     container_name: test_container
