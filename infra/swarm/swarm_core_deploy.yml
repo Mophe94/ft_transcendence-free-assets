@@ -67,16 +67,6 @@ configs:
   nginx_conf:
     file: ./nginx/nginx.conf
 
-secrets:
-  registry_tls_cert:
-    external: true
-  registry_tls_key:
-    external: true
-  nginx_tls_cert:
-    external: true
-  nginx_tls_key:
-    external: true
-
 networks:
   transcendence:
     driver: overlay

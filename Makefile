@@ -11,15 +11,11 @@ all:
 	@$(MAKE) --no-print-directory swarm-status
 
 swarm_setup:
-	@chmod +x $(SCRIPTS)/swarm/launch_swarm.sh
-	@$(SCRIPTS)/swarm/launch_swarm.sh "$(SCRIPTS)/swarm" "$(IP4)"
-	docker network create --driver overlay --attachable --external the_world
-	docker network create --driver overlay --attachable --internal swarm_core
-	docker network create --driver overlay --attachable --internal observ
-	docker network create --driver overlay --attachable --internal game
+	@chmod +x infra/swarm/scripts/launch_swarm.sh
+	@infra/swarm/scripts/launch_swarm.sh "infra/swarm/scripts" "$(IP4)"
 	#docker network create --driver overlay --attachable registry_net
-	docker stack deploy -c $(DEPLOY_FILE) transcendence
-	docker stack deploy -c $(OBSERV_FILE) transcendence
+	#docker stack deploy -c $(DEPLOY_FILE) transcendence
+	#docker stack deploy -c $(OBSERV_FILE) transcendence
 
 build: swarm_setup
 	docker compose -f $(BUILD_FILE) build
@@ -30,8 +26,8 @@ push: build
 up: push
 
 down:
-	chmod 777 $(SCRIPTS)/swarm/end_swarm.sh
-	$(SCRIPTS)/swarm/end_swarm.sh
+	chmod 777 infra/swarm/scripts/end_swarm.sh
+	infra/swarm/scripts/end_swarm.sh
 	@$(MAKE) --no-print-directory swarm-status
 
 swarm-status:

@@ -1,9 +1,7 @@
 FROM debian:12-slim
 
-WORKDIR .
-#to be modified
-
 LABEL   version="0.1" \
+		org.opencontainers.image.source="https://github.com/sitempels/ft_transcendence" \
 		org.opencontainers.image.title="dev-transcendance-base" \
         org.opencontainers.image.description="Base image for all Transcendance microservices"
 
