@@ -14,13 +14,23 @@ services:
 
   grafana:
     image: grafana/grafana
+
+    configs:
+        - source: grafana_datasource
+          target: /etc/grafana/provisioning/datasources/datasources.yml
+        - source: grafana_dashboards
+          target: /etc/grafana/provisioning/dashboards/dashboards.yml
+
     environment:
-      GF_SERVER_ROOT_URL: https://localhost/grafana/
-      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
-      GF_SECURITY_ALLOW_EMBEDDING: "true"
+        GF_SERVER_ROOT_URL: https://localhost/grafana/
+        GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+        GF_SECURITY_ALLOW_EMBEDDING: "true"
+        GF_SECURITY_ADMIN_USER: "admin"
+        GF_SECURITY_ADMIN_PASSWORD: "admin123"
 
     volumes:
-      - grafana_data:/var/lib/grafana
+        - grafana_data:/var/lib/grafana
+        - ../containers/grafana/dashboards:/var/lib/grafana/dashboards
     networks:
       - obsrv_net
 
@@ -37,12 +47,16 @@ services:
       mode: global
 
 volumes:
-  prom_data:
-  grafana_data:
+    prom_data:
+    grafana_data:
 
 configs:
-  prometheus_config:
-    file: ../containers/prometheus/prometheus.yml
+    prometheus_config:
+        file: ../containers/prometheus/prometheus.yml
+    grafana_datasources:
+        file: ../containers/grafana/provisioning/datasources/datasources.yml
+    grafana_dashboards:
+        file: ../containers/grafana/provisioning/dashboards/dashboards.yml
 
 networks:
     obsrv_net:
