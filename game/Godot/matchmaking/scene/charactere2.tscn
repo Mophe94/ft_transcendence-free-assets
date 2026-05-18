@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://dohty5jw2ebc3"]
+
+[ext_resource type="Texture2D" uid="uid://ceknd82yfrqn7" path="res://asset/decoration/monster.png" id="1_brgl1"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_46krr"]
+atlas = ExtResource("1_brgl1")
+region = Rect2(640, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5okf2"]
+atlas = ExtResource("1_brgl1")
+region = Rect2(768, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6ssnl"]
+atlas = ExtResource("1_brgl1")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lu5vr"]
+atlas = ExtResource("1_brgl1")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qcv5f"]
+atlas = ExtResource("1_brgl1")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tej07"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_46krr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5okf2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6ssnl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lu5vr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qcv5f")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Charactere2" type="Node2D" unique_id=906344038]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1958000027]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D" unique_id=501150125]
+scale = Vector2(-2, 2)
+sprite_frames = SubResource("SpriteFrames_tej07")
+autoplay = "default"
+frame_progress = 0.90782005
