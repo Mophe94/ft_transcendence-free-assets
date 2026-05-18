@@ -12,13 +12,13 @@ export CYAN   := \033[1;36m
 
 push:
 	@branch=$$(git branch --show-current); \
-	printf "$(CYAN)You are in branch : $$branch$(RESET)\n"; \
+	printf "$(CYAN)Current branch : $$branch$(RESET)\n"; \
 	\
 	while true; do \
-		printf "Do you want push in this branch ? (y/n)\n"; \
+		printf "Do you want to push to this branch ? (y/n)\n"; \
 		read msg; \
 		if [ "$$msg" = "n" ] || [ "$$msg" = "no" ]; then \
-			printf "$(RED)❌ Operation aborded !$(RESET)\n"; \
+			printf "$(RED)❌ Push cancelled !$(RESET)\n"; \
 			exit 0; \
 		elif [ "$$msg" = "yes" ] || [ "$$msg" = "y" ]; then \
 			break; \
@@ -28,42 +28,42 @@ push:
 	done; \
 	\
 	git rev-parse --is-inside-work-tree > /dev/null 2>&1 || { \
-		printf "❌ Not a git repository"; \
+		printf "❌ Not a Git repository."; \
 		exit 0; \
 	}; \
 	\
-	printf "$(CYAN)🔄 Verification if in last version$(RESET)\n"; \
+	printf "$(CYAN)🔄 Checking if repository is up to date...$(RESET)\n"; \
 	git fetch origin; \
 	\
 	LOCAL=$$(git rev-parse $$branch); \
 	REMOTE=$$(git rev-parse origin/$$branch); \
 	\
 	if [ "$$LOCAL" != "$$REMOTE" ]; then \
-		printf "$(YELLOW)Your repo isn't the most recent, please pull the newest$(RESET)\n"; \
-		printf "$(RED)❌ Operation aborded !$(RESET)\n"; \
+		printf "$(YELLOW)Repository is not up to date. Please pull first.$(RESET)\n"; \
+		printf "$(RED)❌ Push cancelled !$(RESET)\n"; \
 		exit 0; \
 	else \
-		printf "$(CYAN)✅ Branch already up to update$(RESET)\n"; \
+		printf "$(CYAN)✅ Branch already up to date$(RESET)\n"; \
 	fi; \
 	\
 	git add .; \
 	\
 	if git diff --quiet && git diff --cached --quiet; then \
-		printf "$(YELLOW)Nothing to commit$(RESET)\n"; \
+		printf "$(YELLOW)Nothing to commit.$(RESET)\n"; \
 		exit 0; \
 	fi; \
 	\
 	while true; do \
-		printf "$(CYAN)Please enter your commentary for commit :$(RESET)\n"; \
+		printf "$(CYAN)Please enter a commit message :$(RESET)\n"; \
 		read msg; \
 		if [ "$$msg" != "" ]; then \
 			git commit -m "$$msg"; \
 			break; \
 		else \
-			printf "$(YELLOW)Empty sentence isn't accepted$(RESET)\n"; \
+			printf "$(YELLOW)Empty message is not allowed.$(RESET)\n"; \
 		fi; \
 	done; \
 	git push; \
-	printf "$(GREEN)🚀 Pushing finish !$(RESET)\n"
+	printf "$(GREEN)Push completed successfully 🚀$(RESET)\n"
 
 .PHONY: all push
