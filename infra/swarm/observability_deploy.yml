@@ -52,7 +52,7 @@ services:
     command: -config.file=/etc/loki/config.yml
     volumes:
       - loki-data:/loki
-      - ../container/loki/loki_config.yml:/etc/loki/config.yml:ro
+      - ../containers/loki/loki_config.yml:/etc/loki/config.yml:ro
   
     networks:
       - obsrv_net
@@ -68,8 +68,8 @@ services:
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ../container/fluentbit/fluentbit_conf:/fluent-bit/etc/fluent-bit.conf:ro
-      - ../container/fluentbit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
+      - ../containers/fluentbit/fluentbit_conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ../containers/fluentbit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
     
     networks:
       - obsrv_net
