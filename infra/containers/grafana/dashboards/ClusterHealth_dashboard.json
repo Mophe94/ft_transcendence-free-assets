@@ -2,7 +2,7 @@
   "title": "Swarm Cluster Health",
   "timezone": "browser",
   "schemaVersion": 38,
-  "version": 2,
+  "version": 3,
   "refresh": "10s",
   "panels": [
     {
@@ -13,6 +13,15 @@
         {
           "expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[1m])) by (name)",
           "legendFormat": "{{name}}"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^([^.]+)\\.[^.]+\\..*$",
+            "renamePattern": "$1"
+          }
         }
       ]
     },
@@ -25,6 +34,15 @@
           "expr": "sum(container_memory_usage_bytes{name!=\"\"}) by (name)",
           "legendFormat": "{{name}}"
         }
+      ],
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^([^.]+)\\.[^.]+\\..*$",
+            "renamePattern": "$1"
+          }
+        }
       ]
     },
     {
@@ -35,6 +53,15 @@
         {
           "expr": "changes(container_start_time_seconds{name!=\"\"}[1h])",
           "legendFormat": "{{name}}"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^([^.]+)\\.[^.]+\\..*$",
+            "renamePattern": "$1"
+          }
         }
       ]
     }
