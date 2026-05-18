@@ -2,26 +2,17 @@
   "title": "Swarm Cluster Health",
   "timezone": "browser",
   "schemaVersion": 38,
-  "version": 1,
+  "version": 2,
   "refresh": "10s",
   "panels": [
     {
-      "type": "stat",
-      "title": "Cluster Nodes Up",
-      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
-      "targets": [
-        {
-          "expr": "up{job=\"node-exporter\"}"
-        }
-      ]
-    },
-    {
       "type": "timeseries",
       "title": "CPU Usage by Service",
-      "gridPos": { "x": 6, "y": 0, "w": 18, "h": 8 },
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total[1m])) by (name)"
+          "expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[1m])) by (name)",
+          "legendFormat": "{{name}}"
         }
       ]
     },
@@ -31,7 +22,8 @@
       "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
       "targets": [
         {
-          "expr": "sum(container_memory_usage_bytes) by (name)"
+          "expr": "sum(container_memory_usage_bytes{name!=\"\"}) by (name)",
+          "legendFormat": "{{name}}"
         }
       ]
     },
@@ -41,7 +33,8 @@
       "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
       "targets": [
         {
-          "expr": "changes(container_start_time_seconds[1h])"
+          "expr": "changes(container_start_time_seconds{name!=\"\"}[1h])",
+          "legendFormat": "{{name}}"
         }
       ]
     }
