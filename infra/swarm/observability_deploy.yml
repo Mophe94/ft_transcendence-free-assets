@@ -16,13 +16,13 @@ services:
     image: grafana/grafana
 
     configs:
-        - source: grafana_datasource
+        - source: grafana_datasources
           target: /etc/grafana/provisioning/datasources/datasources.yml
         - source: grafana_dashboards
           target: /etc/grafana/provisioning/dashboards/dashboards.yml
 
     environment:
-        GF_SERVER_ROOT_URL: https://localhost/grafana/
+        GF_SERVER_ROOT_URL: http://localhost/grafana/
         GF_SERVER_SERVE_FROM_SUB_PATH: "true"
         GF_SECURITY_ALLOW_EMBEDDING: "true"
         GF_SECURITY_ADMIN_USER: "admin"
@@ -31,6 +31,7 @@ services:
     volumes:
         - grafana_data:/var/lib/grafana
         - ../containers/grafana/dashboards:/var/lib/grafana/dashboards
+
     networks:
       - obsrv_net
 
