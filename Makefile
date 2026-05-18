@@ -17,12 +17,13 @@ swarm_setup:
 	docker stack deploy -c infra/swarm/observability_deploy.yml metrics
 
 build: swarm_setup
-	docker compose -f $(BUILD_FILE) build
+	docker buildx bake --no-cache -f infra/containers/docker-bake.hcl
 
 push: build
 	docker compose -f $(BUILD_FILE) push
 
-up: push
+up: build
+	docker stack deploy -c infra/swarm/website_deploy.yml website
 
 down:
 	chmod 777 infra/swarm/scripts/end_swarm.sh

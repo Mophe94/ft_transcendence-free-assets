@@ -1,0 +1,11 @@
+FROM node:20
+
+WORKDIR /FrontEnd
+
+COPY FrontEnd/package*.json ./
+
+RUN npm install
+
+COPY FrontEnd/ ./
+
+ENTRYPOINT ["npm", "run", "dev", "--", "--host"]

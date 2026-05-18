@@ -11,8 +11,8 @@
       "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[1m])) by (name)",
-          "legendFormat": "{{name}}"
+          "expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[1m])) by (service, instance)",
+          "legendFormat": "{{service}}"
         }
       ],
       "transformations": [
@@ -31,8 +31,8 @@
       "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
       "targets": [
         {
-          "expr": "sum(container_memory_usage_bytes{name!=\"\"}) by (name)",
-          "legendFormat": "{{name}}"
+          "expr": "sum(container_memory_usage_bytes{name!=\"\"}) by (service, instance)",
+          "legendFormat": "{{service}}"
         }
       ],
       "transformations": [
@@ -52,7 +52,7 @@
       "targets": [
         {
           "expr": "changes(container_start_time_seconds{name!=\"\"}[1h])",
-          "legendFormat": "{{name}}"
+          "legendFormat": "{{service}}"
         }
       ],
       "transformations": [

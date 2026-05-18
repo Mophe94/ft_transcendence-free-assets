@@ -1,0 +1,14 @@
+services:
+
+    site:
+        image: site:latest
+
+        networks:
+            - games_net
+
+        deploy:
+            replicas: 1
+
+networks:
+    games_net:
+        external: true
