@@ -37,7 +37,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
     
     const clients = this.rooms.get(payload.lobbyId);
     if (clients)
-      this.broadcast(clients, `{"scene" : "lobby", "type" : "join", "userId" : ${payload.lobbyId}"}`)
+      this.broadcast(clients, `{"scene" : "lobby", "type" : "join", "userId" : ${payload.lobbyId}}`)
 
     console.log(`Client joined lobby: ${payload.lobbyId}`);
 
