@@ -46,8 +46,41 @@ services:
       - obsrv_net
     deploy:
       mode: global
+      
+  loki:
+    image: grafana/loki:2.9.0
+    command: -config.file=/etc/loki/config.yml
+    volumes:
+      - loki-data:/loki
+      - ../container/loki/loki_config.yml:/etc/loki/config.yml:ro
+  
+    networks:
+      - obsrv_net
+    
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  fluent-bit:
+    image: fluent/fluent-bit:2.2
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../container/fluentbit/fluentbit_conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ../container/fluentbit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
+    
+    networks:
+      - obsrv_net
+    
+    deploy:
+      mode: global
+      restart_policy:
+        condition: any
 
 volumes:
+    loki-data:
     prom_data:
     grafana_data:
 
