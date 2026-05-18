@@ -16,10 +16,9 @@ IP="$2"
 docker swarm init --advertise-addr $IP
 
 #CREATE THE NEEDED OVERLAY NETWORKS#
-docker network create --driver overlay --attachable --external the_world
-docker network create --driver overlay --attachable --internal swarm_core
-docker network create --driver overlay --attachable --internal observ
-docker network create --driver overlay --attachable --internal game
+docker network create --driver overlay --attachable --internal swarm_net
+docker network create --driver overlay --attachable --internal obsrv_net
+docker network create --driver overlay --attachable --internal games_net
 
 #SECRET_HANDLER=$DIR/secret_handler.sh
 #chmod +x $SECRET_HANDLER

@@ -4,15 +4,13 @@ services:
 
   prometheus:
     image: prom/prometheus
-    ports:
-      - "9090:9090"
     configs:
       - source: prometheus_config
         target: /etc/prometheus/prometheus.yml
     volumes:
       - prom_data:/prometheus
     networks:
-      - obs
+      - obsrv_net
 
   grafana:
     image: grafana/grafana
@@ -24,8 +22,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
-      - obs
-      - shared_net
+      - obsrv_net
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor
@@ -35,16 +32,9 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     networks:
-      - obs
+      - obsrv_net
     deploy:
       mode: global
-
-networks:
-  obs:
-    driver: overlay
-    external: false
-  shared_net:
-    external: true
 
 volumes:
   prom_data:
@@ -52,4 +42,8 @@ volumes:
 
 configs:
   prometheus_config:
-    file: ./prometheus.yml
+    file: ../containers/prometheus/prometheus.yml
+
+networks:
+    obsrv_net:
+        external: true

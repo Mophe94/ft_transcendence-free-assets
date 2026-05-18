@@ -13,9 +13,8 @@ all:
 swarm_setup:
 	@chmod +x infra/swarm/scripts/launch_swarm.sh
 	@infra/swarm/scripts/launch_swarm.sh "infra/swarm/scripts" "$(IP4)"
-	#docker network create --driver overlay --attachable registry_net
-	#docker stack deploy -c $(DEPLOY_FILE) transcendence
-	#docker stack deploy -c $(OBSERV_FILE) transcendence
+	docker stack deploy -c infra/swarm/swarm_core_deploy.yml    swarm_core
+	docker stack deploy -c infra/swarm/observability_deploy.yml metrics
 
 build: swarm_setup
 	docker compose -f $(BUILD_FILE) build

@@ -1,76 +1,41 @@
 services:
 
-  registry:
-    image: registry:2
+    nginx:
+        image: nginx:alpine
 
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-         - node.role == manager
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-
-#    secrets:
-#      - registry_tls_cert
-#      - registry_tls_key
-
-    environment:
-      REGISTRY_HTTP_ADDR: 0.0.0.0:5000
-#      REGISTRY_HTTP_TLS_CERTIFICATE: /run/secrets/registry_tls_cert
-#      REGISTRY_HTTP_TLS_KEY: /run/secrets/registry_tls_key
-
-    ports:
-      - "5000:5000"
-
-    networks:
-      - registry_net
-
-
-  nginx:
-    image: nginx:alpine
-
-    ports:
-      - "8080:80"
-      - "8443:443"
+        ports:
+            - "80:80"
+            - "443:443"
       #- target: 80
       #  published: 8080
       #  protocol: tcp
       #  mode: ingress
 
-    configs:
-      - source: nginx_conf
-        target: /etc/nginx/nginx.conf
+        configs:
+            - source: nginx_conf
+              target: /etc/nginx/nginx.conf
 
-    networks:
-      - transcendence
-      - shared_net
-      - registry_net
+        networks:
+            - swarm_net
+            - obsrv_net
+            - games_net
 
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-
-    secrets:
-      - nginx_tls_cert
-      - nginx_tls_key
-
-    hostname: nginx
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - node.role == manager
 
 #volumes:
 
 configs:
-  nginx_conf:
-    file: ./nginx/nginx.conf
+    nginx_conf:
+        file: ../containers/nginx/nginx.conf
 
 networks:
-  transcendence:
-    driver: overlay
-  registry_net:
-    external: true
-  shared_net:
-    external: true
+    swarm_net:
+        external: true
+    obsrv_net:
+        external: true
+    games_net:
+        external: true
