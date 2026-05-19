@@ -38,11 +38,15 @@ if [ ! -f "$ISO_FILE" ]; then
     Help
     exit 1
 else
-    if [ ! "$ISO_FILE" = *iso ]; then
-        echo "ERROR: "$ISO_FILE" is not an .iso"
-        Help
-        exit
-    fi
+    FILE_NAME="${ISO_FILE##*/}"
+    case "$FILE_NAME" in
+        *.iso|*.ISO)
+            ;;
+        *)
+            echo "ERROR: "$FILE_NAME" is not an .iso"
+            Help
+            exit 1;;
+    esac
 fi
 
 # Options handling
