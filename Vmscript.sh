@@ -140,22 +140,61 @@ VBoxManage modifyvm "$VM_NAME" \
     --boot4 none
 
 # Start VM
+VBoxManage startvm "$VM_NAME" \
+#    --type headless
 echo "Starting VM..."
 
-VBoxManage startvm "$VM_NAME"
+echo "Waiting for VM CPU to stabilize..."
 
-echo ""
-echo "VM '$VM_NAME' is now running."
-echo ""
-echo " mkdir /mnt/setup"
-echo " mount -t vboxsf setup /mnt/setup"
-echo " setup-alpine -f /mnt/setup/answer.conf"
-echo ""
-echo "When installation is complete:"
-echo "  poweroff"
-echo ""
-echo "Then detach ISO:"
-echo "  VBoxManage storageattach \"$VM_NAME\" \\"
-echo "      --storagectl \"IDE Controller\" \\"
-echo "      --port 0 --device 0 \\"
-echo "      --medium none"
+STABLE_COUNT=0
+REQUIRED_STABLE=5   # seconds of low CPU
+THRESHOLD=15        # % CPU considered "idle"
+
+VBoxManage metrics setup "$VM_NAME" --period 1 --samples 5 --list >/dev/null 2>&1 || true
+
+while true; do
+    # Get CPU load (fallback-safe parsing)
+    CPU=$(VBoxManage metrics query "$VM_NAME" CPU/Load/User 2>/dev/null | awk '/value/ {print $4}' | tr -d '%')
+
+    # If metrics not ready, fallback
+    #if [ -z "$CPU" ]; then
+     #   CPU=100
+   # fi
+
+    echo "CPU: $CPU%"
+
+    # compare (integer-safe)
+    CPU_INT=${CPU%.*}
+
+    if [ "$CPU_INT" -lt "$THRESHOLD" ]; then
+        STABLE_COUNT=$((STABLE_COUNT + 1))
+    else
+        STABLE_COUNT=0
+    fi
+
+    if [ "$STABLE_COUNT" -ge "$REQUIRED_STABLE" ]; then
+        echo "VM appears booted (CPU stable)"
+        break
+    fi
+
+    sleep 1
+done
+
+VBoxManage showvminfo "$VM_NAME" --machinereadable | grep "VMState"
+    sleep 2
+
+#echo ""
+#echo "VM '$VM_NAME' is now running."
+#echo ""
+#echo " mkdir /mnt/setup"
+#echo " mount -t vboxsf setup /mnt/setup"
+#echo " setup-alpine -f /mnt/setup/answer.conf"
+#echo ""
+#echo "When installation is complete:"
+#echo "  poweroff"
+#echo ""
+#echo "Then detach ISO:"
+#echo "  VBoxManage storageattach \"$VM_NAME\" \\"
+#echo "      --storagectl \"IDE Controller\" \\"
+#echo "      --port 0 --device 0 \\"
+#echo "      --medium none"
