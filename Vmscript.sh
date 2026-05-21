@@ -89,6 +89,14 @@ VBoxManage modifyvm "$VM_NAME" \
     --vram "$VRAM_MB" \
     --cpus "$CPUS" \
     --nic1 nat \
+	--natpf1 "ssh,tcp,,2222,,22" \
+	--natpf1 "swarm_management,tcp,,2377,,2377" \
+	--natpf1 "node_communication-TCP,tcp,,7946,,7946" \
+	--natpf1 "node_communication-UDP,udp,,7946,,7946" \
+	--natpf1 "overlay_networks,upd,,4789,,4789" \
+	--paravirtprovider default \
+	--nictype1 virtio \
+	--natdnshostresolver1 on \
     --audio-enabled off \
     --usb off \
     --clipboard bidirectional \
@@ -139,50 +147,52 @@ VBoxManage modifyvm "$VM_NAME" \
     --boot3 none \
     --boot4 none
 
+#Set scalable GUI
+VBoxManage setextradata "$VM_NAME" \
+	--GUI/SCALEMODE "true"
+
 # Start VM
 VBoxManage startvm "$VM_NAME" \
 #    --type headless
 echo "Starting VM..."
 
-echo "Waiting for VM CPU to stabilize..."
+#echo "Waiting for VM CPU to stabilize..."
+#
+#STABLE_COUNT=0
+#REQUIRED_STABLE=5   # seconds of low CPU
+#THRESHOLD=15        # % CPU considered "idle"
+#
+#VBoxManage metrics setup "$VM_NAME" --period 1 --samples 5 --list >/dev/null 2>&1 || true
 
-STABLE_COUNT=0
-REQUIRED_STABLE=5   # seconds of low CPU
-THRESHOLD=15        # % CPU considered "idle"
-
-VBoxManage metrics setup "$VM_NAME" --period 1 --samples 5 --list >/dev/null 2>&1 || true
-
-while true; do
-    # Get CPU load (fallback-safe parsing)
-    CPU=$(VBoxManage metrics query "$VM_NAME" CPU/Load/User 2>/dev/null | awk '/value/ {print $4}' | tr -d '%')
-
-    # If metrics not ready, fallback
-    #if [ -z "$CPU" ]; then
-     #   CPU=100
-   # fi
-
-    echo "CPU: $CPU%"
-
-    # compare (integer-safe)
-    CPU_INT=${CPU%.*}
-
-    if [ "$CPU_INT" -lt "$THRESHOLD" ]; then
-        STABLE_COUNT=$((STABLE_COUNT + 1))
-    else
-        STABLE_COUNT=0
-    fi
-
-    if [ "$STABLE_COUNT" -ge "$REQUIRED_STABLE" ]; then
-        echo "VM appears booted (CPU stable)"
-        break
-    fi
-
-    sleep 1
-done
-
-VBoxManage showvminfo "$VM_NAME" --machinereadable | grep "VMState"
-    sleep 2
-
+#while true; do
+#    # Get CPU load (fallback-safe parsing)
+#    CPU=$(VBoxManage metrics query "$VM_NAME" CPU/Load/User 2>/dev/null | awk '/value/ {print $4}' | tr -d '%')
+#
+#    # If metrics not ready, fallback
+#    #if [ -z "$CPU" ]; then
+#     #   CPU=100
+#   # fi
+#
+#    echo "CPU: $CPU%"
+#
+#    # compare (integer-safe)
+#    CPU_INT=${CPU%.*}
+#
+#    if [ "$CPU_INT" -lt "$THRESHOLD" ]; then
+#        STABLE_COUNT=$((STABLE_COUNT + 1))
+#    else
+#        STABLE_COUNT=0
+#    fi
+#
+#    if [ "$STABLE_COUNT" -ge "$REQUIRED_STABLE" ]; then
+#        echo "VM appears booted (CPU stable)"
+#        break
+#    fi
+#
+#    sleep 1
+#done
+#VBoxManage showvminfo "$VM_NAME" --machinereadable | grep "VMState"
+#    sleep 2
 #echo ""
 #echo "VM '$VM_NAME' is now running."
 #echo ""
