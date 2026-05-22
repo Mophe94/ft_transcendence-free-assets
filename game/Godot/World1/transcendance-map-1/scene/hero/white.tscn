@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://bggap8dfixovj"]
+
+[ext_resource type="Texture2D" uid="uid://csm523fhx5skh" path="res://assets/character/Owlet_Monster_Idle_4.png" id="1_7sblg"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r475a"]
+atlas = ExtResource("1_7sblg")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f24cx"]
+atlas = ExtResource("1_7sblg")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_in5of"]
+atlas = ExtResource("1_7sblg")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pm6wv"]
+atlas = ExtResource("1_7sblg")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qymi8"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r475a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f24cx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_in5of")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pm6wv")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="White" type="Node2D" unique_id=1138279058]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=881535314]
+scale = Vector2(1.5, 1.5)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D" unique_id=669009543]
+position = Vector2(0, -16)
+sprite_frames = SubResource("SpriteFrames_qymi8")
+autoplay = "default"

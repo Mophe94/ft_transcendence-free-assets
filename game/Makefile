@@ -46,7 +46,7 @@ push:
 		printf "$(CYAN)✅ Branch already up to date$(RESET)\n"; \
 	fi; \
 	\
-	git add -u *; \
+	git add *; \
 	\
 	if git diff --quiet && git diff --cached --quiet; then \
 		printf "$(YELLOW)Nothing to commit.$(RESET)\n"; \

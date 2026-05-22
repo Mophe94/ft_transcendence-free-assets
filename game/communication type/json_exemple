@@ -1,0 +1,294 @@
+﻿send server:
+
+
+MAP:
+
+
+JSON
+{
+	“event”: “game”,
+	“state”: "map_enter",
+	“data”: {
+		“server_time”: nb,
+		“time_duration”: nb,
+		“map”: "map_name",
+		“player”: {
+			“id”: player_id,
+			“player_name”: “name”,
+			“asset”: "name_asset",
+			“team”: [“name”]
+		}
+	}
+}
+
+
+JSON:
+{
+	“event”: “game”,
+	“state”: "end_map"
+}
+
+
+
+SET TEAM:
+
+
+JSON
+{
+	“event”: “game”,
+	“state”: "team_setup",
+	“data”: {
+		“server_time”: nb,
+		“time_duration”: nb,
+		“player”: {
+			“team”: ["name", "name", "name", "name", "name", "name"],
+		}
+		“enemy”: {
+			“asset”: “name_asset”,
+			“enemy_name”: “name”,
+			“team”: ["name", "name", "name", "name", "name", "name"]
+	}
+}
+
+
+JSON:
+{
+	“event”: “game”,
+	“state”: "end_set_team”
+}
+
+
+
+MATCH
+
+
+JSON
+{
+	“event”: “game”,
+	“state”: "battle_choose_monster",
+	“data”: {
+		“server_time”: nb,
+		“time_duration”: nb,
+		“player”: {
+			“team”: ["name", "name", "name"]
+		}
+	}
+}
+
+
+// Response after received choose monster from each player
+JSON:
+{
+	"event": “game”,
+	"state": "battle_start",
+	"data": {
+		“server_time”: nb,
+		“time_duration”: nb,
+		“player”: {
+			“current_monster”: {
+					"name": “name”,
+					"life": [rest, full],
+					“skill”: ["name", “name”, “name”, “name”],
+			}
+			“inventory”: ["object1", "object2", "object3", "object4"]
+		}
+		“enemy”{
+			“current_monster”:{
+				“name”: “name”,
+				“life”: [rest, full],
+			}
+		}
+	}
+}
+
+
+
+Message to send every turn:
+
+
+//Wait each response for new send
+JSON:
+{
+	"event": “game”,
+	"state": "battle_choose_action",
+	"data": {
+		“server_time”: nb,
+		“time_duration”: nb,
+}
+
+
+
+
+
+
+
+JSON
+{
+	"event": “game”,
+	"state": "battle_resolve_turn",
+	"data": {
+		“player”: {
+			“inventory”: ["object1", "object2", "object3", "object4"],
+			“current_monster”: {
+					"name": “name”,
+					"life": [rest, full],
+					“skill”: ["name", “name”, “name”, “name”],
+			}
+		}
+		“enemy”: {
+			“current_monster”: {
+				“life”: [rest, full]
+			}
+		}
+	}
+}
+
+
+
+
+END MATCH
+
+
+// Result
+JSON
+{
+	“event”: “game”,
+	“state”: "battle_end_match",
+	“data”: {
+		“result_game”: “win” / “loose”
+	}
+}
+
+//If continue
+JSON
+{
+	“event”: “game”,
+	“state”: "map_enter",
+	“data”: {
+		“server_time”: nb,
+		“time_duration”: nb,
+		“map”: "map_name",
+		“player”: {
+			“team”: [“name”, “name”, “name”, “name”, “name”, “name”],
+			“inventory”: ["object1", "object2", "object3", "object4"]
+		}
+	}
+}
+
+// If win all game
+JSON
+{
+	“event”: “game”,
+	“state: "victory"
+}
+
+
+
+
+receive server
+
+
+
+MAP:
+
+// Response to "end_map"
+JSON:
+{
+	“event”: “game”,
+	“state”: "map_data",
+	“data”: {
+		“player”: {
+			“id”: player_id,
+			“inventory”: ["object1", "object2", "object3", "object4"],
+			“team”: ["name", "name", "name", "name", "name", "name"]
+		}
+	}
+}
+
+SET TEAM:
+
+//Response to "set_monster"
+
+JSON:
+{
+	“event”: “game”
+	“state”: "team_setup"
+	“data”:{
+		“player:” {
+			“id”: player_id,
+			“team”: ["name", “name”, “name”]
+		}
+	}
+}
+
+
+MATCH
+
+JSON:
+{
+	“event”: “game”
+	“state”: "battle_choose_monster"
+	“data”: {
+		“player”: {
+			"id": player_id,
+			“current_monster”: {
+			“name”: “name”
+			}
+		}
+	}
+}
+
+
+
+
+
+
+
+
+Choice message to send every turn (depend action):
+
+JSON:
+{
+	"event": “game”
+	"state": "submit_action"
+	"data": {
+		“player”: {
+			“id”: player_id,
+		}
+		“action”: {
+			“type”: “use”,
+			“value”: object_id,
+			“target”: “name”
+		}
+	}
+}
+
+JSON:
+{
+	"Event": “game”
+	"State": "submit_action"
+	"Data": {
+		“player”: {
+			“id”: player_id,
+		}
+		“action”: {
+			“type”: “attack”,
+			“value”: “name”
+		}
+	}
+}
+
+JSON:
+{
+	"event": “game”
+	"state": "battle_submit_action"
+	"data": {
+		“player”: {
+			“id”: player_id,
+		}
+		“action”: {
+			“type”: “change”,
+			“value”: [“name”, “name”]
+		}
+	}
+}

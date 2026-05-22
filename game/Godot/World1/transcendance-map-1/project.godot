@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="transcendance_map_1"
-run/main_scene="uid://c807d36aqdx1s"
+run/main_scene="uid://bb1hdkkboqqi5"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+GeneralData="*uid://diqen0fl03d16"
 
 [display]
 

@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://b3rbbu0ysoihx"]
+
+[ext_resource type="Script" uid="uid://bn63oh1d8nl1u" path="res://script/monster_appears/monster_appears_script.gd" id="1_e0d45"]
+[ext_resource type="PackedScene" uid="uid://d1pee6mshm38u" path="res://scene/banner/monster_appears_banner.tscn" id="2_e0d45"]
+
+[node name="Scene" type="Node2D" unique_id=354331252]
+script = ExtResource("1_e0d45")
+
+[node name="background" type="Sprite2D" parent="." unique_id=1634591458]
+position = Vector2(456, 296)
+scale = Vector2(2.4, 2.3962963)
+
+[node name="monster_appears_banner" parent="." unique_id=1870351660 instance=ExtResource("2_e0d45")]
+
+[node name="Player" type="Sprite2D" parent="." unique_id=1502176770]
+position = Vector2(192, 384)
+
+[node name="Monster" type="Sprite2D" parent="." unique_id=84566588]
+position = Vector2(768, 384)
