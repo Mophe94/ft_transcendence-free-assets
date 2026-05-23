@@ -1,9 +1,9 @@
 import "./Home.css"
 
 import gameBanner from '../assets/images/banner.gif'
-import PlayButton from "../components/Button";
-import MediaWindow from "../components/MediaWindow";
-import TextWindow from "../components/TextWindow";
+import {PlayButton} from "../components/Buttons/Button";
+import { RectMediaWindow } from "../components/MediaWindow/RectMediaWindow";
+import {TextWindow} from "../components/Text/TextWindow";
 
 export default function Home() {
     return (
@@ -11,20 +11,20 @@ export default function Home() {
             <div className="gameBanner">
                 <img src={gameBanner} alt="Banner" />
             </div>
-            <Body />
+            <HomeBody />
         </div>
   );
 }
 
 
-function Body () {
+export function HomeBody () {
   return (
-    <div className="content-layout">
+    <div className="home-content-layout">
       <Media1 />
       <TextWindow title="Most loved game by its creators&nbsp;!" containerId="content1" />
-      <MediaWindow type="img" src="./src/assets/images/stars.png" alt="stars" containerId="media2"/>
+      <RectMediaWindow type="img" src="./src/assets/images/stars.png" alt="stars" containerId="media2"/>
       <TextWindow title="Always at least one player when you connect." containerId="content2" />
-      <MediaWindow type="img" src="./src/assets/images/mutenroshi.png" alt="Tortue Géniale" containerId="media3"/>
+      <RectMediaWindow type="img" src="./src/assets/images/mutenroshi.png" alt="Tortue Géniale" containerId="media3"/>
       <TextWindow title="More fun to play than to code&nbsp;!" containerId="content3" />
     </div>
   );

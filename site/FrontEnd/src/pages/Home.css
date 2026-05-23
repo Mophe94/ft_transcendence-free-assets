@@ -5,7 +5,7 @@
 	display: block
 }
 
-.content-layout {
+.home-content-layout {
 
 	display: grid;
 	grid-template-columns: 18fr;
@@ -18,7 +18,7 @@
 }
 
 @media (min-width: 768px){
-	.content-layout {
+	.home-content-layout {
 		grid-template-columns:
 			2fr
 			1fr

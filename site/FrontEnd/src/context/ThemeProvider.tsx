@@ -10,7 +10,7 @@ export  const ThemeContext = createContext<ThemeContextType | undefined>(undefin
 
 export function ThemeProvider({children}: PropsWithChildren) {
 
-    const [theme, setTheme] = useState('green');
+    const [theme, setTheme] = useState('dark');
 
     useEffect(() => {
         const classesToRemove = Array.from(document.body.classList)

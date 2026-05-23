@@ -1,5 +1,5 @@
 import './Play.css'
-import Game from '../components/Game'
+import { Game } from '../components/Game'
 
 export default function Play () {
     return (

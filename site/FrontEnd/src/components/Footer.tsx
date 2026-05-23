@@ -1,6 +1,6 @@
 import './Footer.css'
 
-export default function Footer () {
+export function Footer () {
   return (
     <div className="footer-layout">
       Footer content
