@@ -11,6 +11,11 @@ export class UsersService {
       where: { fortyTwoId: id },
     });
   }
+  async findByUsername(username: string): Promise<User | null> {
+    return await this.repo.findOne({
+      where: { username },
+    });
+  }
 
   create(forty_two_user: FortyTwoUser) {
     const db_user = this.repo.create(forty_two_user);
