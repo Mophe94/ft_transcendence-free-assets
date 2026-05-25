@@ -1,0 +1,9 @@
+.message-display {
+    background-color: black;
+    color: white;
+}
+
+.input-bar { 
+    width: auto;
+    margin: 0;
+}

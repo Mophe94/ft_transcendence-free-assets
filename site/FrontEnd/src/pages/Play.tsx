@@ -5,6 +5,7 @@ export default function Play () {
     return (
         <div className="game-layout">
             <Game />
+            
         </div>
     )
 }

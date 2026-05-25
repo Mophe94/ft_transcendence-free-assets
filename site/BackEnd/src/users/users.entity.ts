@@ -1,4 +1,12 @@
-import { AfterInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Settings } from 'src/settings/settings.entity';
+import {
+  AfterInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -17,6 +25,15 @@ export class User {
   @Column()
   avatarUrl!: string;
 
+  @OneToOne(() => Settings, (settings) => settings.user, { cascade: true })
+  settings!: Settings;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created_at!: Date;
+
   @AfterInsert()
   logInsert() {
     console.log(
@@ -24,6 +41,7 @@ export class User {
       `\n\t${this.username}`,
       `\n\t${this.email}`,
       `\n\t${this.avatarUrl}`,
+      `\n\t${this.created_at.toLocaleTimeString()}`,
     );
   }
 }

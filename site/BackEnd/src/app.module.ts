@@ -6,6 +6,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './users/users.entity';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { SettingsModule } from './settings/settings.module';
+import { Settings } from './settings/settings.entity';
 
 @Module({
   imports: [
@@ -21,12 +23,13 @@ import { AuthModule } from './auth/auth.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME') ?? 'test',
-        entities: [User],
+        entities: [User, Settings],
         synchronize: true, // !!Only for dev, remove for prod.
       }),
     }),
     UsersModule,
     AuthModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -26,7 +26,7 @@ function App() {
             <Profile />
           </ProtectedRoute>
         } />
-        <Route path="/test" element={<Test />} />
+          <Route path="/test" element={<Test />} />
       </Routes>
       <Footer />
     </div>

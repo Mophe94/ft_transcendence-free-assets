@@ -1,11 +1,16 @@
-import { HexMediaWindow } from "../components/MediaWindow/HexMediaWindow"
-import { useAuth } from "../context/AuthContext";
+import Chat from '../components/Chat/Chat'
+import { Game } from '../components/Game'
+import { ChatProvider } from '../context/ChatProvider'
+import './Test.css'
 
 export default function Test () {
-    const { user } = useAuth();
+
     return (
-        <div style={{width: '300px', height:'300px', display: 'inline-block'}}>
-            <HexMediaWindow type='img' src={user?.avatarUrl} />
+        <div className='game-area'>
+            <Game />
+            <ChatProvider>
+                <Chat />
+            </ChatProvider>
         </div>
     )
 }
