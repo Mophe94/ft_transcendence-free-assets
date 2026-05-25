@@ -34,12 +34,13 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
   private broadcast(clients : Set<WebSocket>, message : string) {
     clients.forEach((client) => {
-      client.send(message);
+      if (client.readyState === WebSocket.OPEN)
+      client.send(JSON.stringify(message));
     })
   }
 
   @SubscribeMessage('lobby')
-  handlejoinLobby(client: WebSocket, payload: LobbyData): string {
+  handlejoinLobby(@ConnectedSocket() client: WebSocket, @MessageBody() payload: LobbyData): string {
     if (!this.rooms.has(payload.lobbyId))
       this.rooms.set(payload.lobbyId, new Set([client]));
     else
