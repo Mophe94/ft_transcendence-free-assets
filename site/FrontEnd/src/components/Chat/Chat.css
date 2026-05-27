@@ -1,9 +1,40 @@
-.message-display {
-    background-color: black;
-    color: white;
+.chat-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    margin-left: 15px;
 }
 
-.input-bar { 
-    width: auto;
-    margin: 0;
+.message-container{
+    width:auto;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    
+    background-color: black;
+    padding: 5px;
+    font-size: x-small;
+    color: green;
+
+    flex-grow: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.response-container {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    grid-template-columns: 1fr 50px;
+    
+}
+
+#chat-input {
+    width: 100%;
+
+    background-color: rgb(56, 56, 56);
+    color: greenyellow;
+}
+
+#send-button {
+    width: 50px;
 }

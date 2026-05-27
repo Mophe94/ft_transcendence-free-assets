@@ -119,6 +119,7 @@ export function Game () {
     }, []);
     return (
         <div className="game-window">
+            <div className='game-area'>
             <canvas id="canvas"></canvas>
             <div id="status">
                 
@@ -129,6 +130,7 @@ export function Game () {
                     <progress id="status-progress"></progress>
                 </div>
                 <div id="status-notice"></div>
+            </div>
             </div>
         </div>
     )

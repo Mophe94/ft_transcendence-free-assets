@@ -4,9 +4,9 @@ import {Link} from 'react-router-dom';
 import React from 'react';
 
 const menuLinks = {
-  "Accueil": "/",
+  "Home": "/",
   "Play": "/play",
-  "Rules": "/about",
+  "Howto": "/howto",
   "Contact": "/contact",
   "Test": "/test"
 };
