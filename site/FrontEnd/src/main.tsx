@@ -7,7 +7,7 @@ import './main.css'
 import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+ <StrictMode>
     <BrowserRouter>
       <AuthProvider>
         <ThemeProvider>
@@ -15,5 +15,5 @@ createRoot(document.getElementById('root')!).render(
         </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
-  </StrictMode>
+ </StrictMode>
 )

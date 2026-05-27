@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { AuthContext, type User } from "./AuthContext";
+import { AuthContext } from "./AuthContext";
+import type { User } from "../types/user";
 
 
 export const AuthProvider = ({ children }: { children: React.ReactNode}) => {
-    const [user, setUser] = useState<User| null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
     const checkUserStatus = async () => {
@@ -17,7 +18,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode}) => {
             }
             return res.json();
         })
-        .then((data: User) => setUser(data))
+        .then((data: User) => {
+            console.log(data); setUser(data);})
         .catch(() => setUser(null))
         .finally(() => setLoading(false));
     }

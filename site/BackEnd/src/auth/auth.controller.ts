@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Post,
   Req,
   Res,
@@ -12,10 +13,14 @@ import { AuthService } from './auth.service';
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from './types/auth-request.interface';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService,
+  ) {}
 
   @Post('/signin')
   async signin(
@@ -50,7 +55,15 @@ export class AuthController {
 
   @Get('/me')
   @UseGuards(JwtAuthGuard)
-  whoami(@Req() req: AuthenticatedRequest) {
-    return req.user;
+  async whoami(@Req() req: AuthenticatedRequest) {
+    const userWithSettings = await this.usersService.findSettingsById(
+      req.user.id,
+    );
+
+    if (!userWithSettings) {
+      throw new NotFoundException('User not found');
+    }
+
+    return userWithSettings;
   }
 }

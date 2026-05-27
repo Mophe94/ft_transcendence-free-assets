@@ -8,6 +8,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { SettingsModule } from './settings/settings.module';
 import { Settings } from './settings/settings.entity';
+import { UserStatsModule } from './stats/stats.module';
+import { UserStats } from './stats/stats.entity';
 
 @Module({
   imports: [
@@ -23,13 +25,14 @@ import { Settings } from './settings/settings.entity';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME') ?? 'test',
-        entities: [User, Settings],
-        synchronize: true, // !!Only for dev, remove for prod.
+        entities: [User, Settings, UserStats],
+        synchronize: true, // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Only for dev, remove for prod.
       }),
     }),
     UsersModule,
     AuthModule,
     SettingsModule,
+    UserStatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

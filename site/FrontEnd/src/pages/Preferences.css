@@ -1,0 +1,19 @@
+.setting-container {
+    display:flex;
+    align-content: center;
+    justify-content: center;
+    background-color: aqua;
+    border-radius: 15px;
+}
+
+#preferences-form {
+    width: 80%;
+    display: grid;
+
+}
+
+.setting-grid {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    margin: 2ch;
+}

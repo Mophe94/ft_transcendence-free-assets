@@ -8,6 +8,7 @@ import Test from "./pages/Test";
 import Play from './pages/Play';
 import {ProtectedRoute} from "./components/ProtectedRoute";
 import Profile from "./pages/Profile";
+import { Preferences } from "./pages/Preferences";
 
 
 function App() {
@@ -21,9 +22,14 @@ function App() {
             <Play />
             </ProtectedRoute>} />
         <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/profile" element={
+        <Route path="/profile/:username?" element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/preferences" element={
+          <ProtectedRoute>
+            <Preferences />
           </ProtectedRoute>
         } />
           <Route path="/test" element={<Test />} />

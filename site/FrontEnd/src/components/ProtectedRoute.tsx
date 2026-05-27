@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -7,13 +7,13 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
     const { user, loading } = useAuth();
-    useEffect(() => {
-        if (!loading && !user) {
-            window.location.href = import.meta.env.VITE_42_OAUTH_API_LINK;
-        }
-    }, [user, loading]);
+
     if (loading) {
-        return <div className="loading-screen">Loading..</div>;
+        return <div className="loading-screen">Loading...</div>;
+    }
+
+    if (!user) {
+        return <Navigate to="/" replace />;
     }
     return <>{children}</>;
 }

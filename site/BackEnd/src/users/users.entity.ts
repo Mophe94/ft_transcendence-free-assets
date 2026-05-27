@@ -1,4 +1,5 @@
 import { Settings } from 'src/settings/settings.entity';
+import { UserStats } from 'src/stats/stats.entity';
 import {
   AfterInsert,
   Column,
@@ -27,6 +28,9 @@ export class User {
 
   @OneToOne(() => Settings, (settings) => settings.user, { cascade: true })
   settings!: Settings;
+
+  @OneToOne(() => UserStats, (stats) => stats.user, { cascade: true })
+  stats!: UserStats;
 
   @CreateDateColumn({
     type: 'timestamp',

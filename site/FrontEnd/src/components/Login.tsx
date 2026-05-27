@@ -16,7 +16,7 @@ export function AuthSection() {
                 <img id='profile-pic' src={user.avatarUrl}></img>
                 <ul className='dropdown-menu'>
                     <li><Link to={ "/profile"} className="nav-link">Profile</Link></li>
-                    <li>setting</li>
+                    <li><Link to={"/preferences"} className='nav-link'>Settings</Link></li>
                     <li><button onClick={handleSignout} className='nav-link clean-btn'>Logout</button></li>
                 </ul>
             </div> 

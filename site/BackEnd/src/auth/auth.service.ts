@@ -11,6 +11,7 @@ import {
   FortyTwoTokenResponse,
 } from './types/fortytwo-profile.interface';
 import { JwtService } from '@nestjs/jwt';
+import { Response } from 'node_modules/@types/express';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,7 @@ export class AuthService {
     const accessToken = await this.exchangeCodeForToken(code);
     const profile = await this.getFortyTwoProfile(accessToken);
 
-    let user = await this.usersService.findByFortyTwoId(profile.id);
+    let user = await this.usersService.findOneByFortyTwoId(profile.id);
     if (!user) {
       user = await this.usersService.create({
         fortyTwoId: profile.id,
@@ -34,10 +35,7 @@ export class AuthService {
       });
     }
     const payload = {
-      sub: user.id,
-      username: user.username,
-      email: user.email,
-      avatarUrl: user.avatarUrl,
+      id: user.id,
     };
     const token = await this.jwtService.signAsync(payload);
 

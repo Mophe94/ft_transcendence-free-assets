@@ -9,8 +9,10 @@ import {
 
 @Entity()
 export class Settings {
-  constructor(user: User) {
-    this.user = user;
+  constructor(user?: User) {
+    if (user) {
+      this.user = user;
+    }
   }
   @PrimaryGeneratedColumn()
   id!: number;
@@ -21,7 +23,7 @@ export class Settings {
   @Column({ default: 0 })
   starter!: number;
 
-  @OneToOne(() => User, (user) => user.settings)
+  @OneToOne(() => User, (user) => user.settings, { onDelete: 'CASCADE' })
   @JoinColumn()
   user!: User;
 }

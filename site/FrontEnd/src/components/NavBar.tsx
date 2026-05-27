@@ -1,6 +1,7 @@
 import './NavBar.css';
 import {AuthSection} from './Login.tsx';
 import {Link} from 'react-router-dom';
+import React from 'react';
 
 const menuLinks = {
   "Accueil": "/",
@@ -23,11 +24,13 @@ function NavMenu () {
 		return (
 			<ul className="navMenu">
 				{Object.entries(menuLinks).map(([name, url]) => (
-					<li>
-						<Link to={url} className="nav-link">
-							{name}
-						</Link>
-					</li>
+					<React.Fragment key={name}>
+						<li>
+							<Link to={url} className="nav-link">
+								{name}
+							</Link>
+						</li>
+					</React.Fragment>
 				))}
 			</ul>
 		);
