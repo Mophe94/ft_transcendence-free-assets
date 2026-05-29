@@ -1,0 +1,16 @@
+KEYMAPOPTS="us us"
+HOSTNAMEOPTS="-n swarm_node"
+DNSOPTS="-d local"
+TIMEZONEOPTS="-z Europe/Brussels"
+PROXYOPTS="none"
+INTERFACESOPTS="auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+"
+
+APKREPOSOPTS="-r"
+SSHDOPTS="-c openssh"
+NTPOPTS="-c chrony"
+DISKOPTS="-m sys /dev/sda"

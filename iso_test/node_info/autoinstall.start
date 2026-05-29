@@ -1,0 +1,21 @@
+#!/bin/sh
+
+LOG=/root/install.log
+FLAG=/root/.installed
+
+# prevent rerun
+[ -f "$FLAG" ] && exit 0
+
+echo "Starting install..." >> $LOG
+
+# Wait for system to be booted
+#while ! ip route | grep -q default; do
+#    sleep 2
+#done
+
+# RUN INSTALLER EXPLICITLY
+setup-alpine -f /root/answerfile -q 
+
+touch "$FLAG"
+
+reboot

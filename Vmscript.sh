@@ -95,10 +95,12 @@ VBoxManage modifyvm "$VM_NAME" \
     --audio-enabled off \
     --usb off \
     --clipboard bidirectional \
-    --draganddrop bidirectional
+    --draganddrop bidirectional \
+    --graphicscontroller vmsvga
 
 # Create Disk
 echo "Creating virtual disk..."
+mkdir -p "$VM_DIR/$VM_NAME"
 VBoxManage createmedium disk \
     --filename "$VM_DIR/$VM_NAME/$VM_NAME.vdi" \
     --size "$DISK_SIZE_MB" \
@@ -109,7 +111,6 @@ echo "Adding storage controllers..."
 VBoxManage storagectl "$VM_NAME" \
     --name "SATA Controller" \
     --add sata \
-    --controller IntelAhci
 
 VBoxManage storagectl "$VM_NAME" \
     --name "IDE Controller" \
@@ -127,6 +128,7 @@ VBoxManage storageattach "$VM_NAME" \
 
 # Attach ISO
 echo "Attaching Alpine ISO..."
+echo $ISO_FILE
 
 VBoxManage storageattach "$VM_NAME" \
     --storagectl "IDE Controller" \
