@@ -27,8 +27,31 @@ jobs:
 
     - name: Install Chromium (system)
       run: sudo apt-get update && sudo apt-get install -y chromium
-      env:
-        PUPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
+        
+    - name: Install Chromium dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+        chromium-browser \
+        libatk1.0-0 \
+        libatk-bridge2.0-0 \
+        libcups2 \
+        libnss3 \
+        libxss1 \
+        libasound2 \
+        libgbm1 \
+        libgtk-3-0 \
+        libdrm2 \
+        libx11-xcb1 \
+        libxcomposite1 \
+        libxdamage1 \
+        libxfixes3 \
+        libxrandr2 \
+        libpangocairo-1.0-0 \
+        libpango-1.0-0 \
+        libatspi2.0-0
 
     - name: Generate SVG
-      run: mmdc -i architecture_diagram.mmd -o architecture_diagram.svg
+      run:
+        export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+        mmdc -i architecture_diagram.mmd -o architecture_diagram.svg
