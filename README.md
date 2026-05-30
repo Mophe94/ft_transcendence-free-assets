@@ -1,6 +1,9 @@
 *This project has been created as part of the 42 curriculum by Dbajeux,Agaland,Bertrmar,Kprist,Stempels*
 
 ---
+## Workfow
+
+[![Update Architecture Diagram](https://github.com/sitempels/ft_transcendence/actions/workflows/update_architecture_diagram.yml/badge.svg?branch=main)](https://github.com/sitempels/ft_transcendence/actions/workflows/update_architecture_diagram.yml)
 
 # ft_transcendence
 
