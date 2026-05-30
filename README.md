@@ -25,6 +25,10 @@
 
 **ft_tranceandance** is a real-time multiplayer web game inspired by Pokémon and Team Fight Tactics (TFT). Players build a team of monsters, explore a map, collect loot, and battle other players in turn-based combat — all directly in the browser.
 
+## Architecture
+
+![Alt text](./architecture_diagram.svg)
+
 ### Key Features
 
 - **Lobby & Social** — friends system, general chat, group invitations
