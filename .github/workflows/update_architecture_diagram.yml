@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'architecture_diagram.mmd'
+  workflow_dispatch:
 
 permissions:
   contents: write
