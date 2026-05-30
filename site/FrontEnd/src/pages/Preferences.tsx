@@ -5,10 +5,14 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
 const ALLOWED_THEMES = ['light', 'dark', 'aqua'];
+const STARTERS = [
+    "./src/assets/images/starters/owlet_monster.gif",
+    "./src/assets/images/starters/pink_monster.gif",]
 
 export function Preferences() {
     const [settings, setSettings] = useState<Settings | null> (null);
-    const [isSaving, setIsSaving] = useState(false);
+    const [starter_id, setStarter] = useState<number> (0);
+    const [_, setIsSaving] = useState(false);
     const { user } = useAuth();
     const { theme, setTheme } = useTheme();
 
@@ -21,8 +25,13 @@ export function Preferences() {
         .then(res => res.json())
         .then(data => {
             setSettings(data.settings);
-            if (data.settings?.theme && ALLOWED_THEMES.includes(data.settings.theme)) {
-                setTheme(data.settings.theme);
+            if (data.settings) {
+                if (data.settings.theme && ALLOWED_THEMES.includes(data.settings.theme)) {
+                    setTheme(data.settings.theme);
+                }
+                if (data.settings.starter !== null) {
+                    setStarter(data.settings.starter);
+                }
             }
         })
         .catch(() => {return null;})
@@ -37,6 +46,9 @@ export function Preferences() {
     const handleThemeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setTheme(event.target.value);
     }
+    const handleStarterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setStarter(Number(event.target.value));
+    }
 
     const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
         event.preventDefault();
@@ -49,7 +61,8 @@ export function Preferences() {
             settings: {
                 ...settings,
                 id: settings.id,
-                theme: theme
+                theme: theme,
+                starter: starter_id,
             }
         };
         try {
@@ -74,6 +87,7 @@ export function Preferences() {
             setIsSaving(false);
         }
     };
+    const starter_img = STARTERS[starter_id] ? STARTERS[starter_id] : STARTERS[0];
     return (
         <div className='setting-container'>
             <form id='preferences-form' onSubmit={handleSubmit}>
@@ -90,9 +104,17 @@ export function Preferences() {
                     </div>
                     
                     <div>Starter:</div>
-                    <div>{settings?.starter}</div>
-                    <button>Reset</button>
-                    <button type="submit">Save</button>
+                    <div className="starter-cell">
+                        <select value={starter_id} onChange={handleStarterChange}>
+                            {STARTERS.map((_, index) => (
+                                <React.Fragment key={index} >
+                                    <option value={ index} >{ index }</option>
+                                </React.Fragment>
+                            ))}
+                        </select>
+                        <img src={starter_img}/></div>
+                    <button className='reset-button'>Reset</button>
+                    <button className="save-button" type="submit">Save</button>
                 </div>
             </form>
         </div>

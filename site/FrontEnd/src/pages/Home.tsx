@@ -1,7 +1,7 @@
 import "./Home.css"
 
 import gameBanner from '../assets/images/banner.gif'
-import {PlayButton} from "../components/Buttons/Button";
+import {PlayButton} from "../components/Buttons/PlayButton";
 import { RectMediaWindow } from "../components/MediaWindow/RectMediaWindow";
 import {TextWindow} from "../components/Text/TextWindow";
 
