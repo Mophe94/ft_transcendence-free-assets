@@ -16,22 +16,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install Mermaid
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+
+    - name: Install Mermaid CLI
       run: npm install -g @mermaid-js/mermaid-cli
+
+    - name: Install Chrome for Puppeteer
+      run: npx puppeteer browsers install chrome
 
     - name: Generate SVG
       run: mmdc -i architecture_diagram.mmd -o architecture_diagram.svg
-
-    - name: Commit SVG
-      run: |
-         git config user.name "github-actions"
-         git config user.email "github-actions@github.com"
-
-         git add architecture_diagram.svg
-
-         if git diff --cached --quiet; then
-           echo "No changes"
-         else
-           git commit -m"Updated architecture diagram for the README"
-           git push
-         fi
