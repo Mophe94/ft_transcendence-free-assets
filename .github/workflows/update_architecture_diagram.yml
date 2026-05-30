@@ -20,15 +20,15 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v4
       with:
-        node-version: 24
+        node-version: 22
 
     - name: Install Mermaid CLI
       run: npm install -g @mermaid-js/mermaid-cli
 
     - name: Install Chromium (system)
-      run: sudo apt-get update && sudo apt-get install -y chromium-browser
+      run: sudo apt-get update && sudo apt-get install -y chromium
       env:
-        PUPETERR_EXECUTABLE_PATH: /usr/bin/chromium-browser
+        PUPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
 
     - name: Generate SVG
       run: mmdc -i architecture_diagram.mmd -o architecture_diagram.svg
