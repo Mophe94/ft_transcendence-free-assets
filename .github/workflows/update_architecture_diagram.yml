@@ -20,5 +20,4 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Generate SVG
-      run:
-        mmdc -i architecture_diagram.mmd -o architecture_diagram.svg
+      run: mmdc -i architecture_diagram.mmd -o architecture_diagram.svg
