@@ -92,6 +92,7 @@ VBoxManage modifyvm "$VM_NAME" \
     --vram "$VRAM_MB" \
     --cpus "$CPUS" \
     --nic1 nat \
+    --natpf1 "ssh,tcp,,2222,,22" \
     --audio-enabled off \
     --usb off \
     --clipboard bidirectional \
@@ -145,7 +146,7 @@ VBoxManage modifyvm "$VM_NAME" \
     --boot4 none
 
 # Start VM
-VBoxManage startvm "$VM_NAME" \
+VBoxManage startvm "$VM_NAME"
 #    --type headless
 echo "Starting VM..."
 

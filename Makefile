@@ -14,13 +14,22 @@ swarm_setup:
 	@chmod +x infra/swarm/scripts/launch_swarm.sh
 	@infra/swarm/scripts/launch_swarm.sh "infra/swarm/scripts" "$(IP4)"
 	docker stack deploy -c infra/swarm/swarm_core_deploy.yml    swarm_core
-	docker stack deploy -c infra/swarm/observability_deploy.yml metrics
+	
+BAKE_ROOT:= "$(LOCATION)/infra/containers"
 
 build:
-	docker buildx bake --no-cache -f infra/containers/docker-bake.hcl
+	echo $(BAKE_ROOT)
+	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake --no-cache -f $(BAKE_ROOT)/docker-bake.hcl 
 
-push: build
-	docker compose -f $(BUILD_FILE) push
+push:
+	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
+	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake site --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
+
+website_setup:
+	docker stack deploy -c infra/swarm/website_deploy.yml website
+
+observ_setup:
+	docker stack deploy -c infra/swarm/observability_deploy.yml metrics
 
 up: build
 	docker stack deploy -c infra/swarm/website_deploy.yml website
@@ -54,3 +63,6 @@ iso_test/image/*.iso:
 	fi
 	@docker run -it --privileged --rm -v"$(LOCATION)/iso_test/image:/build/image" --name test swarm_test sh;
 	chmod 755 iso_test/image
+
+vm_erase:
+	

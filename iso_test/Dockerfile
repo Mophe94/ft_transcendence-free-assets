@@ -14,19 +14,25 @@ RUN apk update && apk upgrade && apk add --no-cache \
             xorriso \
 	    kmod 
 
-WORKDIR /src
-RUN git clone --depth 1 git://git.alpinelinux.org/aports
+#RUN apk add  syslinux-utils
+
+WORKDIR /build
+COPY --chmod=777 node_info/entrypoint.sh .
+COPY --chmod=777 node_info/answerfile .
+COPY --chmod=777 node_info/autoinstall.start .
+
+WORKDIR /root
+RUN mkdir -p aports
+RUN git clone --depth 1 git://git.alpinelinux.org/aports aports
 RUN chmod +x aports/scripts/mkimage.sh
-RUN sed -i 's/--no-chown.*//' /src/aports/scripts/mkimage.sh
+RUN sed -i 's/--no-chown.*//' aports/scripts/mkimage.sh
 RUN mkdir -pv /build/tmp && export TMPDIR=/build/tmp
 
 RUN addgroup root abuild
 
-WORKDIR /build
-COPY --chmod=777 node_info/mkimg.swarm_node.sh /src/aports/scripts/mkimg.swarm_node.sh /src/aports/scripts/
-COPY --chmod=777 node_info/genapkovl-swarm_node.sh /src/aports/scripts/genapkovl-swarm_node.sh 
-COPY --chmod=777 node_info/entrypoint.sh .
-COPY --chmod=777 node_info/answerfile .
-COPY --chmod=777 node_info/autoinstall.start .
+COPY --chmod=777 node_info/mkimg.swarm_node.sh aports/scripts/mkimg.swarm_node.sh
+COPY --chmod=777 node_info/genapkovl-swarm_node.sh aports/scripts/genapkovl-swarm_node.sh 
+
+WORKDIR /root/aports/scripts
 
 CMD ["/bin/sh", "-c", "/build/entrypoint.sh"]

@@ -1,4 +1,5 @@
-#!/bin/sh -e
+#!/bin/sh 
+set -eux
 
 cleanup() {
 	rm -rf "$tmp"
@@ -8,7 +9,10 @@ makefile() {
 	OWNER="$1"
 	PERMS="$2"
 	FILENAME="$3"
+
+	mkdir -p "$(dirname "$FILENAME")"
 	cat > "$FILENAME"
+
 	chown "$OWNER" "$FILENAME"
 	chmod "$PERMS" "$FILENAME"
 }
@@ -23,6 +27,8 @@ trap cleanup exit
 
 mkdir -p "$tmp"/etc
 mkdir -p "$tmp"/etc/apk
+mkdir -p "$tmp"/etc/ssh
+mkdir -p "$tmp"/etc/sshd
 #mkdir -p "$tmp"/etc/network
 mkdir -p "$tmp"/etc/local.d
 mkdir -p "$tmp"/root
@@ -32,8 +38,8 @@ $HOSTNAME
 EOF
 
 cp /build/answerfile "$tmp"/root/answerfile
-cp /build/autoinstall.start "$tmp"/local.d/
-chmod +x "$tmp"/local.d/autoinstall.start
+cp /build/autoinstall.start "$tmp"/etc/local.d/
+chmod +x "$tmp"/etc/local.d/autoinstall.start
 
 makefile root:root 0644 "$tmp"/etc/apk/world <<EOF
 alpine-base
@@ -63,8 +69,11 @@ makefile root:root 0644 "$tmp"/etc/motd <<EOF
 Welcome to the Swarm!
 EOF
 
-rc_add alpine-base boot
-rc_add docker boot
-rc_add sshd boot
-EOF
-tar -c -C "$tmp" etc | gzip -9n > $HOSTNAME.apkovl.tar.gz
+#rc_add alpine-base boot
+rc_add docker default
+rc_add sshd default
+rc_add local default
+
+echo "[genapkovl] building overlay"
+tar -C "$tmp" -czf "/root/apkovl.tar.gz" etc root
+ls -l "/root/apkovl.tar.gz" || echo "[genapkovl] missing overlay"

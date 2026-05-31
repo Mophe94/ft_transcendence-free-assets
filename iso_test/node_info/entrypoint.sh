@@ -1,15 +1,16 @@
 #!/bin/sh
 
-set -e
+set -eux
 export HOSTNAME="swarm_node"
-ln -s vmlinuz-lts /boot/vmlinuz
 
 VERSION="latest-stable"
 export OUTDIR=/build/image
 
 abuild-keygen -na
 export APK_OPTS="--no-script"
-sh "/src/aports/scripts/mkimage.sh" \
+export APORTS_DIR=/root/aports
+cd /root/aports/scripts
+sh "./mkimage.sh" \
 	--tag "$VERSION" \
 	--outdir "$OUTDIR" \
         --arch x86_64 \
