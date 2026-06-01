@@ -6,50 +6,45 @@ extends Node2D
 ]
 
 @onready var current_monster = [
-	$Current_team/Monster,
-	$Current_team/Monster2,
-	$Current_team/Monster3
+	$CurrentTeam/Monster1,
+	$CurrentTeam/Monster2,
+	$CurrentTeam/Monster3
 ]
 
 @onready var monster_database = GeneralData.monster_database
 
-var battle_team = GeneralData.player["battle_team"]
+func refresh_team_visual():
+	for i in range(3):
+		for child in current_monster[i].get_children():
+			child.queue_free()
+
+		if GeneralData.player["battle_team"][i]["name"] != "":
+			var monster_scene = monster_database[GeneralData.player["battle_team"][i]["name"]].instantiate()
+			current_monster[i].add_child(monster_scene)
 	
 func _compact_team():
 	for i in range(3):
-		if battle_team[i]["name"] == "":
+		if GeneralData.player["battle_team"][i]["name"] == "":
 			for j in range(i + 1, 3):
-				if battle_team[j]["name"] != "":
-					var tmp = battle_team[i]
-					battle_team[i] = battle_team[j]
-					battle_team[j] = tmp
+				if GeneralData.player["battle_team"][j]["name"] != "":
+					var tmp = GeneralData.player["battle_team"][i]
+					GeneralData.player["battle_team"][i] = GeneralData.player["battle_team"][j]
+					GeneralData.player["battle_team"][j] = tmp
 					break
 			
 			
 	
 func _on_delete_monster(monster_name):
 	for i in range(3):
-		if battle_team[i]["name"] == monster_name:
-			battle_team[i]["name"] = ""
-			for u in range(3):
-				print(battle_team[u])
-			print()
+		if GeneralData.player["battle_team"][i]["name"] == monster_name:
+			GeneralData.player["battle_team"][i]["name"] = ""
 			_compact_team()
-			for u in range(3):
-				print(battle_team[u])
-			print()
+			refresh_team_visual()
 			return
 
 func _on_add_monster(monster_name, slot_index):
-	for i in range(3):
-		if battle_team[i]["name"] == "":
-			var monster_scene = monster_database[monster_name].instantiate()
-			current_monster[i].add_child(monster_scene)
-			break
-	battle_team[slot_index]["name"] = monster_name
-	for u in range(3):
-		print(battle_team[u])
-	print()
+	GeneralData.player["battle_team"][slot_index]["name"] = monster_name
+	refresh_team_visual()
 
 func _ready():
 	for i in range(slots.size()):

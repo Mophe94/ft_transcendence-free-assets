@@ -1,0 +1,112 @@
+[gd_scene format=3 uid="uid://yshscl5383ux"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vaksa"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(480, 128, 200)
+angle_min = -149.09999
+angle_max = 216.00002
+gravity = Vector3(48, 98, 0)
+linear_accel_min = -32.86
+linear_accel_max = 44.999996
+radial_accel_min = -47.14
+radial_accel_max = 42.139996
+scale_min = 1.5
+scale_max = 3.5
+color = Color(0, 1, 1, 1)
+
+[sub_resource type="Animation" id="Animation_vaksa"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/Background/Loose:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_swtfl"]
+resource_name = "rotation"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/Background/Loose:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0001, 0.0002, 0.5, 1, 1.5, 1.5001, 1.5002, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 0.0, 0.13962634015954636, 0.0, -0.13962634015954636, -0.17453292, -0.13962634015954636, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_dcvbm"]
+_data = {
+&"RESET": SubResource("Animation_vaksa"),
+&"rotation": SubResource("Animation_swtfl")
+}
+
+[node name="Loose" type="Node2D" unique_id=1151978334]
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=428179872]
+position = Vector2(480, 128)
+amount = 40
+lifetime = 3.5
+randomness = 1.0
+visibility_rect = Rect2(0, 0, 0, 0)
+local_coords = true
+trail_lifetime = 0.05
+trail_sections = 6
+trail_section_subdivisions = 1
+process_material = SubResource("ParticleProcessMaterial_vaksa")
+
+[node name="Control" type="Control" parent="." unique_id=1103557546]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Background" type="ColorRect" parent="Control" unique_id=1364077225]
+custom_minimum_size = Vector2(960, 320)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = 164.0
+offset_right = 940.0
+offset_bottom = 484.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.28627452, 0.019607844, 0.40784314, 0.37254903)
+
+[node name="Loose" type="Label" parent="Control/Background" unique_id=1006893142]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -157.0
+offset_top = -38.5
+offset_right = 157.0
+offset_bottom = 38.5
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1, 1.2)
+theme_override_font_sizes/font_size = 56
+text = "YOU LOSE"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Control/Background" unique_id=599412664]
+root_node = NodePath("../../..")
+libraries/ = SubResource("AnimationLibrary_dcvbm")
+autoplay = &"rotation"

@@ -1,29 +1,27 @@
 extends Node
 
-@export var background_database: Dictionary = {
-	"fields_day": preload("res://assets/background_battle_appaers/fields_day.png"),
-	"fields_night": preload("res://assets/background_battle_appaers/fields_night.png"),
-	"twilight_fields": preload("res://assets/background_battle_appaers/twilight_fields.png"),
+@onready var transi = preload("res://scene/transition/blur_transition.tscn")
+
+const background_database: Dictionary = {
 	"plains_dawn": preload("res://assets/background_battle_appaers/plains_dawn.png"),
 	"plains_night": preload("res://assets/background_battle_appaers/plains_night.png"),
 	"plains_day": preload("res://assets/background_battle_appaers/plains_day.png"),
-	"sky_day": preload("res://assets/background_battle_appaers/sky_day.png"),
-	"sky_night": preload("res://assets/background_battle_appaers/sky_night.png")
+	"beach_day": preload("res://assets/background_battle_appaers/beach_day.png")
 }
 
-@export var map_01: Dictionary = {
-	"floor_0" = preload("res://scene/map_01/floor_0.tscn"),
-	"floor_1" = preload("res://scene/map_01/floor_01.tscn"),
-	"floor_2" = preload("res://scene/map_01/floor_02.tscn"),
-	"floor_3" = preload("res://scene/map_01/floor_03.tscn")
-}
+#const map_01: Dictionary = {
+#	"floor_0" = preload("res://scene/map_01/floor_0.tscn"),
+#	"floor_1" = preload("res://scene/map_01/floor_01.tscn"),
+#	"floor_2" = preload("res://scene/map_01/floor_02.tscn"),
+#	"floor_3" = preload("res://scene/map_01/floor_03.tscn")
+#}
 
-@export var monster_database: Dictionary = {
+const monster_database: Dictionary = {
 	"manTree": preload("res://scene/monster/mantree.tscn"),
 	"mushroom": preload("res://scene/monster/mushroom.tscn")
 }
 
-@export var hero_database: Dictionary = {
+const hero_database: Dictionary = {
 	"violet": preload("res://scene/hero/violet.tscn"),
 	"white": preload("res://scene/hero/white.tscn")
 }
@@ -33,21 +31,22 @@ var player: Dictionary = {
 	"name": "Gerard",
 	"asset": "white",
 	"currentMonster": {
-		"name": "mushroom",
+		"name": "",
+		"index": -1,
 		"life": {
 			"current": 0,
 			"max": 0
 		},
 		"skill": [
 			{
-				"name": "",
-				"current": 0,
-				"max": 0
+				"name": "claw",
+				"current": 5,
+				"max": 10
 			},
 			{
-				"name": "",
-				"current": 0,
-				"max": 0
+				"name": "deflagration",
+				"current": 1,
+				"max": 1
 			},
 			{
 				"name": "",
@@ -66,38 +65,38 @@ var player: Dictionary = {
 		{
 			"name": "",
 			"life": {
-				"current": 0,
-				"max": 0
+				"current": 20,
+				"max": 60
+			},
+		},
+		{
+			"name": "",
+			"life": {
+				"current": 90,
+				"max": 100
 			},
 		},
 		{
 			"name": "",
 			"life": {
 				"current": 0,
-				"max": 0
-			},
-		},
-		{
-			"name": "",
-			"life": {
-				"current": 0,
-				"max": 0
+				"max": 60
 			},
 		},
 	],
-	"team": ["manTree", "mushroom", "manTree", "manTree", "manTree", "manTree"],
+	"team": ["manTree", "", "", "", "", ""],
 	"inventory": [
 		{
-			"name": "",
-			"current": 0
+			"name": "popo",
+			"current": 1
 		},
 		{
-			"name": "",
-			"current": 0
+			"name": "golden ticket",
+			"current": 4
 		},
 		{
-			"name": "",
-			"current": 0
+			"name": "rage",
+			"current": 6
 		},
 		{
 			"name": "",
@@ -111,7 +110,8 @@ var enemy: Dictionary = {
 	"name": "Samantha",
 	"asset": "violet",
 	"currentMonster": {
-		"name": "mushroom",
+		"name": "",
+		"index": 0,
 		"life": {
 			"current": 0,
 			"max": 0
@@ -184,8 +184,10 @@ var enemy: Dictionary = {
 	]
 }
 
+const SPEED_TEXT = 0.03
 var tile = ""
 var object = ""
 var current_map = "floor_0"
-var monster_encounter = "manTree"
-var background = "plains_night"
+var monster_encounter = "mushroom"
+var background_capture = "beach_day"
+var background_battle = "plains_night"

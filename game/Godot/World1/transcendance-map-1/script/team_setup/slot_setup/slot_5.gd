@@ -5,7 +5,6 @@ signal delete_monster(monster_name)
 
 @onready var button = $Button
 @onready var sprite = $Monster
-@onready var battle_team = GeneralData.player["battle_team"]
  
 var selected = false
 
@@ -27,7 +26,7 @@ func _on_pressed():
 	selected = !selected
 	if selected:
 		for i in range(3):
-			if battle_team[i]["name"] == "":
+			if GeneralData.player["battle_team"][i]["name"] == "":
 				slot_id = i
 				break
 		if slot_id == -1:

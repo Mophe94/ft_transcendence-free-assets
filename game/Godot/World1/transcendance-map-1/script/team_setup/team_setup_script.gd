@@ -21,6 +21,7 @@ func instantiate_charactere():
 	enemy_scene.get_node("Body").get_node("Animated").flip_h = true
 
 func instanciate_monster_player():
+	var current = 0
 	for i in range(6):
 		var monster_name = player_monster[i]
 		if monster_name == "":
@@ -30,24 +31,41 @@ func instanciate_monster_player():
 			player_monster[i] = ""
 			continue
 		var monster_scene = monster[monster_name].instantiate()
-		slot_player[i].get_node("Monster").add_child(monster_scene)
-		slot_player[i].get_node("Button").monster_name = monster_name
-		slot_player[i].get_node("Button").slot_ref = i
+		slot_player[current].get_node("Monster").add_child(monster_scene)
+		slot_player[current].get_node("Button").monster_name = monster_name
+		slot_player[current].get_node("Button").slot_ref = current
+		current += 1
 		
 func instanciate_monster_enemy():
+	var current = 0
 	for i in range(6):
 		var monster_name = enemy_monster[i]
 		if monster_name == "":
 			continue
 		var monster_scene = monster[monster_name].instantiate()
-		slot_enemy[i].get_node("Monster").add_child(monster_scene)
+		slot_enemy[current].get_node("Monster").add_child(monster_scene)
+		current += 1
 		
+func transi_open():
+	var transi_scene = GeneralData.transi.instantiate()
+	add_child(transi_scene)
+	await transi_scene.get_node("CanvasLayer/ColorRect").open()
+	transi_scene.queue_free()
+
+func transi_close():
+	var transi_scene = GeneralData.transi.instantiate()
+	add_child(transi_scene)
+	await transi_scene.get_node("CanvasLayer/ColorRect").close()
+	transi_scene.queue_free()
 
 func _ready() -> void:
-	instantiate_charactere()
-	instanciate_monster_player()
-	instanciate_monster_enemy()
-	await get_tree().create_timer(4.0).timeout
+	transi_open()
+	await instantiate_charactere()
+	await instanciate_monster_player()
+	await instanciate_monster_enemy()
+	await get_tree().create_timer(5.0).timeout
+	await transi_close()
+	get_tree().change_scene_to_file("res://scene/combat/combat.tscn")
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
