@@ -2,3 +2,4 @@
 .php
 infra/*.php
 infra/*.html
+*.iso

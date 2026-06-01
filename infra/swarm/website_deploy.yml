@@ -1,14 +1,17 @@
 services:
 
     site:
-        image: site:latest
+        image: 192.168.0.144:8080/site:latest
 
         networks:
             - games_net
+            - swarm_net
 
         deploy:
             replicas: 1
 
 networks:
     games_net:
+        external: true
+    swarm_net:
         external: true

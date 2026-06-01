@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
 SCRIPT_NAME="${0##*/}"
+SSH_PORT="2222"
+SSH_HOST="localhost"
+VM_USER="root"
 
 # VM Configuration
 VM_DIR="$HOME/VirtualBox VMs"   # Default VM directory
-VM_NAME="transcendence_node"    # Default VM name
+VM_NAME="transcendence_node_test"    # Default VM name
 
 RAM_MB=2048
 VRAM_MB=16
@@ -100,10 +103,12 @@ VBoxManage modifyvm "$VM_NAME" \
     --audio-enabled off \
     --usb off \
     --clipboard bidirectional \
-    --draganddrop bidirectional
+    --draganddrop bidirectional \
+    --graphicscontroller vmsvga
 
 # Create Disk
 echo "Creating virtual disk..."
+mkdir -p "$VM_DIR/$VM_NAME"
 VBoxManage createmedium disk \
     --filename "$VM_DIR/$VM_NAME/$VM_NAME.vdi" \
     --size "$DISK_SIZE_MB" \
@@ -114,7 +119,6 @@ echo "Adding storage controllers..."
 VBoxManage storagectl "$VM_NAME" \
     --name "SATA Controller" \
     --add sata \
-    --controller IntelAhci
 
 VBoxManage storagectl "$VM_NAME" \
     --name "IDE Controller" \
@@ -132,6 +136,7 @@ VBoxManage storageattach "$VM_NAME" \
 
 # Attach ISO
 echo "Attaching Alpine ISO..."
+echo $ISO_FILE
 
 VBoxManage storageattach "$VM_NAME" \
     --storagectl "IDE Controller" \
@@ -152,47 +157,24 @@ VBoxManage setextradata "$VM_NAME" \
 	--GUI/SCALEMODE "true"
 
 # Start VM
-VBoxManage startvm "$VM_NAME" \
+VBoxManage startvm "$VM_NAME"
 #    --type headless
 echo "Starting VM..."
 
-#echo "Waiting for VM CPU to stabilize..."
-#
-#STABLE_COUNT=0
-#REQUIRED_STABLE=5   # seconds of low CPU
-#THRESHOLD=15        # % CPU considered "idle"
-#
-#VBoxManage metrics setup "$VM_NAME" --period 1 --samples 5 --list >/dev/null 2>&1 || true
+# Wait until SSH becomes reachable
+echo "Waiting for SSH..."
 
-#while true; do
-#    # Get CPU load (fallback-safe parsing)
-#    CPU=$(VBoxManage metrics query "$VM_NAME" CPU/Load/User 2>/dev/null | awk '/value/ {print $4}' | tr -d '%')
-#
-#    # If metrics not ready, fallback
-#    #if [ -z "$CPU" ]; then
-#     #   CPU=100
-#   # fi
-#
-#    echo "CPU: $CPU%"
-#
-#    # compare (integer-safe)
-#    CPU_INT=${CPU%.*}
-#
-#    if [ "$CPU_INT" -lt "$THRESHOLD" ]; then
-#        STABLE_COUNT=$((STABLE_COUNT + 1))
-#    else
-#        STABLE_COUNT=0
-#    fi
-#
-#    if [ "$STABLE_COUNT" -ge "$REQUIRED_STABLE" ]; then
-#        echo "VM appears booted (CPU stable)"
-#        break
-#    fi
-#
-#    sleep 1
-#done
-#VBoxManage showvminfo "$VM_NAME" --machinereadable | grep "VMState"
-#    sleep 2
+while ! ssh \
+    -p 2222 \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    -o ConnectTimeout=2 \
+    "$VM_USER@$SSH_HOST" true 2>/dev/null
+do
+    sleep 2
+done
+
+echo "SSH is online"
 #echo ""
 #echo "VM '$VM_NAME' is now running."
 #echo ""

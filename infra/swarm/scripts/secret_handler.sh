@@ -10,7 +10,7 @@ fi
 
 ###CONFIG###
 CERT_DIR="$1/certs"
-REGISTRY_NAME="Swarm-internal-CA"
+REGISTRY_NAME="registry"
 REGISTRY_IP="$2"
 USE_IP=true
 OVERWRITE=false
