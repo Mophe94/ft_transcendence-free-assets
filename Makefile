@@ -48,9 +48,9 @@ swarm-status:
 	    echo "Swarm status: inactive"; \
 	fi
 
-vm : iso_test/image/*.iso
+create_vm_base : 
 	chmod +x Vmscript.sh
-	./Vmscript.sh iso_test/image/*.iso
+	./Vmscript.sh /media/stempels/Extreme SSD/alpine-virt-3.23.4-x86_64.iso
 
 iso_test/image/*.iso:
 	mkdir -p iso_test/image
