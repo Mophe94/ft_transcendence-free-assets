@@ -1,0 +1,174 @@
+[gd_scene format=3 uid="uid://d00fh2hedgeid"]
+
+[ext_resource type="Script" uid="uid://brpxfet53sr8k" path="res://Script/Combat/CombatMenus/combat_menus_script.gd" id="1_ft0o0"]
+[ext_resource type="Texture2D" uid="uid://cahcqvw78pcay" path="res://Assets/Other/menus.png" id="2_6de8u"]
+[ext_resource type="Script" uid="uid://bc0a1v7x7lv30" path="res://Script/Combat/CombatMenus/Button/button1.gd" id="2_pdxn8"]
+[ext_resource type="Script" uid="uid://0agt68dsf8u8" path="res://Script/Combat/CombatMenus/Button/button2.gd" id="3_qak3q"]
+[ext_resource type="Texture2D" uid="uid://c8nlwnbl608lo" path="res://Assets/Other/cross .png" id="3_ywjy7"]
+[ext_resource type="Script" uid="uid://b3g5devu5v23i" path="res://Script/Combat/CombatMenus/Button/button3.gd" id="4_am4ef"]
+[ext_resource type="Script" uid="uid://4qqllerfl4b2" path="res://Script/Combat/CombatMenus/Button/button4.gd" id="5_c4p42"]
+[ext_resource type="Script" uid="uid://c10oqrdst0hxr" path="res://Script/Combat/CombatMenus/Button/button5.gd" id="8_qbfww"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_re7nl"]
+bg_color = Color(0, 0.627451, 0.9882353, 1)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0, 0, 0, 1)
+border_blend = true
+corner_detail = 20
+expand_margin_left = 32.0
+expand_margin_top = 32.0
+expand_margin_right = 32.0
+expand_margin_bottom = 32.0
+shadow_size = 10
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3jeak"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0.9861415, 0.7965759, 0.850991, 1)
+shadow_size = 8
+
+[node name="CaptureMenus" type="Panel" unique_id=1186040270]
+self_modulate = Color(1, 1, 1, 0.59607846)
+z_index = 1
+offset_left = 192.0
+offset_top = 512.0
+offset_right = 748.0
+offset_bottom = 597.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_re7nl")
+script = ExtResource("1_ft0o0")
+
+[node name="Banner" type="Sprite2D" parent="." unique_id=1718146371]
+z_index = -1
+position = Vector2(272, -48)
+scale = Vector2(0.41900095, 0.3224677)
+texture = ExtResource("2_6de8u")
+region_enabled = true
+region_rect = Rect2(3169.6682, 4309.789, 979.88745, 240.37451)
+
+[node name="CenterContainer" type="CenterContainer" parent="Banner" unique_id=536802985]
+offset_left = -171.83734
+offset_top = -99.23474
+offset_right = 184.44171
+offset_bottom = 10.765259
+
+[node name="Action" type="Label" parent="Banner/CenterContainer" unique_id=1797309399]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "ACTION"
+horizontal_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="." unique_id=345759480]
+layout_mode = 0
+offset_left = 16.0
+offset_top = -24.0
+offset_right = 496.0
+offset_bottom = 120.0
+mouse_filter = 2
+theme_override_constants/h_separation = 64
+theme_override_constants/v_separation = 24
+columns = 2
+
+[node name="Slot1" type="Control" parent="GridContainer" unique_id=1066230986]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="button" type="Button" parent="GridContainer/Slot1" unique_id=1319362089]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 0
+offset_top = 16.0
+offset_right = 200.0
+offset_bottom = 56.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
+action_mode = 0
+script = ExtResource("2_pdxn8")
+
+[node name="Slot2" type="Control" parent="GridContainer" unique_id=1990547524]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="button" type="Button" parent="GridContainer/Slot2" unique_id=947961164]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 0
+offset_top = 16.0
+offset_right = 200.0
+offset_bottom = 56.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
+action_mode = 0
+script = ExtResource("3_qak3q")
+
+[node name="Slot3" type="Control" parent="GridContainer" unique_id=388988968]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="button" type="Button" parent="GridContainer/Slot3" unique_id=1801507858]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 0
+offset_top = 16.0
+offset_right = 200.0
+offset_bottom = 56.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
+action_mode = 0
+script = ExtResource("4_am4ef")
+
+[node name="Slot4" type="Control" parent="GridContainer" unique_id=110820671]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="button" type="Button" parent="GridContainer/Slot4" unique_id=522886939]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 0
+offset_top = 16.0
+offset_right = 200.0
+offset_bottom = 56.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
+action_mode = 0
+script = ExtResource("5_c4p42")
+
+[node name="Player" type="Sprite2D" parent="GridContainer" unique_id=1716291788]
+z_index = 1
+position = Vector2(520, 32)
+
+[node name="Slot5" type="Control" parent="." unique_id=1829754871]
+anchors_preset = 0
+offset_left = 512.0
+offset_top = 40.0
+offset_right = 512.0
+offset_bottom = 40.0
+mouse_filter = 2
+
+[node name="Button" type="Button" parent="Slot5" unique_id=1964781078]
+layout_mode = 0
+offset_top = 8.0
+offset_right = 80.0
+offset_bottom = 88.0
+scale = Vector2(0.6, 0.6)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
+action_mode = 0
+icon = ExtResource("3_ywjy7")
+script = ExtResource("8_qbfww")
+
+[node name="Text" type="RichTextLabel" parent="." unique_id=603523971]
+layout_mode = 0
+offset_right = 556.0
+offset_bottom = 85.0
+mouse_filter = 2
+bbcode_enabled = true
+horizontal_alignment = 1
+text_direction = 1

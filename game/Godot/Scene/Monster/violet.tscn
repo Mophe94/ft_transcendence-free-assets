@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://cwphcal638egl"]
+
+[ext_resource type="Texture2D" uid="uid://dy20t436ur1mh" path="res://Assets/Monster/Pink_Monster_Idle_4.png" id="1_k1328"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jd4tk"]
+atlas = ExtResource("1_k1328")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rll3b"]
+atlas = ExtResource("1_k1328")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vgnio"]
+atlas = ExtResource("1_k1328")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3ytsj"]
+atlas = ExtResource("1_k1328")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_em3yd"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jd4tk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rll3b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vgnio")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3ytsj")
+}],
+"loop": true,
+"name": &"idle_right",
+"speed": 5.0
+}]
+
+[node name="Violet" type="Node2D" unique_id=555793041]
+position = Vector2(0, -24)
+
+[node name="Body" type="CharacterBody2D" parent="." unique_id=1307560028]
+scale = Vector2(1.5, 1.5)
+
+[node name="Animated" type="AnimatedSprite2D" parent="Body" unique_id=1920580006]
+position = Vector2(0, 16)
+sprite_frames = SubResource("SpriteFrames_em3yd")
+animation = &"idle_right"
+autoplay = "idle_right"

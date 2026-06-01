@@ -1,0 +1,196 @@
+[gd_scene format=3 uid="uid://bjdmq32k87slx"]
+
+[ext_resource type="Texture2D" uid="uid://3xh88kkc3o6d" path="res://Scene/Lobby/asset/nobody.jpg" id="1_ix0g6"]
+[ext_resource type="Script" uid="uid://c050s7loyp0ym" path="res://Scene/Lobby/scipt/lobby_script.gd" id="1_qng6a"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qng6a"]
+atlas = ExtResource("1_ix0g6")
+
+[node name="CanvasLayer" type="CanvasLayer" unique_id=293512249]
+script = ExtResource("1_qng6a")
+
+[node name="Control" type="Control" parent="." unique_id=573672213]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="ColorRect" type="ColorRect" parent="Control" unique_id=600368956]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0, 0, 0, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="Control" unique_id=5653999]
+layout_mode = 0
+offset_left = 256.0
+offset_top = 64.0
+offset_right = 1024.0
+offset_bottom = 567.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/CenterContainer" unique_id=213262574]
+layout_mode = 2
+theme_override_constants/separation = 80
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer" unique_id=581805971]
+layout_mode = 2
+
+[node name="Lobby" type="Label" parent="Control/CenterContainer/VBoxContainer/VBoxContainer2" unique_id=863759634]
+z_index = 1
+layout_mode = 2
+theme_override_font_sizes/font_size = 70
+text = "LOBBY"
+horizontal_alignment = 1
+
+[node name="Timer" type="Label" parent="Control/CenterContainer/VBoxContainer/VBoxContainer2" unique_id=1317567320]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+
+[node name="players" type="GridContainer" parent="Control/CenterContainer/VBoxContainer" unique_id=224009225]
+layout_mode = 2
+theme_override_constants/h_separation = 100
+theme_override_constants/v_separation = 50
+columns = 4
+
+[node name="slot1" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/players" unique_id=419571297]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+theme_override_constants/separation = 23
+alignment = 1
+
+[node name="photo" type="TextureRect" parent="Control/CenterContainer/VBoxContainer/players/slot1" unique_id=643553503]
+layout_mode = 2
+texture = SubResource("AtlasTexture_qng6a")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="player" type="Label" parent="Control/CenterContainer/VBoxContainer/players/slot1" unique_id=1285675648]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "????????"
+clip_text = true
+
+[node name="slot2" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/players" unique_id=1595370024]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+theme_override_constants/separation = 23
+alignment = 1
+
+[node name="photo" type="TextureRect" parent="Control/CenterContainer/VBoxContainer/players/slot2" unique_id=1339310811]
+layout_mode = 2
+texture = SubResource("AtlasTexture_qng6a")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="player" type="Label" parent="Control/CenterContainer/VBoxContainer/players/slot2" unique_id=87502839]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "????????"
+clip_text = true
+
+[node name="slot3" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/players" unique_id=503278753]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+theme_override_constants/separation = 23
+alignment = 1
+
+[node name="photo" type="TextureRect" parent="Control/CenterContainer/VBoxContainer/players/slot3" unique_id=2070085820]
+layout_mode = 2
+texture = SubResource("AtlasTexture_qng6a")
+expand_mode = 5
+
+[node name="player" type="Label" parent="Control/CenterContainer/VBoxContainer/players/slot3" unique_id=1874195714]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "????????"
+clip_text = true
+
+[node name="slot4" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/players" unique_id=1319467456]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+theme_override_constants/separation = 23
+alignment = 1
+
+[node name="photo" type="TextureRect" parent="Control/CenterContainer/VBoxContainer/players/slot4" unique_id=1769346699]
+layout_mode = 2
+texture = SubResource("AtlasTexture_qng6a")
+expand_mode = 5
+
+[node name="player" type="Label" parent="Control/CenterContainer/VBoxContainer/players/slot4" unique_id=776135048]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "????????"
+clip_text = true
+
+[node name="slot5" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/players" unique_id=403560508]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+theme_override_constants/separation = 23
+alignment = 1
+
+[node name="photo" type="TextureRect" parent="Control/CenterContainer/VBoxContainer/players/slot5" unique_id=1690861653]
+layout_mode = 2
+texture = SubResource("AtlasTexture_qng6a")
+expand_mode = 5
+
+[node name="player" type="Label" parent="Control/CenterContainer/VBoxContainer/players/slot5" unique_id=1694870225]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "????????"
+clip_text = true
+
+[node name="slot6" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/players" unique_id=1251172517]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+theme_override_constants/separation = 23
+alignment = 1
+
+[node name="photo" type="TextureRect" parent="Control/CenterContainer/VBoxContainer/players/slot6" unique_id=190019813]
+layout_mode = 2
+texture = SubResource("AtlasTexture_qng6a")
+expand_mode = 5
+
+[node name="player" type="Label" parent="Control/CenterContainer/VBoxContainer/players/slot6" unique_id=880465761]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "????????"
+clip_text = true
+
+[node name="slot7" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/players" unique_id=382752659]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+theme_override_constants/separation = 23
+alignment = 1
+
+[node name="photo" type="TextureRect" parent="Control/CenterContainer/VBoxContainer/players/slot7" unique_id=999269767]
+layout_mode = 2
+texture = SubResource("AtlasTexture_qng6a")
+expand_mode = 5
+
+[node name="player" type="Label" parent="Control/CenterContainer/VBoxContainer/players/slot7" unique_id=500151283]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "????????"
+clip_text = true
+
+[node name="slot8" type="VBoxContainer" parent="Control/CenterContainer/VBoxContainer/players" unique_id=98006292]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+theme_override_constants/separation = 23
+alignment = 1
+
+[node name="photo" type="TextureRect" parent="Control/CenterContainer/VBoxContainer/players/slot8" unique_id=1765517474]
+layout_mode = 2
+texture = SubResource("AtlasTexture_qng6a")
+expand_mode = 5
+
+[node name="player" type="Label" parent="Control/CenterContainer/VBoxContainer/players/slot8" unique_id=475707282]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "????????"
+clip_text = true
+
+[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=1060699037]
+
+[connection signal="request_completed" from="HTTPRequest" to="." method="_on_http_request_request_completed"]
