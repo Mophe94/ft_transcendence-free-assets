@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://c807d36aqdx1s"]
 
-[ext_resource type="Script" uid="uid://dn47rj48ddawd" path="res://Script/World/Map_01/floor_0.gd" id="1_xrrma"]
+[ext_resource type="Script" uid="uid://dn47rj48ddawd" path="res://Script/World/Map_01/world_01.gd" id="1_xrrma"]
 [ext_resource type="Texture2D" uid="uid://dia6k4csibwso" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/Terrain/Tileset/Water Background color.png" id="2_hoqb8"]
 [ext_resource type="Texture2D" uid="uid://dd8eaycde3nte" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/Terrain/Tileset/Water Foam.png" id="3_yy1uu"]
 [ext_resource type="Texture2D" uid="uid://bejlwbb4f6evk" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/Terrain/Tileset/Tilemap_color5.png" id="4_gc1ye"]
@@ -2016,5 +2016,6 @@ polygon = PackedVector2Array(1025, 827, 1281, 830, 1287, 956, 1273, 968, 1024, 9
 
 [node name="Timer" type="Timer" parent="." unique_id=1906439368]
 wait_time = 15.0
+autostart = true
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

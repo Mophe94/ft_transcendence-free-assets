@@ -150,7 +150,7 @@ func set_menus_choice(object):
 		var lose_scene = battle_result["lose"].instantiate()
 		get_tree().current_scene.add_child(lose_scene)
 	await get_tree().create_timer(5.0).timeout
-	get_tree().change_scene_to_file("res://scene/map_01/floor_0.tscn")
+	get_tree().change_scene_to_file("res://Scene/World01/world_01.tscn")
 	
 func set_menus_use(object):
 	unlock_button()

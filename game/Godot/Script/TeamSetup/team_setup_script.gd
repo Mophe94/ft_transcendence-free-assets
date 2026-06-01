@@ -18,7 +18,6 @@ func instantiate_charactere():
 	$Player/asset.add_child(player_scene)
 	var enemy_scene = hero[assetEnemy].instantiate()
 	$Enemy/asset.add_child(enemy_scene)
-	enemy_scene.get_node("Body").get_node("Animated").flip_h = true
 
 func instanciate_monster_player():
 	var current = 0
@@ -63,7 +62,7 @@ func _ready() -> void:
 	await instantiate_charactere()
 	await instanciate_monster_player()
 	await instanciate_monster_enemy()
-	await get_tree().create_timer(5.0).timeout
+	await get_tree().create_timer(10.0).timeout
 	await transi_close()
 	get_tree().change_scene_to_file("res://scene/combat/combat.tscn")
 
