@@ -14,10 +14,8 @@ IP="$2"
 
 #SETUP DOCKER DEAMON
 mkdir -p /etc/docker
-cat << 'EOF' > /etc/docker/daemon.json
+cat << EOF > /etc/docker/daemon.json
 {
-    "oom-score-adjust": -500,
-    "debug": false,
     "insecure-registries": [
 	"registry",
 	"registry:5000",
@@ -56,8 +54,8 @@ while ! docker info >/dev/null 2>&1; do
 	echo "Docker took to much time"
 	exit 1
     fi
-    sleep 1
-    COUNTER=$((CONTER + 1))
+    COUNTER=$((COUNTER + 1))
+    sleep 2
     echo -n "."
 done
 

@@ -128,10 +128,11 @@ fi
 if [ ! -f "$BASE_DIR/$BASE_IMG" ]; then
     echo "[$SCRIPT_NAME] Copying base image to $BASE_DIR"
     mkdir -p "$BASE_DIR"
-    chmod 744 "$BASE_DIR"
+    chmod 755 "$BASE_DIR"
     VBoxManage clonemedium disk \
 	"$VM_DIR/$VM_NAME/$VM_NAME.vdi" \
 	"$BASE_DIR/$BASE_IMG"
+    chmod 755 "$BASE_DIR/$BASE_IMG"
 else
     echo "[$SCRIPT_NAME] $BASE_IMG already exist in $VM_DIR"
 fi
