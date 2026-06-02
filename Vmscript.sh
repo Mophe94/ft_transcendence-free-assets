@@ -7,7 +7,7 @@ VM_USER="root"
 
 # VM Configuration
 VM_DIR="$HOME/VirtualBox VMs"   # Default VM directory
-VM_NAME="transcendence_node_test"    # Default VM name
+VM_NAME="transcendence_node"
 
 RAM_MB=2048
 VRAM_MB=16
@@ -96,7 +96,7 @@ VBoxManage modifyvm "$VM_NAME" \
 	--natpf1 "swarm_management,tcp,,2377,,2377" \
 	--natpf1 "node_communication-TCP,tcp,,7946,,7946" \
 	--natpf1 "node_communication-UDP,udp,,7946,,7946" \
-	--natpf1 "overlay_networks,upd,,4789,,4789" \
+	--natpf1 "overlay_networks,udp,,4789,,4789" \
 	--paravirtprovider default \
 	--nictype1 virtio \
 	--natdnshostresolver1 on \
