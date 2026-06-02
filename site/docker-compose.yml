@@ -1,0 +1,52 @@
+services:
+  frontend:
+    build:
+      context: FrontEnd
+    container_name: frontend
+    ports:
+      - "5173:5173"
+
+    env_file:
+    - FrontEnd/.env
+
+  backend:
+    build:
+      context: BackEnd
+    container_name: backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - BackEnd/.env.docker
+    depends_on:
+      users_db:
+        condition: service_healthy
+  game:
+    build:
+      context: game_test
+    container_name: game
+    env_file:
+      - game_test/.env
+    ports:
+      - "8060:8060"
+  users_db:
+    build:
+      context: databases/users_db/
+    container_name: users_db
+    ports:
+      - "5434:5432"
+    env_file:
+      - databases/users_db/.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s   # Teste toutes les 3 secondes
+      timeout: 5s    # Temps max accordé au test
+      retries: 5     # Nombre d'essais avant de considérer la DB comme en panne
+      start_period: 5s # Laisse 5 secondes au démarrage avant de commencer à tester
+  game_db:
+    build:
+      context: databases/game_db/
+    container_name: game_db
+    ports:
+      - "5433:5432"
+    env_file:
+      - databases/game_db/.env
