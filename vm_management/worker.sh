@@ -31,13 +31,16 @@ BASE_DIR=""
 VM_DIR=""
 
 # Check if VM already exist, if not create it
-if VBoxManage list vms | grep $VM_NAME; then 
-	echo "VM exist..."
+if VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; then
+    echo "[$SCRIPT_NAME] $VM_NAME exist..."
+elif [ -f "$VM_DIR/$VM_NAME/$VM_NAME.vbox" ]; then
+    echo "[$SCRIPT_NAME] $VM_NAME exist but is not registered. Registering now..."
+    VBoxManage registrvm "$VM_DIR/$VM_NAME/$VM_NAME.vbox"
 else
 	# Get config argument and set default value if missing
 	if [ ! -f "$CONFIG_FILE" ]; then
 		using_defaults=true
-		echo "$CONFIG_FILE not found."
+		echo "[$SCRIPT_NAME] $CONFIG_FILE not found."
 	else
 		while IFS='=' read -r key value; do
 			case "$key" in
@@ -47,44 +50,44 @@ else
 		done < "$CONFIG_FILE"
 		if [ -z "$BASE_DIR" ] || [ -z "$VM_DIR" ]; then
 			using_defaults=true
-			echo "Missing variable in configuration file."
+			echo "[$SCRIPT_NAME] variable in configuration file."
 		fi
 	fi
 
 	# Prompt for default value usage
 	if [ "$using_defaults" = true ]; then
-		echo "Using default value:"
-		echo "Vm directory: $DEFAULT_VM_DIR\nBase Vm directory: $DEFAULT_VM_DIR"
+		echo "[$SCRIPT_NAME] default value:"
+		echo -e "\tdirectory: $DEFAULT_VM_DIR\tBase Vm directory: $DEFAULT_VM_DIR"
 		BASE_DIR=$DEFAULT_BASE_DIR
 		VM_DIR=$DEFAULT_VM_DIR
-		read -p "Proceed with these values ? (y/N): " answer
+		read -p " Proceed with these values ? (y/N): " answer
 		case "${answer,,}" in
 			[y]|[yes]) ;;
-			*) echo "Aborted."
+			*) echo "[$SCRIPT_NAME] Aborted."
 				exit 1 ;;
 		esac
 	fi
 
 	# Validate the values
 	if [ ! -d "$BASE_DIR" ] || [ ! -d "$VM_DIR" ];then
-		echo "Target directory $BASE_DIR or $VM_DIR does not exist"
+		echo "[$SCRIPT_NAME] directory $BASE_DIR or $VM_DIR does not exist"
 		exit 1
 	elif [ ! -f $BASE_DIR/$BASE_IMG ];then
-		echo "Missing base vm image in $BASE_DIR"
+		echo "[$SCRIPT_NAME] base vm image in $BASE_DIR"
 		exit 1
 	fi
 
-	echo "VM name: $VM_NAME"
-	echo "VM directory: $VM_DIR"
+	echo "[$SCRIPT_NAME] name: $VM_NAME"
+	echo "[$SCRIPT_NAME] directory: $VM_DIR"
 
     # Create VM
-    echo "Creating VM..."
+    echo "[$SCRIPT_NAME] Creating VM..."
     VBoxManage createvm \
 	--name "$VM_NAME" \
 	--register
 
     # Configure VM
-    echo "Configuring VM..."
+    echo "[$SCRIPT_NAME] Configuring VM..."
     VBoxManage modifyvm "$VM_NAME" \
 	--memory "$RAM_MB" \
 	--vram "$VRAM_MB" \
@@ -105,19 +108,19 @@ else
 	--graphicscontroller vmsvga
 
     # Create Disk
-    echo "Creating virtual disk..."
+    echo "[$SCRIPT_NAME] Creating virtual disk..."
     mkdir -p "$VM_DIR/$VM_NAME"
     VBoxManage clonemedium disk \
 	"$BASE_DIR/$BASE_IMG" \
 	"$VM_DIR/$VM_NAME/$VM_NAME.vdi"
 
     # Storage Controllers
-    echo "Adding storage controllers..."
+    echo "[$SCRIPT_NAME] Adding storage controllers..."
     VBoxManage storagectl "$VM_NAME" \
 	--name "SATA Controller" \
 	--add sata
 
-    echo "Attaching disk..."
+    echo "[$SCRIPT_NAME] Attaching disk..."
     VBoxManage storageattach "$VM_NAME" \
 	--storagectl "SATA Controller" \
 	--port 0 \
@@ -135,9 +138,34 @@ else
     # Set scalable GUI
     VBoxManage setextradata "$VM_NAME" \
 	    --GUI/SCALEMODE "true"
-fi
 
-# Start VM
-echo "Starting VM..."
-VBoxManage startvm "$VM_NAME"
+    # Start VM
+    echo "[$SCRIPT_NAME] Starting VM..."
+    VBoxManage startvm "$VM_NAME"
 #    --type headless
+
+    #Waiting for VM ssh to be ready
+    TIMEOUT=120
+    INTERVAL=2
+    ELAPSED=0
+    echo "[$SCRIPT_NAME] Waiting for ssh"
+    while ! ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "exit 0"; do
+	sleep $INTERVAL
+	ELAPSED=$((ELAPSED + INTERVAL))
+	echo -n "."
+	if [ $ELAPSED -ge $TIMEOUT ]; then
+		echo "SSH not ready after ${TIMEOUT}s"
+		exit 1
+	fi
+    done
+    echo "[$SCRIPT_NAME] SSH is fully ready"
+    echo "[$SCRIPT_NAME] Setting up worker"
+    #ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}' > "host_ip.txt"
+    #-->does not work
+    if [ $# -ge 1 ]; then
+	if [ "$1" == "leader" ]; then
+	    scp -r -P "$SSH_PORT" host_ip.txt game infra site Makefile "$VM_USER"@"$SSH_HOST":/home/
+	    ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "make -C /home/ swarm_setup IP4=$1"
+	fi
+    fi
+fi

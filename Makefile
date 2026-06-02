@@ -6,6 +6,7 @@ DEPLOY_FILE = $(LOCATION)/infra/docker-compose-deploy.yml
 OBSERV_FILE = $(LOCATION)/infra/docker-compose-observability.yml
 SCRIPTS = $(LOCATION)/infra/scripts
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
+TYPE=""
 
 all:
 	@$(MAKE) --no-print-directory swarm-status
@@ -66,7 +67,10 @@ worker:
 		exit 1; \
 	fi
 	@chmod +x ./vm_management/worker.sh;
-	@./vm_management/worker.sh;
+	@./vm_management/worker.sh $(TYPE);
+
+leader:
+	@$(MAKE) worker TYPE="leader"
 
 iso_test/image/*.iso:
 	mkdir -p iso_test/image
