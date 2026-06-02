@@ -49,8 +49,24 @@ swarm-status:
 	fi
 
 vm : 
-	chmod +x Vmscript.sh
-	./Vmscript.sh /media/stempels/Extreme SSD/alpine-virt-3.23.4-x86_64.iso
+	@if [ "$(USER)" != "stempels" ]; then \
+	    echo "You are not supposed to use that !"; \
+	    exit 1; \
+	fi
+	@if [ ! -f "vm_management/vm.sh" ]; then \
+		echo "vm.sh file missing"; \
+		exit 1; \
+	fi
+	@chmod +x ./vm_management/vm.sh
+	@./vm_management/vm.sh
+
+worker:
+	@if [ ! -f vm_management/worker.sh ]; then \
+		echo "worker.sh file missing"; \
+		exit 1; \
+	fi
+	@chmod +x ./vm_management/worker.sh;
+	@./vm_management/worker.sh;
 
 iso_test/image/*.iso:
 	mkdir -p iso_test/image

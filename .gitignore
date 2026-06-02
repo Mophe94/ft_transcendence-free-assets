@@ -6,3 +6,4 @@ infra/*.html
 misc/*
 !misc/.gitkeep
 !misc/README
+vm_management/worker_config.txt
