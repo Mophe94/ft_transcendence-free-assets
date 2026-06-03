@@ -7,9 +7,15 @@ OBSERV_FILE = $(LOCATION)/infra/docker-compose-observability.yml
 SCRIPTS = $(LOCATION)/infra/scripts
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 TYPE=""
+USER_NAME="$(USER)"
 
 all:
 	@$(MAKE) --no-print-directory swarm-status
+
+node_launch:
+	@if [ "$(TYPE)" == "manager" ]; then \
+	    $(MAKE) swarm_setup; \
+	fi
 
 swarm_setup:
 	@chmod +x infra/swarm/scripts/launch_swarm.sh
@@ -61,7 +67,7 @@ vm :
 	@chmod +x ./vm_management/vm.sh
 	@./vm_management/vm.sh
 
-worker:
+setup_worker:
 	@if [ ! -f vm_management/worker.sh ]; then \
 		echo "worker.sh file missing"; \
 		exit 1; \
@@ -69,8 +75,11 @@ worker:
 	@chmod +x ./vm_management/worker.sh;
 	@./vm_management/worker.sh $(TYPE) $(IP4);
 
-leader:
-	@$(MAKE) worker TYPE="leader"
+worker:
+	@$(MAKE) setup_worker TYPE="worker"
+
+manager:
+	@$(MAKE) setup_worker TYPE="manager"
 
 iso_test/image/*.iso:
 	mkdir -p iso_test/image

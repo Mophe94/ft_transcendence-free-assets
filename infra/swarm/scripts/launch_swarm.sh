@@ -62,10 +62,21 @@ done
 #INIT THE SWARM AND PUBLISH IS IP#
 docker swarm init --advertise-addr $IP
 
+#Adding more node ?
+read -p "[$SCRIPT_NAME] Do you want to add more node: " answer
+case "${answer,,}" in
+	[y]|[yes])
+	    chmod +x "${1}/add_node.sh"
+	    ./"${1}/add_node.sh" "$JOIN_TOKEN_MANAGER" "$JOIN_TOKEN_WORKER";;
+	*) echo "[$SCRIPT_NAME] Aborted."
+		exit 1 ;;
+esac
+
 #CREATE THE NEEDED OVERLAY NETWORKS#
 docker network create --driver overlay --attachable --internal swarm_net
 docker network create --driver overlay --attachable --internal obsrv_net
 docker network create --driver overlay --attachable --internal games_net
+
 
 #SECRET_HANDLER=$DIR/secret_handler.sh
 #chmod +x $SECRET_HANDLER

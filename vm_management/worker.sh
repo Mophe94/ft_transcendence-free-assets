@@ -31,8 +31,8 @@ VM_DIR=""
 
 # Define role of VM
 if [ $# -eq 2 ]; then
-    if [ "$1" == "leader" ] || [ "$1" == "worker" ]; then
-	TYPE="$1"
+    if [ "$1" == "manager" ] || [ "$1" == "worker" ]; then
+	TYPE="${1,,}"
     else
 	echo "[$SCRIPT_NAME] invalid argument '$1'"
 	exit 1
@@ -156,28 +156,61 @@ else
 
     # Start VM
     echo "[$SCRIPT_NAME] Starting VM..."
-    VBoxManage startvm "$VM_NAME"
-#    --type headless
+    VBoxManage startvm "$VM_NAME" --type headless
 
     #Waiting for VM ssh to be ready
     TIMEOUT=120
     INTERVAL=2
     ELAPSED=0
-#    echo "[$SCRIPT_NAME] Waiting for ssh"
-#    while ! ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "exit 0"; do
-#	sleep $INTERVAL
-#	ELAPSED=$((ELAPSED + INTERVAL))
-#	echo -n "."
-#	if [ $ELAPSED -ge $TIMEOUT ]; then
-#		echo "SSH not ready after ${TIMEOUT}s"
-#		exit 1
-#	fi
-#    done
+    echo "[$SCRIPT_NAME] Waiting for ssh"
+    while ! ssh \
+	-o ControlMaster=auto \
+	-o ControlPath=~/.ssh/cm-%r@%h:%p \
+	-o ControlPersist=10m \
+	-p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" -N 2>/dev/null; do
+	sleep $INTERVAL
+	ELAPSED=$((ELAPSED + INTERVAL))
+	if [ $ELAPSED -ge $TIMEOUT ]; then
+		echo "SSH not ready after ${TIMEOUT}s"
+		exit 1
+	fi
+    done
 #    echo "[$SCRIPT_NAME] SSH is fully ready"
     echo "[$SCRIPT_NAME] Setting up worker"
     echo "$IP" > "host_ip.txt"
-    if [ "$TYPE" == "leader" ]; then
-	scp -r -P "$SSH_PORT" host_ip.txt game infra site Makefile "$VM_USER"@"$SSH_HOST":/home/
-	ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "make -C /home/ swarm_setup IP4=$IP"
-    fi
+
+    VM_TARGET_DIR="/home/$USER"
+
+    echo "[$SCRIPT_NAME] Setting up node"
+    scp -o ControlPath=~/.ssh/cm-%r@%h:%p -P "$SSH_PORT" "./setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
+    ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER"
+
+    echo "[$SCRIPT_NAME] Switching user"
+    VM_USER=$USER
+    VM_TARGET_DIR="/home/$USER"
+
+    echo "[$SCRIPT_NAME] Waiting for VM reboot"
+    while ! ssh \
+	-o ControlMaster=auto \
+	-o ControlPath=~/.ssh/cm-%r@%h:%p \
+	-o ControlPersist=5m \
+	-p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" true 2>/dev/null; do
+	sleep $INTERVAL
+	ELAPSED=$((ELAPSED + INTERVAL))
+	if [ $ELAPSED -ge $TIMEOUT ]; then
+		echo "SSH not ready after ${TIMEOUT}s"
+		exit 1
+	fi
+    done
+
+    VM_USER=$USER
+    VM_TARGET_DIR="/home/$USER"
+    declare -A PACK
+    PACK[manager]="host_ip.txt game infra site Makefile"
+    PACK[worker]="Makefile"
+    read -r -a files <<< "${PACK[$TYPE]}"
+    echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
+    ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "mkdir -p $VM_TARGET_DIR"
+    scp -o ControlPath=~/.ssh/cm-%r@%h:%p -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
 fi
+ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR node_launch IP4=$IP TYPE=$TYPE USER_NAME=$USER"
