@@ -67,7 +67,7 @@ worker:
 		exit 1; \
 	fi
 	@chmod +x ./vm_management/worker.sh;
-	@./vm_management/worker.sh $(TYPE);
+	@./vm_management/worker.sh $(TYPE) $(IP4);
 
 leader:
 	@$(MAKE) worker TYPE="leader"

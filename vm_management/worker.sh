@@ -12,7 +12,6 @@ BASE_IMG="vm_node_base.vdi"
 
 # VM Configuration
 DEFAULT_VM_DIR="$HOME/goinfre/"
-VM_NAME="node_$USER"
 
 # Vm config
 RAM_MB=2048
@@ -29,6 +28,22 @@ set -euo pipefail
 
 BASE_DIR=""
 VM_DIR=""
+
+# Define role of VM
+if [ $# -eq 2 ]; then
+    if [ "$1" == "leader" ] || [ "$1" == "worker" ]; then
+	TYPE="$1"
+    else
+	echo "[$SCRIPT_NAME] invalid argument '$1'"
+	exit 1
+    fi
+    IP="$2"
+else
+    echo "[$SCRIPT_NAME] invalid argument."
+    exit 1
+fi
+
+VM_NAME="${TYPE}_node_${USER}"
 
 # Check if VM already exist, if not create it
 if VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; then
@@ -148,24 +163,21 @@ else
     TIMEOUT=120
     INTERVAL=2
     ELAPSED=0
-    echo "[$SCRIPT_NAME] Waiting for ssh"
-    while ! ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "exit 0"; do
-	sleep $INTERVAL
-	ELAPSED=$((ELAPSED + INTERVAL))
-	echo -n "."
-	if [ $ELAPSED -ge $TIMEOUT ]; then
-		echo "SSH not ready after ${TIMEOUT}s"
-		exit 1
-	fi
-    done
-    echo "[$SCRIPT_NAME] SSH is fully ready"
+#    echo "[$SCRIPT_NAME] Waiting for ssh"
+#    while ! ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "exit 0"; do
+#	sleep $INTERVAL
+#	ELAPSED=$((ELAPSED + INTERVAL))
+#	echo -n "."
+#	if [ $ELAPSED -ge $TIMEOUT ]; then
+#		echo "SSH not ready after ${TIMEOUT}s"
+#		exit 1
+#	fi
+#    done
+#    echo "[$SCRIPT_NAME] SSH is fully ready"
     echo "[$SCRIPT_NAME] Setting up worker"
-    #ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}' > "host_ip.txt"
-    #-->does not work
-    if [ $# -ge 1 ]; then
-	if [ "$1" == "leader" ]; then
-	    scp -r -P "$SSH_PORT" host_ip.txt game infra site Makefile "$VM_USER"@"$SSH_HOST":/home/
-	    ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "make -C /home/ swarm_setup IP4=$1"
-	fi
+    echo "$IP" > "host_ip.txt"
+    if [ "$TYPE" == "leader" ]; then
+	scp -r -P "$SSH_PORT" host_ip.txt game infra site Makefile "$VM_USER"@"$SSH_HOST":/home/
+	ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "make -C /home/ swarm_setup IP4=$IP"
     fi
 fi

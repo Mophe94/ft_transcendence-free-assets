@@ -8,8 +8,10 @@ VM_USER="root"
 # VM Configuration
 VM_DIR="/media/stempels/Extreme SSD/ft_transcendence"   # Default VM directory
 VM_NAME="vm_node_base"    # Default VM name
+LOCAL_VM="$HOME/goinfre"
 BASE_DIR="$HOME/sgoinfre/students/stempels"
 BASE_IMG="vm_node_base.vdi"
+ISO_FILE=""
 
 RAM_MB=2048
 VRAM_MB=16
@@ -29,6 +31,7 @@ else
     echo "[$SCRIPT_NAME] Creating $VM_NAME..."
     VBoxManage createvm \
 	--name "$VM_NAME" \
+	--basefolder "$LOCAL_VM" \
 	--ostype "Linux_64" \
 	--register
 
@@ -55,8 +58,8 @@ else
 
     # Boot Order
     VBoxManage modifyvm "$VM_NAME" \
-	--boot1 disk \
-	--boot2 none  \
+	--boot1 none \
+	--boot2 disk \
 	--boot3 none \
 	--boot4 none
 
@@ -73,6 +76,11 @@ else
 	echo "[$SCRIPT_NAME] Attaching Alpine ISO..."
 	echo $ISO_FILE
 
+	VBoxManage storagectl "$VM_NAME" \
+	    --name "IDE Controller" \
+	    --add ide
+
+
 	VBoxManage storageattach "$VM_NAME" \
 	    --storagectl "IDE Controller" \
 	    --port 0 \
@@ -80,12 +88,8 @@ else
 	    --type dvddrive \
 	    --medium "$ISO_FILE"
 
-	VBoxManage storagectl "$VM_NAME" \
-	    --name "IDE Controller" \
-	    --add ide
-
 	VBoxManage modifyvm "$VM_NAME" \
-	    --boot2 dvd \
+	    --boot1 dvd \
 
     fi
 
@@ -98,11 +102,12 @@ else
     # Attach Disk
     echo "[$SCRIPT_NAME] Attaching disk..."
     VBoxManage storageattach "$VM_NAME" \
-        --storagectl "Controller" \
+        --storagectl "SATA Controller" \
         --port 0 \
         --device 0 \
         --type hdd \
         --medium "$VM_DIR/$VM_NAME/$VM_NAME.vdi"
+
     #Set scalable GUI
     VBoxManage setextradata "$VM_NAME" \
 	    --GUI/SCALEMODE "true"
