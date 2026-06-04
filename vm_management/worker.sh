@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#! /bin/bash
 
 SCRIPT_NAME="${0##*/}"
 
@@ -21,10 +21,30 @@ DISK_SIZE_MB=10240
 
 SSH_PORT="2222"
 SSH_HOST="localhost"
-VM_USER="root"
+VM_USER="$USER"
+VM_TARGET_DIR="/home/$USER"
 
 #Safeguard
 set -euo pipefail
+
+wait_for_ssh() {
+    TIMEOUT=120
+    INTERVAL=2
+    ELAPSED=0
+    echo "[$SCRIPT_NAME] Waiting for VM to boot"
+    while ! ssh \
+	-o ControlMaster=auto \
+	-o ControlPath=~/.ssh/cm-%r@%h:%p \
+	-o ControlPersist=5m \
+	-p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" true 2>/dev/null; do
+	sleep $INTERVAL
+	ELAPSED=$((ELAPSED + INTERVAL))
+	if [ $ELAPSED -ge $TIMEOUT ]; then
+		echo "SSH not ready after ${TIMEOUT}s"
+		exit 1
+	fi
+    done
+}
 
 BASE_DIR=""
 VM_DIR=""
@@ -45,13 +65,24 @@ fi
 
 VM_NAME="${TYPE}_node_${USER}"
 
-# Check if VM already exist, if not create it
-if VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; then
+# Check if VM already run, exist, if not create it
+if VBoxManage showvminfo "$VM_NAME" --machinereadable 2>&1 | grep -q '^VMState="running"'; then
+    wait_for_ssh
+elif VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; then
     echo "[$SCRIPT_NAME] $VM_NAME exist..."
+    # Start VM
+    echo "[$SCRIPT_NAME] Starting VM..."
+    VBoxManage startvm "$VM_NAME" --type headless
+    wait_for_ssh
 elif [ -f "$VM_DIR/$VM_NAME/$VM_NAME.vbox" ]; then
     echo "[$SCRIPT_NAME] $VM_NAME exist but is not registered. Registering now..."
     VBoxManage registrvm "$VM_DIR/$VM_NAME/$VM_NAME.vbox"
+    # Start VM
+    echo "[$SCRIPT_NAME] Starting VM..."
+    VBoxManage startvm "$VM_NAME" --type headless
+    wait_for_ssh
 else
+	VM_USER="root"
 	# Get config argument and set default value if missing
 	if [ ! -f "$CONFIG_FILE" ]; then
 		using_defaults=true
@@ -159,22 +190,7 @@ else
     VBoxManage startvm "$VM_NAME" --type headless
 
     #Waiting for VM ssh to be ready
-    TIMEOUT=120
-    INTERVAL=2
-    ELAPSED=0
-    echo "[$SCRIPT_NAME] Waiting for ssh"
-    while ! ssh \
-	-o ControlMaster=auto \
-	-o ControlPath=~/.ssh/cm-%r@%h:%p \
-	-o ControlPersist=10m \
-	-p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" -N 2>/dev/null; do
-	sleep $INTERVAL
-	ELAPSED=$((ELAPSED + INTERVAL))
-	if [ $ELAPSED -ge $TIMEOUT ]; then
-		echo "SSH not ready after ${TIMEOUT}s"
-		exit 1
-	fi
-    done
+    wait_for_ssh
 #    echo "[$SCRIPT_NAME] SSH is fully ready"
     echo "[$SCRIPT_NAME] Setting up worker"
     echo "$IP" > "host_ip.txt"
@@ -188,29 +204,13 @@ else
     echo "[$SCRIPT_NAME] Switching user"
     VM_USER=$USER
     VM_TARGET_DIR="/home/$USER"
-
-    echo "[$SCRIPT_NAME] Waiting for VM reboot"
-    while ! ssh \
-	-o ControlMaster=auto \
-	-o ControlPath=~/.ssh/cm-%r@%h:%p \
-	-o ControlPersist=5m \
-	-p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" true 2>/dev/null; do
-	sleep $INTERVAL
-	ELAPSED=$((ELAPSED + INTERVAL))
-	if [ $ELAPSED -ge $TIMEOUT ]; then
-		echo "SSH not ready after ${TIMEOUT}s"
-		exit 1
-	fi
-    done
-
-    VM_USER=$USER
-    VM_TARGET_DIR="/home/$USER"
+    wait_for_ssh
     declare -A PACK
     PACK[manager]="host_ip.txt game infra site Makefile"
     PACK[worker]="Makefile"
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
-    ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "mkdir -p $VM_TARGET_DIR"
+    ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
     scp -o ControlPath=~/.ssh/cm-%r@%h:%p -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
 fi
-ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR node_launch IP4=$IP TYPE=$TYPE USER_NAME=$USER"
+ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR node_launch IP4=$IP TYPE=$TYPE USER_NAME=$USER"

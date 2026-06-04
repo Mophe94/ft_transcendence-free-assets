@@ -60,22 +60,27 @@ while ! docker info >/dev/null 2>&1; do
 done
 
 #INIT THE SWARM AND PUBLISH IS IP#
-docker swarm init --advertise-addr $IP
-
+if [ ! "$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then
+    docker swarm init --advertise-addr $IP
+fi
+#CREATE THE NEEDED OVERLAY NETWORKS#
+if ! docker network inspect "$NETWORK_NAME" >/dev/null 2>&1; then
+    docker network create --driver overlay --attachable --internal swarm_net
+fi
+if ! docker network inspect "$NETWORK_NAME" >/dev/null 2>&1; then
+    docker network create --driver overlay --attachable --internal obsrv_net
+fi
+if ! docker network inspect "$NETWORK_NAME" >/dev/null 2>&1; then
+    docker network create --driver overlay --attachable --internal games_net
+fi
 #Adding more node ?
-read -p "[$SCRIPT_NAME] Do you want to add more node: " answer
+read -p "[$SCRIPT_NAME] Do you want to add more node (y/N): " answer
 case "${answer,,}" in
 	[y]|[yes])
 	    chmod +x "${1}/add_node.sh"
 	    ./"${1}/add_node.sh" "$JOIN_TOKEN_MANAGER" "$JOIN_TOKEN_WORKER";;
-	*) echo "[$SCRIPT_NAME] Aborted."
-		exit 1 ;;
+	*) echo "[$SCRIPT_NAME] No node added"
 esac
-
-#CREATE THE NEEDED OVERLAY NETWORKS#
-docker network create --driver overlay --attachable --internal swarm_net
-docker network create --driver overlay --attachable --internal obsrv_net
-docker network create --driver overlay --attachable --internal games_net
 
 
 #SECRET_HANDLER=$DIR/secret_handler.sh
