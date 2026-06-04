@@ -15,7 +15,9 @@ SSH_CONFIG="/etc/ssh/sshd_config"
 echo "[$SCRIPT_NAME] Creating user: $NEW_USER"
 
 adduser -D "$NEW_USER"
+echo "$NEW_USER:$PASSWORD" | chpasswd
 addgroup "$NEW_USER" wheel
+addgroup "$NEW_USER" docker
 
 #delete once base VM is update
 apk add doas
