@@ -29,6 +29,7 @@ build:
 	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake --no-cache -f $(BAKE_ROOT)/docker-bake.hcl 
 
 push:
+	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake databases --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
 	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake site --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
 #	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
 

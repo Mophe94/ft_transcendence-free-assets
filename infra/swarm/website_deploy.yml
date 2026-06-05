@@ -1,11 +1,44 @@
 services:
 
-    site:
-        image: ${IP}:80/site:latest
+    frontend:
+        image: ${IP}:80/frontend:latest
+        env_file:
+          - "site/FrontEnd/.env"
 
         networks:
             - games_net
-            - swarm_net
+
+        deploy:
+            replicas: 1
+
+    backend:
+        image: ${IP}:80/backend:latest
+        env_file:
+          - "site/BackEnd/.env"
+
+        networks:
+            - games_net
+        deploy:
+            replicas: 1
+
+    users_db:
+        image: ${IP}:80/users_db:latest
+        env_file:
+          - "site/databases/user_db/.env"
+
+        networks:
+            - games_net
+
+        deploy:
+            replicas: 1
+
+    game_db:
+        image: ${IP}:80/game_db:latest
+        env_file:
+          - "site/databases/game_db/.env"
+
+        networks:
+            - games_net
 
         deploy:
             replicas: 1
