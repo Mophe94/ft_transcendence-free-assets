@@ -1,28 +1,39 @@
-import { createContext, useState, useEffect} from 'react';
+import { useState, useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
+import { ThemeContext } from './ThemeContext';
+import { useAuth } from './AuthContext';
 
-interface ThemeContextType {
-    theme: string,
-    setTheme: (theme: string) => void;
-}
-
-export  const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({children}: PropsWithChildren) {
 
-    const [theme, setTheme] = useState('green');
+    const { user } = useAuth();
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem('app-theme') || 'light';
+    });
+
+    const [prevUserTheme, setPrevUserTheme] = useState<string | undefined>(undefined);
+
+    if (user?.settings?.theme && user.settings.theme !== prevUserTheme) {
+        setPrevUserTheme(user.settings.theme);
+        setTheme(user.settings.theme);
+    }
 
     useEffect(() => {
-        const classesToRemove = Array.from(document.body.classList)
-                               .filter(c => c.startsWith('theme-'));
+        const classesToRemove = Array.from(document.body.classList).filter(
+            (c) => c.startsWith('theme-'));
         document.body.classList.remove(...classesToRemove);
         document.body.classList.add(`theme-${theme}`);
+
+        localStorage.setItem('app-theme', theme);
     }, [theme]);
 
+    console.log("=== THEME PROVIDER ===");
+    console.log("User global actuel :", user);
+    console.log("Thème appliqué à l'écran :", theme);
     return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
         <div className={`theme-${theme}`}> 
-        {children}
+            {children}
         </div>
     </ThemeContext.Provider>
     );

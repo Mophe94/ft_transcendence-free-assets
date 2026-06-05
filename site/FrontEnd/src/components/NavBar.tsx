@@ -1,14 +1,17 @@
-import './NavBar.css'
-import {Link} from "react-router"
+import './NavBar.css';
+import {AuthSection} from './Login.tsx';
+import {Link} from 'react-router-dom';
+import React from 'react';
 
 const menuLinks = {
-  "Accueil": "/",
+  "Home": "/",
   "Play": "/play",
-  "Rules": "/about",
-  "Contact": "/contact"
+  "Howto": "/howto",
+  "Contact": "/contact",
+  "Test": "/test"
 };
 
-function NavBar () {
+export function NavBar () {
 	return (
 		<div className="navBar">
 			<NavMenu />
@@ -21,22 +24,14 @@ function NavMenu () {
 		return (
 			<ul className="navMenu">
 				{Object.entries(menuLinks).map(([name, url]) => (
-					<li>
-						<a href={url} className="nav-link">
-							{name}
-						</a>
-					</li>
+					<React.Fragment key={name}>
+						<li>
+							<Link to={url} className="nav-link">
+								{name}
+							</Link>
+						</li>
+					</React.Fragment>
 				))}
 			</ul>
 		);
 }
-
-function AuthSection () {
-	return (
-		<div className='auth-section'>
-			<Link to='https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-1b38091db24458e2993e02de67e10e256ae4289d7288b4bcaf59e5729e15df5b&redirect_uri=http%3A%2F%2Flocalhost%3A5173%2Fauth.hml&response_type=code' className='nav-link'>Login</Link>
-		</div>
-	);
-}
-
-export default NavBar

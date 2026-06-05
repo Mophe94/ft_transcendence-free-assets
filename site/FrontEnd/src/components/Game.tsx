@@ -4,9 +4,10 @@ import './Game.css'
 import '../../public/game/the_game_chrono.js'
 
 
-export default function Game () {
+export function Game () {
     useEffect(() =>{
-        const GODOT_CONFIG = {"args":[],"canvasResizePolicy":1,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"/game/the_game_chrono","experimentalVK":false,"fileSizes":{"/game/the_game_chrono.pck": 3989900,"/game/the_game_chrono.wasm":35749181},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+
+        const GODOT_CONFIG = {"args":[],"canvasResizePolicy":1,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"/game/the_game_chrono","experimentalVK":false,"fileSizes":{"the_game_chrono.pck":4026384,"the_game_chrono.wasm":35749181},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
         const GODOT_THREADS_ENABLED = false;
         const engine = new Engine(GODOT_CONFIG);
 
@@ -118,6 +119,7 @@ export default function Game () {
     }, []);
     return (
         <div className="game-window">
+            <div className='game-area'>
             <canvas id="canvas"></canvas>
             <div id="status">
                 
@@ -128,6 +130,7 @@ export default function Game () {
                     <progress id="status-progress"></progress>
                 </div>
                 <div id="status-notice"></div>
+            </div>
             </div>
         </div>
     )

@@ -1,0 +1,6 @@
+FROM postgres:18.4-alpine3.22
+
+COPY entrypoint.sh /docker-entrypoint-initdb.d/
+COPY users_db_init.sql /app/sql/
+
+RUN chmod +x /docker-entrypoint-initdb.d/entrypoint.sh

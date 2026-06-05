@@ -1,4 +1,4 @@
-import "./MediaWindow.css"
+import "./HexMediaWindow.css"
 
 interface MediaProps {
     type: "img" | "video" | "default";
@@ -10,21 +10,13 @@ interface MediaProps {
     mediaId?: string;
 }
 
-function MediaWindow({ 
+export function HexMediaWindow({ 
     type, 
     src, 
     alt,
-    width = "100%",
-    height = "auto",
     containerId,
     mediaId,
 }: MediaProps) {
-    const mediaStyle = {
-        width: width,
-        height: height,
-        maxWidth: "100%",
-        objectFit: "cover" as const
-    };
     let content;
 
     switch (type) {
@@ -32,9 +24,9 @@ function MediaWindow({
             content = (
                 <img 
                     src={src} 
-                    style={mediaStyle}
                     alt={alt || "Image"} 
                     id = {mediaId}
+                    className="hex-image"
                 />
             );
             break;
@@ -42,7 +34,6 @@ function MediaWindow({
             content = (
                 <video 
                     src={src}
-                    style={mediaStyle}
                     controls
                     id = {mediaId}
                 />
@@ -52,14 +43,17 @@ function MediaWindow({
             content = (
                     <img 
                         src="assets/images/mediaNotFound.png" 
-                        style={mediaStyle}
                         alt="Media not found"
                         id = {mediaId}
+                        className="hex-image"
                     />
             );
     }
-    return <div className="media-content" id={containerId}>
+    return (
+        <div className="hex-container" id={containerId}>
+            <div className="hex-border">
                 {content}
             </div>
+        </div>
+    )
 }
-export default MediaWindow

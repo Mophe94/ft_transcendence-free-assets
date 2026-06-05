@@ -15,10 +15,14 @@
 	font-weight: 700;
 	color:var(--tertiary-color);
 
-	backdrop-filter: blur(15px);
+	/* backdrop-filter: blur(15px);
   	-webkit-backdrop-filter: blur(15px);
 	mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
- 	-webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+ 	-webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%); */
+}
+.navBar .theme-hex {
+	backdrop-filter: unset;
+
 }
 
 .navMenu{
@@ -42,18 +46,20 @@
 }
 
 
-.auth-section {
-	padding: 1rem;
-	transition: var(--transition-time);
-	text-align: none;
-	align-self: center;
-}
-.auth-section:hover {
-	opacity: 0.5;
-	transition: var(--transition-time) ease-in-out;
-}
 .nav-link {
   text-decoration: none;
   color: inherit;
   cursor: pointer;
+}
+
+.dropdown-menu button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    display: inline-block;
 }
