@@ -1,7 +1,7 @@
 services:
 
     site:
-        image: 192.168.0.144:8080/site:latest
+        image: ${IP}:80/site:latest
 
         networks:
             - games_net

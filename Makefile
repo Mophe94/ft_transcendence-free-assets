@@ -29,11 +29,14 @@ build:
 	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake --no-cache -f $(BAKE_ROOT)/docker-bake.hcl 
 
 push:
-	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
 	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake site --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
+#	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
+
+core_setup:
+	docker stack deploy -c infra/swarm/swarm_core_deploy.yml    swarm_core
 
 website_setup:
-	docker stack deploy -c infra/swarm/website_deploy.yml website
+	IP=$(IP4) docker stack deploy -c infra/swarm/website_deploy.yml website
 
 observ_setup:
 	docker stack deploy -c infra/swarm/observability_deploy.yml metrics

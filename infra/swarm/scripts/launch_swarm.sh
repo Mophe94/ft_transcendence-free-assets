@@ -20,7 +20,7 @@ if [ ! -f "/etc/docker/daemon.json" ]; then
     "insecure-registries": [
         "registry",
         "registry:5000",
-        "$IP:8080"
+        "$IP:80"
     ]
 }
 EOF

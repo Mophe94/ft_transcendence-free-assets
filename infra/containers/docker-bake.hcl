@@ -1,5 +1,5 @@
 variable "IP" { default = "127.0.0.1"}
-variable "REGISTRY" { default = "${IP}:8080" }
+variable "REGISTRY" { default = "${IP}:80" }
 variable "BAKE_ROOT" { default = "." }
 
 group "default" {

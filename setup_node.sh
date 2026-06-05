@@ -19,14 +19,6 @@ echo "$NEW_USER:$PASSWORD" | chpasswd
 addgroup "$NEW_USER" wheel
 addgroup "$NEW_USER" docker
 
-#delete once base VM is update
-apk add doas
-mkdir -p "/etc/doas.d/"
-cat > "/etc/doas.d/doas.conf" << EOF
-permit persist :wheel
-permit nopass :wheel
-EOF
-  
 echo "[$SCRIPT_NAME] Disabling root SSH login"
 
 cp "$SSH_CONFIG" "${SSH_CONFIG}.bak"

@@ -35,8 +35,8 @@ services:
         image: nginx:alpine
 
         ports:
-            - "8080:80"
-            - "8443:443"
+            - "80:80"
+            - "443:443"
       #- target: 80
       #  published: 8080
       #  protocol: tcp

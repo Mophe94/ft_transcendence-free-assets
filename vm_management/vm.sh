@@ -47,6 +47,8 @@ else
 	--vram "$VRAM_MB" \
 	--cpus "$CPUS" \
 	--nic1 nat \
+	    --natpf1 "http,tcp,,8080,,80" \
+	    --natpf1 "https,tcp,,8443,,443" \
 	    --natpf1 "ssh,tcp,,2222,,22" \
 	    --natpf1 "swarm_management,tcp,,2377,,2377" \
 	    --natpf1 "node_communication-TCP,tcp,,7946,,7946" \

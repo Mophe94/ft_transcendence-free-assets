@@ -103,7 +103,7 @@ else
 	# Prompt for default value usage
 	if [ "$using_defaults" = true ]; then
 		echo "[$SCRIPT_NAME] default value:"
-		echo -e "\tdirectory: $DEFAULT_VM_DIR\tBase Vm directory: $DEFAULT_VM_DIR"
+		echo -e "\tdirectory: $DEFAULT_VM_DIR\tBase Vm directory: $BASE_DIR"
 		BASE_DIR=$DEFAULT_BASE_DIR
 		VM_DIR=$DEFAULT_VM_DIR
 		read -p " Proceed with these values ? (y/N): " answer
@@ -139,6 +139,8 @@ else
 	--vram "$VRAM_MB" \
 	--cpus "$CPUS" \
 	--nic1 nat \
+	    --natpf1 "http,tcp,,8080,,80" \
+	    --natpf1 "https,tcp,,8443,,443" \
 	    --natpf1 "ssh,tcp,,2222,,22" \
 	    --natpf1 "swarm_management,tcp,,2377,,2377" \
 	    --natpf1 "node_communication-TCP,tcp,,7946,,7946" \
@@ -213,4 +215,4 @@ else
     ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
     scp -o ControlPath=~/.ssh/cm-%r@%h:%p -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
 fi
-ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR node_launch IP4=$IP TYPE=$TYPE USER_NAME=$USER"
+ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR node_launch TYPE=$TYPE USER_NAME=$USER"
