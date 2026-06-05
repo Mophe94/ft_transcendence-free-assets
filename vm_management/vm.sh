@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [ ! $USER == "stempels" ]; then
+    echo "[$SCRIPT_NAME] You should not use this script, ask stempels"
+    exit 1
+fi
+
 SCRIPT_NAME="${0##*/}"
 SSH_PORT="2222"
 SSH_HOST="localhost"
@@ -10,7 +15,7 @@ VM_DIR="/media/stempels/Extreme SSD/ft_transcendence"   # Default VM directory
 VM_NAME="vm_node_base"    # Default VM name
 LOCAL_VM="$HOME/goinfre"
 BASE_DIR="$HOME/sgoinfre/students/stempels"
-BASE_IMG="vm_node_base.vdi"
+BASE_IMG="$VM_NAME.vdi"
 ISO_FILE=""
 
 RAM_MB=2048
@@ -130,14 +135,16 @@ else
     echo "[$SCRIPT_NAME] $VM_NAME exited"
 fi
 
-if [ ! -f "$BASE_DIR/$BASE_IMG" ]; then
-    echo "[$SCRIPT_NAME] Copying base image to $BASE_DIR"
+if [ ! -d "$BASE_DIR" ]; then
+    echo "[$SCRIPT_NAME] Creating base image directory $BASE_DIR"
     mkdir -p "$BASE_DIR"
     chmod 755 "$BASE_DIR"
-    VBoxManage clonemedium disk \
-	"$VM_DIR/$VM_NAME/$VM_NAME.vdi" \
-	"$BASE_DIR/$BASE_IMG"
-    chmod 755 "$BASE_DIR/$BASE_IMG"
-else
-    echo "[$SCRIPT_NAME] $BASE_IMG already exist in $VM_DIR"
 fi
+if [ -f "$BASE_DIR/$BASE_IMG" ]; then
+    VBoxManage closemedium disk "$BASE_DIR/$BASE_IMG"
+    rm -rf "$BASE_DIR/$BASE_IMG"
+fi
+VBoxManage clonemedium disk \
+    "$VM_DIR/$VM_NAME/$VM_NAME.vdi" \
+    "$BASE_DIR/$BASE_IMG"
+chmod 755 "$BASE_DIR/$BASE_IMG"
