@@ -1,6 +1,9 @@
 *This project has been created as part of the 42 curriculum by Dbajeux,Agaland,Bertrmar,Kprist,Stempels*
 
 ---
+## Workfow
+
+[![Update Architecture Diagram](https://github.com/sitempels/ft_transcendence/actions/workflows/update_architecture_diagram.yml/badge.svg?branch=main)](https://github.com/sitempels/ft_transcendence/actions/workflows/update_architecture_diagram.yml)
 
 # ft_transcendence
 
@@ -24,6 +27,10 @@
 ## Description
 
 **ft_tranceandance** is a real-time multiplayer web game inspired by Pokémon and Team Fight Tactics (TFT). Players build a team of monsters, explore a map, collect loot, and battle other players in turn-based combat — all directly in the browser.
+
+## Architecture
+
+![Alt text](./architecture_diagram.svg)
 
 ### Key Features
 
