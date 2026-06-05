@@ -101,7 +101,7 @@ else
 	fi
 
 	# Prompt for default value usage
-	if [ "$using_defaults" = true ]; then
+	if [ "$using_defaults" ]; then
 		echo "[$SCRIPT_NAME] default value:"
 		echo -e "\tdirectory: $DEFAULT_VM_DIR\tBase Vm directory: $BASE_DIR"
 		BASE_DIR=$DEFAULT_BASE_DIR
