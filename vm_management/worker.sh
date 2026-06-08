@@ -1,9 +1,10 @@
 #! /bin/bash
 
 SCRIPT_NAME="${0##*/}"
+SCRIPT_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Set script variable
-CONFIG_FILE="worker_config.txt"
+CONFIG_FILE="$SCRIPT_LOCATION/worker_config.txt"
 using_defaults=false
 
 #Base image -->Default value, overide in CONFIG_FILE
@@ -28,22 +29,30 @@ VM_TARGET_DIR="/home/$USER"
 set -euo pipefail
 
 wait_for_ssh() {
-    TIMEOUT=120
+    RESULT=1
+    TIMEOUT=30
     INTERVAL=2
     ELAPSED=0
-    SSH_CTRL_PATH="$HOME/.ssh/cm-%r@%h:%p"
     echo "[$SCRIPT_NAME] Waiting for VM to boot"
-    while ! ssh \
-	-o ControlMaster=auto \
-	-o ControlPath="$SSH_CTRL_PATH" \
-	-o ControlPersist=5m \
-	-p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" true 2>/dev/null; do
-	sleep $INTERVAL
-	ELAPSED=$((ELAPSED + INTERVAL))
-	if [ $ELAPSED -ge $TIMEOUT ]; then
-		echo "SSH not ready after ${TIMEOUT}s"
-		exit 1
+    while :; do
+	status=$(ssh -o BatchMode=yes -o ConnectTimeout=5 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} 2>&1)
+	RESULT=$?
+	if [ $RESULT -eq 0 ]; then
+	    echo "Connected"
+	    break
 	fi
+	if [ $RESULT -eq 255 ]; then
+	    if [[ $status == *"Permission denied"* ]]; then
+		echo "server found"
+		break
+	    fi
+	fi
+	TIMEOUT=$((TIMEOUT - 1))
+	if [ $TIMEOUT -eq 0 ]; then
+	    echo "Time out"
+	    exit 1
+	fi
+	sleep 2
     done
 }
 
@@ -55,7 +64,7 @@ if [ $# -eq 2 ]; then
     if [ "$1" == "manager" ] || [ "$1" == "worker" ]; then
 	TYPE="${1,,}"
     else
-	echo "[$SCRIPT_NAME] invalid argument '$1'"
+	echo "[$SCRIPT_NAME] invalid argument $1"
 	exit 1
     fi
     IP="$2"
@@ -68,20 +77,21 @@ VM_NAME="${TYPE}_node_${USER}"
 
 # Check if VM already run, exist, if not create it
 if VBoxManage showvminfo "$VM_NAME" --machinereadable 2>&1 | grep -q '^VMState="running"'; then
-    wait_for_ssh
+   # wait_for_ssh
+   echo "coucou"
 elif VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; then
     echo "[$SCRIPT_NAME] $VM_NAME exist..."
     # Start VM
     echo "[$SCRIPT_NAME] Starting VM..."
     VBoxManage startvm "$VM_NAME" --type headless
-    wait_for_ssh
+   # wait_for_ssh
 elif [ -f "$VM_DIR/$VM_NAME/$VM_NAME.vbox" ]; then
     echo "[$SCRIPT_NAME] $VM_NAME exist but is not registered. Registering now..."
     VBoxManage registrvm "$VM_DIR/$VM_NAME/$VM_NAME.vbox"
     # Start VM
     echo "[$SCRIPT_NAME] Starting VM..."
     VBoxManage startvm "$VM_NAME" --type headless
-    wait_for_ssh
+  #  wait_for_ssh
 else
 	VM_USER="root"
 	# Get config argument and set default value if missing
@@ -131,6 +141,7 @@ else
     echo "[$SCRIPT_NAME] Creating VM..."
     VBoxManage createvm \
 	--name "$VM_NAME" \
+	--basefolder "$VM_DIR" \
 	--register
 
     # Configure VM
@@ -193,27 +204,28 @@ else
     VBoxManage startvm "$VM_NAME" --type headless
 
     #Waiting for VM ssh to be ready
-    wait_for_ssh
+ #   wait_for_ssh
 #    echo "[$SCRIPT_NAME] SSH is fully ready"
     echo "[$SCRIPT_NAME] Setting up worker"
-    echo "$IP" > "infa/host_ip.txt"
+    echo "$IP" > "infra/host_ip.txt"
 
     VM_TARGET_DIR="/home/$USER"
 
     echo "[$SCRIPT_NAME] Setting up node"
-    scp -o ControlPath="$SSH_CTRL_PATH" -P "$SSH_PORT" "infra/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
-    ssh -o ControlPath="$SSH_CTRL_PATH" -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER"
+    scp -P "$SSH_PORT" "vm_management/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
+    ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER"
 
     echo "[$SCRIPT_NAME] Switching user"
     VM_USER=$USER
     VM_TARGET_DIR="/home/$USER"
     wait_for_ssh
     declare -A PACK
-    PACK[manager]="infra game site"
+    PACK[manager]="infra site"
     PACK[worker]="infra/Makefile"
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
-    ssh -o ControlPath="$SSH_CTRL_PATH" -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
-    scp -o ControlPath="$SSH_CTRL_PATH" -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+    ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
+    scp -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+    echo "coucou2"
 fi
-ssh -o ControlPath="$SSH_CTRL_PATH" -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR/infra node_launch TYPE=$TYPE HOST_IP="$IP" USER_NAME=$USER"
+ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP="$IP" USER_NAME=$USER"

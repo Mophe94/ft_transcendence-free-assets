@@ -80,8 +80,8 @@ case "${answer,,}" in
 esac
 
 #Create secret
-SECRET_FILE=$DIR/secrets.txt
+SECRET_FILE=$DIR/../../secrets.env
 chmod +x "$DIR"/secrets_handler.sh
-#$SECRET_HANDLER $DIR $IP
+."$DIR"/secret_handler.sh '$SECRET_FILE"
 
 docker service ls

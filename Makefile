@@ -27,16 +27,16 @@ vm :
 		echo "vm.sh file missing"; \
 		exit 1; \
 	fi
-	@chmod +x ./$(VM_SCRIPTS)/vm.sh
-	@./$(VM_SCRIPTS)/vm.sh
+	@chmod +x $(VM_SCRIPTS)/vm.sh
+	@bash $(VM_SCRIPTS)/vm.sh
 
 setup_worker:
 	@if [ ! -f $(VM_SCRIPTS)/worker.sh ]; then \
 		echo "worker.sh file missing"; \
 		exit 1; \
 	fi
-	@chmod +x ./$(VM_SCRIPTS)/worker.sh;
-	@./$(VM_SCRIPTS)/worker.sh $(TYPE) $(HOST_IP);
+	@chmod +x $(VM_SCRIPTS)/worker.sh;
+	@bash $(VM_SCRIPTS)/worker.sh $(TYPE) $(IP4);
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"

@@ -7,8 +7,8 @@ if [ $# -gt 1 ]; then
     echo "[$SCRIPT_NAME] Error: usage: $SCRIPT_NAME <secret_file_path>"
     exit 1
 else
-    if [ ! -f \'$1\' ]; then
-	echo "[$SCRIPT_NAME] Error: file \'$1\' not found"
+    if [ ! -f $1 ]; then
+	echo "[$SCRIPT_NAME] Error: file $1 not found"
 	exit 1
     else
 	SECRET_FILE="$1"
@@ -19,7 +19,8 @@ echo "[$SCRIPT_NAME] loading secrets"
 while IFS='=' read -r key value; do
     #Skip empty lines and comments
     [[ -z "${key// }" ]] && continue
-    [[ "$key" =~[[:space:]]*# ]] && continue
+    [[ -z "${value// }" ]] && continue
+    [[ "$key" =~ [[:space:]]*# ]] && continue
 
     #Trim IFS
     key=$(xargs <<<"$key")
