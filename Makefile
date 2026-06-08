@@ -5,7 +5,6 @@ VM_SCRIPTS = $(LOCATION)/vm_management
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 USER_NAME="$(USER)"
 TYPE=""
-HOST_IP :=$(IP4)
 
 all:
 	@$(MAKE) --no-print-directory swarm-status

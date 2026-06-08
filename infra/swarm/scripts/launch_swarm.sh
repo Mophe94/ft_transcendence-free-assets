@@ -3,7 +3,7 @@
 #SAFEGUARDING#
 set -euo pipefail
 SCRIPT_NAME="${0##*/}"
-if [ $# -lt 2 ]; then
+if [ ! $# -eq 2 ]; then
 	echo "Usage: $SCRIPT_NAME <dir> <ip>"
 	exit 1
 fi
@@ -79,9 +79,9 @@ case "${answer,,}" in
 	*) echo "[$SCRIPT_NAME] No node added"
 esac
 
-
-#SECRET_HANDLER=$DIR/secret_handler.sh
-#chmod +x $SECRET_HANDLER
+#Create secret
+SECRET_FILE=$DIR/secrets.txt
+chmod +x "$DIR"/secrets_handler.sh
 #$SECRET_HANDLER $DIR $IP
 
 docker service ls

@@ -31,10 +31,11 @@ wait_for_ssh() {
     TIMEOUT=120
     INTERVAL=2
     ELAPSED=0
+    SSH_CTRL_PATH="$HOME/.ssh/cm-%r@%h:%p"
     echo "[$SCRIPT_NAME] Waiting for VM to boot"
     while ! ssh \
 	-o ControlMaster=auto \
-	-o ControlPath=~/.ssh/cm-%r@%h:%p \
+	-o ControlPath="$SSH_CTRL_PATH" \
 	-o ControlPersist=5m \
 	-p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" true 2>/dev/null; do
 	sleep $INTERVAL
@@ -195,24 +196,24 @@ else
     wait_for_ssh
 #    echo "[$SCRIPT_NAME] SSH is fully ready"
     echo "[$SCRIPT_NAME] Setting up worker"
-    echo "$IP" > "host_ip.txt"
+    echo "$IP" > "infa/host_ip.txt"
 
     VM_TARGET_DIR="/home/$USER"
 
     echo "[$SCRIPT_NAME] Setting up node"
-    scp -o ControlPath=~/.ssh/cm-%r@%h:%p -P "$SSH_PORT" "./setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
-    ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER"
+    scp -o ControlPath="$SSH_CTRL_PATH" -P "$SSH_PORT" "infra/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
+    ssh -o ControlPath="$SSH_CTRL_PATH" -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER"
 
     echo "[$SCRIPT_NAME] Switching user"
     VM_USER=$USER
     VM_TARGET_DIR="/home/$USER"
     wait_for_ssh
     declare -A PACK
-    PACK[manager]="host_ip.txt game infra site Makefile"
-    PACK[worker]="Makefile"
+    PACK[manager]="infra game site"
+    PACK[worker]="infra/Makefile"
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
-    ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
-    scp -o ControlPath=~/.ssh/cm-%r@%h:%p -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+    ssh -o ControlPath="$SSH_CTRL_PATH" -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
+    scp -o ControlPath="$SSH_CTRL_PATH" -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
 fi
-ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR node_launch TYPE=$TYPE HOST_IP="$IP" USER_NAME=$USER"
+ssh -o ControlPath="$SSH_CTRL_PATH" -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR/infra node_launch TYPE=$TYPE HOST_IP="$IP" USER_NAME=$USER"
