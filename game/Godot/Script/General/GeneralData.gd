@@ -18,6 +18,17 @@ const monster_database: Dictionary = {
 	"mushroom": preload("res://Scene/Monster/mushroom.tscn")
 }
 
+const monster_icon_database: Dictionary = {
+	"mushroom": preload("res://Assets/Monster/Mushroom.tres"),
+	"manTree": preload("res://Assets/Inventory/monster.png"),
+}
+
+const object_database: Dictionary = {
+	"potion": preload("res://Assets/Inventory/Icon_04.png"),
+	"golden ticket": preload("res://Assets/Inventory/Icon_03.png"),
+	"rage": preload("res://Assets/Inventory/Icon_05.png"),
+	"test": preload("res://Assets/Inventory/Icon_09.png"),
+}
 const hero_database: Dictionary = {
 	"dino": preload("res://Scene/PlayerCharactere/dino_01.tscn") 
 }
@@ -83,7 +94,7 @@ var player: Dictionary = {
 	"team": ["manTree", "", "", "", "", ""],
 	"inventory": [
 		{
-			"name": "popo",
+			"name": "potion",
 			"current": 1
 		},
 		{

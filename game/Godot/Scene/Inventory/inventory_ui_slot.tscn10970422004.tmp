@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://bk8mkrekusx3p"]
+
+[ext_resource type="Script" uid="uid://blccmmn2i2put" path="res://Scene/Inventory/inventory_ui_slot.gd" id="1_v1nwp"]
+[ext_resource type="Texture2D" uid="uid://c5ypd8gkg5csp" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Buttons/TinySquareRedButton.png" id="1_y6qex"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="3_6jcij"]
+
+[node name="inventory_UI_slot" type="Panel" unique_id=1201840829]
+self_modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(63, 62)
+offset_right = 63.0
+offset_bottom = 62.0
+script = ExtResource("1_v1nwp")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=784473591]
+scale = Vector2(1.0000001, 0.96875006)
+texture = ExtResource("1_y6qex")
+centered = false
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1040511306]
+layout_mode = 0
+offset_right = 62.0
+offset_bottom = 60.0
+
+[node name="Panel" type="Panel" parent="CenterContainer" unique_id=1661603732]
+layout_mode = 2
+
+[node name="item_display" type="Sprite2D" parent="CenterContainer/Panel" unique_id=1439197138]
+scale = Vector2(1.2656248, 1.2499999)
+
+[node name="item_count" type="Label" parent="CenterContainer/Panel" unique_id=58092227]
+layout_mode = 0
+offset_left = 2.0
+offset_top = -4.0
+offset_right = 23.0
+offset_bottom = 20.0
+theme_override_fonts/font = ExtResource("3_6jcij")
+theme_override_font_sizes/font_size = 23
