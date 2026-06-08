@@ -215,4 +215,4 @@ else
     ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
     scp -o ControlPath=~/.ssh/cm-%r@%h:%p -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
 fi
-ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR node_launch TYPE=$TYPE USER_NAME=$USER"
+ssh -o ControlPath=~/.ssh/cm-%r@%h:%p -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR node_launch TYPE=$TYPE HOST_IP="$IP" USER_NAME=$USER"

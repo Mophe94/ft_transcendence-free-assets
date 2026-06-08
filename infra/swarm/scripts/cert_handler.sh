@@ -105,17 +105,7 @@ sudo mkdir -p /etc/docker/certs.d/${REGISTRY_NAME}:5000
 sudo cp ca.crt /etc/docker/certs.d/${REGISTRY_NAME}:5000/ca.crt
 sudo systemctl restart docker
 
-### SWARM SECRET ###
-echo "[SWARM] loading secrets"
-
-create_secret "registry_tls_cert" "tls.crt"
-create_secret "registry_tls_key" "tls.key"
-create_secret "swarm_ca_cert" "ca.crt"
-create_secret "nginx_tls_cert" "tls.crt"
-create_secret "nginx_tls_key" "tls.key"
-
 #clean up
 echo "[CLEAN] removing temp files"
 rm -f tls.* ca.* san.cnf
 rm -rf "$CERT_DIR"
-echo "[DONE] swarm secret loaded"

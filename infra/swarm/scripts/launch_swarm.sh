@@ -65,7 +65,8 @@ networks=("swarm_net" "obsrv_net" "games_net")
 #CREATE THE NEEDED OVERLAY NETWORKS#
 for network in "${networks[@]}"; do
     if ! docker network inspect "$network" >/dev/null 2>&1; then
-	docker network create --driver overlay --attachable --internal "$network"
+	docker network create --driver overlay --attachable --internal "$network" >/dev/null 2>&1
+	echo "[$SCRIPT_NAME] $network created"
     fi
 done
 
@@ -73,8 +74,8 @@ done
 read -p "[$SCRIPT_NAME] Do you want to add more node (y/N): " answer
 case "${answer,,}" in
 	[y]|[yes])
-	    chmod +x "${1}/add_node.sh"
-	    ./"${1}/add_node.sh" "$JOIN_TOKEN_MANAGER" "$JOIN_TOKEN_WORKER";;
+	    chmod +x "${DIR}/add_node.sh"
+	    ./"${DIR}/add_node.sh";;
 	*) echo "[$SCRIPT_NAME] No node added"
 esac
 

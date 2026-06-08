@@ -4,8 +4,8 @@ SCRIPT_NAME="${0##*/}"
 
 users=("agaland" "bertmart" "dbajeux" "kprist" "stempels") 
 
-MANAGER_JOIN_CMD= docker swarm joint-token -q manager
-WORKER_JOIN_CMD= docker swarm joint-token -q worker
+MANAGER_JOIN_CMD=$(docker swarm joint-token -q manager)
+WORKER_JOIN_CMD=$(docker swarm joint-token -q worker)
 
 NODE_CONNECTED=0
 JOIN_CMD="$MANAGER_JOIN_CMD"
@@ -13,6 +13,9 @@ JOIN_CMD="$MANAGER_JOIN_CMD"
 for user in "${users[@]}"; do
     if [ "$user" == "$USER" ]; then
 	continue
+    fi
+    if [ "$NBR_MANAGER" -eq 3 ]; then
+	JOIN_CMD="$WORKER_JOIN_CMD"
     fi
     echo "[$SCRIPT_NAME] Connecting to $user node:"
     read -p "[$SCRIPT_NAME]    IP of $user node host machine: " answer
@@ -30,9 +33,6 @@ for user in "${users[@]}"; do
 	NODE_CONNECTED=($NODE_CONNECTED + 1)
     fi
     NBR_MANAGER=docker node ls --format '{{.ManagerStatus}}' | grep -E 'Leader|Reachable' | wc -l
-    if [ "$NBR_MANAGER" -eq 3 ]; then
-	JOIN_CMD="$WORKER_JOIN_CMD"
-    fi
 done
 
 echo "[$SCRIPT_NAME] Number of node connected $NODE_CONNECTED"

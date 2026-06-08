@@ -1,53 +1,13 @@
 #SWARM_STATUS := $(shell docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null)
 STACK_NAME = transcendence
 LOCATION := $(shell pwd)
-BUILD_FILE = $(LOCATION)/infra/docker-compose-build.yml
-DEPLOY_FILE = $(LOCATION)/infra/docker-compose-deploy.yml
-OBSERV_FILE = $(LOCATION)/infra/docker-compose-observability.yml
-SCRIPTS = $(LOCATION)/infra/scripts
+VM_SCRIPTS = $(LOCATION)/vm_management
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
-TYPE=""
 USER_NAME="$(USER)"
+TYPE=""
+HOST_IP :=$(IP4)
 
 all:
-	@$(MAKE) --no-print-directory swarm-status
-
-node_launch:
-	@if [ "$(TYPE)" == "manager" ]; then \
-	    $(MAKE) swarm_setup; \
-	fi
-
-swarm_setup:
-	@chmod +x infra/swarm/scripts/launch_swarm.sh
-	@infra/swarm/scripts/launch_swarm.sh "infra/swarm/scripts" "$(IP4)"
-	docker stack deploy -c infra/swarm/swarm_core_deploy.yml    swarm_core
-	
-BAKE_ROOT:= "$(LOCATION)/infra/containers"
-
-build:
-	echo $(BAKE_ROOT)
-	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake --no-cache -f $(BAKE_ROOT)/docker-bake.hcl 
-
-push:
-	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake databases --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
-	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake site --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
-#	BAKE_ROOT=$(BAKE_ROOT) IP=$(IP4) docker buildx bake --no-cache -f $(BAKE_ROOT)/docker-bake.hcl --push
-
-core_setup:
-	docker stack deploy -c infra/swarm/swarm_core_deploy.yml    swarm_core
-
-website_setup:
-	IP=$(IP4) docker stack deploy -c infra/swarm/website_deploy.yml website
-
-observ_setup:
-	docker stack deploy -c infra/swarm/observability_deploy.yml metrics
-
-up: build
-	docker stack deploy -c infra/swarm/website_deploy.yml website
-
-down:
-	chmod 777 infra/swarm/scripts/end_swarm.sh
-	infra/swarm/scripts/end_swarm.sh
 	@$(MAKE) --no-print-directory swarm-status
 
 swarm-status:
@@ -64,20 +24,20 @@ vm :
 	    echo "You are not supposed to use that !"; \
 	    exit 1; \
 	fi
-	@if [ ! -f "vm_management/vm.sh" ]; then \
+	@if [ ! -f "$(VM_SCRIPTS)/vm.sh" ]; then \
 		echo "vm.sh file missing"; \
 		exit 1; \
 	fi
-	@chmod +x ./vm_management/vm.sh
-	@./vm_management/vm.sh
+	@chmod +x ./$(VM_SCRIPTS)/vm.sh
+	@./$(VM_SCRIPTS)/vm.sh
 
 setup_worker:
-	@if [ ! -f vm_management/worker.sh ]; then \
+	@if [ ! -f $(VM_SCRIPTS)/worker.sh ]; then \
 		echo "worker.sh file missing"; \
 		exit 1; \
 	fi
-	@chmod +x ./vm_management/worker.sh;
-	@./vm_management/worker.sh $(TYPE) $(IP4);
+	@chmod +x ./$(VM_SCRIPTS)/worker.sh;
+	@./$(VM_SCRIPTS)/worker.sh $(TYPE) $(HOST_IP);
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"
