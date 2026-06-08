@@ -12,9 +12,5 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	pass
-
-
-func _on_timer_timeout() -> void:
-	$Player/CharacterBody2D/Camera2D.enabled = false
+	await get_tree().create_timer(10.0).timeout
 	get_tree().change_scene_to_file("res://Scene/TeamSetup/team_setup.tscn")

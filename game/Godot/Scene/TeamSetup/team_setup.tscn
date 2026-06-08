@@ -126,9 +126,9 @@ script = ExtResource("3_f4a0n")
 [node name="Button" type="Button" parent="Player/Slot1" unique_id=123822889]
 layout_mode = 0
 offset_left = 152.0
-offset_top = 48.0
+offset_top = 88.0
 offset_right = 232.0
-offset_bottom = 128.0
+offset_bottom = 168.0
 action_mode = 0
 flat = true
 script = ExtResource("3_saqoo")
@@ -144,9 +144,9 @@ script = ExtResource("5_do8e3")
 [node name="Button" type="Button" parent="Player/Slot2" unique_id=1737180991]
 layout_mode = 0
 offset_left = 152.0
-offset_top = 176.0
+offset_top = 216.0
 offset_right = 232.0
-offset_bottom = 256.0
+offset_bottom = 296.0
 action_mode = 0
 flat = true
 script = ExtResource("4_6pa65")
@@ -162,9 +162,9 @@ script = ExtResource("7_2ad6k")
 [node name="Button" type="Button" parent="Player/Slot3" unique_id=1300418116]
 layout_mode = 0
 offset_left = 152.0
-offset_top = 302.0
+offset_top = 344.0
 offset_right = 232.0
-offset_bottom = 382.0
+offset_bottom = 424.0
 action_mode = 0
 flat = true
 script = ExtResource("5_f4a0n")
@@ -180,9 +180,9 @@ script = ExtResource("9_6flf8")
 [node name="Button" type="Button" parent="Player/Slot4" unique_id=1658962573]
 layout_mode = 0
 offset_left = 280.0
-offset_top = 48.0
+offset_top = 88.0
 offset_right = 360.0
-offset_bottom = 128.0
+offset_bottom = 168.0
 action_mode = 0
 flat = true
 script = ExtResource("6_30lkc")
@@ -198,9 +198,9 @@ script = ExtResource("11_albly")
 [node name="Button" type="Button" parent="Player/Slot5" unique_id=1359846070]
 layout_mode = 0
 offset_left = 280.0
-offset_top = 176.0
+offset_top = 216.0
 offset_right = 360.0
-offset_bottom = 256.0
+offset_bottom = 296.0
 action_mode = 0
 flat = true
 script = ExtResource("7_gx04m")
@@ -216,9 +216,9 @@ script = ExtResource("13_qa51j")
 [node name="Button" type="Button" parent="Player/Slot6" unique_id=848241373]
 layout_mode = 0
 offset_left = 280.0
-offset_top = 304.0
+offset_top = 344.0
 offset_right = 360.0
-offset_bottom = 384.0
+offset_bottom = 424.0
 action_mode = 0
 flat = true
 script = ExtResource("8_0w0gp")
@@ -255,13 +255,13 @@ TEAM"
 horizontal_alignment = 1
 
 [node name="Monster1" type="Sprite2D" parent="Player/CurrentTeam" unique_id=1069025327]
-position = Vector2(224, 96)
+position = Vector2(224, 64)
 
 [node name="Monster2" type="Sprite2D" parent="Player/CurrentTeam" unique_id=482167391]
-position = Vector2(352, 96)
+position = Vector2(352, 64)
 
 [node name="Monster3" type="Sprite2D" parent="Player/CurrentTeam" unique_id=1720717862]
-position = Vector2(480, 96)
+position = Vector2(480, 64)
 
 [node name="Enemy" type="Control" parent="." unique_id=557213865]
 layout_mode = 3

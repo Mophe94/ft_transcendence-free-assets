@@ -1,5 +1,7 @@
 extends Node2D
 
+@onready var combatScene = preload("res://Scene/Combat/combat.tscn")
+
 @onready var assetEnemy = GeneralData.enemy["asset"]
 @onready var assetPlayer = GeneralData.player["asset"]
 @onready var hero = GeneralData.hero_database
@@ -64,7 +66,7 @@ func _ready() -> void:
 	await instanciate_monster_enemy()
 	await get_tree().create_timer(10.0).timeout
 	await transi_close()
-	get_tree().change_scene_to_file("res://scene/combat/combat.tscn")
+	get_tree().change_scene_to_packed(combatScene)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

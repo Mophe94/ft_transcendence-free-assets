@@ -1,1 +1,4 @@
 res://Scene/World01/world_01.tscn
+res://Script/World/Map_01/world_01.gd
+res://Scene/TeamSetup/team_setup.tscn
+res://Script/TeamSetup/team_setup_script.gd

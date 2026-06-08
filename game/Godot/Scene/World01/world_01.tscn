@@ -2013,9 +2013,3 @@ polygon = PackedVector2Array(1276, 707, 1276, 766, 1286, 774, 1329, 775, 1337, 7
 [node name="CollisionShapeGroundLayer4" type="CollisionPolygon2D" parent="Collision" unique_id=1145732515]
 visible = false
 polygon = PackedVector2Array(1025, 827, 1281, 830, 1287, 956, 1273, 968, 1024, 966)
-
-[node name="Timer" type="Timer" parent="." unique_id=1906439368]
-wait_time = 15.0
-autostart = true
-
-[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
