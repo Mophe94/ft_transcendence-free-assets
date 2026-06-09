@@ -22,6 +22,5 @@ export const createMockUser = () => {
   mockUserCounter++;
   return {
 	sub: mockUserCounter,
-	username: `user_${mockUserCounter}`
   }
 }

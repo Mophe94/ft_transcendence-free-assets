@@ -7,6 +7,9 @@ import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
 import { GamePayload, PHASE_DURATIONS,  PhaseName, createMockUser} from './game.type';
 import { ClientData, clientsMap } from 'src/shared/clients.map';
+import { PhaseTimerService } from 'src/shared/phase-timer.service';
+import { IncomingMessage } from 'http';
+
 
 @WebSocketGateway(8082, /* { cors: true } */)
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -16,17 +19,26 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private gameService: GameService) {}
   
-  handleConnection(client: WebSocket): void {
-    //client.data.user = createMockUser();
-   clientsMap.set(client, { user: createMockUser() });
-    console.log('Client connected');
+  handleConnection(client: WebSocket, request: IncomingMessage): void {
+    //const roomId = request.headers['x-room-id'] as string;
+    // Replace by JWT token validation!
+    let roomId = 'test-room';
+    const user = createMockUser();
+    if (!roomId || !this.gameService.isPlayerInRoom(user.sub, roomId)) {
+      client.close();
+      return;
+    }
+    clientsMap.set(client, { user, roomId });
+    console.log(`Client ${user.sub} connected in room ${roomId}`);
+
+    // Implement addPlayerToRoom in GameService
+    // if FULL_LOBBY -> startMapPhase(roomId) + send phase state to Godot
   }
 
   handleDisconnect(client: WebSocket): void {
     clientsMap.delete(client);
     console.log('Client disonnected');
   }
-
 
 
   private broadcast(clients : Set<WebSocket>, message : object) {
@@ -50,7 +62,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return;
       }
       const userId = clientData.user.sub
-      const username = clientData.user.username;
       
       // Dispatch "State" exemple
       switch (payload.state) {

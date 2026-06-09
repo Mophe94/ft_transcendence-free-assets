@@ -3,15 +3,19 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { WebSocket } from 'ws';
 import { randomUUID } from 'crypto';
 import { clientsMap, ClientData } from 'src/shared/clients.map';
-import { FULL_LOBBY, PHASE_DURATIONS, PhaseName } from 'src/game/game.type';
+import { FULL_LOBBY } from 'src/game/game.type';
+import { PhaseTimerService } from 'src/shared/phase-timer.service';
 
 @Injectable()
 export class LobbyService {
 
-	constructor(private eventEmitter: EventEmitter2) {}
+	constructor(
+		private eventEmitter: EventEmitter2,
+		private phaseTimer: PhaseTimerService
+	) {}
 
 	private rooms = new Map<string, Set<WebSocket>>();
-	private phaseTimers = new Map<string, NodeJS.Timeout>()
+	//private phaseTimers = new Map<string, NodeJS.Timeout>()
 
 	// JOIN LOBBY
 	joinLobby(client: WebSocket, user: ClientData['user']) : void {
@@ -38,11 +42,11 @@ export class LobbyService {
 		});
 
 		if (clients.size === FULL_LOBBY) {
-			this.clearPhaseTimer(roomId);
+			this.phaseTimer.clear(roomId);
 			this.eventEmitter.emit('lobby.start', { roomId, clients });
 		}
 		else if (clients.size === 1) {
-			this.startPhaseTimer(roomId, 'lobby', () => {
+			this.phaseTimer.start(roomId, 'lobby', () => {
 			console.log(`[LobbyService] Room ${roomId} lobby timeout`)
 			//ADD bots ??
 			this.eventEmitter.emit('lobby.start', { roomId, clients });
@@ -74,7 +78,7 @@ export class LobbyService {
 	console.log(`Client left ${roomId}, ${clients.size} players remaining`);
 
 	if (clients.size === 0 ) {
-		this.clearPhaseTimer(roomId);
+		this.phaseTimer.clear(roomId);
 		this.rooms.delete(roomId);
 		console.log(`Room ${roomId} deleted (empty)`)
 	}
@@ -83,21 +87,6 @@ export class LobbyService {
 	getRoom(roomId: string) : Set<WebSocket> | undefined {
 		return this.rooms.get(roomId);
 	}
-
-	// PHASE TIMERS
-	startPhaseTimer(roomId: string, phase: PhaseName, onTimeout: () => void) : void {
-		this.clearPhaseTimer(roomId);
-		const duration = PHASE_DURATIONS[phase];
-		this.phaseTimers.set(roomId, setTimeout(onTimeout, duration * 1000));
-	  }
-	
-	private clearPhaseTimer(roomId: string): void {
-		const handle = this.phaseTimers.get(roomId);
-		if (handle) {
-		  clearTimeout(handle);
-		  this.phaseTimers.delete(roomId);
-		}
-	  }
 }
 
 
