@@ -7,4 +7,4 @@ async function bootstrap() {
   app.useWebSocketAdapter(new WsAdapter(app)); // added to switch to ws instead of default socket.io
   await app.listen(process.env.PORT ?? 3000);
 }
-void bootstrap();
+bootstrap();
