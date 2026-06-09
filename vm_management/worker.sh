@@ -24,26 +24,30 @@ SSH_PORT="2222"
 SSH_HOST="localhost"
 VM_USER="$USER"
 VM_TARGET_DIR="/home/$USER"
+CONTROL_PATH="$HOME/.ssh/ssh-mux/%L-%r@%h:%p"
 
 #Safeguard
-#set -euo pipefail
+set -euo pipefail
 
 wait_for_ssh() {
+    set +e
+#    mkdir -p "$HOME/.ssh/ssh-mux"
+#    ssh -nNf -o ControlMaster=yes -o ControlPath="$CONTROL_PATH" "$VM_USER"@"$SSH_HOST" -p "$SSH_PORT"
     RESULT=1
     TIMEOUT=30
     INTERVAL=2
     ELAPSED=0
-    echo "[$SCRIPT_NAME] Waiting for VM to boot"
+    echo -n "[$SCRIPT_NAME] Waiting for VM to boot."
     while :; do
 	status=$(ssh -o BatchMode=yes -o ConnectTimeout=5 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} 2>&1)
 	RESULT=$?
 	if [ $RESULT -eq 0 ]; then
-	    echo "Connected"
+	    echo " Connected"
 	    break
 	fi
 	if [ $RESULT -eq 255 ]; then
 	    if [[ $status == *"Permission denied"* ]]; then
-		echo "server found"
+		echo " server found"
 		break
 	    fi
 	fi
@@ -53,7 +57,13 @@ wait_for_ssh() {
 	    exit 1
 	fi
 	sleep 2
+	echo -n "."
     done
+    set -e
+}
+
+ssh_finish_session() {
+    ssh -O exit -o ControlPath="$CONTROL_PATH" "$VM_USER"@"SSH_HOST"
 }
 
 BASE_DIR=""
@@ -78,7 +88,6 @@ VM_NAME="${TYPE}_node_${USER}"
 # Check if VM already run, exist, if not create it
 if VBoxManage showvminfo "$VM_NAME" --machinereadable 2>&1 | grep -q '^VMState="running"'; then
     wait_for_ssh
-    echo "coucou"
 elif VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; then
     echo "[$SCRIPT_NAME] $VM_NAME exist..."
     # Start VM
@@ -227,6 +236,5 @@ else
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
     scp -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
-    echo "coucou2"
 fi
 ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP=$IP USER_NAME=$USER"
