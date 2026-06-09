@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import type { Socket } from "socket.io-client";
 
 export interface Message {
     time: Date;
@@ -7,8 +8,9 @@ export interface Message {
 }
 
 export interface Chat {
-    user: string;
+    socket: Socket | null;
     messages: Array<Message>;
+    isConnected: boolean;
     sendMessage: (text: string) => Promise<void>;
 }
 

@@ -21,17 +21,17 @@ export function NavBar () {
 }
 
 function NavMenu () {
-		return (
-			<ul className="navMenu">
-				{Object.entries(menuLinks).map(([name, url]) => (
-					<React.Fragment key={name}>
-						<li>
-							<Link to={url} className="nav-link">
-								{name}
-							</Link>
-						</li>
-					</React.Fragment>
-				))}
-			</ul>
-		);
+	return (
+		<ul className="navMenu">
+			{Object.entries(menuLinks).map(([name, url]) => (
+				<React.Fragment key={name}>
+					<li>
+						<Link to={url} className="nav-link">
+							{name}
+						</Link>
+					</li>
+				</React.Fragment>
+			))}
+		</ul>
+	);
 }

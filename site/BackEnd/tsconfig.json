@@ -14,8 +14,18 @@
     "sourceMap": true,
     "outDir": "./dist",
     "paths": {
-      "*": ["./*"],
-      "@/*": ["./src/*"],
+      "*": [
+        "./*"
+      ],
+      "@/*": [
+        "./src/*"
+      ],
+      "app/shared": [
+        "libs/shared/src"
+      ],
+      "app/shared/*": [
+        "libs/shared/src/*"
+      ]
     },
     "incremental": true,
     "skipLibCheck": true,
@@ -23,6 +33,7 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "baseUrl": "./"
   }
 }
