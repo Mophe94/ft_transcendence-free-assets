@@ -20,7 +20,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private gameService: GameService) {}
   
   handleConnection(client: WebSocket, request: IncomingMessage): void {
-    //const roomId = request.headers['x-room-id'] as string;
+    let url = request.url;
+    console.log(url);
     // Replace by JWT token validation!
     let roomId = 'test-room';
     const user = createMockUser();
