@@ -30,7 +30,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private gameService: GameService) {}
 
   handleConnection(client: WebSocket, request: IncomingMessage): void {
-    //const roomId = request.headers['x-room-id'] as string;
+    const url = request.url!;
+    console.log(url);
+    const params = new URLSearchParams(url.split('?')[1]);
+    console.log(params);
+    if (!params) {
+      console.log("Missing token to authenticate");
+      client.close();
+      return;
+    }
+    const token = params.get('token');
+    console.log(token);
+
     // Replace by JWT token validation!
     let roomId = 'test-room';
     const user = createMockUser();
