@@ -9,7 +9,7 @@ using_defaults=false
 
 #Base image -->Default value, overide in CONFIG_FILE
 DEFAULT_BASE_DIR="$HOME/sgoinfre/students/stempels/"
-BASE_IMG="vm_node_base.vdi"
+BASE_IMG="node_base.vdi"
 
 # VM Configuration
 DEFAULT_VM_DIR="$HOME/goinfre/"
@@ -26,7 +26,7 @@ VM_USER="$USER"
 VM_TARGET_DIR="/home/$USER"
 
 #Safeguard
-set -euo pipefail
+#set -euo pipefail
 
 wait_for_ssh() {
     RESULT=1
@@ -77,21 +77,21 @@ VM_NAME="${TYPE}_node_${USER}"
 
 # Check if VM already run, exist, if not create it
 if VBoxManage showvminfo "$VM_NAME" --machinereadable 2>&1 | grep -q '^VMState="running"'; then
-   # wait_for_ssh
-   echo "coucou"
+    wait_for_ssh
+    echo "coucou"
 elif VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; then
     echo "[$SCRIPT_NAME] $VM_NAME exist..."
     # Start VM
     echo "[$SCRIPT_NAME] Starting VM..."
     VBoxManage startvm "$VM_NAME" --type headless
-   # wait_for_ssh
+    wait_for_ssh
 elif [ -f "$VM_DIR/$VM_NAME/$VM_NAME.vbox" ]; then
     echo "[$SCRIPT_NAME] $VM_NAME exist but is not registered. Registering now..."
     VBoxManage registrvm "$VM_DIR/$VM_NAME/$VM_NAME.vbox"
     # Start VM
     echo "[$SCRIPT_NAME] Starting VM..."
     VBoxManage startvm "$VM_NAME" --type headless
-  #  wait_for_ssh
+    wait_for_ssh
 else
 	VM_USER="root"
 	# Get config argument and set default value if missing
@@ -99,10 +99,11 @@ else
 		using_defaults=true
 		echo "[$SCRIPT_NAME] $CONFIG_FILE not found."
 	else
+		echo "[$SCRIPT_NAME] $CONFIG_FILE found."
 		while IFS='=' read -r key value; do
 			case "$key" in
 				BASE_DIR) BASE_DIR="$value";;
-				VM_DIR) VM_DIR="$value" ;;
+				VM_DIR) VM_DIR="$value";;
 			esac
 		done < "$CONFIG_FILE"
 		if [ -z "$BASE_DIR" ] || [ -z "$VM_DIR" ]; then
@@ -112,7 +113,7 @@ else
 	fi
 
 	# Prompt for default value usage
-	if [ "$using_defaults" ]; then
+	if [ "$using_defaults" == true ]; then
 		echo "[$SCRIPT_NAME] default value:"
 		echo -e "\tdirectory: $DEFAULT_VM_DIR\tBase Vm directory: $BASE_DIR"
 		BASE_DIR=$DEFAULT_BASE_DIR
@@ -129,7 +130,7 @@ else
 	if [ ! -d "$BASE_DIR" ] || [ ! -d "$VM_DIR" ];then
 		echo "[$SCRIPT_NAME] directory $BASE_DIR or $VM_DIR does not exist"
 		exit 1
-	elif [ ! -f $BASE_DIR/$BASE_IMG ];then
+	elif [ ! -f "$BASE_DIR/$BASE_IMG" ];then
 		echo "[$SCRIPT_NAME] base vm image in $BASE_DIR"
 		exit 1
 	fi
@@ -204,7 +205,7 @@ else
     VBoxManage startvm "$VM_NAME" --type headless
 
     #Waiting for VM ssh to be ready
- #   wait_for_ssh
+    wait_for_ssh
 #    echo "[$SCRIPT_NAME] SSH is fully ready"
     echo "[$SCRIPT_NAME] Setting up worker"
     echo "$IP" > "infra/host_ip.txt"

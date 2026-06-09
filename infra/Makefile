@@ -21,7 +21,7 @@ node_launch:
 swarm_setup:
 	@chmod +x $(SWARM_SCRIPTS)/launch_swarm.sh
 	@$(SWARM_SCRIPTS)/launch_swarm.sh "$(SWARM_SCRIPTS)" "$(HOST_IP)"
-	docker stack deploy -c $(DEPLOY_FILES)/core_deploy.yml    core
+	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
 build:
 	echo $(CONTAINER_FILES)
@@ -33,16 +33,16 @@ push:
 #	BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
 
 core:
-	docker stack deploy -c $(DEPLOY_FILES)/$@_deploy.yml    $@
+	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 website:
-	IP=$(IP4) docker stack deploy -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 observ:
-	docker stack deploy -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 up: build
-	docker stack deploy -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 down:
 	chmod 777 $(SWARM_SCRIPTS)/end_swarm.sh
