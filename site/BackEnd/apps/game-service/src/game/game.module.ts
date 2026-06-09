@@ -4,6 +4,6 @@ import { GameService } from './game.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 
 @Module({
-  providers: [GameGateway, GameService, PhaseTimerService]
+  providers: [GameGateway, GameService, PhaseTimerService],
 })
 export class GameModule {}

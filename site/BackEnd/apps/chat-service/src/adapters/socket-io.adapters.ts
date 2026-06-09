@@ -13,6 +13,4 @@ export class CustomIoAdapter extends IoAdapter {
     super(app);
     this.frontend_url = configService.getOrThrow<string>('FRONT_END_URL');
   }
-
-  
 }

@@ -15,5 +15,5 @@ app.use(express.static(__dirname));
 
 const PORT = process.env.GAME_PORT || 8060;
 app.listen(PORT, () => {
-  console.log(`🎮 Serveur Godot prêt sur : http://localhost:${PORT}/the_game_chrono.html`);
+  console.log(`🎮 Serveur Godot prêt sur : http://localhost:${PORT}/Export_test.html`);
 });
