@@ -71,7 +71,8 @@ for network in "${networks[@]}"; do
 done
 
 #Adding more node ?
-read -p "[$SCRIPT_NAME] Do you want to add more node (y/N): " answer
+echo -n "[$SCRIPT_NAME] Do you want to add more node (y/N): " 
+read answer
 case "${answer,,}" in
 	[y]|[yes])
 	    chmod +x "${DIR}/add_node.sh"
@@ -89,3 +90,4 @@ else
 fi
 
 docker service ls
+echo ""

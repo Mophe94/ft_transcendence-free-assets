@@ -229,4 +229,4 @@ else
     scp -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
     echo "coucou2"
 fi
-ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP="$IP" USER_NAME=$USER"
+ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP=$IP USER_NAME=$USER"
