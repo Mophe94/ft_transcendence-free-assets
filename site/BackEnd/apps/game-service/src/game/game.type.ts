@@ -4,7 +4,7 @@ export interface GamePayload {
 	data? : any;
  }
   
-export const FULL_LOBBY = 8;
+export const FULL_LOBBY = 1;
   
 export const PHASE_DURATIONS = {
 	lobby: 5,
