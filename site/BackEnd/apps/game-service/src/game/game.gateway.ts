@@ -33,22 +33,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const url = request.url!;
     console.log(url);
     const params = new URLSearchParams(url.split('?')[1]);
-    console.log(params);
-    if (!params) {
+    const token = params.get('token');
+    console.log(token);
+    if (!token) {
       console.log("Missing token to authenticate");
       client.close();
       return;
     }
-    const token = params.get('token');
-    console.log(token);
 
-    // Replace by JWT token validation!
+    // Add JWT token validation
+
     let roomId = 'test-room';
     const user = createMockUser();
     if (!roomId || !this.gameService.isPlayerInRoom(user.sub, roomId)) {
       client.close();
       return;
     }
+
     clientsMap.set(client, { user, roomId });
     console.log(`Client ${user.sub} connected in room ${roomId}`);
 
@@ -58,7 +59,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: WebSocket): void {
     clientsMap.delete(client);
-    console.log('Client disonnected');
+    console.log('[Disconnect]: Client disconnected');
   }
 
   private broadcast(clients: Set<WebSocket>, message: object) {
