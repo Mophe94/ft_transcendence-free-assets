@@ -20,6 +20,7 @@ import {
   clientsMap,
 } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
+import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
 
 @WebSocketGateway(8082, { cors: true })
@@ -31,21 +32,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: WebSocket, request: IncomingMessage): void {
     const url = request.url!;
-    console.log(url);
     const params = new URLSearchParams(url.split('?')[1]);
     const token = params.get('token');
-    console.log(token);
-    if (!token) {
-      console.log("Missing token to authenticate");
-      client.close();
-      return;
-    }
-
     // Add JWT token validation
-
-    let roomId = 'test-room';
+    const roomId = params.get('room-id');
+    console.log(url);
+    console.log(token);
+    console.log(roomId);
     const user = createMockUser();
-    if (!roomId || !this.gameService.isPlayerInRoom(user.sub, roomId)) {
+    if (!token || !roomId || !this.gameService.isPlayerInRoom(user.sub, roomId)) {
+      console.log("Missing token to authenticate");
       client.close();
       return;
     }
@@ -54,7 +50,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client ${user.sub} connected in room ${roomId}`);
 
     // Implement addPlayerToRoom in GameService
-    // if FULL_LOBBY -> startMapPhase(roomId) + send phase state to Godot
+/*     if (FULL_LOBBY)
+    startMapPhase(roomId) //+ send phase state to Godot */
   }
 
   handleDisconnect(client: WebSocket): void {
@@ -75,12 +72,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('game')
-  async handleGame(
-    @ConnectedSocket() client: WebSocket,
-    @MessageBody() payload: any,
-  ): Promise<void> {
+  async handleGame(@ConnectedSocket() client: WebSocket, @MessageBody() payload: any,): Promise<void> {
     // create a GamePayload interface to avoid 'any'?
-    const clientData = clientsMap.get(client); //client.data.user.sub;
+    const clientData = clientsMap.get(client);
     if (!clientData) {
       client.close();
       return;
