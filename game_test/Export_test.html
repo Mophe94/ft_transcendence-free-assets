@@ -115,11 +115,13 @@ body {
 
     if (event.data && event.data.type === "SET_GAME_TOKEN") {
         const token = event.data.token;
+		console.log(event.data);
 
         if (typeof Godot !== 'undefined' && Godot.Instance) {
             Godot.Instance.get_main_loop().get_root().get_node("MonNodeJeu").call("set_token", token);
         } else {
-            window.gameToken = token;
+            window.userToken = token.user_token;
+			window.roomToken = token.room_token;
         }
     }
 });
