@@ -222,8 +222,10 @@ else
     VM_TARGET_DIR="/home/$USER"
 
     echo "[$SCRIPT_NAME] Setting up node"
+    set +e
     scp -P "$SSH_PORT" "vm_management/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
     ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER"
+    set -e
 
     echo "[$SCRIPT_NAME] Switching user"
     VM_USER=$USER
@@ -234,7 +236,11 @@ else
     PACK[worker]="infra/Makefile"
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
+    set +e
     ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
     scp -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+    set -e
 fi
+set +e
 ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP=$IP USER_NAME=$USER"
+set -e

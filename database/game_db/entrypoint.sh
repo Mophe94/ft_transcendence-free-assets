@@ -28,6 +28,6 @@ EOF
 
 echo "Running schema initialization on ${GAME_DB_NAME}..."
 psql -v ON_ERROR_STOP=1 \
-     --username="$POSTGRES_USER" \
+     --username=postgres \
      --dbname="${GAME_DB_NAME}" \
      -f /app/sql/game_db_init.sql

@@ -2,8 +2,8 @@ services:
 
     frontend:
         image: ${IP}:80/frontend:latest
-        env_file:
-          - "site/FrontEnd/.env"
+#        env_file:
+#          - "site/FrontEnd/.env"
 
         networks:
             - games_net
@@ -21,24 +21,24 @@ services:
           - VITE_42_OAUTH_API_LINK
 
         environment:
-          FORTYTWO_CLIENT_ID: $(cat /run/secrets/FORTYTWO_CLIENT_ID)
-          FORTYTWO_CLIENT_SECRET: $(cat /run/secrets/FORTYTWO_CLIENT_SECRET)
-          FORTYTWO_REDIRECT_URI: $(cat /run/secrets/FORTYTWO_REDIRECT_URI)
-          FORTYTWO_API_TOKENEXCHANGE: $(cat /run/secrets/FORTYTWO_API_TOKENEXCHANGE)
-          FORTYTWO_API_GETUSER: $(cat /run/secrets/FORTYTWO_API_GETUSER)
-          VITE_API_BASE_URL: $(cat /run/secrets/VITE_API_BASE_URL)
-          VITE_42_OAUTH_API: $(cat /run/secrets/VITE_42_OAUTH_API)
-          VITE_42_OAUTH_CLIENT_ID: $(cat /run/secrets/VITE_42_OAUTH_CLIENT_ID)
-          VITE_42_OAUTH_REDIRECT_URI: $(cat /run/secrets/VITE_42_OAUTH_REDIRECT_URI)
-          VITE_42_OAUTH_API_LINK: $(cat /run/secrets/VITE_42_OAUTH_API_LINK)
+          FORTYTWO_CLIENT_ID: /run/secrets/FORTYTWO_CLIENT_ID
+          FORTYTWO_CLIENT_SECRET: /run/secrets/FORTYTWO_CLIENT_SECRET
+          FORTYTWO_REDIRECT_URI: /run/secrets/FORTYTWO_REDIRECT_URI
+          FORTYTWO_API_TOKENEXCHANGE: /run/secrets/FORTYTWO_API_TOKENEXCHANGE
+          FORTYTWO_API_GETUSER: /run/secrets/FORTYTWO_API_GETUSER
+          VITE_API_BASE_URL: /run/secrets/VITE_API_BASE_URL
+          VITE_42_OAUTH_API: /run/secrets/VITE_42_OAUTH_API
+          VITE_42_OAUTH_CLIENT_ID: /run/secrets/VITE_42_OAUTH_CLIENT_ID
+          VITE_42_OAUTH_REDIRECT_URI: /run/secrets/VITE_42_OAUTH_REDIRECT_URI
+          VITE_42_OAUTH_API_LINK: /run/secrets/VITE_42_OAUTH_API_LINK
 
         deploy:
             replicas: 1
 
     backend:
         image: ${IP}:80/backend:latest
-        env_file:
-          - "site/BackEnd/.env"
+#        env_file:
+#          - "site/BackEnd/.env"
 
         networks:
             - games_net
@@ -52,19 +52,22 @@ services:
 
         environment:
           FRONT_END_URL: http://localhost:5173/
-          FORTYTWO_CLIENT_ID: $(cat /run/secrets/FORTYTWO_CLIENT_ID)
-          FORTYTWO_CLIENT_SECRET: $(cat /run/secrets/FORTYTWO_CLIENT_SECRET)
-          FORTYTWO_REDIRECT_URI: $(cat /run/secrets/FORTYTWO_REDIRECT_URI)
-          FORTYTWO_API_TOKENEXCHANGE: $(cat /run/secrets/FORTYTWO_API_TOKENEXCHANGE)
-          FORTYTWO_API_GETUSER: $(cat /run/secrets/FORTYTWO_API_GETUSER)
+          FORTYTWO_CLIENT_ID: /run/secrets/FORTYTWO_CLIENT_ID
+          FORTYTWO_CLIENT_SECRET: /run/secrets/FORTYTWO_CLIENT_SECRET
+          FORTYTWO_REDIRECT_URI: /run/secrets/FORTYTWO_REDIRECT_URI
+          FORTYTWO_API_TOKENEXCHANGE: /run/secrets/FORTYTWO_API_TOKENEXCHANGE
+          FORTYTWO_API_GETUSER: /run/secrets/FORTYTWO_API_GETUSER
 
         deploy:
             replicas: 1
 
     users_db:
         image: ${IP}:80/users_db:latest
-        env_file:
-          - "site/databases/user_db/.env"
+#        env_file:
+#          - "site/databases/user_db/.env"
+
+        volumes:
+          - users_data:/var/lib/postgresql/users_data
 
         networks:
             - games_net
@@ -74,22 +77,25 @@ services:
           - POSTGRES_PASSWORD
           - USERS_DB_NAME
           - USERS_DB_USER
-          - USER_DB_PASSWORD
+          - USERS_DB_PASSWORD
 
         environment:
-          POSTGRES_USER: $(cat /run/secrets/POSTGRES_USER)
-          POSTGRES_PASSWORD: $(cat /run/secrets/POSTGRES_PASSWORD)
-          USERS_DB_NAME: $(cat /run/secrets/USERS_DB_NAME)
-          USERS_DB_USER: $(cat /run/secrets/USERS_DB_USER)
-          USERS_DB_PASSWORD: $(cat /run/secrets/USERS_DB_PASSWORD)
+          POSTGRES_USER: /run/secrets/POSTGRES_USER
+          POSTGRES_PASSWORD: /run/secrets/POSTGRES_PASSWORD
+          USERS_DB_NAME: /run/secrets/USERS_DB_NAME
+          USERS_DB_USER: /run/secrets/USERS_DB_USER
+          USERS_DB_PASSWORD: /run/secrets/USERS_DB_PASSWORD
 
         deploy:
             replicas: 1
 
     game_db:
         image: ${IP}:80/game_db:latest
-        env_file:
-          - "site/databases/game_db/.env"
+#        env_file:
+#          - "site/databases/game_db/.env"
+
+        volumes:
+          - game_data:/var/lib/game/game_data
 
         networks:
             - games_net
@@ -102,11 +108,11 @@ services:
           - GAME_DB_PASSWORD
 
         environment:
-          POSTGRES_USER: $(cat /run/secrets/POSTGRES_USER)
-          POSTGRES_PASSWORD: $(cat /run/secrets/POSTGRES_PASSWORD)
-          GAME_DB_NAME: $(cat /run/secrets/GAME_DB_NAME)
-          GAME_DB_USER: $(cat /run/secrets/GAME_DB_USER)
-          GAME_DB_PASSWORD: $(cat /run/secrets/GAME_DB_PASSWORD)
+          POSTGRES_USER: /run/secrets/POSTGRES_USER
+          POSTGRES_PASSWORD: /run/secrets/POSTGRES_PASSWORD
+          GAME_DB_NAME: /run/secrets/GAME_DB_NAME
+          GAME_DB_USER: /run/secrets/GAME_DB_USER
+          GAME_DB_PASSWORD: /run/secrets/GAME_DB_PASSWORD
           
 
         deploy:
@@ -118,40 +124,44 @@ networks:
     swarm_net:
         external: true
 
-secrest:
-    POSTGRES_USER
+volumes:
+  users_data:
+  game_data:
+
+secrets:
+    POSTGRES_USER:
       external: true
-    POSTGRES_PASSWORD
+    POSTGRES_PASSWORD:
       external: true
-    USERS_DB_NAME
+    USERS_DB_NAME:
       external: true
-    USERS_DB_USER
+    USERS_DB_USER:
       external: true
-    USER_DB_PASSWORD
+    USERS_DB_PASSWORD:
       external: true
-    GAME_DB_NAME
+    GAME_DB_NAME:
       external: true
-    GAME_DB_USER
+    GAME_DB_USER:
       external: true
-    GAME_DB_PASSWORD
+    GAME_DB_PASSWORD:
       external: true
-    FORTYTWO_CLIENT_ID
+    FORTYTWO_CLIENT_ID:
       external: true
-    FORTYTWO_CLIENT_SECRET
+    FORTYTWO_CLIENT_SECRET:
       external: true
-    FORTYTWO_REDIRECT_URI
+    FORTYTWO_REDIRECT_URI:
       external: true
-    FORTYTWO_API_TOKENEXCHANGE
+    FORTYTWO_API_TOKENEXCHANGE:
       external: true
-    FORTYTWO_API_GETUSER
+    FORTYTWO_API_GETUSER:
       external: true
-    VITE_API_BASE_URL
+    VITE_API_BASE_URL:
       external: true
-    VITE_42_OAUTH_API
+    VITE_42_OAUTH_API:
       external: true
-    VITE_42_OAUTH_CLIENT_ID
+    VITE_42_OAUTH_CLIENT_ID:
       external: true
-    VITE_42_OAUTH_REDIRECT_URI
+    VITE_42_OAUTH_REDIRECT_URI:
       external: true
-    VITE_42_OAUTH_API_LINK
+    VITE_42_OAUTH_API_LINK:
       external: true

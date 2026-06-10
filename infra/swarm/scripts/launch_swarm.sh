@@ -10,55 +10,55 @@ fi
 
 #ARGUMENTS ASSIGNATION#
 DIR="$1"
-IP="$2"
+HOST_IP="$2"
 
 #SETUP DOCKER DEAMON
-mkdir -p /etc/docker
-if [ ! -f "/etc/docker/daemon.json" ]; then
-    cat << EOF > /etc/docker/daemon.json
-{
-    "insecure-registries": [
-        "registry",
-        "registry:5000",
-        "$IP:80"
-    ]
-}
-EOF
+#mkdir -p /etc/docker
+#if [ ! -f "/etc/docker/daemon.json" ]; then
+#    cat << EOF > /etc/docker/daemon.json
+#{
+#    "insecure-registries": [
+#        "registry",
+#        "registry:5000",
+#        "$IP:80"
+#    ]
+#}
+#EOF
+#
+#    if [ -f /etc/os-release ]; then
+#	DISTRO=$(grep -E '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
+#    else
+#	echo "Can not detect os-version"
+#	exit 1
+#    fi
+#
+#    case "$DISTRO" in
+#	alpine)
+#	    rc-service docker restart
+#	    ;;
+#	*)
+#	    echo "Os-version unsupported by this script"
+#	    exit 1
+#	    ;;
+#    esac
+#
+#    COUNTER=0
+#    TIMEOUT=30
+#    echo "Waiting for docker to restart"
+#    while ! docker info >/dev/null 2>&1; do
+#	if [ "$COUNTER" -ge "$TIMEOUT" ]; then
+#	    echo "Docker took to much time"
+#	    exit 1
+#	fi
+#	COUNTER=$((COUNTER + 1))
+#	sleep 2
+#	echo -n "."
+#    done
+#fi
 
-    if [ -f /etc/os-release ]; then
-	DISTRO=$(grep -E '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
-    else
-	echo "Can not detect os-version"
-	exit 1
-    fi
-
-    case "$DISTRO" in
-	alpine)
-	    rc-service docker restart
-	    ;;
-	*)
-	    echo "Os-version unsupported by this script"
-	    exit 1
-	    ;;
-    esac
-
-    COUNTER=0
-    TIMEOUT=30
-    echo "Waiting for docker to restart"
-    while ! docker info >/dev/null 2>&1; do
-	if [ "$COUNTER" -ge "$TIMEOUT" ]; then
-	    echo "Docker took to much time"
-	    exit 1
-	fi
-	COUNTER=$((COUNTER + 1))
-	sleep 2
-	echo -n "."
-    done
-fi
-
-#INIT THE SWARM AND PUBLISH IS IP#
+#INIT THE SWARM AND PUBLISH IS IP OF CONTACT(HOST_IP)#
 if [ ! "$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then
-    docker swarm init --advertise-addr $IP
+    docker swarm init --advertise-addr ${HOST_IP}
 fi
 
 networks=("swarm_net" "obsrv_net" "games_net")

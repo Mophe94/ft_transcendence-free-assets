@@ -8,7 +8,7 @@ CONTAINER_FILES:= "$(LOCATION)/containers"
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 USER_NAME="$(USER)"
 TYPE:=""
-HOST_IP:=""
+HOST_IP:= $(shell cat host_ip.txt)
 
 all:
 	@$(MAKE) --no-print-directory swarm-status
@@ -21,21 +21,24 @@ node_launch:
 swarm_setup:
 	@chmod +x $(SWARM_SCRIPTS)/launch_swarm.sh
 	@$(SWARM_SCRIPTS)/launch_swarm.sh "$(SWARM_SCRIPTS)" "$(HOST_IP)"
-	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
+	BUILDX_BAKE_ENTITLEMENTS_FS=0 IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
 build:
 	echo $(CONTAINER_FILES)
 	BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl 
 
 push:
-	BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake databases --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
-	BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake site --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
-#	BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
+	
+	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake databases --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
+	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake site --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
+#	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
 
 core:
 	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 website:
+	@doas mkdir -p "/var/lib/postgresql/data"
+	@doas mkdir -p "/var/lib/game/data"
 	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 observ:
