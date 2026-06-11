@@ -9,16 +9,8 @@ import {
 } from '@nestjs/websockets';
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
-import {
-  GamePayload,
-  PHASE_DURATIONS,
-  PhaseName,
-  createMockUser,
-} from './game.type';
-import {
-  ClientData,
-  clientsMap,
-} from 'apps/game-service/src/shared/clients.map';
+import { GamePayload, PHASE_DURATIONS, PhaseName, createMockUser } from './game.type';
+import { ClientData, clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
@@ -34,11 +26,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const url = request.url!;
     const params = new URLSearchParams(url.split('?')[1]);
     const token = params.get('token');
-    // Add JWT token validation
     const roomId = params.get('room-id');
     console.log(url);
     console.log(token);
     console.log(roomId);
+    // Add JWT token validation
     const user = createMockUser();
     if (!token || !roomId || !this.gameService.isPlayerInRoom(user.sub, roomId)) {
       console.log("Missing token to authenticate");
@@ -49,14 +41,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     clientsMap.set(client, { user, roomId });
     console.log(`Client ${user.sub} connected in room ${roomId}`);
 
-    // Implement addPlayerToRoom in GameService
-/*     if (FULL_LOBBY)
-    startMapPhase(roomId) //+ send phase state to Godot */
+    this.gameService.onGodotConnected(client, roomId);
   }
 
   handleDisconnect(client: WebSocket): void {
+    const user = clientsMap.get(client);
     clientsMap.delete(client);
-    console.log('[Disconnect]: Client disconnected');
+    console.log(`Client ${user?.user.sub} disconnected`);
   }
 
   private broadcast(clients: Set<WebSocket>, message: object) {
@@ -80,6 +71,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     const userId = clientData.user.sub;
+
+    //this.gameService.
 
     // Dispatch "State" exemple
     switch (payload.state) {
