@@ -130,7 +130,7 @@ services:
           - /load_secrets.sh
 
         command:
-
+          - /usr/local/bin/docker-entrypoint.sh 
           - postgres
 
         deploy:
