@@ -8,6 +8,11 @@ services:
         networks:
             - games_net
 
+        configs:
+          - source: load_secrets
+            target: /load_secrets.sh
+            mode: 0555
+
         secrets:
           - FORTYTWO_CLIENT_ID
           - FORTYTWO_CLIENT_SECRET
@@ -20,17 +25,13 @@ services:
           - VITE_42_OAUTH_REDIRECT_URI
           - VITE_42_OAUTH_API_LINK
 
-        environment:
-          FORTYTWO_CLIENT_ID: /run/secrets/FORTYTWO_CLIENT_ID
-          FORTYTWO_CLIENT_SECRET: /run/secrets/FORTYTWO_CLIENT_SECRET
-          FORTYTWO_REDIRECT_URI: /run/secrets/FORTYTWO_REDIRECT_URI
-          FORTYTWO_API_TOKENEXCHANGE: /run/secrets/FORTYTWO_API_TOKENEXCHANGE
-          FORTYTWO_API_GETUSER: /run/secrets/FORTYTWO_API_GETUSER
-          VITE_API_BASE_URL: /run/secrets/VITE_API_BASE_URL
-          VITE_42_OAUTH_API: /run/secrets/VITE_42_OAUTH_API
-          VITE_42_OAUTH_CLIENT_ID: /run/secrets/VITE_42_OAUTH_CLIENT_ID
-          VITE_42_OAUTH_REDIRECT_URI: /run/secrets/VITE_42_OAUTH_REDIRECT_URI
-          VITE_42_OAUTH_API_LINK: /run/secrets/VITE_42_OAUTH_API_LINK
+        entrypoint:
+          - /load_secrets.sh
+
+        command:
+          - npm
+          - run
+          - dev
 
         deploy:
             replicas: 1
@@ -43,6 +44,11 @@ services:
         networks:
             - games_net
 
+        configs:
+          - source: load_secrets
+            target: /load_secrets.sh
+            mode: 0555
+
         secrets:
           - FORTYTWO_CLIENT_ID
           - FORTYTWO_CLIENT_SECRET
@@ -52,11 +58,14 @@ services:
 
         environment:
           FRONT_END_URL: http://localhost:5173/
-          FORTYTWO_CLIENT_ID: /run/secrets/FORTYTWO_CLIENT_ID
-          FORTYTWO_CLIENT_SECRET: /run/secrets/FORTYTWO_CLIENT_SECRET
-          FORTYTWO_REDIRECT_URI: /run/secrets/FORTYTWO_REDIRECT_URI
-          FORTYTWO_API_TOKENEXCHANGE: /run/secrets/FORTYTWO_API_TOKENEXCHANGE
-          FORTYTWO_API_GETUSER: /run/secrets/FORTYTWO_API_GETUSER
+
+        entrypoint:
+          - /load_secrets.sh
+
+        command:
+          - npm
+          - run
+          - start
 
         deploy:
             replicas: 1
@@ -67,10 +76,15 @@ services:
 #          - "site/databases/user_db/.env"
 
         volumes:
-          - users_data:/var/lib/postgresql/users_data
+          - users_data:/var/lib/postgresql/
 
         networks:
             - games_net
+
+        configs:
+          - source: load_secrets
+            target: /load_secrets.sh
+            mode: 0555
 
         secrets:
           - POSTGRES_USER
@@ -79,12 +93,12 @@ services:
           - USERS_DB_USER
           - USERS_DB_PASSWORD
 
-        environment:
-          POSTGRES_USER: /run/secrets/POSTGRES_USER
-          POSTGRES_PASSWORD: /run/secrets/POSTGRES_PASSWORD
-          USERS_DB_NAME: /run/secrets/USERS_DB_NAME
-          USERS_DB_USER: /run/secrets/USERS_DB_USER
-          USERS_DB_PASSWORD: /run/secrets/USERS_DB_PASSWORD
+        entrypoint:
+          - /load_secrets.sh
+
+        command:
+          - /usr/local/bin/docker-entrypoint.sh 
+          - postgres
 
         deploy:
             replicas: 1
@@ -95,10 +109,15 @@ services:
 #          - "site/databases/game_db/.env"
 
         volumes:
-          - game_data:/var/lib/game/game_data
+          - game_data:/var/lib/postgresql/
 
         networks:
             - games_net
+
+        configs:
+          - source: load_secrets
+            target: /load_secrets.sh
+            mode: 0555
 
         secrets:
           - POSTGRES_USER
@@ -107,13 +126,12 @@ services:
           - GAME_DB_USER
           - GAME_DB_PASSWORD
 
-        environment:
-          POSTGRES_USER: /run/secrets/POSTGRES_USER
-          POSTGRES_PASSWORD: /run/secrets/POSTGRES_PASSWORD
-          GAME_DB_NAME: /run/secrets/GAME_DB_NAME
-          GAME_DB_USER: /run/secrets/GAME_DB_USER
-          GAME_DB_PASSWORD: /run/secrets/GAME_DB_PASSWORD
-          
+        entrypoint:
+          - /load_secrets.sh
+
+        command:
+
+          - postgres
 
         deploy:
             replicas: 1
@@ -127,6 +145,10 @@ networks:
 volumes:
   users_data:
   game_data:
+
+configs:
+  load_secrets:
+    file: "$HOME/infra/swarm/scripts/load_secrets.sh"
 
 secrets:
     POSTGRES_USER:
