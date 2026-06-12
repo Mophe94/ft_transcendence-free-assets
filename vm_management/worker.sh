@@ -39,7 +39,7 @@ wait_for_ssh() {
     ELAPSED=0
     echo -n "[$SCRIPT_NAME] Waiting for VM to boot."
     while :; do
-	status=$(ssh -o BatchMode=yes -o ConnectTimeout=5 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} 2>&1)
+	status=$(ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o ConnectTimeout=5 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} 2>&1)
 	RESULT=$?
 	if [ $RESULT -eq 0 ]; then
 	    echo " Connected"
@@ -223,8 +223,8 @@ else
 
     echo "[$SCRIPT_NAME] Setting up node"
     set +e
-    scp -P "$SSH_PORT" "vm_management/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
-    ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER"
+    scp -P "$SSH_PORT" -o StrictHostKeyChecking=no "vm_management/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER"
     set -e
 
     echo "[$SCRIPT_NAME] Switching user"
@@ -242,5 +242,5 @@ else
     set -e
 fi
 set +e
-ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP=$IP USER_NAME=$USER"
+ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP=$IP USER_NAME=$USER"
 set -e
