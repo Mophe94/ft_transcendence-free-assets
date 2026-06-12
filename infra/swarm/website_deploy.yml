@@ -50,7 +50,7 @@ services:
           - FORTYTWO_REDIRECT_URI
           - FORTYTWO_API_TOKENEXCHANGE
           - FORTYTWO_API_GETUSER
-          - JWT_TOKEN
+          - JWT_SECRET
 
         environment:
           FRONT_END_URL: http://localhost:5173/
@@ -72,8 +72,8 @@ services:
         networks:
             - games_net
 
-        configs:
-        entrypoint:
+#        configs:
+#        entrypoint:
         command:
           - node
           - server.js
@@ -198,5 +198,5 @@ secrets:
       external: true
     VITE_42_OAUTH_API_LINK:
       external: true
-    JWT_TOKEN:
+    JWT_SECRET:
       external: true

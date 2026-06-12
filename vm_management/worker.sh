@@ -39,7 +39,7 @@ wait_for_ssh() {
     ELAPSED=0
     echo -n "[$SCRIPT_NAME] Waiting for VM to boot."
     while :; do
-	status=$(ssh -o BatchMode=yes -o StrictHostKeyChecking=no -o ConnectTimeout=5 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} 2>&1)
+	status=$(ssh -v -o BatchMode=yes -o ConnectTimeout=5 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} 2>&1)
 	RESULT=$?
 	if [ $RESULT -eq 0 ]; then
 	    echo " Connected"
@@ -124,9 +124,9 @@ else
 	# Prompt for default value usage
 	if [ "$using_defaults" == true ]; then
 		echo "[$SCRIPT_NAME] default value:"
-		echo -e "\tdirectory: $DEFAULT_VM_DIR\tBase Vm directory: $BASE_DIR"
 		BASE_DIR=$DEFAULT_BASE_DIR
 		VM_DIR=$DEFAULT_VM_DIR
+		echo -e "\tdirectory: $DEFAULT_VM_DIR\tBase Vm directory: $BASE_DIR"
 		read -p " Proceed with these values ? (y/N): " answer
 		case "${answer,,}" in
 			[y]|[yes]) ;;
