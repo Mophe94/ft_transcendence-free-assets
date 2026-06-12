@@ -15,7 +15,7 @@ import { LobbyService } from 'apps/game-service/src/lobby/lobby.service'
 import { RoomService} from 'apps/game-service/src/shared/room.service'
 
 
-@WebSocketGateway(8080 /*, { cors: true } */)
+@WebSocketGateway(8080 , { cors: true })
 export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
@@ -29,8 +29,10 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: WebSocket): void {
     const clientData = clientsMap.get(client);
-    if (clientData?.roomId)
+    if (clientData?.roomId) {
       this.roomService.leaveRoom(client, clientData.roomId);
+      console.log('LEAVEROOM');
+    }
     clientsMap.delete(client);
     console.log('[LobbyGateway]: Client disconnected');
   }

@@ -21,8 +21,9 @@ export class RoomService {
 		if (clientData) clientData.roomId = roomId;
 	}
 
+	// ROOMID HARDCODEE
 	createRoom(roomId?: string): string {
-		const id = roomId ?? randomUUID();
+		const id = roomId ?? 'test-room'; //randomUUID();
 		this.rooms.set(id, new Set());
 		console.log(`Room created: ${id}`);
 		return id;

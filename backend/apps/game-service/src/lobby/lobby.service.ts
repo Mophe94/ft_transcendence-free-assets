@@ -47,8 +47,6 @@ export class LobbyService {
         this.eventEmitter.emit('lobby.start', { roomId, clients });
       });
     }
-
-    this.roomService.leaveRoom(client, roomId);
   }
 
 }

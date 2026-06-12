@@ -24,7 +24,7 @@ export default function Test () {
                 console.log(nouveauMessage);
 
                 setUserToken(nouveauMessage.event);
-                setRoomToken("123");
+                setRoomToken("test-room");
                 
                 setTimeout(() => {
                     setGameStart(true);

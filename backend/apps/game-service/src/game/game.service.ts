@@ -33,15 +33,17 @@ export class GameService implements OnModuleInit {
 
   @OnEvent('lobby.start')
   initGameRoom({ roomId }: { roomId: string }) : void {
+    console.log("OnEvent -> createRoom()")
     this.roomService.createRoom(roomId);
   }
 
   onGodotConnected(client: WebSocket, roomId: string) : void {
     this.roomService.joinRoom(client, roomId);
     const size = this.roomService.getRoomSize(roomId);
+    console.log(`Size = ${size}, RoomId = ${roomId}`);
     if (size === FULL_LOBBY) {
       this.startMapPhase(roomId);
-      console.log('FULL');
+      console.log('[GameService]: StartMapPhase');
     }
   }
 

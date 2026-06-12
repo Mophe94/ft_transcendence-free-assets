@@ -26,7 +26,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const url = request.url!;
     const params = new URLSearchParams(url.split('?')[1]);
     const token = params.get('token');
-    const roomId = params.get('room-id');
+    const roomId = params.get('room');
     console.log(url);
     console.log(token);
     console.log(roomId);
