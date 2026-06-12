@@ -14,11 +14,6 @@ services:
             mode: 0555
 
         secrets:
-          - FORTYTWO_CLIENT_ID
-          - FORTYTWO_CLIENT_SECRET
-          - FORTYTWO_REDIRECT_URI
-          - FORTYTWO_API_TOKENEXCHANGE
-          - FORTYTWO_API_GETUSER
           - VITE_API_BASE_URL
           - VITE_42_OAUTH_API
           - VITE_42_OAUTH_CLIENT_ID
@@ -55,6 +50,7 @@ services:
           - FORTYTWO_REDIRECT_URI
           - FORTYTWO_API_TOKENEXCHANGE
           - FORTYTWO_API_GETUSER
+          - JWT_TOKEN
 
         environment:
           FRONT_END_URL: http://localhost:5173/
@@ -66,6 +62,21 @@ services:
           - npm
           - run
           - start
+
+        deploy:
+            replicas: 1
+
+    game:
+        image: ${IP}:80/game:latest
+
+        networks:
+            - games_net
+
+        configs:
+        entrypoint:
+        command:
+          - node
+          - server.js
 
         deploy:
             replicas: 1
@@ -186,4 +197,6 @@ secrets:
     VITE_42_OAUTH_REDIRECT_URI:
       external: true
     VITE_42_OAUTH_API_LINK:
+      external: true
+    JWT_TOKEN:
       external: true

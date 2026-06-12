@@ -9,7 +9,7 @@ using_defaults=false
 
 #Base image -->Default value, overide in CONFIG_FILE
 DEFAULT_BASE_DIR="$HOME/sgoinfre/students/stempels/"
-BASE_IMG="node_base.vdi"
+BASE_IMG="vm_node_base.vdi"
 
 # VM Configuration
 DEFAULT_VM_DIR="$HOME/goinfre/"
@@ -232,13 +232,13 @@ else
     VM_TARGET_DIR="/home/$USER"
     wait_for_ssh
     declare -A PACK
-    PACK[manager]="infra site"
+    PACK[manager]="infra site game_test"
     PACK[worker]="infra/Makefile"
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     set +e
-    ssh -p "$SSH_PORT" "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
-    scp -r -P "$SSH_PORT" "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
+    scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
     set -e
 fi
 set +e

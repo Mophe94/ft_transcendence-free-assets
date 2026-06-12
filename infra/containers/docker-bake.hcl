@@ -11,7 +11,7 @@ group "databases" {
 }
 
 group "site" {
-    targets = ["frontend", "backend"]
+    targets = ["frontend", "backend", "game"]
 }
 
 target "alpine_base" {
@@ -30,6 +30,12 @@ target "backend" {
     context     = "${BAKE_ROOT}/../../site/BackEnd"
     dockerfile  = "Dockerfile"
     tags        = ["${REGISTRY}/backend:latest"]
+}
+
+target "game" {
+    context     = "${BAKE_ROOT}/../../game_test"
+    dockerfile  = "Dockerfile"
+    tags        = ["${REGISTRY}/game:latest"]
 }
 
 target "database_users" {
