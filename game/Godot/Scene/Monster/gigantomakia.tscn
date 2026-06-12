@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://c6bgvgr1uwcky"]
+
+[ext_resource type="Texture2D" uid="uid://co3ucalb2743x" path="res://Assets/Monster/spritesheet/Gigantomakia/sprite-1-1.png" id="1_o8vcr"]
+[ext_resource type="Texture2D" uid="uid://bbiarcbnih5na" path="res://Assets/Monster/spritesheet/Gigantomakia/sprite-1-2.png" id="2_knxrv"]
+[ext_resource type="Texture2D" uid="uid://b42ecy5amq1jf" path="res://Assets/Monster/spritesheet/Gigantomakia/sprite-1-3.png" id="3_4b3i1"]
+[ext_resource type="Texture2D" uid="uid://bvb2eoabi1vgb" path="res://Assets/Monster/spritesheet/Gigantomakia/sprite-1-4.png" id="4_0541e"]
+[ext_resource type="Texture2D" uid="uid://cxqab5mcvh3ma" path="res://Assets/Monster/spritesheet/Gigantomakia/sprite-2-1.png" id="5_0541e"]
+[ext_resource type="Texture2D" uid="uid://d2hld3p120srj" path="res://Assets/Monster/spritesheet/Gigantomakia/sprite-2-4.png" id="5_gkvj2"]
+[ext_resource type="Texture2D" uid="uid://kq3ygmy0ud8d" path="res://Assets/Monster/spritesheet/Gigantomakia/sprite-2-2.png" id="6_gkvj2"]
+[ext_resource type="Texture2D" uid="uid://gslmmp2ewnxi" path="res://Assets/Monster/spritesheet/Gigantomakia/sprite-2-3.png" id="7_6n4g2"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6n4g2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_o8vcr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_knxrv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_4b3i1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_0541e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_0541e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_gkvj2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_6n4g2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_gkvj2")
+}],
+"loop": true,
+"name": &"default",
+"speed": 4.0
+}]
+
+[node name="Gigantomakia" type="Node2D" unique_id=1678516007]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=489529665]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D" unique_id=338558824]
+position = Vector2(-0.40000308, -7.999996)
+scale = Vector2(0.29705882, 0.27118644)
+sprite_frames = SubResource("SpriteFrames_6n4g2")
+autoplay = "default"
+frame_progress = 0.65715814

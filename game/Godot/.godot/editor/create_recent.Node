@@ -1,1 +1,14 @@
-Timer
+TextureRect
+CollisionShape2D
+Area2D
+CollisionPolygon2D
+TileMapLayer
+Node
+AnimatedSprite2D
+StaticBody2D
+TileMap
+Sprite2D
+HSeparator
+RichTextLabel
+VBoxContainer
+MarginContainer

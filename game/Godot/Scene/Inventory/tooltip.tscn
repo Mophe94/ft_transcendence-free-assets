@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://ud8c3pownn8g"]
+
+[ext_resource type="Script" uid="uid://yb0kjfhatua7" path="res://Scene/Inventory/panel_tooltip.gd" id="1_frmea"]
+[ext_resource type="Texture2D" uid="uid://c80bwfj2cerhg" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Banners/Banner_Slots.png" id="2_7p1mb"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="3_i4usc"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7p1mb"]
+
+[node name="Tooltip" type="CanvasLayer" unique_id=1901411104]
+
+[node name="PanelTooltip" type="Panel" parent="." unique_id=1063020927 groups=["tooltip"]]
+z_index = 15
+offset_right = 212.0
+offset_bottom = 241.0
+script = ExtResource("1_frmea")
+
+[node name="NinePatchRect" type="NinePatchRect" parent="PanelTooltip" unique_id=1191627473]
+layout_mode = 0
+offset_right = 211.0
+offset_bottom = 240.0
+texture = ExtResource("2_7p1mb")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelTooltip/NinePatchRect" unique_id=2026844277]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 20.0
+offset_right = 201.0
+offset_bottom = 244.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelTooltip/NinePatchRect/MarginContainer" unique_id=1765429636]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TooltipName" type="Label" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer" unique_id=699870699]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_i4usc")
+theme_override_font_sizes/font_size = 23
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer" unique_id=895623972]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxFlat_7p1mb")
+
+[node name="TooltipDescription" type="Label" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer" unique_id=1696804875]
+custom_minimum_size = Vector2(180, 180)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_i4usc")
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+autowrap_mode = 3

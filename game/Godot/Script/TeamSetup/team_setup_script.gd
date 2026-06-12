@@ -24,12 +24,12 @@ func instantiate_charactere():
 func instanciate_monster_player():
 	var current = 0
 	for i in range(6):
-		var monster_name = player_monster[i]
+		var monster_name = player_monster[i]["name"]  # ✅ accède au dictionnaire
 		if monster_name == "":
 			continue
-		#Voir easter egg
+		# Voir easter egg
 		elif !monster.has(monster_name):
-			player_monster[i] = ""
+			player_monster[i]["name"] = ""  # ✅ modifie le bon champ
 			continue
 		var monster_scene = monster[monster_name].instantiate()
 		slot_player[current].get_node("Monster").add_child(monster_scene)

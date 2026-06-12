@@ -142,9 +142,8 @@ animations = [{
 "speed": 10.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hjaqi"]
-radius = 5.0
-height = 10.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g4843"]
+size = Vector2(18.5, 24.125)
 
 [node name="Player" type="Node2D" unique_id=622233450]
 
@@ -169,6 +168,6 @@ limit_right = 6336
 limit_bottom = 3776
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D" unique_id=29086616]
-position = Vector2(1, 10)
+position = Vector2(-1.5, 1.125)
 scale = Vector2(2, 2)
-shape = SubResource("CapsuleShape2D_hjaqi")
+shape = SubResource("RectangleShape2D_g4843")

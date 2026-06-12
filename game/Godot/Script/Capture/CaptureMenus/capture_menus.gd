@@ -88,7 +88,7 @@ func set_menus_flee():
 func set_menus_capture():
 	$Banner/CenterContainer/Action.text = "CAPTURE"
 	hide_button("all")
-	if GeneralData.player["team"].has(""):
+	if GeneralData.player["team"].any(func(slot): return slot["name"] == ""):
 		await text_show("Do you want to try to catch " + GeneralData.monster_encounter)
 		button[2].text = "YES"
 		button[2].action = "catch"
@@ -114,8 +114,9 @@ func set_menus_catch_result(object):
 	hide_button("all")
 	if object == "yes":
 		for i in range(6):
-			if GeneralData.player["team"][i] == "":
-				GeneralData.player["team"][i] = GeneralData.monster_encounter
+			if GeneralData.player["team"][i]["name"] == "":  # ✅ accède au dictionnaire
+				GeneralData.player["team"][i]["name"] = GeneralData.monster_encounter  # ✅ modifie le bon champ
+				GeneralData.player["team"][i]["description"] = ""  # ✅ initialise la description
 				break
 		set_menus_back()
 		emit_signal("monster_back")

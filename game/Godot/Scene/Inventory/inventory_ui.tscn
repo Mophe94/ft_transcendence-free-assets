@@ -20,7 +20,6 @@ grow_vertical = 2
 script = ExtResource("1_oy36q")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="." unique_id=606246237]
-z_index = 15
 layout_mode = 0
 offset_right = 2944.0
 offset_bottom = 2368.0
@@ -105,7 +104,7 @@ theme_override_font_sizes/normal_font_size = 30
 text = "Quit"
 horizontal_alignment = 1
 
-[node name="Button" type="Button" parent="." unique_id=295561470]
+[node name="ButtonQuit" type="Button" parent="." unique_id=295561470]
 z_index = 15
 layout_mode = 0
 offset_left = 280.0
@@ -115,3 +114,49 @@ offset_bottom = 472.0
 icon = ExtResource("5_750jp")
 flat = true
 script = ExtResource("6_g7rln")
+
+[node name="ConfirmationDialog" type="CanvasLayer" parent="." unique_id=1329696129]
+visible = false
+
+[node name="Panel" type="Panel" parent="ConfirmationDialog" unique_id=871070916]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -125.0
+offset_top = -94.5
+offset_right = 125.0
+offset_bottom = 94.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ButtonNo" type="Button" parent="ConfirmationDialog/Panel" unique_id=1852241172]
+layout_mode = 0
+offset_left = 161.0
+offset_top = 112.5
+offset_right = 198.0
+offset_bottom = 144.5
+theme_override_fonts/font = ExtResource("4_bfugl")
+theme_override_font_sizes/font_size = 23
+text = "No"
+
+[node name="Label" type="Label" parent="ConfirmationDialog/Panel" unique_id=1887807372]
+layout_mode = 0
+offset_left = 41.0
+offset_top = 51.0
+offset_right = 204.0
+offset_bottom = 75.0
+theme_override_fonts/font = ExtResource("4_bfugl")
+theme_override_font_sizes/font_size = 23
+text = "Are you Sure ?"
+
+[node name="ButtonYes" type="Button" parent="ConfirmationDialog/Panel" unique_id=298309631]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 114.0
+offset_right = 94.0
+offset_bottom = 146.0
+theme_override_fonts/font = ExtResource("4_bfugl")
+theme_override_font_sizes/font_size = 23
+text = "Yes "

@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://dq0rno40c1qun"]
+
+[ext_resource type="Texture2D" uid="uid://56n2c17cvaqn" path="res://Assets/Monster/spritesheet/Papate/sprite-1-1-copy-1.png" id="1_k2ies"]
+[ext_resource type="Texture2D" uid="uid://cfc1euuj0q5xn" path="res://Assets/Monster/spritesheet/Papate/sprite-1-3-copy-1.png" id="2_jfq7f"]
+[ext_resource type="Texture2D" uid="uid://cmn5tpg8hhnmj" path="res://Assets/Monster/spritesheet/Papate/sprite-1-4-copy-0.png" id="3_22724"]
+[ext_resource type="Texture2D" uid="uid://c450rssgly456" path="res://Assets/Monster/spritesheet/Papate/sprite-2-2-copy-0.png" id="4_b7fl8"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_fumfw"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_k2ies")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_jfq7f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_22724")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_b7fl8")
+}],
+"loop": true,
+"name": &"default",
+"speed": 3.0
+}]
+
+[node name="Papate" type="Node2D" unique_id=1871283800]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=2125506957]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D" unique_id=1983161945]
+position = Vector2(1.3113022e-06, 1.66893e-06)
+scale = Vector2(0.3149606, 0.2531646)
+sprite_frames = SubResource("SpriteFrames_fumfw")
+autoplay = "default"
+frame_progress = 0.8760477

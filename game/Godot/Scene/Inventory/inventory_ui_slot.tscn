@@ -10,24 +10,29 @@ custom_minimum_size = Vector2(63, 62)
 offset_right = 63.0
 offset_bottom = 62.0
 script = ExtResource("1_v1nwp")
+metadata/_edit_horizontal_guides_ = [30.0]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=784473591]
 scale = Vector2(1.0000001, 0.96875006)
 texture = ExtResource("1_y6qex")
 centered = false
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1040511306]
+[node name="Panel" type="Panel" parent="." unique_id=1661603732]
 layout_mode = 0
-offset_right = 62.0
-offset_bottom = 60.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 56.0
+offset_bottom = 54.0
 
-[node name="Panel" type="Panel" parent="CenterContainer" unique_id=1661603732]
-layout_mode = 2
+[node name="item_display" type="TextureRect" parent="Panel" unique_id=1610652601]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 0
+offset_right = 97.127975
+offset_bottom = 105.937836
+scale = Vector2(0.49419338, 0.43421692)
+expand_mode = 5
 
-[node name="item_display" type="Sprite2D" parent="CenterContainer/Panel" unique_id=1439197138]
-scale = Vector2(1.2656248, 1.2499999)
-
-[node name="item_count" type="Label" parent="CenterContainer/Panel" unique_id=58092227]
+[node name="item_count" type="Label" parent="Panel" unique_id=58092227]
 layout_mode = 0
 offset_left = 2.0
 offset_top = -4.0
