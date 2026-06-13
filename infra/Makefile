@@ -21,7 +21,7 @@ node_launch:
 swarm_setup:
 	@chmod +x $(SWARM_SCRIPTS)/launch_swarm.sh
 	@$(SWARM_SCRIPTS)/launch_swarm.sh "$(SWARM_SCRIPTS)" "$(HOST_IP)"
-	BUILDX_BAKE_ENTITLEMENTS_FS=0 IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
+	@BUILDX_BAKE_ENTITLEMENTS_FS=0 IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
 build:
 	echo $(CONTAINER_FILES)
@@ -29,9 +29,13 @@ build:
 
 push:
 	
+	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake observ --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl
 	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake databases --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
-	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake site --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
+	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake website --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
+	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake game --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
 #	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
+test:
+	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake fluent-bit --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl
 
 core:
 	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@

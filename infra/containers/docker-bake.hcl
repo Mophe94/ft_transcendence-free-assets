@@ -10,12 +10,16 @@ group "databases" {
     targets = ["database_users", "database_game"]
 }
 
-group "site" {
-    targets = ["frontend", "backend", "game"]
-}
-
 group "observ" {
     targets = ["fluent-bit"]
+}
+
+group "website" {
+    targets = ["frontend", "backend"]
+}
+
+group "game" {
+    targets = ["game"]
 }
 
 target "alpine_base" {
@@ -56,7 +60,7 @@ target "database_game" {
 
 target "fluent-bit" {
     context     = "${BAKE_ROOT}/fluent-bit"
-    dockerfile  = Dockerfile
+    dockerfile  = "Dockerfile"
     tags        = ["${REGISTRY}/fluent-bit:latest"]
 }
 

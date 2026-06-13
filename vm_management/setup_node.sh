@@ -21,6 +21,10 @@ echo "${NEW_USER}:${PASSWORD}" | chpasswd
 addgroup "$NEW_USER" wheel
 addgroup "$NEW_USER" docker
 
+mkdir -p "/home/${NEW_USER}/.ssh"
+chown -R ${NEW_USER}:${NEW_USER} "/home/${NEW_USER}/.ssh/"
+chmod 700 "/home/${NEW_USER}/.ssh"
+
 echo "[$SCRIPT_NAME] Disabling root SSH login"
 
 cp "$SSH_CONFIG" "${SSH_CONFIG}.bak"

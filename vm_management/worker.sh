@@ -223,13 +223,16 @@ else
 
     echo "[$SCRIPT_NAME] Setting up node"
     set +e
+    PUB_KEY="$HOME/.ssh/*.pub"
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
     scp -P "$SSH_PORT" -o StrictHostKeyChecking=no "vm_management/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER"
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER; exit 0"
     set -e
 
     echo "[$SCRIPT_NAME] Switching user"
     VM_USER=$USER
     VM_TARGET_DIR="/home/$USER"
+    echo "[$SCRIPT_NAME] Current user: $VM_USER"
     wait_for_ssh
     declare -A PACK
     PACK[manager]="infra site backend database game_test"
@@ -237,10 +240,10 @@ else
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     set +e
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "doas mkdir -p $VM_TARGET_DIR"
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; doas mkdir -p $VM_TARGET_DIR; exit 0"
     scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
     set -e
 fi
 set +e
-ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "doas make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP=$IP USER_NAME=$VM_USER"
+ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP=$IP USER_NAME=$VM_USER; exit 0"
 set -e
