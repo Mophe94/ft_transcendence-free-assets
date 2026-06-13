@@ -81,6 +81,7 @@ case "${answer,,}" in
 esac
 
 #Create secret
+echo "[$SCRIPT_NAME]: HOME: $HOME"
 SECRET_FILE=$HOME/infra/secrets.env
 if [ ! -f "$SECRET_FILE" ]; then
     echo "[$SCRIPT_NAME] Secret file: $SECRET_FILE not found"

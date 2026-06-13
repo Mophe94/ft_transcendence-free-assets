@@ -14,6 +14,10 @@ group "site" {
     targets = ["frontend", "backend", "game"]
 }
 
+group "observ" {
+    targets = ["fluent-bit"]
+}
+
 target "alpine_base" {
     context	= "${BAKE_ROOT}/base/"
     dockerfile	= "Dockerfile_base"
@@ -21,13 +25,13 @@ target "alpine_base" {
 }
 
 target "frontend" {
-    context     = "${BAKE_ROOT}/../../site/FrontEnd"
+    context     = "${BAKE_ROOT}/../../site/"
     dockerfile  = "Dockerfile"
     tags        = ["${REGISTRY}/frontend:latest"]
 }
 
 target "backend" {
-    context     = "${BAKE_ROOT}/../../site/BackEnd"
+    context     = "${BAKE_ROOT}/../../backend"
     dockerfile  = "Dockerfile"
     tags        = ["${REGISTRY}/backend:latest"]
 }
@@ -39,15 +43,21 @@ target "game" {
 }
 
 target "database_users" {
-    context     = "${BAKE_ROOT}/../../site/databases/users_db"
+    context     = "${BAKE_ROOT}/../../database/users_db"
     dockerfile  = "Dockerfile"
     tags        = ["${REGISTRY}/users_db:latest"]
 }
 
 target "database_game" {
-    context     = "${BAKE_ROOT}/../../site/databases/game_db"
+    context     = "${BAKE_ROOT}/../../database/game_db"
     dockerfile  = "Dockerfile"
     tags        = ["${REGISTRY}/game_db:latest"]
+}
+
+target "fluent-bit" {
+    context     = "${BAKE_ROOT}/fluent-bit"
+    dockerfile  = Dockerfile
+    tags        = ["${REGISTRY}/fluent-bit:latest"]
 }
 
 target "mynginx" {

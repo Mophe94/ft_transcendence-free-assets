@@ -232,7 +232,7 @@ else
     VM_TARGET_DIR="/home/$USER"
     wait_for_ssh
     declare -A PACK
-    PACK[manager]="infra site game_test"
+    PACK[manager]="infra site backend database game_test"
     PACK[worker]="infra/Makefile"
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"

@@ -77,12 +77,13 @@ services:
           - node.role == manager
 
   fluent-bit:
-    image: fluent/fluent-bit:2.2
+    image: ${IP}:80/fluent-bit:latest
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ../containers/fluentbit/fluentbit_conf:/fluent-bit/etc/fluent-bit.conf:ro
-      - ../containers/fluentbit/parsers.conf:/fluent-bit/etc/parsers.conf:ro
+      - fluent-bit-config:/fluent-bit/etc
+
+    command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
     
     networks:
       - obsrv_net
@@ -96,6 +97,7 @@ volumes:
     loki-data:
     prom_data:
     grafana_data:
+    fluent-bit-config:
 
 configs:
     prometheus_config:
