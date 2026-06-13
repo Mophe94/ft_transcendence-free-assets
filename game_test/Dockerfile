@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN apk upgrade && apk add npm
 
-COPY .  /app
+COPY . /app
 
 RUN npm install
 
