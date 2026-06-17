@@ -9,6 +9,7 @@ IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src")
 USER_NAME="$(USER)"
 TYPE:=""
 HOST_IP:= $(shell cat host_ip.txt)
+REG_PORT=5050
 
 all:
 	@$(MAKE) --no-print-directory swarm-status
@@ -21,7 +22,7 @@ node_launch:
 swarm_setup:
 	@chmod +x $(SWARM_SCRIPTS)/launch_swarm.sh
 	@$(SWARM_SCRIPTS)/launch_swarm.sh "$(SWARM_SCRIPTS)" "$(HOST_IP)"
-	@BUILDX_BAKE_ENTITLEMENTS_FS=0 IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
+	@BUILDX_BAKE_ENTITLEMENTS_FS=0 IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
 build:
 	echo $(CONTAINER_FILES)
@@ -38,18 +39,18 @@ test:
 	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake fluent-bit --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl
 
 core:
-	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 website:
 	@doas mkdir -p "/var/lib/postgresql/data"
 	@doas mkdir -p "/var/lib/game/data"
-	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 observ:
-	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 up: build
-	IP=$(IP4) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 down:
 	chmod 777 $(SWARM_SCRIPTS)/end_swarm.sh

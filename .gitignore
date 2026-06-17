@@ -9,3 +9,4 @@ misc/*
 !misc/README
 vm_management/worker_config.txt
 host_ip.txt
+!infra/template.secrets.env
