@@ -46,7 +46,7 @@ fi
 cat > "/etc/docker/daemon.json" << EOF
 {
     "insecure-registries": [
-        "${IP}:80"
+        "${IP}:5050"
     ]
 }
 EOF
