@@ -2,12 +2,14 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { WebSocket } from 'ws';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { PlayerService } from './player/player.service';
+import { Player } from './player/player'
 import { GamePayload } from './game.type';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { FULL_LOBBY, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { start_game } from './events/start_game';
+import { new_encounter } from './events/new_encounters';
 
 
 @Injectable()
@@ -61,8 +63,38 @@ export class GameService implements OnModuleInit {
     const payload = start_game(player);
     console.log(`[GameService]: startMapPhase -> start_game payload built`)
     return payload;
-
   }
+
+  async handleMessage(userId: number, state: string): Promise<object> {
+    switch (state) {
+      case 'new_encounter':
+        return this.handleNewEncounter(userId);
+      default:
+        return { event: 'game', data: { state: 'action_rejected', reason: 'invalid_action'} };
+    }
+  }
+
+  private handleNewEncounter(userId: number): object {
+    const player = this.playerService.getPlayer(userId)!;
+
+    //retrieve in DB 
+    player.current_monster = 'monster_test';
+    return new_encounter(player);
+  }
+
+  // JSON RESPONSE
+  new_current_item: () => object
+	new_encounter: () => object
+	result_catch: (result: number) => object
+	start_map: () => object
+	team_setup: (enemy: Player) => object
+	update_inventory: () => object
+	update_team: () => object
+
+	combat: () => object
+
+	changeMonster: (new_monster: number) => object
+	attack: (enemy: Player, attackName: string) => object
 
   //Events 
   @OnEvent('lobby.start')
@@ -70,9 +102,4 @@ export class GameService implements OnModuleInit {
     console.log("OnEvent -> createRoom()")
     this.roomService.createRoom(roomId);
   }
-
-/*   async handleEndMap(userId: number, payload: any): Promise<void> {
-    console.log('[GameService]: handleEndMap called');
-    // load data from DB and return a Json to broadcast
-  } */
 }

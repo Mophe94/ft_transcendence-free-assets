@@ -75,19 +75,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-/*     // Dispatch "State" exemple
-    switch (payload.state) {
-      case 'end_map':
-        await this.gameService.handleEndMap(userId, payload);
-        break;
-      default:
-        client.send(
-          JSON.stringify({
-            event: 'game',
-            state: 'action_rejected',
-            data: { reason: 'invalid_action' },
-          }),
-        );
-    } */
+    const userId = clientData.user.sub;
+
+    const response = await this.gameService.handleMessage(userId, payload.data.state);
+    this.sendToClient(client, response);
   }
 }

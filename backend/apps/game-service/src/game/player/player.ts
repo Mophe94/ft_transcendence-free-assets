@@ -183,19 +183,6 @@ export class Player {
 	current_item: string  = ""
 	text: string = ""
 
-	new_current_item: () => object
-	new_encounter: () => object
-	result_catch: (result: number) => object
-	start_map: () => object
-	team_setup: (enemy: Player) => object
-	update_inventory: () => object
-	update_team: () => object
-
-	combat: () => object
-
-	changeMonster: (new_monster: number) => object
-	attack: (enemy: Player, attackName: string) => object
-
 	constructor(new_id: number, name: string, asset: string){
 		this.id = new_id;
 		this.name = name;
