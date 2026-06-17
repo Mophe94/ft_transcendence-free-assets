@@ -1,6 +1,9 @@
 export interface GamePayload {
   state: string;
-  data?: any;
+  data: {
+    state: string;
+    [key: string]: any;
+  }
 }
 
 export const FULL_LOBBY = 1;

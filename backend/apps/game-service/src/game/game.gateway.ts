@@ -9,6 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
+import { PlayerService } from './player/player.service';
 import { GamePayload, PHASE_DURATIONS, PhaseName, createMockUser } from './game.type';
 import { ClientData, clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
@@ -20,7 +21,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private gameService: GameService) {}
+  constructor(private gameService: GameService, private playerService: PlayerService) {}
 
   handleConnection(client: WebSocket, request: IncomingMessage): void {
     const url = request.url!;
@@ -41,7 +42,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     clientsMap.set(client, { user, roomId });
     console.log(`Client ${user.sub} connected in room ${roomId}`);
 
-    this.gameService.onGodotConnected(client, roomId);
+    const payload = this.gameService.onGodotConnected(client, user.sub, roomId);
+    if (payload) {
+      this.sendToClient(client, payload);
+    }
   }
 
   handleDisconnect(client: WebSocket): void {
@@ -70,11 +74,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.close();
       return;
     }
-    const userId = clientData.user.sub;
 
-    //this.gameService.
-
-    // Dispatch "State" exemple
+/*     // Dispatch "State" exemple
     switch (payload.state) {
       case 'end_map':
         await this.gameService.handleEndMap(userId, payload);
@@ -87,6 +88,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             data: { reason: 'invalid_action' },
           }),
         );
-    }
+    } */
   }
 }
