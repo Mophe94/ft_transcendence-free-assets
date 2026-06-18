@@ -9,7 +9,7 @@ export class PlayerService {
 		const player = new Player (
 			userId,
 			'Test', //need to retrieve name from userDB
-			'Pisciner',
+			'dino',
 		)
 		this.players.set(userId, player)
 	}

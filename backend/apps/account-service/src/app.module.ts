@@ -11,6 +11,8 @@ import { Settings } from './settings/settings.entity';
 import { UserStatsModule } from './stats/stats.module';
 import { UserStats } from './stats/stats.entity';
 import { GameModule } from './game/game.module';
+import { Monster } from './game/monsters.entity';
+import { Skill } from './game/skills.entity';
 
 @Module({
   imports: [
