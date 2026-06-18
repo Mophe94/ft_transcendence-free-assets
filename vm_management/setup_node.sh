@@ -1,18 +1,27 @@
 #!/bin/bash
 set -e
+
+#Safeguard
 SCRIPT_NAME="${0##*/}"
 
-NEW_USER="$2"
-IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
-echo "[${SCRIPT_NAME}] VM ip: ${IP}"
-
-if [ -z "${NEW_USER}" ]; then
-    echo "Usage: $0 <node type> <node username>"
+if [ ! $# -eq 2 ]; then
+    echo "Usage: ${SCRIPT_NAME} <node type> <node new username>"
+    exit 1
+elif [ -z "$1" ] || [ -z "$2" ]; then
+    echo "Usage: ${SCRIPT_NAME} <node type> <node new username>"
     exit 1
 fi
 
-PASSWORD="Nd${NEW_USER}123"
+#Setup
+TYPE="$1"
+NEW_USER="$2"
+IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
+CERT_DIR="/etc/certs/"
 SSH_CONFIG="/etc/ssh/sshd_config"
+echo "[${SCRIPT_NAME}] VM ip: ${IP}"
+
+#Change for env procured password
+PASSWORD="Nd${NEW_USER}123"
 
 echo "[$SCRIPT_NAME] Creating user: $NEW_USER"
 
@@ -38,21 +47,45 @@ fi
 echo "[$SCRIPT_NAME] Changing VM hostname to: swarmnode.${NEW_USER}"
 echo "swarmnode.${NEW_USER}" > /etc/hostname
 
-echo "[$SCRIPT_NAME] Setting up Docker Daemon"
-mkdir -p /etc/docker
-if [ -f "/etc/docker/daemon.json" ]; then
-    rm -f "/etc/docker/daemon.json"
-fi
-cat > "/etc/docker/daemon.json" << EOF
-{
-    "insecure-registries": [
-        "${IP}:5050"
-    ]
-}
+#Server CA creation
+if [ ${TYPE} == "manager" ]; then
+
+    echo "[$SCRIPT_NAME] Setting up directory"
+    mkdir -p ${CERT_DIR}
+
+    #Server CA generation
+    echo "[$SCRIPT_NAME] Generating CA"
+    cd ${CERT_DIR}
+
+    openssl genrsa -out ca.key 4096
+    openssl req -x509 -new -nodes \
+		    -key ca.key \
+		    -sha256 \
+		    -days 30 \
+		    -out ca.crt \
+
+    echo "[$SCRIPT_NAME] Setting up Docker Daemon"
+    mkdir -p "/etc/docker"
+    if [ ! -f ${CERT_DIR}/ca.crt ]; then
+	echo "[$SCRIPT_NAME] Missing CA certificate, marking registry as insecure"
+	if [ -f "/etc/docker/daemon.json" ]; then
+	    rm -f "/etc/docker/daemon.json"
+	fi
+	cat > "/etc/docker/daemon.json" << EOF
+	{
+	    "insecure-registries": [
+		"${IP}:5050"
+	    ]
+	}
 EOF
+    else
+	echo "[$SCRIPT_NAME] Found CA certificate, marking registry as secure"
+	mkdir -p "/etc/docker/certs.d/${IP}/"
+	cp "${CERT_DIR}/ca.crt" "/etc/docker/certs.d/${IP}/"
+    fi
+fi
+
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"
-#"registry",
-#"registry:5000",
 
 echo "[$SCRIPT_NAME] Restarting VM"
 reboot

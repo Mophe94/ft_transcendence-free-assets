@@ -11,6 +11,7 @@ fi
 #ARGUMENTS ASSIGNATION#
 DIR="$1"
 HOST_IP="$2"
+IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
 
 #SETUP DOCKER DEAMON
 #mkdir -p /etc/docker
@@ -55,10 +56,21 @@ HOST_IP="$2"
 #	echo -n "."
 #    done
 #fi
-
 #INIT THE SWARM AND PUBLISH IS IP OF CONTACT(HOST_IP)#
 if [ ! "$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then
     docker swarm init --advertise-addr ${HOST_IP}
+fi
+
+if [ ! -f $HOME/infra/cert_creation.sh ]; then
+  echo "[$SCRIPT_NAME] $HOME/infra/cert_creation.sh missing, skipping certificate creation"
+else
+  chmod +x $HOME/infra/cert_creation.sh
+  bash $HOME/infra/cert_creation.sh "/etc/certs" "${HOST_IP}" nginx
+  docker secret create nginx_crt $HOME/certs/nginx.crt
+  docker secret create nginx_key $HOME/certs/nginx.key
+  bash $HOME/cert_creation.sh "/etc/certs" "${IP}" registry
+  docker secret create registry_crt $HOME/certs/registry.crt
+  docker secret create registry_key $HOME/certs/registry.key
 fi
 
 networks=("swarm_net" "obsrv_net" "games_net")
@@ -81,7 +93,6 @@ case "${answer,,}" in
 esac
 
 #Create secret
-echo "[$SCRIPT_NAME]: HOME: $HOME"
 SECRET_FILE=$HOME/infra/secrets.env
 if [ ! -f "$SECRET_FILE" ]; then
     echo "[$SCRIPT_NAME] Secret file: $SECRET_FILE not found"

@@ -47,6 +47,12 @@ services:
             - source: nginx_conf
               target: /etc/nginx/nginx.conf
 
+        secrets:
+          - nginx_crt
+          - nginx_key
+          - registry_crt
+          - registry_key
+
         networks:
             - swarm_net
             - obsrv_net
@@ -66,9 +72,13 @@ configs:
         file: ../containers/nginx/nginx.conf
 
 secrets:
-  registry_tls_cert:
+  nginx_crt:
     external: true
-  registry_tls_key:
+  nginx_key:
+    external: true
+  registry_crt:
+    external: true
+  registry_key:
     external: true
 
 networks:

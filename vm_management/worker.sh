@@ -226,8 +226,6 @@ else
     PUB_KEY="$HOME/.ssh/*.pub"
     ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
     scp -P "$SSH_PORT" -o StrictHostKeyChecking=no "vm_management/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
-    scp -P "$SSH_PORT" -o StrictHostKeyChecking=no "vm_management/cert_handler.sh" "$VM_USER"@"$SSH_HOST":"/cert_handler.sh"
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /cert_handler.sh; bash /cert_handler.sh $TYPE $USER; exit 0"
     ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER; exit 0"
     set -e
 
