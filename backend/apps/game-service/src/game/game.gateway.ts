@@ -10,8 +10,16 @@ import {
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
 import { PlayerService } from './player/player.service';
-import { GamePayload, PHASE_DURATIONS, PhaseName, createMockUser } from './game.type';
-import { ClientData, clientsMap } from 'apps/game-service/src/shared/clients.map';
+import {
+  GamePayload,
+  PHASE_DURATIONS,
+  PhaseName,
+  createMockUser,
+} from './game.type';
+import {
+  ClientData,
+  clientsMap,
+} from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
@@ -21,7 +29,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private gameService: GameService, private playerService: PlayerService) {}
+  constructor(
+    private gameService: GameService,
+    private playerService: PlayerService,
+  ) {}
 
   handleConnection(client: WebSocket, request: IncomingMessage): void {
     const url = request.url!;
@@ -33,8 +44,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(roomId);
     // Add JWT token validation
     const user = createMockUser();
-    if (!token || !roomId || !this.gameService.isPlayerInRoom(user.sub, roomId)) {
-      console.log("Missing token to authenticate");
+    if (
+      !token ||
+      !roomId
+      //|| !this.gameService.isPlayerInRoom(user.sub, roomId)
+    ) {
+      console.log('Missing token to authenticate');
       client.close();
       return;
     }
@@ -67,7 +82,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('game')
-  async handleGame(@ConnectedSocket() client: WebSocket, @MessageBody() payload: any,): Promise<void> {
+  async handleGame(
+    @ConnectedSocket() client: WebSocket,
+    @MessageBody() payload: any,
+  ): Promise<void> {
     // create a GamePayload interface to avoid 'any'?
     const clientData = clientsMap.get(client);
     if (!clientData) {
@@ -77,7 +95,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const userId = clientData.user.sub;
 
-    const response = await this.gameService.handleMessage(userId, payload.data.state);
+    const response = await this.gameService.handleMessage(
+      userId,
+      payload.data.state,
+    );
     this.sendToClient(client, response);
   }
 }

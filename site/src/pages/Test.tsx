@@ -57,8 +57,8 @@ export default function Test () {
                     src="http://localhost:8060/Export_test.html"
                     onLoad={sendTokenToGame}
                     title="Godot Game"
-                    height="600"
-                    width="800"/>)}
+                    height="820"
+                    width="1272"/>)}
         </div>
     )
 }

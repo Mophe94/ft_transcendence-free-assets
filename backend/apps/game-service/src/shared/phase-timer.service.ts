@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { FULL_LOBBY, PHASE_DURATIONS, PhaseName } from 'apps/game-service/src/game/game.type';
+import {
+  FULL_LOBBY,
+  PHASE_DURATIONS,
+  PhaseName,
+} from 'apps/game-service/src/game/game.type';
 
 @Injectable()
 export class PhaseTimerService {

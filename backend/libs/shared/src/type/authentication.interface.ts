@@ -1,8 +1,9 @@
-import { Request } from "express";
-import { WebSocket } from "ws";
+import { Request } from 'express';
+import { WebSocket } from 'ws';
 
 export interface AuthenticatedUser {
   id: number;
+  username: string;
 }
 export interface AuthenticatedRequest extends Request {
   user: AuthenticatedUser;

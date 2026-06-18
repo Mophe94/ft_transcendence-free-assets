@@ -2,10 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { WebSocket } from 'ws';
 import { randomUUID } from 'crypto';
-import { clientsMap, ClientData } from 'apps/game-service/src/shared/clients.map';
+import {
+  clientsMap,
+  ClientData,
+} from 'apps/game-service/src/shared/clients.map';
 import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
-import { RoomService } from 'apps/game-service/src/shared/room.service'
+import { RoomService } from 'apps/game-service/src/shared/room.service';
 
 @Injectable()
 export class LobbyService {
@@ -19,17 +22,19 @@ export class LobbyService {
 
   // JOIN LOBBY
   joinLobby(client: WebSocket, user: ClientData['user']): void {
-
-    const roomId = this.roomService.findAvailableRoom() ?? this.roomService.createRoom();
+    const roomId =
+      this.roomService.findAvailableRoom() ?? this.roomService.createRoom();
 
     this.roomService.joinRoom(client, roomId);
 
     const clients = this.roomService.getClients(roomId)!;
 
-/*     const clientData = clientsMap.get(client);
+    /*     const clientData = clientsMap.get(client);
     if (clientData) clientData.roomId = roomId; */
 
-    console.log(`[LobbyService] User ${user.sub} joined room ${roomId} (${clients.size}/${FULL_LOBBY})`);
+    console.log(
+      `[LobbyService] User ${user.sub} joined room ${roomId} (${clients.size}/${FULL_LOBBY})`,
+    );
 
     this.eventEmitter.emit('lobby.player_joined', {
       clients,
@@ -48,5 +53,4 @@ export class LobbyService {
       });
     }
   }
-
 }
