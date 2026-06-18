@@ -1,4 +1,4 @@
-import { InjectRepository } from 'node_modules/@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Monster } from './monsters.entity';
 import { FindOptionsRelations, Repository } from 'typeorm';
 
