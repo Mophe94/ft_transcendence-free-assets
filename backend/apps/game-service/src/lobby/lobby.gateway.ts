@@ -18,7 +18,7 @@ import {
 import { LobbyService } from 'apps/game-service/src/lobby/lobby.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 
-@WebSocketGateway(8081, { cors: true })
+@WebSocketGateway(8081, { cors: { origin: true }, path: '/lobby' })
 export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;

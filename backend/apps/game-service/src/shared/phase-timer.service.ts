@@ -8,7 +8,7 @@ import {
 @Injectable()
 export class PhaseTimerService {
   private timers = new Map<string, NodeJS.Timeout>();
-  private startTimes = new Map<string, number>();
+  startTimes = new Map<string, number>();
 
   start(roomId: string, phase: PhaseName, onTimeout: () => void): void {
     this.clear(roomId);

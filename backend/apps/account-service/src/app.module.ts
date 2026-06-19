@@ -10,7 +10,6 @@ import { SettingsModule } from './settings/settings.module';
 import { Settings } from './settings/settings.entity';
 import { UserStatsModule } from './stats/stats.module';
 import { UserStats } from './stats/stats.entity';
-import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -34,7 +33,6 @@ import { GameModule } from './game/game.module';
     AuthModule,
     SettingsModule,
     UserStatsModule,
-    GameModule,
   ],
   controllers: [AppController],
   providers: [AppService],

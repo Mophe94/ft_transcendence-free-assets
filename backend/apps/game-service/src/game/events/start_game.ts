@@ -21,12 +21,12 @@ export function start_game(player: Player) {
       state: 'start_game',
       player: {
         id: player.id,
-        name: "Ce que tu veux",
-        asset: "dino",
+        name: 'Ce que tu veux',
+        asset: 'dino',
         team: player.team,
       },
       timer: player.timer,
-      current_map: "map_01",
+      current_map: 'map_01',
     },
   };
 }

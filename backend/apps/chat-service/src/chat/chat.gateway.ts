@@ -12,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { Server, WebSocket } from 'ws';
 import { clientsMap } from '../shared/clients.map';
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ cors: { origin: '*' }, path: '/chat' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;

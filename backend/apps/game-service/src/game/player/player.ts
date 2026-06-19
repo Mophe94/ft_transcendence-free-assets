@@ -156,7 +156,7 @@ export class Player {
       ],
     },
   ];
-  team: string[] = ['', '', '', '', '', ''];
+  team: string[] = ['pisciner', '', '', '', '', ''];
   inventory: Inventory[] = [
     {
       name: '',
@@ -192,7 +192,6 @@ export class Player {
   constructor(new_id: number, name: string, asset: string) {
     this.id = new_id;
     this.name = name;
-    this.asset = 'asset';
-    this.team[0] = 'burpy';
+    this.asset = asset;
   }
 }

@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { WebSocket } from 'ws';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { PlayerService } from './player/player.service';
+import { MonstersService } from './entities/monsters.service';
 import { Player } from './player/player';
 import { GamePayload } from './game.type';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
@@ -21,6 +22,7 @@ export class GameService implements OnModuleInit {
     private eventEmitter: EventEmitter2,
     private phaseTimer: PhaseTimerService,
     private playerService: PlayerService,
+    private monstersService: MonstersService,
   ) {}
 
   private rooms = new Map<string, Set<WebSocket>>();
@@ -65,8 +67,8 @@ export class GameService implements OnModuleInit {
     });
 
     const player = this.playerService.getPlayer(userId)!;
-    player.timer = PHASE_DURATIONS.map;
-    //add server_time ?
+    player.timer =
+      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map * 1000; // server time + map time in millisec-> make it cleaner
     const payload = start_game(player);
     console.log(`[GameService]: startMapPhase -> start_game payload built`);
     return payload;
@@ -89,6 +91,8 @@ export class GameService implements OnModuleInit {
 
     //retrieve in DB
     player.current_monster = 'monster_test';
+    //this.monstersService.findOneByName()
+
     return new_encounter(player);
   }
 

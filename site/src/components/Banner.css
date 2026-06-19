@@ -1,0 +1,25 @@
+.banner-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    
+    width: 60vw;
+    
+    overflow: hidden;
+    position: relative;
+}
+
+.free_assets_banner {
+    position: absolute;
+    width: 35%;
+    height: 35%;
+    right: 0;
+    z-index: 99;
+}
+
+.video-banner {
+    max-width: 100%;
+    top: 0;
+    position: relative;
+    object-position: center top;
+}

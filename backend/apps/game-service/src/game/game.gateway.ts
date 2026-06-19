@@ -24,7 +24,7 @@ import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.serv
 import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
 
-@WebSocketGateway(8082, { cors: true })
+@WebSocketGateway(8082, { cors: {origin: true}, path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
