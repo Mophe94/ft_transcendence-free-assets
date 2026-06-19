@@ -1,0 +1,24 @@
+body, #root{
+  margin: 0px;
+  height: 100vh; 
+
+  display: flex;
+  flex-direction: column; 
+
+  font-family: 'Ubuntu', sans-serif;
+  background-color: rgb(71, 171, 169);
+  overflow-x: hidden;
+
+  --black: rgb(84, 102, 126);
+  --blue: rgb(71, 149, 167);
+  --red: rgb(222, 84, 84);
+  --purple: rgb(163, 112, 150);
+  --yellow: rgb(220, 170, 70);
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+

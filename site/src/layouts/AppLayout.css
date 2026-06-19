@@ -1,0 +1,20 @@
+.body-layout {
+  flex-grow: 1;
+
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-rows: 100%; 
+}
+
+.side-padding-left {
+  background-image: url('src/assets/side_banner.png');
+  background-repeat: no-repeat;
+  background-size: cover; 
+}
+
+.side-padding-right {
+  background-image: url('src/assets/side_banner.png');
+  background-repeat: no-repeat;
+  background-size: cover; 
+  transform:scaleX(-1);
+}
