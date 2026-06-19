@@ -7,8 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { AuthenticatedRequest, AuthenticatedUser } from 'libs/shared/src';
-import { Socket } from 'socket.io';
+import { AuthenticatedRequest } from 'libs/shared/src';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -17,7 +16,6 @@ export class JwtAuthGuard implements CanActivate {
     private configService: ConfigService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromCookie(request);
     if (!token) {
@@ -45,23 +43,5 @@ export class JwtAuthGuard implements CanActivate {
       }
     }
     return undefined;
-  }
-  private extractTokenFromWsClient(client: Socket): string | undefined {
-    const rawCookies = client.handshake?.headers?.cookie;
-
-    if (!rawCookies) {
-      return undefined;
-    }
-    const tokenCookie = rawCookies
-      .split(';')
-      .map((c) => c.trim())
-      .find((c) => c.startsWith('access_token='));
-
-    if (!tokenCookie) {
-      return undefined;
-    }
-
-    const token = tokenCookie.split('=')[1];
-    return token || undefined;
   }
 }

@@ -8,11 +8,17 @@ import {
 @Injectable()
 export class PhaseTimerService {
   private timers = new Map<string, NodeJS.Timeout>();
+  startTimes = new Map<string, number>();
 
   start(roomId: string, phase: PhaseName, onTimeout: () => void): void {
     this.clear(roomId);
     const duration = PHASE_DURATIONS[phase];
+    this.startTimes.set(roomId, Date.now());
     this.timers.set(roomId, setTimeout(onTimeout, duration * 1000));
+  }
+
+  getStartTime(roomId: string): number | undefined {
+    return this.startTimes.get(roomId);
   }
 
   clear(roomId: string): void {

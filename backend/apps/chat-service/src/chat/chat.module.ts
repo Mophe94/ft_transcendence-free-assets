@@ -10,7 +10,6 @@ import { JwtService } from '@nestjs/jwt';
       isGlobal: true,
     }),
   ],
-  providers: [ChatService
-  ],
+  providers: [ChatService, wsAuthService, JwtService],
 })
 export class ChatModule {}

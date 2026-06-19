@@ -1,16 +1,14 @@
 import { createContext } from "react";
-import type { Socket } from "socket.io-client";
 
 export interface Message {
-    time: Date;
+    time: string;
     username: string;
-    text: string;
+    content: string;
 }
 
 export interface Chat {
-    socket: Socket | null;
+    user: string;
     messages: Array<Message>;
-    isConnected: boolean;
     sendMessage: (text: string) => Promise<void>;
 }
 
