@@ -1,0 +1,22 @@
+.app-layout {
+	display: flex;
+	flex-direction: column;
+	width: 1fr;
+	min-height: 100vh;
+}
+
+.clean-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
+.top-left{
+    position: relative;
+    top: 0;
+    right: 0;
+}
