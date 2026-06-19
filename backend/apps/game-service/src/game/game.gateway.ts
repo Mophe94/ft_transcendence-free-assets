@@ -9,6 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
+import { PlayerService } from './player/player.service';
 import {
   GamePayload,
   PHASE_DURATIONS,
@@ -23,25 +24,32 @@ import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.serv
 import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
 
-@WebSocketGateway(8082, { cors: true })
+@WebSocketGateway(8082, { cors: {origin: true}, path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private gameService: GameService) {}
+  constructor(
+    private gameService: GameService,
+    private playerService: PlayerService,
+  ) {}
 
   handleConnection(client: WebSocket, request: IncomingMessage): void {
     const url = request.url!;
     const params = new URLSearchParams(url.split('?')[1]);
     const token = params.get('token');
-    // Add JWT token validation
-    const roomId = params.get('room-id');
+    const roomId = params.get('room');
     console.log(url);
     console.log(token);
     console.log(roomId);
+    // Add JWT token validation
     const user = createMockUser();
-    if (!token || !roomId || !this.gameService.isPlayerInRoom(user.sub, roomId)) {
-      console.log("Missing token to authenticate");
+    if (
+      !token ||
+      !roomId
+      //|| !this.gameService.isPlayerInRoom(user.sub, roomId)
+    ) {
+      console.log('Missing token to authenticate');
       client.close();
       return;
     }
@@ -49,14 +57,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     clientsMap.set(client, { user, roomId });
     console.log(`Client ${user.sub} connected in room ${roomId}`);
 
-    // Implement addPlayerToRoom in GameService
-/*     if (FULL_LOBBY)
-    startMapPhase(roomId) //+ send phase state to Godot */
+    const payload = this.gameService.onGodotConnected(client, user.sub, roomId);
+    if (payload) {
+      this.sendToClient(client, payload);
+    }
   }
 
   handleDisconnect(client: WebSocket): void {
+    const user = clientsMap.get(client);
     clientsMap.delete(client);
-    console.log('[Disconnect]: Client disconnected');
+    console.log(`Client ${user?.user.sub} disconnected`);
   }
 
   private broadcast(clients: Set<WebSocket>, message: object) {
@@ -72,28 +82,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('game')
-  async handleGame(@ConnectedSocket() client: WebSocket, @MessageBody() payload: any,): Promise<void> {
+  async handleGame(
+    @ConnectedSocket() client: WebSocket,
+    @MessageBody() payload: any,
+  ): Promise<void> {
     // create a GamePayload interface to avoid 'any'?
     const clientData = clientsMap.get(client);
     if (!clientData) {
       client.close();
       return;
     }
+
     const userId = clientData.user.sub;
 
-    // Dispatch "State" exemple
-    switch (payload.state) {
-      case 'end_map':
-        await this.gameService.handleEndMap(userId, payload);
-        break;
-      default:
-        client.send(
-          JSON.stringify({
-            event: 'game',
-            state: 'action_rejected',
-            data: { reason: 'invalid_action' },
-          }),
-        );
-    }
+    const response = await this.gameService.handleMessage(
+      userId,
+      payload.data.state,
+    );
+    this.sendToClient(client, response);
   }
 }

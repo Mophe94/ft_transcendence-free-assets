@@ -1,37 +1,40 @@
-import './NavBar.css';
-import {AuthSection} from './Login.tsx';
-import {Link} from 'react-router-dom';
-import React from 'react';
+import React from "react"
+import { Link } from "react-router-dom"
+import './NavBar.css'
 
 const menuLinks = {
-  "Home": "/",
-  "Play": "/play",
-  "Howto": "/howto",
-  "Contact": "/contact",
-  "Test": "/test"
-};
-
-export function NavBar () {
-	return (
-		<div className="navBar">
-			<NavMenu />
-			<AuthSection />
-		</div>
-	);
+  'Learn More': '/project',
+  'About Us': '/about_us', 
+  'Contact': '/contact', 
 }
 
+
 function NavMenu () {
-	return (
-		<ul className="navMenu">
-			{Object.entries(menuLinks).map(([name, url]) => (
-				<React.Fragment key={name}>
-					<li>
-						<Link to={url} className="nav-link">
-							{name}
-						</Link>
-					</li>
-				</React.Fragment>
-			))}
-		</ul>
-	);
+    return (
+        <div className='nav-menu'>
+            <div className="nav-extreme">
+                <img src="src/assets/banner-beg.png" />
+            </div>
+            {Object.entries(menuLinks).map(([name, url]) => (
+                <React.Fragment key={name}>
+                    <div className="nav-tab">
+                        <Link to={url} className="nav-link">
+                            {name}
+                        </Link>
+                    </div>
+                </React.Fragment>
+            ))}
+            <div className="nav-extreme">
+                <img src="src/assets/banner-end.png" />
+            </div>
+        </div>
+    )
+}
+
+export function PublicNavBar() {
+    return (
+        <div className="PubNavBar">
+            <NavMenu />
+        </div>
+    )
 }

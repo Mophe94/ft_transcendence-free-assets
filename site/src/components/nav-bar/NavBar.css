@@ -1,0 +1,59 @@
+.pub-nav-bar {
+    height: 15ch;
+}
+.priv-nav-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 15ch;
+}
+
+.nav-menu {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+}
+
+.nav-extreme img {
+    height: 100%;
+    object-fit: contain;
+}
+
+.nav-tab {
+    max-width: 0px;
+    height: 100%;
+
+    padding-left: 0px;
+    padding-right: 0px;
+
+    white-space: nowrap;
+
+
+    background-image: url("src/assets/sword_mid.png");
+    background-repeat: round no-repeat;
+    background-size: auto 100%;
+
+    align-content: center;
+
+    overflow: hidden;
+    transition: max-width 0.6s, padding 0.6s;
+}
+
+.nav-menu:hover .nav-tab {
+    padding-left: 20px;
+    padding-right: 15px;
+    max-width: 500px;
+}
+
+.nav-link {
+    font-family: "New Rocker", system-ui;
+    color: rgb(121, 121, 121);
+    font-size: 48px;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: rgb(90, 90, 90);
+}
+

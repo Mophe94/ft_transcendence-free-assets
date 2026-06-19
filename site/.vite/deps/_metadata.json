@@ -1,0 +1,48 @@
+{
+  "hash": "3fd37e12",
+  "configHash": "5d677169",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "322949b8",
+  "optimized": {
+    "react-dom/client": {
+      "src": "../../old_frontend/node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "fe498e19",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../old_frontend/node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "88b3cb83",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../old_frontend/node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "5937ff50",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../old_frontend/node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "44b4110a",
+      "needsInterop": true
+    },
+    "socket.io-client": {
+      "src": "../../old_frontend/node_modules/socket.io-client/build/esm/index.js",
+      "file": "socket__io-client.js",
+      "fileHash": "f5bcdcd8",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-CYJPkc-J": {
+      "file": "chunk-CYJPkc-J.js",
+      "isDynamicEntry": false
+    },
+    "react-dom-Bt_XZNtA": {
+      "file": "react-dom-Bt_XZNtA.js",
+      "isDynamicEntry": false
+    }
+  }
+}

@@ -7,12 +7,7 @@ export function MessagesWindow() {
     if (!chatContext) { return null; }
     const { messages } = chatContext;
 
-    const options: Intl.DateTimeFormatOptions = {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    };
+    
     
 
     return (
@@ -21,9 +16,9 @@ export function MessagesWindow() {
             {messages.map((msg, index) => {
                 return (
                     <div key={index}>
-                        <span>{msg.time.toLocaleTimeString('default', options)} </span>
+                        <span>{msg.time}</span>
                         <span>{msg.username}</span>
-                        <p>{msg.text}</p>
+                        <p>{msg.content}</p>
                     </div>
                 )
             })}
@@ -60,7 +55,6 @@ export default function Chat () {
 
     return (
         <div className="chat-container">
-            
             <InputBar />
             <MessagesWindow />
         </div>

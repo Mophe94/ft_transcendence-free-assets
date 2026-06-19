@@ -1,0 +1,60 @@
+.profile-content {
+    background-image: url('src/assets/SpecialPaper.png');
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-size: 100% 100%;
+    background-position: top left;
+}
+
+.profile-content-layout {
+    display: grid;
+
+	align-content: center;
+    justify-content: center;
+    padding: 2vh;
+
+    border-radius: 50px;
+
+}
+
+.stats-table {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    font-size: larger;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+.user-table {
+    font-size: larger;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+@media (min-width: 768px){
+    .hex-container {
+        position: relative;
+        right: 0;
+    }
+    .profile-content-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+    .user-table {
+        grid-column: 1 / span 1;
+        grid-row: 1 / span 1;
+
+        align-content: center;
+    }
+    #avatar-pic {
+        grid-column: 2 / span 1;
+
+        align-content: center;
+    }
+    .stats-table {
+        grid-column: 1 / span 2;
+        grid-row: 2 / span 1;
+        grid-template-columns: 1fr 1fr;
+    }
+    
+
+}
