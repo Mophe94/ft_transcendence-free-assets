@@ -1,0 +1,117 @@
+version: "3.8"
+
+services:
+
+  prometheus:
+    image: prom/prometheus
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+    volumes:
+      - prom_data:/prometheus
+    networks:
+      - obsrv_net
+
+  grafana:
+    image: grafana/grafana
+
+    configs:
+        - source: grafana_datasources
+          target: /etc/grafana/provisioning/datasources/datasources.yml
+        - source: grafana_dashboards
+          target: /etc/grafana/provisioning/dashboards/dashboards.yml
+
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+    environment:
+        GF_SERVER_ROOT_URL: http://localhost/grafana/
+        GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+        GF_SECURITY_ALLOW_EMBEDDING: "true"
+        GF_SECURITY_ADMIN_USER: "admin"
+        GF_SECURITY_ADMIN_PASSWORD: "admin123"
+
+    volumes:
+        - grafana_data:/var/lib/grafana
+        - ../containers/grafana/dashboards:/var/lib/grafana/dashboards
+
+    networks:
+      - obsrv_net
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - obsrv_net
+    deploy:
+      mode: global
+      
+  loki:
+    image: grafana/loki:3.5.2
+    command:
+      -config.file=/etc/loki/config.yml
+    volumes:
+      - loki-data:/loki
+    configs:
+      - source: loki_config
+        target: /etc/loki/loki-config.yml
+    networks:
+      - obsrv_net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+  fluent-bit:
+    image: ${IP}:80/fluent-bit:latest
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - fluent-bit-config:/fluent-bit/etc
+
+    command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+    
+    networks:
+      - obsrv_net
+    
+    deploy:
+      mode: global
+      restart_policy:
+        condition: any
+
+volumes:
+    loki-data:
+    prom_data:
+    grafana_data:
+    fluent-bit-config:
+
+configs:
+    prometheus_config:
+        file: ../containers/prometheus/prometheus.yml
+    grafana_datasources:
+        file: ../containers/grafana/provisioning/datasources/datasources.yml
+    grafana_dashboards:
+        file: ../containers/grafana/provisioning/dashboards/dashboards.yml
+    loki_config:
+        file: ../containers/loki/loki_config.yml
+
+networks:
+    obsrv_net:
+        external: true

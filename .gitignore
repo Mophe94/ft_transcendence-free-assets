@@ -1,4 +1,12 @@
 .env
+**/**.env
 .php
 infra/*.php
 infra/*.html
+*.iso
+misc/*
+!misc/.gitkeep
+!misc/README
+vm_management/worker_config.txt
+host_ip.txt
+!infra/template.secrets.env

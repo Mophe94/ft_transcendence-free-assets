@@ -1,0 +1,69 @@
+{
+  "title": "Swarm Cluster Health",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 3,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "CPU Usage by Service",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[1m])) by (service, instance)",
+          "legendFormat": "{{service}}"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^([^.]+)\\.[^.]+\\..*$",
+            "renamePattern": "$1"
+          }
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Memory Usage by Service",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "sum(container_memory_usage_bytes{name!=\"\"}) by (service, instance)",
+          "legendFormat": "{{service}}"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^([^.]+)\\.[^.]+\\..*$",
+            "renamePattern": "$1"
+          }
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Container Restarts",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "changes(container_start_time_seconds{name!=\"\"}[1h])",
+          "legendFormat": "{{service}}"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^([^.]+)\\.[^.]+\\..*$",
+            "renamePattern": "$1"
+          }
+        }
+      ]
+    }
+  ]
+}
