@@ -35,8 +35,8 @@ export class AuthController {
 
     res.cookie('access_token', token, {
       httpOnly: true,
-      secure: false, // change to true for prod !!!!!!!! for HTTPS
-      sameSite: 'lax', // Protects against CSRF attack
+      secure: true,
+      sameSite: 'none',
       maxAge: 24 * 60 * 60 * 1000,
     });
     return user;
@@ -47,8 +47,8 @@ export class AuthController {
   signout(@Res({ passthrough: true }) res: Response) {
     res.cookie('access_token', '', {
       httpOnly: true,
-      secure: false, // change to true for prod !!!!!!!! for HTTPS
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 0,
     });
   }

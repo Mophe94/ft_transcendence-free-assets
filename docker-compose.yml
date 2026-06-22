@@ -67,7 +67,7 @@ services:
       users_db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://users_db:3000/health"]
       interval: 5s
       timeout: 3s
       retries: 3
