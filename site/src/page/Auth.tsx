@@ -26,7 +26,7 @@ export default function AuthCallback() {
         else {
             navigate(`/login?error=no_code`)
         }
-    })
+    }, [searchParams, navigate, checkUserStatus])
     return (
         <div className="auth-loading-screen">
             <p>Loading...</p>

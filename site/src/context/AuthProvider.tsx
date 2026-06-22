@@ -5,7 +5,7 @@ import type { User } from "../types/user";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode}) => {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
 
     const checkUserStatus = async () => {
         fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode}) => {
         .then((data: User) => {
             console.log(data); setUser(data);})
         .catch(() => setUser(null))
-        .finally(() => setLoading(false));
+        .finally(() => setIsLoading(false));
     }
     useEffect(() => {
         checkUserStatus()
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode}) => {
         });
     }
     return (
-        <AuthContext.Provider value={{ user, loading, handleSignout, checkUserStatus}}>
+        <AuthContext.Provider value={{ user, isLoading, handleSignout, checkUserStatus}}>
             {children}
         </AuthContext.Provider>
     );

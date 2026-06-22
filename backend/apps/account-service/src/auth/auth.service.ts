@@ -56,6 +56,7 @@ export class AuthService {
     );
     try {
       const tokenResponse = await axios.post<FortyTwoTokenResponse>(
+
         tokenExchangeUrl ?? 'https://api.intra.42.fr/oauth/token',
         {
           grant_type: 'authorization_code',

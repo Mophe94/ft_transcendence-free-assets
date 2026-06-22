@@ -1,11 +1,9 @@
 import { createContext, useContext } from "react";
 import type { User } from "../types/user";
 
-
-
 export interface AuthContextType {
     user: User | null;
-    loading: boolean;
+    isLoading: boolean;
     handleSignout: () => Promise<void>;
     checkUserStatus: () => Promise<void>;
 }
