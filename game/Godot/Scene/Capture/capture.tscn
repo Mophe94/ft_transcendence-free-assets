@@ -2,16 +2,20 @@
 
 [ext_resource type="Script" uid="uid://bn63oh1d8nl1u" path="res://Script/Capture/capture_script.gd" id="1_e0d45"]
 [ext_resource type="PackedScene" uid="uid://d1pee6mshm38u" path="res://Scene/Capture/CaptureBanner/capture_banner.tscn" id="2_e0d45"]
-[ext_resource type="PackedScene" uid="uid://d00fh2hedgeid" path="res://Scene/Capture/CaptureMenus/capture_menus.tscn" id="3_bbbsk"]
-[ext_resource type="Script" uid="uid://duu1tp1at0kqb" path="res://Script/Capture/CaptureMenus/capture_menus.gd" id="4_bmvyp"]
+[ext_resource type="PackedScene" uid="uid://1ixfwa02xeek" path="res://Scene/Capture/CaptureMenus/capture_menus.tscn" id="3_bbbsk"]
 
-[node name="Scene" type="Node2D" unique_id=354331252]
+[node name="Scene" type="Control" unique_id=1183881975]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_e0d45")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=544557502]
-layer = -1
-
-[node name="BackGround" type="TextureRect" parent="CanvasLayer" unique_id=355111745]
+[node name="BackGround" type="TextureRect" parent="." unique_id=355111745]
+z_index = -1
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -20,14 +24,26 @@ grow_vertical = 2
 mouse_filter = 2
 stretch_mode = 6
 
-[node name="MonsterAppearsBanner" parent="." unique_id=1870351660 instance=ExtResource("2_e0d45")]
-mouse_filter = 2
-
 [node name="Player" type="Sprite2D" parent="." unique_id=1502176770]
 position = Vector2(192, 416)
 
 [node name="Monster" type="Sprite2D" parent="." unique_id=84566588]
 position = Vector2(768, 417)
 
-[node name="CaptureMenus" parent="." unique_id=1186040270 instance=ExtResource("3_bbbsk")]
-script = ExtResource("4_bmvyp")
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=298272530]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 63.0
+grow_horizontal = 2
+
+[node name="Timer" type="Label" parent="CenterContainer" unique_id=878087262]
+layout_mode = 2
+theme_override_font_sizes/font_size = 45
+horizontal_alignment = 1
+
+[node name="MonsterAppearsBanner" parent="." unique_id=1870351660 instance=ExtResource("2_e0d45")]
+layout_mode = 1
+
+[node name="CaptureMenus" parent="." unique_id=1080234561 instance=ExtResource("3_bbbsk")]
+layout_mode = 1

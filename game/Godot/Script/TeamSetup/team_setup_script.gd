@@ -1,10 +1,7 @@
-extends Node2D
-
-@onready var combatScene = preload("res://Scene/Combat/combat.tscn")
+extends Control
 
 @onready var assetEnemy = GeneralData.enemy["asset"]
 @onready var assetPlayer = GeneralData.player["asset"]
-@onready var hero = GeneralData.hero_database
 
 @onready var player_monster = GeneralData.player["team"]
 @onready var enemy_monster = GeneralData.enemy["team"]
@@ -13,23 +10,22 @@ extends Node2D
 @onready var slot_player = [$Player/Slot1, $Player/Slot2, $Player/Slot3, $Player/Slot4, $Player/Slot5, $Player/Slot6]
 @onready var slot_enemy = [$Enemy/Slot1, $Enemy/Slot2, $Enemy/Slot3, $Enemy/Slot4, $Enemy/Slot5, $Enemy/Slot6]
 
+@onready var message_sended = false
+
 func instantiate_charactere():
-	$CenterContainer/VBoxContainer/PlayerName.text = GeneralData.player["name"]
-	$CenterContainer/VBoxContainer/Enemy.text = GeneralData.enemy["name"]
-	var player_scene = hero[assetPlayer].instantiate()
-	$Player/asset.add_child(player_scene)
-	var enemy_scene = hero[assetEnemy].instantiate()
-	$Enemy/asset.add_child(enemy_scene)
+	$NameVS/VBoxContainer/PlayerName.text = GeneralData.player["name"]
+	$NameVS/VBoxContainer/Enemy.text = GeneralData.enemy["name"]
+	var player_scene = GeneralData.player_charactere_scene.instantiate()
+	$Player/AssetControl/Asset.add_child(player_scene)
+	var enemy_scene = GeneralData.player_charactere_scene.instantiate()
+	enemy_scene.scale.x = -1
+	$Enemy/AssetControl/asset.add_child(enemy_scene)
 
 func instanciate_monster_player():
 	var current = 0
-	for i in range(6):
-		var monster_name = player_monster[i]["name"]  # ✅ accède au dictionnaire
-		if monster_name == "":
-			continue
-		# Voir easter egg
-		elif !monster.has(monster_name):
-			player_monster[i]["name"] = ""  # ✅ modifie le bon champ
+	for i in range(GeneralData.player["team"].size()):
+		var monster_name = player_monster[i]
+		if !monster_name || monster_name == "":
 			continue
 		var monster_scene = monster[monster_name].instantiate()
 		slot_player[current].get_node("Monster").add_child(monster_scene)
@@ -44,6 +40,7 @@ func instanciate_monster_enemy():
 		if monster_name == "":
 			continue
 		var monster_scene = monster[monster_name].instantiate()
+		monster_scene.scale.x = -1
 		slot_enemy[current].get_node("Monster").add_child(monster_scene)
 		current += 1
 		
@@ -64,11 +61,18 @@ func _ready() -> void:
 	await instantiate_charactere()
 	await instanciate_monster_player()
 	await instanciate_monster_enemy()
-	await get_tree().create_timer(10.0).timeout
-	await transi_close()
-	get_tree().change_scene_to_packed(combatScene)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	pass
+	var time = GeneralData.timer - Time.get_unix_time_from_system()
+	if time <= 0:
+		time = 0
+	$TimeDisplay/Timer.text = str(int(time))
+	if time <= 0:
+		if !message_sended:
+			Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TEAM_CHOICE], GeneralData.player["battle_team"])
+			message_sended = !message_sended
+		await Received.combat_scene
+		await transi_close()
+		get_tree().change_scene_to_packed(GeneralData.combat_scene)

@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://wjv0gspt4u36"]
 
 [ext_resource type="Script" uid="uid://8jtepesdh8yf" path="res://Script/Combat/combat_script.gd" id="1_g5y1o"]
+[ext_resource type="Script" uid="uid://c5bq774x4p57m" path="res://Script/Combat/UIPrgressBar/CharactereUI.gd" id="2_2n7sj"]
 [ext_resource type="PackedScene" uid="uid://bktfivjvrdagt" path="res://Scene/Combat/CombatBanner/combat_banner.tscn" id="2_hmmyv"]
 [ext_resource type="PackedScene" uid="uid://b3wokw8n0gxhc" path="res://Scene/Combat/CombatMenus/combat_menus.tscn" id="3_odnam"]
+[ext_resource type="Script" uid="uid://bk48efbd6ljn2" path="res://Script/Combat/Effect/particule.gd" id="4_00rey"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_odnam"]
 bg_color = Color(0, 0.62, 0.98, 1)
@@ -12,10 +14,11 @@ border_width_right = 8
 border_width_bottom = 8
 border_color = Color(0, 0, 0, 1)
 border_blend = true
-
-[sub_resource type="Gradient" id="Gradient_odnam"]
-offsets = PackedFloat32Array(0, 0.52868855, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 20
 
 [sub_resource type="Gradient" id="Gradient_bptys"]
 colors = PackedColorArray(1, 1, 1, 1, 0.39215687, 1, 1, 0)
@@ -37,13 +40,23 @@ scale_max = 2.0
 scale_over_velocity_max = 639.29
 color_ramp = SubResource("GradientTexture1D_exqle")
 
-[node name="Combat" type="Node2D" unique_id=354331252]
+[sub_resource type="Gradient" id="Gradient_odnam"]
+offsets = PackedFloat32Array(0, 0.52868855, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[node name="Combat" type="Control" unique_id=719366222]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_g5y1o")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1502547819]
 layer = -1
 
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer" unique_id=213333826]
+[node name="BackGround" type="TextureRect" parent="CanvasLayer" unique_id=213333826]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -51,100 +64,122 @@ grow_horizontal = 2
 grow_vertical = 2
 stretch_mode = 6
 
-[node name="PlayerMonsterUI" type="PanelContainer" parent="." unique_id=1259933676]
+[node name="Charactere" type="Node2D" parent="." unique_id=1892663939]
+
+[node name="Player" type="Node2D" parent="Charactere" unique_id=2051076367]
+
+[node name="PlayerMonster" type="Sprite2D" parent="Charactere/Player" unique_id=1382979419]
+position = Vector2(192, 400)
+
+[node name="PlayerAsset" type="Sprite2D" parent="Charactere/Player" unique_id=1546507000]
+position = Vector2(96, 400)
+
+[node name="Enemy" type="Node2D" parent="Charactere" unique_id=913849575]
+
+[node name="EnemyAsset" type="Sprite2D" parent="Charactere/Enemy" unique_id=1421233296]
+position = Vector2(864, 400)
+
+[node name="EnemyMonster" type="Sprite2D" parent="Charactere/Enemy" unique_id=925352506]
+position = Vector2(768, 400)
+
+[node name="EnemyMonsterUI" type="Panel" parent="." unique_id=858043743]
 self_modulate = Color(1, 1, 1, 0.74509805)
 top_level = true
-offset_left = 64.0
-offset_top = 32.0
-offset_right = 264.0
-offset_bottom = 95.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.6
+anchor_top = 0.05
+anchor_right = 0.95
+anchor_bottom = 0.14
 theme_override_styles/panel = SubResource("StyleBoxFlat_odnam")
+script = ExtResource("2_2n7sj")
 
-[node name="MarginContainer" type="MarginContainer" parent="PlayerMonsterUI" unique_id=1285568387]
-layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="HBoxContainer" type="HBoxContainer" parent="PlayerMonsterUI/MarginContainer" unique_id=1742667680]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="Name" type="Label" parent="PlayerMonsterUI/MarginContainer/HBoxContainer" unique_id=695930864]
-layout_mode = 2
-
-[node name="ProgressBar" type="ProgressBar" parent="PlayerMonsterUI/MarginContainer/HBoxContainer" unique_id=109383469]
-custom_minimum_size = Vector2(128, 32)
-layout_mode = 2
-show_percentage = false
-
-[node name="HP" type="Label" parent="PlayerMonsterUI/MarginContainer/HBoxContainer" unique_id=921667358]
-layout_mode = 2
-
-[node name="EnemyMonsterUI" type="PanelContainer" parent="." unique_id=261811868]
-self_modulate = Color(1, 1, 1, 0.74509805)
-top_level = true
-anchors_preset = 1
-anchor_left = 1.0
+[node name="CenterContainer" type="CenterContainer" parent="EnemyMonsterUI" unique_id=958302830]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
-offset_left = -264.0
-offset_top = 32.0
-offset_right = -64.0
-offset_bottom = 95.0
-grow_horizontal = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_odnam")
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="EnemyMonsterUI" unique_id=1925689632]
-layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
-
-[node name="HBoxContainer" type="HBoxContainer" parent="EnemyMonsterUI/MarginContainer" unique_id=37702971]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="Name" type="Label" parent="EnemyMonsterUI/MarginContainer/HBoxContainer" unique_id=1678799990]
+[node name="HBoxContainer" type="HBoxContainer" parent="EnemyMonsterUI/CenterContainer" unique_id=1639639712]
 layout_mode = 2
 
-[node name="ProgressBar" type="ProgressBar" parent="EnemyMonsterUI/MarginContainer/HBoxContainer" unique_id=1469960749]
-custom_minimum_size = Vector2(128, 32)
+[node name="Name" type="Label" parent="EnemyMonsterUI/CenterContainer/HBoxContainer" unique_id=323279255]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="EnemyMonsterUI/CenterContainer/HBoxContainer" unique_id=136387307]
+clip_contents = true
 layout_mode = 2
 show_percentage = false
 
-[node name="HP" type="Label" parent="EnemyMonsterUI/MarginContainer/HBoxContainer" unique_id=299150167]
+[node name="HP" type="Label" parent="EnemyMonsterUI/CenterContainer/HBoxContainer" unique_id=2097177710]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="PlayerMonsterUI" type="Panel" parent="." unique_id=2032749796]
+self_modulate = Color(1, 1, 1, 0.74509805)
+top_level = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.05
+anchor_right = 0.4
+anchor_bottom = 0.14
+theme_override_styles/panel = SubResource("StyleBoxFlat_odnam")
+script = ExtResource("2_2n7sj")
+
+[node name="CenterContainer" type="CenterContainer" parent="PlayerMonsterUI" unique_id=21159817]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PlayerMonsterUI/CenterContainer" unique_id=1742667680]
 layout_mode = 2
 
-[node name="background" type="Sprite2D" parent="." unique_id=1634591458]
-position = Vector2(448, 320)
-scale = Vector2(2.4, 2.3962963)
+[node name="Name" type="Label" parent="PlayerMonsterUI/CenterContainer/HBoxContainer" unique_id=695930864]
+layout_mode = 2
+horizontal_alignment = 1
 
-[node name="Charactere" type="Node2D" parent="." unique_id=558316525]
+[node name="ProgressBar" type="ProgressBar" parent="PlayerMonsterUI/CenterContainer/HBoxContainer" unique_id=109383469]
+clip_contents = true
+layout_mode = 2
+show_percentage = false
 
-[node name="Player" type="Sprite2D" parent="Charactere" unique_id=1546507000]
-position = Vector2(128, 416)
-
-[node name="Enemy" type="Sprite2D" parent="Charactere" unique_id=1200163913]
-position = Vector2(832, 416)
-
-[node name="Monster" type="Node2D" parent="." unique_id=239727870]
-
-[node name="Player" type="Sprite2D" parent="Monster" unique_id=1375353573]
-position = Vector2(256, 416)
-
-[node name="Enemy" type="Sprite2D" parent="Monster" unique_id=583265071]
-position = Vector2(704, 416)
+[node name="HP" type="Label" parent="PlayerMonsterUI/CenterContainer/HBoxContainer" unique_id=921667358]
+layout_mode = 2
+horizontal_alignment = 1
 
 [node name="CombatBanner" parent="." unique_id=1870351660 instance=ExtResource("2_hmmyv")]
+layout_mode = 1
 
 [node name="CombatMenus" parent="." unique_id=1186040270 instance=ExtResource("3_odnam")]
-z_index = 0
+layout_mode = 1
 
-[node name="Star" type="CPUParticles2D" parent="." unique_id=644864512]
+[node name="Effect" type="Control" parent="." unique_id=1122628541]
+clip_contents = true
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 0.55
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_00rey")
+
+[node name="Comete" type="GPUParticles2D" parent="Effect" unique_id=1939011732]
 position = Vector2(480, 128)
-amount = 10
+amount = 1
+lifetime = 1.5
+trail_enabled = true
+trail_lifetime = 0.1
+process_material = SubResource("ParticleProcessMaterial_34ebb")
+
+[node name="Star" type="CPUParticles2D" parent="Effect" unique_id=644864512]
+position = Vector2(480, 128)
+amount = 15
 lifetime = 5.0
 emission_shape = 3
 emission_rect_extents = Vector2(480, 128)
@@ -152,18 +187,3 @@ gravity = Vector2(0, 0)
 scale_amount_min = 2.0
 scale_amount_max = 4.0
 color_ramp = SubResource("Gradient_odnam")
-
-[node name="Control" type="Control" parent="." unique_id=1122628541]
-clip_contents = true
-layout_mode = 3
-anchors_preset = 0
-offset_right = 960.0
-offset_bottom = 320.0
-
-[node name="Comete" type="GPUParticles2D" parent="Control" unique_id=1939011732]
-position = Vector2(480, 128)
-amount = 1
-lifetime = 1.5
-trail_enabled = true
-trail_lifetime = 0.1
-process_material = SubResource("ParticleProcessMaterial_34ebb")

@@ -1,6 +1,5 @@
 extends Node
 
-signal launch
 signal fail_connection
 
 @export var timeToConnect = 5.0
@@ -13,11 +12,14 @@ var sceneLaunch = false
 
 @onready var messageQueue = []
 
+
 func connect_server():
 	#CONNECT AND SEND TOKEN
-	var url = "ws://127.0.0.1:8082/?token=" + token + "&room=" + room
+	print("Try to connect server")
+	var url = "wss://free-assets.42belgium.com/game/?token=" + token + "&room=" + room
 	print("url : " + url)
 	var err = ws.connect_to_url(url)
+	print("response of connect fonction: " + str(err))
 	if err != OK:
 		emit_signal("fail_connection")
 		print("WebSocket connection failed")
@@ -25,7 +27,9 @@ func connect_server():
 	else:
 		print("Connected to server")
 
+
 func receive_token():
+	print("received_token start")
 	var token_ok = false
 	var room_ok = false
 	var currentTime = 0.0
@@ -45,17 +49,18 @@ func receive_token():
 					room_ok = true
 					print("TOKEN ROOM RECEIVE: " +  room)
 		if token_ok == true && room_ok == true:
+			print("All token receiped")
 			return true
 		await get_tree().create_timer(0.2).timeout
 		currentTime += 0.2
-		print(currentTime)
 	return false
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if OS.has_feature("web"):
+		print("OS web ok")
 		var result = await receive_token()
-		print("result : " + str(result))
 		if !result:
 			print("TOKEN TIMEOUT")
 			emit_signal("fail_connection")
@@ -76,17 +81,17 @@ func _process(_delta: float) -> void:
 		receive_messages()
 		#HANDLE FIRST MESSAGE STOCK IN QUEUE
 		process_network_messages()
-		print("ws connect launch scene map")
-		if sceneLaunch == false:
-			sceneLaunch = true
-			emit_signal("launch")
+		
 	if wsSate == WebSocketPeer.STATE_CONNECTING:
 		pass
+
 
 func process_network_messages():
 	while messageQueue.size() > 0:
 		var msg = messageQueue.pop_front()
+		print(msg)
 		Received.handle_message_receive(msg)
+
 
 func receive_messages():
 	if ws.get_ready_state() != WebSocketPeer.STATE_OPEN:

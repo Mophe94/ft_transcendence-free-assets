@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://f6gbl207gcmk"]
+
+[ext_resource type="Texture2D" uid="uid://dkxnnuayg68c8" path="res://Assets/Monster/spritesheet/Pisciner/pisciner_01.png" id="1_yrfxy"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bumfg"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_yrfxy")
+}],
+"loop": true,
+"name": &"default",
+"speed": 2.0
+}]
+
+[node name="Pisciner" type="Node2D" unique_id=1106059411]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=440978739]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D" unique_id=1343580698]
+position = Vector2(2.0625007, -2.0000017)
+scale = Vector2(0.20730875, 0.21590908)
+sprite_frames = SubResource("SpriteFrames_bumfg")
+frame_progress = 0.4874668

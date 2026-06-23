@@ -3,18 +3,14 @@
 [ext_resource type="Script" uid="uid://chjj6vvhpmpr2" path="res://Script/TeamSetup/team_setup_script.gd" id="1_p3dhh"]
 [ext_resource type="Texture2D" uid="uid://diomywihvuhfv" path="res://Assets/TeamSetup/mon_star_sky.png" id="2_p3dhh"]
 [ext_resource type="Script" uid="uid://64kusr7j27pr" path="res://Script/TeamSetup/SlotSetup/player.gd" id="3_2ad6k"]
-[ext_resource type="Script" uid="uid://dhqgwdgfpxvpp" path="res://Script/TeamSetup/SlotSetup/slot_1.gd" id="3_f4a0n"]
+[ext_resource type="Script" uid="uid://dhqgwdgfpxvpp" path="res://Script/TeamSetup/SlotSetup/slot_player.gd" id="3_f4a0n"]
+[ext_resource type="Script" uid="uid://b0y2tyw4p7bv" path="res://Script/TeamSetup/Label/Label.gd" id="3_r3dx7"]
 [ext_resource type="Script" uid="uid://dlj0x06vhlfx" path="res://Script/TeamSetup/ButtonTeamSetup/button_slot1.gd" id="3_saqoo"]
-[ext_resource type="Script" uid="uid://cv3vsie8hc6ko" path="res://Script/TeamSetup/ButtonTeamSetup/button_slot2.gd" id="4_6pa65"]
-[ext_resource type="Script" uid="uid://cwpe1g4tlq75" path="res://Script/TeamSetup/SlotSetup/slot_2.gd" id="5_do8e3"]
-[ext_resource type="Script" uid="uid://evxi5qcmmuhw" path="res://Script/TeamSetup/ButtonTeamSetup/button_slot3.gd" id="5_f4a0n"]
-[ext_resource type="Script" uid="uid://hoxuft48pa1q" path="res://Script/TeamSetup/ButtonTeamSetup/button_slot4.gd" id="6_30lkc"]
-[ext_resource type="Script" uid="uid://quckugkxl4dj" path="res://Script/TeamSetup/SlotSetup/slot_3.gd" id="7_2ad6k"]
-[ext_resource type="Script" uid="uid://5igmwd71f3gu" path="res://Script/TeamSetup/ButtonTeamSetup/button_slot5.gd" id="7_gx04m"]
-[ext_resource type="Script" uid="uid://c2drw1ghi4fno" path="res://Script/TeamSetup/ButtonTeamSetup/button_slot6.gd" id="8_0w0gp"]
-[ext_resource type="Script" uid="uid://ctr1ps5p0fxfi" path="res://Script/TeamSetup/SlotSetup/slot_4.gd" id="9_6flf8"]
-[ext_resource type="Script" uid="uid://cqvns02f1cs1n" path="res://Script/TeamSetup/SlotSetup/slot_5.gd" id="11_albly"]
-[ext_resource type="Script" uid="uid://mq07eilfi4xt" path="res://Script/TeamSetup/SlotSetup/slot_6.gd" id="13_qa51j"]
+[ext_resource type="Script" uid="uid://doc0b8w1nr3t4" path="res://Script/TeamSetup/CurrentTeam/current_team.gd" id="4_aslvp"]
+[ext_resource type="Script" uid="uid://bblhf43qu0piw" path="res://Script/TeamSetup/Asset/asset_player.gd" id="12_50khs"]
+[ext_resource type="Script" uid="uid://3bnlilm7i22h" path="res://Script/TeamSetup/SlotSetup/slot_enemy.gd" id="14_ld8bc"]
+[ext_resource type="Script" uid="uid://px2lq1j8nsjh" path="res://Script/TeamSetup/Asset/asset_enemy.gd" id="15_f6nhm"]
+[ext_resource type="Script" uid="uid://c6k5aeej1ipwh" path="res://Script/TeamSetup/Effect/effect.gd" id="16_r3dx7"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vqryw"]
 bg_color = Color(0, 0.61960787, 0.98039216, 0.59607846)
@@ -76,241 +72,411 @@ color_ramp = SubResource("GradientTexture1D_albly")
 turbulence_noise_strength = 0.2
 turbulence_noise_scale = 0.3
 
-[node name="TeamSetup" type="Node2D" unique_id=1489940972]
+[node name="TeamSetup" type="Control" unique_id=29161733]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_p3dhh")
 
-[node name="TextureRect" type="TextureRect" parent="." unique_id=1430445055]
-offset_right = 960.0
-offset_bottom = 640.0
+[node name="BackGround" type="TextureRect" parent="." unique_id=1430445055]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_p3dhh")
 expand_mode = 5
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1130583131]
+[node name="NameVS" type="CenterContainer" parent="." unique_id=1130583131]
 z_index = 1
-offset_right = 960.0
-offset_bottom = 640.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=561615232]
+[node name="VBoxContainer" type="VBoxContainer" parent="NameVS" unique_id=561615232]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 25
+script = ExtResource("3_r3dx7")
 
-[node name="PlayerName" type="Label" parent="CenterContainer/VBoxContainer" unique_id=90486603]
+[node name="PlayerName" type="Label" parent="NameVS/VBoxContainer" unique_id=90486603]
 layout_mode = 2
-theme_override_font_sizes/font_size = 35
 text = "????????"
 horizontal_alignment = 1
+visible_characters = 9
+visible_ratio = 1.125
 
-[node name="VS" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1556867610]
+[node name="VS" type="Label" parent="NameVS/VBoxContainer" unique_id=1556867610]
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
 text = "VS"
 horizontal_alignment = 1
 
-[node name="Enemy" type="Label" parent="CenterContainer/VBoxContainer" unique_id=388193558]
+[node name="Enemy" type="Label" parent="NameVS/VBoxContainer" unique_id=388193558]
 layout_mode = 2
-theme_override_font_sizes/font_size = 35
 text = "????????"
 horizontal_alignment = 1
+visible_characters = 9
+visible_ratio = 1.125
 
-[node name="Player" type="Node2D" parent="." unique_id=2131074739]
+[node name="CurrentTeam" type="Panel" parent="." unique_id=174295079]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.8
+anchor_right = 0.8
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_vqryw")
+script = ExtResource("4_aslvp")
+
+[node name="YourTeam" type="Panel" parent="CurrentTeam" unique_id=627994661]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.1
+anchor_right = 0.25
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_b5mtn")
+
+[node name="YourTeam" type="Label" parent="CurrentTeam/YourTeam" unique_id=704925483]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 40
+text = "YOUR
+TEAM"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Monster1" type="TextureRect" parent="CurrentTeam" unique_id=1247847934]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.35
+anchor_top = 0.1
+anchor_right = 0.5
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 5
+
+[node name="Monster2" type="TextureRect" parent="CurrentTeam" unique_id=527342790]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.55
+anchor_top = 0.1
+anchor_right = 0.7
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 5
+
+[node name="Monster3" type="TextureRect" parent="CurrentTeam" unique_id=269698550]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.75
+anchor_top = 0.1
+anchor_right = 0.9
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 5
+
+[node name="Player" type="Control" parent="." unique_id=360951260]
+z_index = 1
+layout_mode = 1
+anchor_right = 0.5
+anchor_bottom = 0.8
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("3_2ad6k")
 
 [node name="Slot1" type="Control" parent="Player" unique_id=1943121951]
-layout_mode = 3
-anchors_preset = 0
+layout_mode = 1
+anchor_left = 0.31
+anchor_top = 0.16
+anchor_right = 0.49
+anchor_bottom = 0.34
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("3_f4a0n")
 
 [node name="Button" type="Button" parent="Player/Slot1" unique_id=123822889]
-layout_mode = 0
-offset_left = 152.0
-offset_top = 88.0
-offset_right = 232.0
-offset_bottom = 168.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 action_mode = 0
 flat = true
 script = ExtResource("3_saqoo")
 
 [node name="Monster" type="Sprite2D" parent="Player/Slot1" unique_id=1487059913]
-position = Vector2(192, 128)
+position = Vector2(43.199997, 46.08)
 
 [node name="Slot2" type="Control" parent="Player" unique_id=382811074]
-layout_mode = 3
-anchors_preset = 0
-script = ExtResource("5_do8e3")
+layout_mode = 1
+anchor_left = 0.31
+anchor_top = 0.41
+anchor_right = 0.49
+anchor_bottom = 0.59
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_f4a0n")
 
 [node name="Button" type="Button" parent="Player/Slot2" unique_id=1737180991]
-layout_mode = 0
-offset_left = 152.0
-offset_top = 216.0
-offset_right = 232.0
-offset_bottom = 296.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 action_mode = 0
 flat = true
-script = ExtResource("4_6pa65")
+script = ExtResource("3_saqoo")
 
 [node name="Monster" type="Sprite2D" parent="Player/Slot2" unique_id=1095879716]
-position = Vector2(192, 256)
+position = Vector2(43.200012, 46.080017)
 
 [node name="Slot3" type="Control" parent="Player" unique_id=1099472075]
-layout_mode = 3
-anchors_preset = 0
-script = ExtResource("7_2ad6k")
+layout_mode = 1
+anchor_left = 0.31
+anchor_top = 0.66
+anchor_right = 0.49
+anchor_bottom = 0.84
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_f4a0n")
 
 [node name="Button" type="Button" parent="Player/Slot3" unique_id=1300418116]
-layout_mode = 0
-offset_left = 152.0
-offset_top = 344.0
-offset_right = 232.0
-offset_bottom = 424.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 action_mode = 0
 flat = true
-script = ExtResource("5_f4a0n")
+script = ExtResource("3_saqoo")
 
 [node name="Monster" type="Sprite2D" parent="Player/Slot3" unique_id=811647169]
-position = Vector2(192, 384)
+position = Vector2(43.200012, 46.079956)
 
 [node name="Slot4" type="Control" parent="Player" unique_id=699156305]
-layout_mode = 3
-anchors_preset = 0
-script = ExtResource("9_6flf8")
+layout_mode = 1
+anchor_left = 0.58
+anchor_top = 0.16
+anchor_right = 0.76
+anchor_bottom = 0.34
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_f4a0n")
 
 [node name="Button" type="Button" parent="Player/Slot4" unique_id=1658962573]
-layout_mode = 0
-offset_left = 280.0
-offset_top = 88.0
-offset_right = 360.0
-offset_bottom = 168.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 action_mode = 0
 flat = true
-script = ExtResource("6_30lkc")
+script = ExtResource("3_saqoo")
 
 [node name="Monster" type="Sprite2D" parent="Player/Slot4" unique_id=2138434928]
-position = Vector2(320, 128)
+position = Vector2(41.599976, 46.08)
 
 [node name="Slot5" type="Control" parent="Player" unique_id=1085793178]
-layout_mode = 3
-anchors_preset = 0
-script = ExtResource("11_albly")
+layout_mode = 1
+anchor_left = 0.58
+anchor_top = 0.41
+anchor_right = 0.76
+anchor_bottom = 0.59
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_f4a0n")
 
 [node name="Button" type="Button" parent="Player/Slot5" unique_id=1359846070]
-layout_mode = 0
-offset_left = 280.0
-offset_top = 216.0
-offset_right = 360.0
-offset_bottom = 296.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 action_mode = 0
 flat = true
-script = ExtResource("7_gx04m")
+script = ExtResource("3_saqoo")
 
 [node name="Monster" type="Sprite2D" parent="Player/Slot5" unique_id=2141652479]
-position = Vector2(320, 256)
+position = Vector2(41.599976, 46.080017)
 
 [node name="Slot6" type="Control" parent="Player" unique_id=187472908]
-layout_mode = 3
-anchors_preset = 0
-script = ExtResource("13_qa51j")
+layout_mode = 1
+anchor_left = 0.58
+anchor_top = 0.66
+anchor_right = 0.76
+anchor_bottom = 0.84
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_f4a0n")
 
 [node name="Button" type="Button" parent="Player/Slot6" unique_id=848241373]
-layout_mode = 0
-offset_left = 280.0
-offset_top = 344.0
-offset_right = 360.0
-offset_bottom = 424.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 action_mode = 0
 flat = true
-script = ExtResource("8_0w0gp")
+script = ExtResource("3_saqoo")
 
 [node name="Monster" type="Sprite2D" parent="Player/Slot6" unique_id=832985135]
-position = Vector2(320, 384)
+position = Vector2(41.599976, 46.079956)
 
-[node name="asset" type="Sprite2D" parent="Player" unique_id=1282193047]
-position = Vector2(64, 320)
+[node name="AssetControl" type="Control" parent="Player" unique_id=1093754269]
+layout_mode = 1
+anchor_left = 0.05
+anchor_top = 0.5
+anchor_right = 0.22
+anchor_bottom = 0.68
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("12_50khs")
 
-[node name="CurrentTeam" type="Panel" parent="Player" unique_id=174295079]
-custom_minimum_size = Vector2(100, 0)
-offset_left = 192.0
-offset_top = 480.0
-offset_right = 769.0
-offset_bottom = 608.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_vqryw")
-
-[node name="YourTeam" type="Panel" parent="Player/CurrentTeam" unique_id=627994661]
-layout_mode = 0
-offset_left = 8.0
-offset_top = 8.0
-offset_right = 136.0
-offset_bottom = 120.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_b5mtn")
-
-[node name="YourTeam" type="Label" parent="Player/CurrentTeam/YourTeam" unique_id=704925483]
-layout_mode = 0
-offset_right = 128.0
-offset_bottom = 113.0
-theme_override_font_sizes/font_size = 40
-text = "YOUR
-TEAM"
-horizontal_alignment = 1
-
-[node name="Monster1" type="Sprite2D" parent="Player/CurrentTeam" unique_id=1069025327]
-position = Vector2(224, 64)
-
-[node name="Monster2" type="Sprite2D" parent="Player/CurrentTeam" unique_id=482167391]
-position = Vector2(352, 64)
-
-[node name="Monster3" type="Sprite2D" parent="Player/CurrentTeam" unique_id=1720717862]
-position = Vector2(480, 64)
+[node name="Asset" type="Sprite2D" parent="Player/AssetControl" unique_id=1282193047]
+position = Vector2(40, 46)
 
 [node name="Enemy" type="Control" parent="." unique_id=557213865]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 448.0
-offset_right = 960.0
-offset_bottom = 640.0
+z_index = 1
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.8
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
-[node name="Slot1" type="Node2D" parent="Enemy" unique_id=1392683541]
+[node name="Slot1" type="Control" parent="Enemy" unique_id=1890584726]
+layout_mode = 1
+anchor_left = 0.51
+anchor_top = 0.16
+anchor_right = 0.69
+anchor_bottom = 0.34
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("14_ld8bc")
 
 [node name="Monster" type="Sprite2D" parent="Enemy/Slot1" unique_id=876499080]
-position = Vector2(321, 128)
+position = Vector2(43.19995, 46.08)
 
-[node name="Slot2" type="Node2D" parent="Enemy" unique_id=2006419113]
+[node name="Slot2" type="Control" parent="Enemy" unique_id=974938190]
+layout_mode = 1
+anchor_left = 0.51
+anchor_top = 0.41
+anchor_right = 0.69
+anchor_bottom = 0.59
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("14_ld8bc")
 
 [node name="Monster" type="Sprite2D" parent="Enemy/Slot2" unique_id=1377266512]
-position = Vector2(321, 256)
+position = Vector2(43.19995, 46.080017)
 
-[node name="Slot3" type="Node2D" parent="Enemy" unique_id=1273485320]
+[node name="Slot3" type="Control" parent="Enemy" unique_id=24678272]
+layout_mode = 1
+anchor_left = 0.51
+anchor_top = 0.66
+anchor_right = 0.69
+anchor_bottom = 0.84
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("14_ld8bc")
 
 [node name="Monster" type="Sprite2D" parent="Enemy/Slot3" unique_id=1929010732]
-position = Vector2(320, 384)
+position = Vector2(43.200012, 46.079987)
 
-[node name="Slot4" type="Node2D" parent="Enemy" unique_id=730651359]
+[node name="Slot4" type="Control" parent="Enemy" unique_id=1778343452]
+layout_mode = 1
+anchor_left = 0.24
+anchor_top = 0.16
+anchor_right = 0.42
+anchor_bottom = 0.34
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("14_ld8bc")
 
 [node name="Monster" type="Sprite2D" parent="Enemy/Slot4" unique_id=291300085]
-position = Vector2(193, 128)
+position = Vector2(44.799988, 46.08)
 
-[node name="Slot5" type="Node2D" parent="Enemy" unique_id=1032949114]
+[node name="Slot5" type="Control" parent="Enemy" unique_id=2019347662]
+layout_mode = 1
+anchor_left = 0.24
+anchor_top = 0.41
+anchor_right = 0.42
+anchor_bottom = 0.59
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("14_ld8bc")
 
 [node name="Monster" type="Sprite2D" parent="Enemy/Slot5" unique_id=554983036]
-position = Vector2(193, 256)
+position = Vector2(44.799988, 46.080017)
 
-[node name="Slot6" type="Node2D" parent="Enemy" unique_id=63427339]
+[node name="Slot6" type="Control" parent="Enemy" unique_id=1635735670]
+layout_mode = 1
+anchor_left = 0.24
+anchor_top = 0.66
+anchor_right = 0.42
+anchor_bottom = 0.84
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("14_ld8bc")
 
 [node name="Monster" type="Sprite2D" parent="Enemy/Slot6" unique_id=1863295735]
-position = Vector2(192, 384)
+position = Vector2(44.799988, 46.079987)
 
-[node name="asset" type="Sprite2D" parent="Enemy" unique_id=108527777]
-position = Vector2(449, 320)
+[node name="AssetControl" type="Control" parent="Enemy" unique_id=1807769211]
+layout_mode = 1
+anchor_left = 0.78
+anchor_top = 0.5
+anchor_right = 0.95
+anchor_bottom = 0.68
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("15_f6nhm")
+
+[node name="asset" type="Sprite2D" parent="Enemy/AssetControl" unique_id=108527777]
+position = Vector2(41.599976, 46)
 
 [node name="Effect" type="Control" parent="." unique_id=424449306]
 clip_contents = true
-layout_mode = 3
-anchors_preset = 0
-offset_right = 960.0
-offset_bottom = 640.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
+script = ExtResource("16_r3dx7")
 
 [node name="Star" type="CPUParticles2D" parent="Effect" unique_id=1298832226]
 position = Vector2(480, 320)
@@ -332,3 +498,16 @@ trail_lifetime = 0.2
 trail_sections = 2
 trail_section_subdivisions = 1
 process_material = SubResource("ParticleProcessMaterial_2ad6k")
+
+[node name="TimeDisplay" type="CenterContainer" parent="." unique_id=813442650]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 63.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="Timer" type="Label" parent="TimeDisplay" unique_id=452841527]
+layout_mode = 2
+theme_override_font_sizes/font_size = 45
+horizontal_alignment = 1

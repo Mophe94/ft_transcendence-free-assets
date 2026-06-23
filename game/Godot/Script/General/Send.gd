@@ -1,5 +1,31 @@
 extends Node
 
+enum SEND_NAME {
+	REQUEST_ITEM,
+	ADD_ITEM,
+	NEW_ENCOUNTER,
+	TRY_CATCH,
+	DELETE_MONSTER,
+	DELETE_ITEM,
+	USE_ITEM,
+	TEAM_CHOICE,
+	CHANGE_CURRENT_MONSTER,
+	TRY_ATTACK
+}
+
+const SEND_TAB = {
+	SEND_NAME.REQUEST_ITEM: "request_item",
+	SEND_NAME.ADD_ITEM: "add_item",
+	SEND_NAME.NEW_ENCOUNTER: "new_encounter",
+	SEND_NAME.TRY_CATCH: "try_catch",
+	SEND_NAME.DELETE_MONSTER: "delete_monster",
+	SEND_NAME.DELETE_ITEM: "delete_item",
+	SEND_NAME.USE_ITEM: "use_item",
+	SEND_NAME.TEAM_CHOICE: "team_choice",
+	SEND_NAME.CHANGE_CURRENT_MONSTER: "change_current_monster",
+	SEND_NAME.TRY_ATTACK: "try_attack"
+}
+
 func send_mesage(event, value = null):
 	#PROTO MESSAGE
 	var packet = {
@@ -27,13 +53,22 @@ func send_mesage(event, value = null):
 			_change_current_monster(packet, value)
 		"try_attack":
 			_try_attack(packet, value)
+		"use_item_combat":
+			_use_item_combat(packet, value)
 	Network.ws.send_text(JSON.stringify(packet))
 
 
-func _try_attack(packet, slot):
+func _use_item_combat(packet, item):
+	packet["data"] = {
+		"state": "use_item_combat",
+		"item": item
+	}
+
+
+func _try_attack(packet, skill):
 	packet["data"] = {
 		"state" = "attack",
-		"slot" = slot
+		"skill" = skill
 	}
 
 
@@ -44,9 +79,13 @@ func _change_current_monster(packet, slot):
 	}
 
 
-func _team_choice(packet, team):
+func _team_choice(packet, battle_team):
+	var tab = ["", "", ""]
+	for i in range(battle_team.size()):
+		tab[i] = battle_team[i]["name"]
 	packet["data"] = {
-		"battle_team": team
+		"state": "team_choice",
+		"battle_team": tab
 	}
 
 func _use_item(packet, item):

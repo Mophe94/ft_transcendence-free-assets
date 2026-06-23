@@ -124,7 +124,6 @@ autoplay = "default"
 frame_progress = 0.1051478
 
 [node name="Camera2D" type="Camera2D" parent="CharacterBody2D" unique_id=284947736]
-position = Vector2(-2, 8)
 limit_left = 0
 limit_top = -128
 limit_right = 6336

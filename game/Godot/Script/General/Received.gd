@@ -1,17 +1,20 @@
 extends Node
 
-signal combat_scene
-signal team_setup_scene
-signal catch_ok
-signal catch_fail
-signal monster_encounter_received
 signal start_game_scene
-signal enemy_action
-signal player_action
+
+signal monster_encounter_received
+signal catch_result(success)
+signal team_setup_scene
+signal item_received
+
+signal combat_scene
 signal battle_start
+
+signal new_turn
 signal lose
 signal win
 signal next_map_scene
+
 signal finish
 
 
@@ -31,46 +34,49 @@ func handle_message_receive(msg):
 	var data = msg["data"]
 	if data.has("state"):
 		var state = data["state"]
+		print("state: " + state)
 		match state:
-			"state" == "start_game":
+			"start_game":
 				_start_game(data)
-			"state" == "team_setup":
+			"team_setup":
 				_team_setup(data)
-			"state" == "new_current_item":
+			"new_current_item":
 				_new_current_item(data)
-			"state" == "new_encounter":
+			"new_encounter":
 				_new_encounter(data)
-			"state" == "result_catch":
+			"result_catch":
 				_result_catch(data)
-			"state" == "update_team":
+			"update_team":
 				_update_team(data)
-			"state" == "update_inventory":
+			"update_inventory":
 				_update_inventory(data)
-			"state" == "combat":
+			"combat":
 				_combat(data)
-			"state" == "battle_start":
+			"battle_start":
 				_battle_start(data)
-			"state" == "update_battle_team":
+			"update_current_monster":
 				_update_current_monster(data)
-			"state" == "update_enemy_momster":
+			"update_enemy_momster":
 				_update_enemy_monster(data)
-			"state" == "action_item_damage":
+			"action_item_damage":
 				_action_item_damage(data)
-			"state" == "action_item_heal":
+			"action_item_heal":
 				_action_item_heal(data)
-			"state" == "action_item_stat":
+			"action_item_stat":
 				_action_item_stat(data)
-			"state" == "attack":
+			"attack":
 				_attack(data)
-			"state" == "damage":
+			"damage":
 				_take_damage(data)
-			"state" == "lose":
+			"new_turn":
+				_new_turn(data)
+			"lose":
 				emit_signal("lose")
-			"state" == "win":
+			"win":
 				emit_signal("win")
-			"state" == "next_map":
+			"next_map":
 				_next_map(data)
-			"state" == "finish":
+			"finish":
 				emit_signal("finish")
 			_:
 				print("data match with nothing")
@@ -85,6 +91,12 @@ func _next_map(data):
 	emit_signal("next_map_scene")
 
 
+func _new_turn(data):
+	if not data.has("timer"):
+		return
+	GeneralData.timer = data["timer"]
+	emit_signal("new_turn")
+
 func _take_damage(data):
 	if not data.has("player"):
 		return
@@ -98,18 +110,19 @@ func _take_damage(data):
 		return
 	GeneralData.player["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
 
-	if not player.has("battle_team"):
-		return
-	var battle_team = player["battle_team"]
-	var slot = GeneralData.player["currentMonster"]["slot"]
-	GeneralData.player["battle_team"][slot]["life"]["current"] = battle_team[slot]["life"]["current"]
-
-	if not data.has("text"):
-		print("func _action_item_stat TEXT missing")
-	GeneralData.text = data["text"]
-
 
 func _attack(data):
+	if not data.has("success"):
+		return
+	var result = data["success"]
+	
+	if not data.has("skill"):
+		return
+	var skill = data["skill"]
+
+	if result == "fail":
+		return
+	
 	if not data.has("enemy"):
 		return
 	var enemy = data["enemy"]
@@ -122,86 +135,100 @@ func _attack(data):
 		return
 	GeneralData.enemy["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
 
-	if not data.has("text"):
+
+func _action_item_stat(data):
+	if not data.has("stat"):
 		return
-	GeneralData.text = data["text"]
+	var stat = data["stat"]
+	
+	if not data.has("change"):
+		return
+	var change = data["change"]
 	
 	if not data.has("charactere"):
 		return
 	if data["charactere"] == "player":
-		emit_signal("player_action")
-	elif data["charactere"] == "enemy":
-		emit_signal("enemy_action")
-
-
-func _action_item_stat(data):
-	if not data.has("text"):
-		return
-	GeneralData.text = data["text"]
-
-	if not data.has("charactere"):
-		return
-	if data["charactere"] == "player":
 		_update_inventory(data)
-		emit_signal("player_action")
-	elif data["charactere"] == "enemy":
-		emit_signal("enemy_action")
 
 
 func _action_item_heal(data):
-	if not data.has("player"):
+	if not data.has("value"):
 		return
-	var player = data["player"]
+	var value = data["value"]
 
-	if not player.has("currentMonster"):
-		return
-	var cMonster = player["currentMonster"]
-
-	if not cMonster.has("life"):
-		return
-	GeneralData.player["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
-
-	if not player.has("battle_team"):
-		return
-	var battle_team = player["battle_team"]
-	var slot = cMonster["slot"]
-	GeneralData.player["battle_team"][slot]["life"]["current"] = battle_team[slot]["life"]["current"]
-		
 	if not data.has("charactere"):
 		return
-	if data["charactere"] == "player":
-		if not data.has("text"):
+	var charactere = data["charactere"]
+
+	if charactere != "player" || charactere != "enemy":
+		return
+	
+	if charactere == "enemy":
+		if not data.has("enemy"):
 			return
-		GeneralData.text = data["text"]
+		var enemy = data["enemy"]
+
+		if not enemy.has("currentMonster"):
+			return
+		var cMonster = enemy["currentMonster"]
+
+		if not cMonster.has("life"):
+			return
+		GeneralData.enemy["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
+
+	else:
+		if not data.has("player"):
+			return
+		var player = data["player"]
+
+		if not player.has("currentMonster"):
+			return
+		var cMonster = player["currentMonster"]
+
+		if not cMonster.has("life"):
+			return
+		GeneralData.player["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
 		_update_inventory(data)
-		emit_signal("player_action")
-	elif data["charactere"] == "enemy":
-		emit_signal("enmey_action")
 
 
 func _action_item_damage(data):
-	if not data.has("enemy"):
+	if not data.has("value"):
 		return
-	var enemy = data["enemy"]
+	var value = data["value"]
 
-	if not enemy.has("currentMonster"):
-		return
-	var cMonster = enemy["currentMonster"]
-
-	if not cMonster.has("life"):
-		return
-	GeneralData.enemy["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
-		
 	if not data.has("charactere"):
 		return
-	if data["charactere"] == "player":
-		if not data.has("text"):
+	var charactere = data["charactere"]
+
+	if charactere != "player" || charactere != "enemy":
+		return
+	
+	if charactere == "enemy":
+		if not data.has("enemy"):
 			return
-		GeneralData.text = data["text"]
+		var enemy = data["enemy"]
+
+		if not enemy.has("currentMonster"):
+			return
+		var cMonster = enemy["currentMonster"]
+
+		if not cMonster.has("life"):
+			return
+		GeneralData.enemy["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
+
+	else:
+		if not data.has("player"):
+			return
+		var player = data["player"]
+
+		if not player.has("currentMonster"):
+			return
+		var cMonster = player["currentMonster"]
+
+		if not cMonster.has("life"):
+			return
+		GeneralData.player["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
 		_update_inventory(data)
-		emit_signal("player_action")
-	elif data["charactere"] == "enemy":
-		emit_signal("player_action")
 
 
 func _update_enemy_monster(data):
@@ -219,7 +246,6 @@ func _update_enemy_monster(data):
 		return
 	GeneralData.enemy["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
 	GeneralData.enemy["currentMonster"]["life"]["max"] = cMonster["life"]
-	emit_signal("enemy_action")
 
 
 func _update_current_monster(data):
@@ -255,10 +281,13 @@ func _update_current_monster(data):
 	if not data.has("text"):
 		return
 	GeneralData.text = data["text"]
-	emit_signal("player_action")
 
 
 func _battle_start(data):
+	if not data.has("timer"):
+		return
+	GeneralData.timer = data["timer"]
+	
 	if not data.has("player"):
 		return
 	var player = data["player"]
@@ -288,6 +317,26 @@ func _battle_start(data):
 	for i in range(status.size()):
 		GeneralData.player["currentMonster"]["skill"][i] = status[i]
 
+	if not data.has("enemy"):
+		return
+	var enemy = data["enemy"]
+	
+	if not enemy.has("currentMonster"):
+		return
+	cMonster = enemy["currentMonster"]
+	GeneralData.enemy["currentMonster"]["name"] = cMonster["name"]
+
+	if not cMonster.has("life"):
+		return
+	GeneralData.enemy["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
+	GeneralData.enemy["currentMonster"]["life"]["max"] = cMonster["life"]
+	
+	if not cMonster.has("status"):
+		return
+	status = cMonster["status"]
+	for i in range(status.size()):
+		GeneralData.player["currentMonster"]["skill"][i] = status[i]
+	
 	if not data.has("text"):
 		return
 	GeneralData.text = data["text"]
@@ -295,6 +344,10 @@ func _battle_start(data):
 
 
 func _combat(data):
+	if not data.has("timer"):
+		return
+	GeneralData.timer = data["timer"]
+
 	if not data.has("player"):
 		return
 	var player = data["player"]
@@ -307,10 +360,15 @@ func _combat(data):
 		GeneralData.player["battle_team"][i]["slot"] = team["slot"]
 		GeneralData.player["battle_team"][i]["life"]["current"] = team[i]["life"]["current"]
 		GeneralData.player["battle_team"][i]["life"]["max"] = team[i]["life"]["max"]
+
 	emit_signal("combat_scene")
 
 
 func _team_setup(data):
+	if not data.has("timer"):
+		return
+	GeneralData.timer = data["timer"]
+	
 	if not data.has("player"):
 		return
 	var player = data["player"]
@@ -345,10 +403,16 @@ func _team_setup(data):
 
 
 func _update_team(data):
-	if not data.has("team"):
+	if not data.has("player"):
 		return
-	for i in range(6):
-		GeneralData.player["team"][i] = data["team"][i]
+	var player = data["player"]
+	
+	if not player.has("team"):
+		return
+	var team = player["team"]
+	
+	for i in range(team.size()):
+		GeneralData.player["team"][i] = team[i] 
 
 
 func _update_inventory(data):
@@ -359,19 +423,15 @@ func _update_inventory(data):
 
 
 func _result_catch(data):
-	if not data.has("result"):
+	if not data.has("success"):
 		return
 
-	if not data["result"] == "ok" || data["result"] == "fail":
-		return
-	if data["result"] == "ok":
-		emit_signal("catch_ok")
-	else:
-		emit_signal("catch_fail")
-
-	if not data.has("text"):
-		return
-	GeneralData.text = data["text"]
+	match data["success"]:
+		"ok":
+			_update_team(data)
+			emit_signal("catch_result", true)
+		"fail":
+			emit_signal("catch_result", false)
 
 
 func _new_encounter(data):
@@ -380,37 +440,35 @@ func _new_encounter(data):
 	GeneralData.monster_encounter = data["monster_encounter"]
 	emit_signal("monster_encounter_received")
 
-	if not data.has("text"):
-		return
-	GeneralData.text = data["text"]
-
 
 func _new_current_item(data):
 	if not data.has("current_item"):
 		return
 	GeneralData.current_item = data["current_item"]
+	emit_signal("item_received")
 
 
 func _start_game(data):
+
 	if not data.has("timer"):
 		return
 	GeneralData.timer = data["timer"]
-	
+
 	if not data.has("player"):
 		return
 	var player = data["player"]
 
 	if not player.has("id"):
 		return
-	GeneralData.player["id"] = data["player"]["id"]
-			
-	if not player.has("name"): 
+	GeneralData.player["id"] = player["id"]
+
+	if not player.has("name"):
 		return
-	GeneralData.player["name"] = data["player"]["name"]
-			
-	if not player.has("asset"): 
+	GeneralData.player["name"] = player["name"]
+
+	if not player.has("asset"):
 		return
-	GeneralData.player["asset"] = data["player"]["asset"]
+	GeneralData.player["asset"] = player["asset"]
 	
 	if not player.has("team"):
 		return

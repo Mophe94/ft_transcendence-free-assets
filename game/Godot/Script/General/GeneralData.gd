@@ -1,30 +1,8 @@
 extends Node
 
 @onready var transi = preload("res://Scene/Transition/blur_transition.tscn")
-enum SEND_NAME {
-	REQUEST_ITEM,
-	ADD_ITEM,
-	NEW_ENCOUNTER,
-	TRY_CATCH,
-	DELETE_MONSTER,
-	DELETE_ITEM,
-	USE_ITEM,
-	TEAM_CHOICE,
-	CHANGE_CURRENT_MONSTER,
-	TRY_ATTACK
-}
-
-const SEND_TAB = {
-	SEND_NAME.REQUEST_ITEM: "request_item",
-	SEND_NAME.ADD_ITEM: "new_item",
-	SEND_NAME.NEW_ENCOUNTER: "new_encounter",
-	SEND_NAME.TRY_CATCH: "try_catch",
-	SEND_NAME.DELETE_MONSTER: "delete_monster",
-	SEND_NAME.DELETE_ITEM: "delete_item",
-	SEND_NAME.TEAM_CHOICE: "team_choice",
-	SEND_NAME.CHANGE_CURRENT_MONSTER: "change_current_monster",
-	SEND_NAME.TRY_ATTACK: "try_attack"
-}
+@onready var team_setup_scene = preload("res://Scene/TeamSetup/team_setup.tscn")
+@onready var combat_scene = preload("res://Scene/Combat/combat.tscn")
 
 const background_database: Dictionary = {
 	"plains_dawn": preload("res://Assets/Capture/plains_dawn.png"),
@@ -33,38 +11,34 @@ const background_database: Dictionary = {
 	"beach_day": preload("res://Assets/Capture/beach_day.png")
 }
 
-const map_01: Dictionary = {
+const map: Dictionary = {
 	"map_01" = preload("res://Scene/World01/world_01.tscn")
 }
 
 const monster_database: Dictionary = {
-	"manTree": preload("res://Scene/Monster/mantree.tscn"),
-	"mushroom": preload("res://Scene/Monster/mushroom.tscn"),
 	"burpy": preload("res://Scene/Monster/burpy.tscn"),
 	"fishet": preload("res://Scene/Monster/fishet.tscn"),
-	"fishet_2": preload("res://Scene/Monster/fishet_2.tscn"),
 	"gigantomakia": preload("res://Scene/Monster/gigantomakia.tscn"),
 	"leafs": preload("res://Scene/Monster/leafs.tscn"),
 	"monkel": preload("res://Scene/Monster/monkel.tscn"),
 	"papate": preload("res://Scene/Monster/papate.tscn"),
 	"pigeonne": preload("res://Scene/Monster/pigeonne.tscn"),
+	"pisciner": preload("res://Scene/Monster/pisciner.tscn"),
 	"sharky": preload("res://Scene/Monster/sharky.tscn"),
 	"squirel": preload("res://Scene/Monster/squirel.tscn")
 }
 
 const monster_icon_database: Dictionary = {
-	"mushroom": preload("res://Assets/Monster/Token/Mushroom.tres"),
-	"manTree": preload("res://Assets/Monster/Token/man_three.tres"),
-	"burpy": preload("res://Assets/Monster/Token/burpy.png"),
-	"fishet": preload("res://Assets/Monster/Token/fishet.png"),
-	"fishet_2": preload("res://Assets/Monster/Token/fishet_2.png"),
-	"gigantomakia": preload("res://Assets/Monster/Token/gigantomakia.png"),
-	"leafs": preload("res://Assets/Monster/Token/leafs.png"),
-	"monkel": preload("res://Assets/Monster/Token/monkel.png"),
-	"papate": preload("res://Assets/Monster/Token/papate.png"),
-	"pigeonne": preload("res://Assets/Monster/Token/pigeonne.png"),
-	"sharky": preload("res://Assets/Monster/Token/sharky.png"),
-	"squirel": preload("res://Assets/Monster/Token/squirel.png")
+	"burpy": preload("res://Assets/Monster/spritesheet/Burpy/sprite-1-1.png"),
+	"fishet": preload("res://Assets/Monster/spritesheet/Fishet/sprite-1-1.png"),
+	"gigantomakia": preload("res://Assets/Monster/spritesheet/Gigantomakia/sprite-1-1.png"),
+	"leafs": preload("res://Assets/Monster/spritesheet/Leafs/sprite-1-1.png"),
+	"monkel": preload("res://Assets/Monster/spritesheet/Monkel/sprite-1-1-copy-0.png"),
+	"papate": preload("res://Assets/Monster/spritesheet/Papate/sprite-1-1-copy-1.png"),
+	"pigeonne": preload("res://Assets/Monster/spritesheet/Pigeonne/sprite-1-1.png"),
+	"pisciner": preload("res://Assets/Monster/spritesheet/Pisciner/pisciner_01.png"),
+	"sharky": preload("res://Assets/Monster/spritesheet/Sharky/sprite-1-1 (1).png"),
+	"squirel": preload("res://Assets/Monster/spritesheet/Squirel/sprite-1-1 (2).png")
 }
 
 const object_database: Dictionary = {
@@ -74,16 +48,49 @@ const object_database: Dictionary = {
 	"bomb": preload("res://Assets/Inventory/Icon_09.png"),
 }
 
-######################################
-# a supprimer lors du merge
-const hero_database: Dictionary = {
-	"dino": preload("res://Scene/PlayerCharacter/character.tscn") 
+const monster_description: Dictionary = {
+	"burpy": "burpy",
+	"fishet": "fishet",
+	"gigantomakia": "gigantomakia",
+	"leafs": "leafs",
+	"monkel": "monkel",
+	"papate": "papate",
+	"pigeonne": "pigeonne",
+	"pisciner": "pisciner",
+	"sharky": "sharky",
+	"squirel": "squirel"
 }
-######################################
+
+const object_description: Dictionary = {
+	"potion": "potion",
+	"golden ticket": "golden ticket",
+	"rage": "rage",
+	"bomb": "bomb"
+}
+
+@export var available_skins: Array[SkinData] = [
+		preload("res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueRessource.tres"),
+		preload("res://Scene/PlayerCharacter/Skin/DinoGreen/dinoGreenRessource.tres"),
+		preload("res://Scene/PlayerCharacter/Skin/DinoRed/dinoRedRessource.tres"),
+		
+	]
+
+func get_equipped_skin() -> SkinData:
+	for skin in available_skins:
+		if skin.skin_id == player["asset"]:
+			return skin
+	push_warning("Skin '%s' introuvable, fallback sur le premier skin disponible." % player["asset"])
+	return available_skins[0] if available_skins.size() > 0 else null
+
+func set_equipped_skin(skin_id: String) -> void:
+	player["asset"] = skin_id
+
+const player_charactere_scene = preload("res://Scene/PlayerCharacter/character.tscn") 
+
 var player: Dictionary = {
 	"id": 0,
-	"name": "ff",
-	"asset": "dino",
+	"name": "archimedee",
+	"asset": "dinoBlue",
 	"currentMonster": {
 		"name": "",
 		"slot": -1,
@@ -117,81 +124,51 @@ var player: Dictionary = {
 	},
 	"battle_team": [
 		{
-			"name": "",
+			"name": "gigantomakia",
 			"slot": 0,
 			"life": {
-				"current": 0,
-				"max": 0
+				"current": 100,
+				"max": 200
 			},
 		},
 		{
-			"name": "",
-			"slot": 0,
-			"life": {
-				"current": 0,
-				"max": 0
-			},
-		},
-		{
-			"name": "",
-			"slot": 0,
-			"life": {
-				"current": 0,
-				"max": 0
-			},
-		},
-	],
-	"team": [
-		{ 
 			"name": "burpy",
-			"description": "une description avec les stats etc",
+			"slot": 0,
+			"life": {
+				"current": 0,
+				"max": 0
+			},
 		},
-		{ 
-			"name": "fishet",
-			"description": "",
+		{
+			"name": "pisciner",
+			"slot": 0,
+			"life": {
+				"current": 1,
+				"max": 200
+			},
 		},
-		{ 
-			"name": "squirel",
-			"description": "",
-		},
-		{ 
-			"name": "",
-			"description": "",
-		},
-		{ 
-			"name": "",
-			"description": "",
-		},
-		{ 
-			"name": "",
-			"description": "",
-		},
-		
 	],
+	"team": ["pisciner", "leafs", "squirel", "burpy", "sharky", ""],
 	"inventory": [
 		{
-			"name": "potion",
-			"scene": "combat",
-			"current": 1,
-			"description": "imagine ses une potion qui redonne des pv",
+			"name": "rage",
+			"scene": "",
+			"current": 0
 		},
 		{
 			"name": "golden ticket",
 			"scene": "map",
-			"current": 4,
-			"description": "vous donne 100% de capture sur votre monstre profiter en !",
+			"current": 1
 		},
 		{
-			"name": "rage",
-			"scene": "combat",
-			"current": 6,
-			"description": "rage description mais j'ai pas d'idée pour l'instant"
+			"name": "bomb",
+			"scene": "",
+			"current": 0
 		},
 		{
 			"name": "bomb",
 			"scene": "combat",
-			"current": 1,
-			"description": "kevin est le plus beau",
+			"current": 1
 		},
 	]
 }
@@ -199,56 +176,30 @@ var player: Dictionary = {
 var enemy: Dictionary = {
 	"id": 0,
 	"name": "gg",
-	"asset": "burpy",
+	"asset": "dino",
 	"currentMonster": {
-		"name": "",
-		"index": 0,
+		"name": "burpy",
 		"life": {
 			"current": 0,
 			"max": 0
 		},
 		"status": []
 	},
-	"team": ["", "", "", "", "", ""],
+	"team": ["burpy", "burpy", "pisciner", "pisciner", "sharky", "sharky"],
 }
 
 const SPEED_TEXT = 0.03
+const WAIT_TEXT = 0.3
 
 var position_player = Vector2(0.0, 0.0)
 var player_speed = 0.0
-var timer = 0
+var timer = 1781786220
 
 var current_item = ""
-var current_map = ""
+var current_map = "map_01"
 var monster_encounter = "burpy"
 var text = []
 
 var tile = ""
 var background_capture = "plains_day"
-
-var background_battle = "plains_dayd"
-
-
-################################
-
-@export var available_skins: Array[SkinData] = [
-		preload("res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueRessource.tres"),
-		preload("res://Scene/PlayerCharacter/Skin/DinoGreen/dinoGreenRessource.tres"),
-		preload("res://Scene/PlayerCharacter/Skin/DinoRed/dinoRedRessource.tres"),
-		
-	]
-
-var equipped_skin_id: String = "po"
-
-func get_equipped_skin() -> SkinData:
-	for skin in available_skins:
-		if skin.skin_id == equipped_skin_id:
-			return skin
-	push_warning("Skin '%s' introuvable, fallback sur le premier skin disponible." % equipped_skin_id)
-	return available_skins[0] if available_skins.size() > 0 else null
-
-func set_equipped_skin(skin_id: String) -> void:
-	equipped_skin_id = skin_id
-
-
-#################################
+var background_battle = "plains_night"

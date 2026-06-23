@@ -1,1 +1,5 @@
+res://Scene/World01/world_01.tscn
+res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueSpriteSheet.tres
+res://Scene/PlayerCharacter/Skin/DinoGreen/dinoGreenSpriteSheet.tres
+res://Scene/PlayerCharacter/Skin/DinoRed/dinoRedSpriteSheet.tres
 res://Script/General/GeneralData.gd

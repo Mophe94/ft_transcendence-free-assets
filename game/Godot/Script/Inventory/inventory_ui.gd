@@ -31,7 +31,7 @@ func update_slots():
 		slots[i].update(inventory[i])
 	var team = GeneralData.player["team"]
 	for i in range(min(team.size(), monster_slots.size())):
-		monster_slots[i].update_monster(team[i]["name"])
+		monster_slots[i].update_monster(team[i])
 
 func _process(_delta):
 	if Input.is_action_just_pressed("menu"):

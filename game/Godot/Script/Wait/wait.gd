@@ -1,4 +1,4 @@
-extends Node2D
+extends Control
 
 func _scene_fail():
 	$CenterContainer/AnimationPlayer.clear_queue()
@@ -6,11 +6,11 @@ func _scene_fail():
 	$CenterContainer/Label.text = "Connection fail"
 	get_tree().paused = true
 
-func _game_start():
+func _on_start_game():
 	get_tree().change_scene_to_packed(GeneralData.map[GeneralData.current_map])
 
 func _enter_tree() -> void:
-	Network.launch.connect(_game_start)
+	Received.start_game_scene.connect(_on_start_game)
 	Network.fail_connection.connect(_scene_fail)
 
 

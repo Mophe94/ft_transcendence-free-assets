@@ -1,29 +1,22 @@
 [gd_scene format=3 uid="uid://b3wokw8n0gxhc"]
 
-[ext_resource type="Script" uid="uid://brpxfet53sr8k" path="res://Script/Combat/CombatMenus/combat_menus_script.gd" id="1_idpst"]
-[ext_resource type="Texture2D" uid="uid://cahcqvw78pcay" path="res://Assets/Other/menus.png" id="2_h412s"]
-[ext_resource type="Script" uid="uid://bc0a1v7x7lv30" path="res://Script/Combat/CombatMenus/Button/button1.gd" id="3_h412s"]
-[ext_resource type="Script" uid="uid://0agt68dsf8u8" path="res://Script/Combat/CombatMenus/Button/button2.gd" id="4_ywtby"]
-[ext_resource type="Script" uid="uid://b3g5devu5v23i" path="res://Script/Combat/CombatMenus/Button/button3.gd" id="5_unwq5"]
-[ext_resource type="Script" uid="uid://4qqllerfl4b2" path="res://Script/Combat/CombatMenus/Button/button4.gd" id="6_05il6"]
-[ext_resource type="Texture2D" uid="uid://c8nlwnbl608lo" path="res://Assets/Other/cross .png" id="7_kv5y6"]
-[ext_resource type="Script" uid="uid://c10oqrdst0hxr" path="res://Script/Combat/CombatMenus/Button/button5.gd" id="8_v7w0p"]
+[ext_resource type="Script" uid="uid://brpxfet53sr8k" path="res://Script/Combat/Menus/combat_menus_script.gd" id="1_idpst"]
+[ext_resource type="Script" uid="uid://rk3tokfreolp" path="res://Script/Combat/Menus/text.gd" id="2_hsiif"]
+[ext_resource type="Script" uid="uid://bc0a1v7x7lv30" path="res://Script/Combat/Menus/Button/button1.gd" id="3_h412s"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_re7nl"]
-bg_color = Color(0, 0.627451, 0.9882353, 1)
+bg_color = Color(0, 0.627, 0.988, 0.8)
 border_width_left = 8
 border_width_top = 8
 border_width_right = 8
 border_width_bottom = 8
 border_color = Color(0, 0, 0, 1)
 border_blend = true
-corner_detail = 20
-expand_margin_left = 32.0
-expand_margin_top = 32.0
-expand_margin_right = 32.0
-expand_margin_bottom = 32.0
-shadow_size = 10
-anti_aliasing = false
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3jeak"]
 bg_color = Color(1, 1, 1, 1)
@@ -32,142 +25,115 @@ border_width_top = 8
 border_width_right = 8
 border_width_bottom = 8
 border_color = Color(0.9861415, 0.7965759, 0.850991, 1)
-shadow_size = 8
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 10
+shadow_size = 4
 
 [node name="CombatMenus" type="Panel" unique_id=1186040270]
-self_modulate = Color(1, 1, 1, 0.59607846)
-z_index = 1
-offset_left = 192.0
-offset_top = 512.0
-offset_right = 748.0
-offset_bottom = 597.0
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.75
+anchor_right = 0.8
+anchor_bottom = 0.95
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_re7nl")
 script = ExtResource("1_idpst")
 
-[node name="Banner" type="Sprite2D" parent="." unique_id=1718146371]
-z_index = -1
-position = Vector2(272, -48)
-scale = Vector2(0.41900095, 0.3224677)
-texture = ExtResource("2_h412s")
-region_enabled = true
-region_rect = Rect2(3169.6682, 4309.789, 979.88745, 240.37451)
-
-[node name="CenterContainer" type="CenterContainer" parent="Banner" unique_id=536802985]
-offset_left = -171.83734
-offset_top = -99.23474
-offset_right = 184.44171
-offset_bottom = 10.765259
-
-[node name="Action" type="Label" parent="Banner/CenterContainer" unique_id=1797309399]
-layout_mode = 2
-theme_override_font_sizes/font_size = 80
+[node name="Text" type="Label" parent="." unique_id=419320735]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.1
+anchor_right = 0.85
+anchor_bottom = 0.5
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 horizontal_alignment = 1
+autowrap_mode = 2
+text_direction = 1
+script = ExtResource("2_hsiif")
 
-[node name="GridContainer" type="GridContainer" parent="." unique_id=345759480]
-layout_mode = 0
-offset_left = 16.0
-offset_top = -24.0
-offset_right = 496.0
-offset_bottom = 120.0
-mouse_filter = 2
-theme_override_constants/h_separation = 64
-theme_override_constants/v_separation = 24
-columns = 2
-
-[node name="Slot1" type="Control" parent="GridContainer" unique_id=1066230986]
-custom_minimum_size = Vector2(200, 40)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="button" type="Button" parent="GridContainer/Slot1" unique_id=1319362089]
-custom_minimum_size = Vector2(200, 40)
-layout_mode = 0
-offset_top = 16.0
-offset_right = 200.0
-offset_bottom = 56.0
+[node name="Button" type="Button" parent="." unique_id=1319362089]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.1
+anchor_right = 0.41
+anchor_bottom = 0.43
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
 action_mode = 0
+autowrap_trim_flags = 192
+clip_text = true
 script = ExtResource("3_h412s")
 
-[node name="Slot2" type="Control" parent="GridContainer" unique_id=1990547524]
-custom_minimum_size = Vector2(200, 40)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="button" type="Button" parent="GridContainer/Slot2" unique_id=947961164]
-custom_minimum_size = Vector2(200, 40)
-layout_mode = 0
-offset_top = 16.0
-offset_right = 200.0
-offset_bottom = 56.0
+[node name="Button2" type="Button" parent="." unique_id=947961164]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.44
+anchor_top = 0.1
+anchor_right = 0.8
+anchor_bottom = 0.43
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
 action_mode = 0
-script = ExtResource("4_ywtby")
+autowrap_trim_flags = 192
+clip_text = true
+script = ExtResource("3_h412s")
 
-[node name="Slot3" type="Control" parent="GridContainer" unique_id=388988968]
-custom_minimum_size = Vector2(200, 40)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="button" type="Button" parent="GridContainer/Slot3" unique_id=1801507858]
-custom_minimum_size = Vector2(200, 40)
-layout_mode = 0
-offset_top = 16.0
-offset_right = 200.0
-offset_bottom = 56.0
+[node name="Button3" type="Button" parent="." unique_id=1801507858]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.57
+anchor_right = 0.41
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
 action_mode = 0
-script = ExtResource("5_unwq5")
+autowrap_trim_flags = 192
+clip_text = true
+script = ExtResource("3_h412s")
 
-[node name="Slot4" type="Control" parent="GridContainer" unique_id=110820671]
-custom_minimum_size = Vector2(200, 40)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="button" type="Button" parent="GridContainer/Slot4" unique_id=522886939]
-custom_minimum_size = Vector2(200, 40)
-layout_mode = 0
-offset_top = 16.0
-offset_right = 200.0
-offset_bottom = 56.0
+[node name="Button4" type="Button" parent="." unique_id=522886939]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.44
+anchor_top = 0.57
+anchor_right = 0.8
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
 action_mode = 0
-script = ExtResource("6_05il6")
+autowrap_trim_flags = 192
+clip_text = true
+script = ExtResource("3_h412s")
 
-[node name="Player" type="Sprite2D" parent="GridContainer" unique_id=1716291788]
-z_index = 1
-position = Vector2(520, 32)
-
-[node name="Slot5" type="Control" parent="." unique_id=1829754871]
-anchors_preset = 0
-offset_left = 512.0
-offset_top = 40.0
-offset_right = 512.0
-offset_bottom = 40.0
-mouse_filter = 2
-
-[node name="Button" type="Button" parent="Slot5" unique_id=1964781078]
-layout_mode = 0
-offset_top = 8.0
-offset_right = 80.0
-offset_bottom = 88.0
-scale = Vector2(0.6, 0.6)
+[node name="Button5" type="Button" parent="." unique_id=805332695]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.85
+anchor_top = 0.1
+anchor_right = 0.96
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
 action_mode = 0
-icon = ExtResource("7_kv5y6")
-script = ExtResource("8_v7w0p")
-
-[node name="Text" type="RichTextLabel" parent="." unique_id=603523971]
-layout_mode = 0
-offset_right = 556.0
-offset_bottom = 85.0
-mouse_filter = 2
-bbcode_enabled = true
-horizontal_alignment = 1
-text_direction = 1
+text = "X"
+autowrap_trim_flags = 192
+clip_text = true
+script = ExtResource("3_h412s")

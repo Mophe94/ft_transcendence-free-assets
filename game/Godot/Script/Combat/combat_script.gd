@@ -1,35 +1,98 @@
-extends Node2D
+extends Control
+
+const REFERENCE_SIZE := Vector2(960, 640)
 
 @onready var nameBackGround = GeneralData.background_battle
-@onready var backGround = $CanvasLayer/TextureRect
-@onready var charactere = $Charactere
-@onready var monster = $Monster
+@onready var backGround = $CanvasLayer/BackGround
+
+@onready var player = $Charactere/Player
+@onready var enemy = $Charactere/Enemy
+
+@onready var player_asset_ref= player.get_node("PlayerAsset")
+@onready var player_monster_ref= player.get_node("PlayerMonster")
+@onready var enemy_asset_ref= enemy.get_node("EnemyAsset")
+@onready var enemy_monster_ref= enemy.get_node("EnemyMonster")
+
+var player_asset_ratio: Vector2
+var player_monster_ratio: Vector2
+var enemy_asset_ratio: Vector2
+var enemy_monster_ratio: Vector2
+
+var player_asset_base_scale: Vector2
+var player_monster_base_scale: Vector2
+var enemy_asset_base_scale: Vector2
+var enemy_monster_base_scale: Vector2
 
 @onready var monsterTab = GeneralData.monster_database
 
-@onready var assetEnemy = GeneralData.enemy["asset"]
-@onready var assetPlayer = GeneralData.player["asset"]
-@onready var player = GeneralData.hero_database
+@onready var assetEnemy = GeneralData.player_charactere_scene
+@onready var assetPlayer = GeneralData.player_charactere_scene
 
 @onready var combatBanner = $CombatBanner
-@onready var playerUI = $PlayerMonsterUI/MarginContainer/HBoxContainer
-@onready var enemyUI = $EnemyMonsterUI/MarginContainer/HBoxContainer
+@onready var playerUI = $PlayerMonsterUI/CenterContainer/HBoxContainer
+@onready var enemyUI = $EnemyMonsterUI/CenterContainer/HBoxContainer
+
+func _capture_battle_ratios() -> void:
+	player_asset_ratio = player_asset_ref.position / REFERENCE_SIZE
+	player_monster_ratio = player_monster_ref.position / REFERENCE_SIZE
+	enemy_asset_ratio = enemy_asset_ref.position / REFERENCE_SIZE
+	enemy_monster_ratio = enemy_monster_ref.position / REFERENCE_SIZE
+
+	player_asset_base_scale = player_asset_ref.scale
+	player_monster_base_scale = player_monster_ref.scale
+	enemy_asset_base_scale = enemy_asset_ref.scale
+	enemy_monster_base_scale = enemy_monster_ref.scale
+
+func _update_battle_positions() -> void:
+	var viewport_size = get_viewport().get_visible_rect().size
+	var scale_ratio = viewport_size.y / REFERENCE_SIZE.y
+
+	player_asset_ref.position = viewport_size * player_asset_ratio
+	player_asset_ref.scale = player_asset_base_scale * scale_ratio
+
+	player_monster_ref.position = viewport_size * player_monster_ratio
+	player_monster_ref.scale = player_monster_base_scale * scale_ratio
+
+	enemy_asset_ref.position = viewport_size * enemy_asset_ratio
+	enemy_asset_ref.scale = enemy_asset_base_scale * scale_ratio
+
+	enemy_monster_ref.position = viewport_size * enemy_monster_ratio
+	enemy_monster_ref.scale = enemy_monster_base_scale * scale_ratio
+
 
 func _new_current_monster():
-	for child in monster.get_node("Player").get_children():
+	for child in player.get_node("PlayerMonster").get_children():
 		child.queue_free()
 	await get_tree().process_frame
 	var monsterHero = GeneralData.player["currentMonster"]["name"]
 	var monster_player_scene = monsterTab[monsterHero].instantiate()
-	monster.get_node("Player").add_child(monster_player_scene)
+	player.get_node("PlayerMonster").add_child(monster_player_scene)
 	show_UI()
 	style_progress_bar()
 
+#func _new_enemy_monster():
+#	for child in enemy.get_node("EnemyMonster").get_children():
+#		child.queue_free()
+#	await get_tree().process_frame
+#	var monsterEnemy = GeneralData.enemy["currentMonster"]["name"]
+#	var monster_enemy_scene = monsterTab[monsterEnemy].instantiate()
+#	enemy.get_node("EnemyMonster").add_child(monster_enemy_scene)
+#	show_UI()
+#	style_progress_bar()
+
 func generate_charactere():
-	var player_scene = player[assetPlayer].instantiate() 
-	charactere.get_node("Player").add_child(player_scene)
-	var enemy_scene = player[assetEnemy].instantiate()
-	charactere.get_node("Enemy").add_child(enemy_scene)
+	var player_scene = assetPlayer.instantiate()
+	player.get_node("PlayerAsset").add_child(player_scene)
+
+#	A modifier quand assetEnemy fait (scene de recup du skin enemy)
+	var enemy_scene = assetPlayer.instantiate()
+	enemy.get_node("EnemyAsset").add_child(enemy_scene)
+	enemy_scene.scale.x *= -1
+
+	var monsterEnemy = GeneralData.enemy["currentMonster"]["name"]
+	var monster_enemy_scene = monsterTab[monsterEnemy].instantiate()
+	monster_enemy_scene.scale.x = -1
+	enemy.get_node("EnemyMonster").add_child(monster_enemy_scene)
 
 func generate_asset():
 	generate_charactere()
@@ -56,8 +119,8 @@ func start_intro():
 	await generate_asset()
 	await generate_banner()
 	
-func show_UI_player():aq
-if GeneralData.player["currentMonster"]["name"] == "":
+func show_UI_player():
+	if GeneralData.player["currentMonster"]["name"] == "":
 		$PlayerMonsterUI.hide()
 		return
 	playerUI.get_node("Name").text = GeneralData.player["currentMonster"]["name"]
@@ -106,8 +169,10 @@ func transi_open():
 	await transi_scene.get_node("CanvasLayer/ColorRect").open()
 	transi_scene.queue_free()
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	_capture_battle_ratios()
+	_update_battle_positions()
+	get_viewport().size_changed.connect(_update_battle_positions)
 	transi_open()
 	await start_intro()
 	show_UI()

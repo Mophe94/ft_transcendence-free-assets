@@ -1,7 +1,0 @@
-[gd_resource type="AtlasTexture" format=3 uid="uid://cha8g2yltksbm"]
-
-[ext_resource type="Texture2D" uid="uid://b0mu4vnrqgqgg" path="res://Assets/Monster/spritesheet/Mushroom-Idle.png" id="1_fhd4f"]
-
-[resource]
-atlas = ExtResource("1_fhd4f")
-region = Rect2(21.999298, 26.333344, 34.66667, 37.666656)

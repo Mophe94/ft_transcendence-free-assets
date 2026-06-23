@@ -1,9 +1,9 @@
-extends Node2D
+extends Control
 
 @onready var portal = preload("res://Scene/Capture/CapturePortal/capture_portal.tscn")
 
 @onready var nameBackGround = GeneralData.background_capture
-@onready var backGround = $CanvasLayer/BackGround
+@onready var backGround = $BackGround
 @onready var player = $Player
 @onready var monster = $Monster
 @onready var capture_menus = $CaptureMenus
@@ -12,40 +12,51 @@ extends Node2D
 @onready var monsterTab = GeneralData.monster_database
 
 @onready var assetPlayer = GeneralData.player["asset"]
-@onready var hero = GeneralData.hero_database
 
 @onready var monsterAppearsBanner = $MonsterAppearsBanner
 
-func _on_monster_back():
+const REFERENCE_SIZE := Vector2(960, 640)
+@onready var player_ref: Node2D = $Player
+@onready var monster_ref: Node2D = $Monster
+var player_base_scale := Vector2(1.0, 1.0)
+var monster_base_scale := Vector2(1.0, 1.0)
+const PLAYER_RATIO := Vector2(0.2, 0.65)
+const MONSTER_RATIO := Vector2(0.8, 0.65)
+
+func transi_close():
+	var transi_scene = GeneralData.transi.instantiate()
+	add_child(transi_scene)
+	await transi_scene.get_node("CanvasLayer/ColorRect").close()
+	transi_scene.queue_free()
+
+func _catch_fail():
 	for child in monster.get_children():
 		child.queue_free()
 	var monster_scene = monsterTab[nameMonster].instantiate()
 	monster.add_child(monster_scene)
 
-func _on_result_catch():
+func _catch_ok():
 	capture_menus.hide_button("all")
-	await capture_menus.text_show("New content incoming")
+	for child in monster.get_children():
+		child.queue_free()
+
+func _wait_catch_result():
+	capture_menus.hide_button("all")
 	for child in monster.get_children():
 		child.queue_free()
 	var portal_scene = portal.instantiate()
 	monster.add_child(portal_scene)
-	capture_menus.button[2].text = "YES"
-	capture_menus.button[2].action = "catch_result"
-	capture_menus.button[2].object = "yes"
-	capture_menus.button[2].show()
-	capture_menus.button[3].text = "NO"
-	capture_menus.button[3].action = "catch_result"
-	capture_menus.button[3].object = "no"
-	capture_menus.button[3].show()
-	capture_menus.back_button.show()
+	
 
 func generate_asset():
 	var monster_scene = monsterTab[nameMonster].instantiate()
+	monster_scene.scale.x = -1
 	monster.add_child(monster_scene)
-	var player_scene = hero[assetPlayer].instantiate()
+	var player_scene = GeneralData.player_charactere_scene.instantiate()
 	player.add_child(player_scene)
 	
 	backGround.texture = GeneralData.background_database[nameBackGround]
+
 
 func generate_banner():
 	monsterAppearsBanner.show()
@@ -67,15 +78,40 @@ func transi_open():
 	transi_scene.queue_free()
 
 func start_intro():
-	capture_menus.try_catch.connect(_on_result_catch)
-	capture_menus.monster_back.connect(_on_monster_back)
+	$CaptureMenus.try_catch.connect(_wait_catch_result)
+	$CaptureMenus.catch_fail.connect(_catch_fail)
+	$CaptureMenus.catch_ok.connect(_catch_ok)
 	generate_asset()
 	transi_open()
 	await generate_banner()
 
+func _update_battle_positions() -> void:
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	var ratio: float = viewport_size.y / REFERENCE_SIZE.y
+
+	if player_ref:
+		player_ref.position = viewport_size * PLAYER_RATIO
+		player_ref.scale = player_base_scale * ratio
+
+	if monster_ref:
+		monster_ref.position = viewport_size * MONSTER_RATIO
+		monster_ref.scale = monster_base_scale * ratio
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	_update_battle_positions()
+	get_tree().get_root().size_changed.connect(_update_battle_positions)
 	capture_menus.hide()
 	monsterAppearsBanner.hide()
 	await start_intro()
 	capture_menus.show()
+
+func _process(_delta: float) -> void:
+	var time = GeneralData.timer - Time.get_unix_time_from_system()
+	if time <= 0:
+		time = 0
+	$CenterContainer/Timer.text = str(int(time))
+	if time <= 0:
+		await Received.combat_scene
+		await transi_close()
+		get_tree().change_scene_to_packed(GeneralData.team_setup_scene)

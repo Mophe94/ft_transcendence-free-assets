@@ -1,11 +1,11 @@
 extends Panel
 
 @onready var item_visual: TextureRect = $Panel/item_display
-@onready var item_count: Label = $  Panel/item_count
+@onready var item_count: Label = $Panel/item_count
 @onready var tooltip = get_tree().get_first_node_in_group("tooltip")
 
 var current_item: Dictionary = {}
-var current_monster: String = ""  
+var current_monster: String = ""
 
 const SCALE_HOVER = Vector2(1.12, 1.12)
 const SCALE_NORMAL = Vector2(1.0, 1.0)
@@ -21,16 +21,11 @@ func _on_mouse_entered():
 	var tween = create_tween()
 	tween.tween_property(self, "scale", SCALE_HOVER, DURATION)\
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-
-
 	if not current_item.is_empty() and current_item["name"] != "":
-		tooltip.show_tooltip(current_item["name"], current_item["description"])
-
-
+		tooltip.show_tooltip(current_item["name"], GeneralData.object_description.get(current_item["name"], ""))
 	elif current_monster != "":
-		var monster_data = _get_monster_data(current_monster)
-		if not monster_data.is_empty():
-			tooltip.show_tooltip(monster_data["name"], monster_data["description"])
+		var description = GeneralData.monster_description.get(current_monster, "")
+		tooltip.show_tooltip(current_monster, description)
 
 func _on_mouse_exited():
 	var tween = create_tween()
@@ -51,15 +46,9 @@ func update(item: Dictionary):
 
 func update_monster(monster_name: String):
 	current_monster = monster_name
-	current_item = {}  
+	current_item = {}
 	if monster_name == "":
 		item_visual.visible = false
 	else:
 		item_visual.visible = true
 		item_visual.texture = GeneralData.monster_icon_database[monster_name]
-
-func _get_monster_data(monster_name: String) -> Dictionary:
-	for monster in GeneralData.player["team"]:
-		if monster["name"] == monster_name:
-			return monster
-	return {}

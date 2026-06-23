@@ -1,6 +1,10 @@
 export interface Inventory {
 	name: string;
+	scene: string;
 	current: number;
+	value: number;
+	type: string;
+	target: string
 }
 
 export interface Skill {
@@ -19,6 +23,11 @@ export interface CurrentMonster {
 	name: string;
 	life: Life;
 	type: string,
+	attack: number,
+	attack_spe: number,
+	defense: number,
+	defense_spe: number,
+	speed: number,
 	slot: number;
 	status: string[];
 	skill: Skill[]

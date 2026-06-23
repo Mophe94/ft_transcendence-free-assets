@@ -40,17 +40,31 @@ _data = {
 &"idle": SubResource("Animation_ettim")
 }
 
-[node name="Wait" type="Node2D" unique_id=1291655158]
+[node name="Wait" type="Control" unique_id=691170863]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_ettim")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1456447316]
-offset_right = 960.0
-offset_bottom = 640.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
 [node name="CenterContainer" type="CenterContainer" parent="." unique_id=918910298]
-offset_right = 960.0
-offset_bottom = 640.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Label" type="Label" parent="CenterContainer" unique_id=1666332822]
 layout_mode = 2

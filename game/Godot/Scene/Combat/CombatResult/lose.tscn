@@ -1,5 +1,8 @@
 [gd_scene format=3 uid="uid://yshscl5383ux"]
 
+[ext_resource type="Script" uid="uid://dedf3uk1uxvpr" path="res://Script/Combat/Lose/text.gd" id="1_7w4gb"]
+[ext_resource type="Script" uid="uid://cjuiuam7a8dka" path="res://Script/Combat/Lose/pliue_particule.gd" id="1_fhdb4"]
+
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vaksa"]
 particle_flag_disable_z = true
 emission_shape = 3
@@ -10,9 +13,9 @@ gravity = Vector3(48, 98, 0)
 linear_accel_min = -32.86
 linear_accel_max = 44.999996
 radial_accel_min = -47.14
-radial_accel_max = 42.139996
-scale_min = 1.5
-scale_max = 3.5
+radial_accel_max = 53.719997
+scale_min = 5.12
+scale_max = 7.4199996
 color = Color(0, 1, 1, 1)
 
 [sub_resource type="Animation" id="Animation_vaksa"]
@@ -20,7 +23,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Control/Background/Loose:rotation")
+tracks/0/path = NodePath("Control/CenterContainer/Lose:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -37,7 +40,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Control/Background/Loose:rotation")
+tracks/0/path = NodePath("Control/CenterContainer/Lose:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -53,12 +56,20 @@ _data = {
 &"rotation": SubResource("Animation_swtfl")
 }
 
-[node name="Loose" type="Node2D" unique_id=1151978334]
+[node name="Loose" type="Control" unique_id=647063903]
+clip_contents = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=428179872]
 position = Vector2(480, 128)
-amount = 40
-lifetime = 3.5
+amount = 50
+lifetime = 6.0
+speed_scale = 1.5
 randomness = 1.0
 visibility_rect = Rect2(0, 0, 0, 0)
 local_coords = true
@@ -66,47 +77,40 @@ trail_lifetime = 0.05
 trail_sections = 6
 trail_section_subdivisions = 1
 process_material = SubResource("ParticleProcessMaterial_vaksa")
+script = ExtResource("1_fhdb4")
 
 [node name="Control" type="Control" parent="." unique_id=1103557546]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchor_top = 0.3
+anchor_right = 1.0
+anchor_bottom = 0.7
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Background" type="ColorRect" parent="Control" unique_id=1364077225]
-custom_minimum_size = Vector2(960, 320)
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = 164.0
-offset_right = 940.0
-offset_bottom = 484.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.28627452, 0.019607844, 0.40784314, 0.37254903)
 
-[node name="Loose" type="Label" parent="Control/Background" unique_id=1006893142]
+[node name="CenterContainer" type="CenterContainer" parent="Control" unique_id=794607287]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -157.0
-offset_top = -38.5
-offset_right = 157.0
-offset_bottom = 38.5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(1, 1.2)
+
+[node name="Lose" type="Label" parent="Control/CenterContainer" unique_id=1006893142]
+layout_mode = 2
 theme_override_font_sizes/font_size = 56
 text = "YOU LOSE"
+script = ExtResource("1_7w4gb")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Control/Background" unique_id=599412664]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Control/CenterContainer" unique_id=599412664]
 root_node = NodePath("../../..")
 libraries/ = SubResource("AnimationLibrary_dcvbm")
 autoplay = &"rotation"

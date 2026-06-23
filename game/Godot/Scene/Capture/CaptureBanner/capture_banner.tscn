@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://d1pee6mshm38u"]
 
+[ext_resource type="Script" uid="uid://1c0meb7vrgpn" path="res://Script/Capture/Banners/label_monsterappears.gd" id="1_rydfw"]
 [ext_resource type="Texture2D" uid="uid://l07jvv7yvcyg" path="res://Assets/Other/monster_appears_spritesheet.png" id="1_upj78"]
+[ext_resource type="Script" uid="uid://fyunvas8ilmk" path="res://Script/Capture/Banners/particule.gd" id="2_hxy66"]
 [ext_resource type="Texture2D" uid="uid://b65i0mgyj0oo6" path="res://Assets/Other/line.png" id="2_watuv"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_watuv"]
@@ -263,19 +265,36 @@ animations = [{
 "speed": 19.0
 }]
 
-[node name="MonsterApearsBanner" type="Control" unique_id=1870351660]
+[node name="MonsterAppearsBanner" type="Control" unique_id=1870351660]
 z_index = 3
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="BackgroundBattle" type="ColorRect" parent="." unique_id=845418622]
-layout_mode = 0
-offset_top = 128.0
-offset_right = 960.0
-offset_bottom = 512.0
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.33
+anchor_right = 1.0
+anchor_bottom = 0.66
+grow_horizontal = 2
+grow_vertical = 2
 color = Color(0.49411765, 0.78431374, 1, 1)
 
-[node name="BattleAnime" type="AnimatedSprite2D" parent="." unique_id=790826774]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=817149285]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.33
+anchor_right = 1.0
+anchor_bottom = 0.66
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rydfw")
+
+[node name="BattleAnime" type="AnimatedSprite2D" parent="CenterContainer" unique_id=790826774]
 z_index = 1
 position = Vector2(464, 320)
 scale = Vector2(0.41000938, 0.3708333)
@@ -285,11 +304,14 @@ frame_progress = 0.50562316
 
 [node name="Control" type="Control" parent="." unique_id=622179451]
 clip_contents = true
-anchors_preset = 0
-offset_top = 128.0
-offset_right = 960.0
-offset_bottom = 512.0
+layout_mode = 1
+anchor_top = 0.33
+anchor_right = 1.0
+anchor_bottom = 0.66
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
+script = ExtResource("2_hxy66")
 
 [node name="CPUParticles2D" type="CPUParticles2D" parent="Control" unique_id=1162992227]
 position = Vector2(-120, 192)
