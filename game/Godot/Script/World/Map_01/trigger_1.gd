@@ -18,15 +18,9 @@ var danger_level: float = 0.0
 
 
 func _ready():
-	print("GRASS READY")
-
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
-
-	print("signals connected")
-
 	randomize()
-
 
 func _physics_process(_delta):
 	if not inside or player == null:
@@ -41,8 +35,6 @@ func _process_steps():
 		step_counter += 1
 		danger_level += 0.02
 		danger_level = min(danger_level, 1.0)
-
-		print("[Grass] Step:", step_counter)
 
 		if step_counter >= steps_between_rolls:
 			step_counter = 0
@@ -59,9 +51,6 @@ func _try_encounter():
 	can_roll = false
 
 	var final_rate = encounter_rate + (danger_level * 0.15)
-
-	print("[Grass] Roll | base:", encounter_rate, "final:", final_rate)
-
 	if randf() < final_rate:
 		_start_battle()
 	else:
@@ -71,8 +60,6 @@ func _try_encounter():
 
 
 func _start_battle():
-	print("[Grass] Wild encounter triggered!")
-
 	if player:
 		player.set_process(false)
 		player.set_physics_process(false)
@@ -92,24 +79,17 @@ func _on_body_entered(body):
 
 	player = root
 	inside = true
-
 	step_counter = 0
 	rolling_lock = false
 	can_roll = true
 	danger_level = 0.0
-
 	last_position = player.global_position
-
-	print("[Grass] Enter zone")
-
 
 func _on_body_exited(body):
 	if player == null:
 		return
 
 	if body == player or body.get_parent() == player:
-		print("[Grass] Exit zone")
-
 		player = null
 		inside = false
 		step_counter = 0

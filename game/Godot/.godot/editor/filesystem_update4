@@ -1,6 +1,1 @@
-res://Scene/World01/world_01.tscn
 res://Script/General/GeneralData.gd
-res://Scene/Inventory/inventory_ui.tscn
-res://Script/World/Map_01/trigger_8.gd
-res://Script/World/Map_01/trigger_21.gd
-res://Script/Capture/capture_script.gd

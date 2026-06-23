@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ud8c3pownn8g"]
 
-[ext_resource type="Script" uid="uid://yb0kjfhatua7" path="res://Scene/Inventory/panel_tooltip.gd" id="1_frmea"]
+[ext_resource type="Script" uid="uid://yb0kjfhatua7" path="res://Script/Inventory/panel_tooltip.gd" id="1_frmea"]
 [ext_resource type="Texture2D" uid="uid://c80bwfj2cerhg" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Banners/Banner_Slots.png" id="2_7p1mb"]
 [ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="3_i4usc"]
 
@@ -12,6 +12,7 @@
 z_index = 15
 offset_right = 212.0
 offset_bottom = 241.0
+mouse_filter = 2
 script = ExtResource("1_frmea")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="PanelTooltip" unique_id=1191627473]
@@ -26,9 +27,11 @@ offset_left = 19.0
 offset_top = 20.0
 offset_right = 201.0
 offset_bottom = 244.0
+mouse_filter = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelTooltip/NinePatchRect/MarginContainer" unique_id=1765429636]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 8
 
 [node name="TooltipName" type="Label" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer" unique_id=699870699]

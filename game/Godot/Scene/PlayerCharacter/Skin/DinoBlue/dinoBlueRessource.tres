@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SkinData" format=3 uid="uid://df1w77lp77anh"]
+
+[ext_resource type="Script" uid="uid://brt0iiv638g4g" path="res://Script/PlayerCharacter/Skindata.gd" id="1_2lm4n"]
+[ext_resource type="SpriteFrames" uid="uid://b5rxktktvja4x" path="res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueSpriteSheet.tres" id="2_ime2f"]
+
+[resource]
+script = ExtResource("1_2lm4n")
+skin_id = "dinoBlue"
+display_name = "dinoBlue"
+sprite_frames = ExtResource("2_ime2f")
+metadata/_custom_type_script = "uid://brt0iiv638g4g"

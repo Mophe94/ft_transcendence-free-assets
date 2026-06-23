@@ -23,6 +23,7 @@ offset_left = 8.0
 offset_top = 8.0
 offset_right = 56.0
 offset_bottom = 54.0
+mouse_filter = 1
 
 [node name="item_display" type="TextureRect" parent="Panel" unique_id=1610652601]
 custom_minimum_size = Vector2(50, 50)

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="FishingZoneData" format=3 uid="uid://dkm20p6ancxj0"]
+
+[ext_resource type="Script" uid="uid://cw7yfmv623v6l" path="res://FishingZoneData.gd" id="1_u5nj6"]
+
+[resource]
+script = ExtResource("1_u5nj6")
+possible_monsters = Array[String](["burpy", ""])
+metadata/_custom_type_script = "uid://cw7yfmv623v6l"

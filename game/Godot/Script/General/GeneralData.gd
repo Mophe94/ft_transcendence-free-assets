@@ -1,7 +1,6 @@
 extends Node
 
 @onready var transi = preload("res://Scene/Transition/blur_transition.tscn")
-
 enum SEND_NAME {
 	REQUEST_ITEM,
 	ADD_ITEM,
@@ -56,7 +55,7 @@ const monster_database: Dictionary = {
 const monster_icon_database: Dictionary = {
 	"mushroom": preload("res://Assets/Monster/Token/Mushroom.tres"),
 	"manTree": preload("res://Assets/Monster/Token/man_three.tres"),
-	"burpy": preload("res://Assets/Monster/spritesheet/Burpy/sprite-1-1.png"),
+	"burpy": preload("res://Assets/Monster/Token/burpy.png"),
 	"fishet": preload("res://Assets/Monster/Token/fishet.png"),
 	"fishet_2": preload("res://Assets/Monster/Token/fishet_2.png"),
 	"gigantomakia": preload("res://Assets/Monster/Token/gigantomakia.png"),
@@ -74,10 +73,13 @@ const object_database: Dictionary = {
 	"rage": preload("res://Assets/Inventory/Icon_05.png"),
 	"bomb": preload("res://Assets/Inventory/Icon_09.png"),
 }
-const hero_database: Dictionary = {
-	"dino": preload("res://Scene/PlayerCharactere/dino_01.tscn") 
-}
 
+######################################
+# a supprimer lors du merge
+const hero_database: Dictionary = {
+	"dino": preload("res://Scene/PlayerCharacter/character.tscn") 
+}
+######################################
 var player: Dictionary = {
 	"id": 0,
 	"name": "ff",
@@ -197,7 +199,7 @@ var player: Dictionary = {
 var enemy: Dictionary = {
 	"id": 0,
 	"name": "gg",
-	"asset": "dino",
+	"asset": "burpy",
 	"currentMonster": {
 		"name": "",
 		"index": 0,
@@ -225,3 +227,28 @@ var tile = ""
 var background_capture = "plains_day"
 
 var background_battle = "plains_dayd"
+
+
+################################
+
+@export var available_skins: Array[SkinData] = [
+		preload("res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueRessource.tres"),
+		preload("res://Scene/PlayerCharacter/Skin/DinoGreen/dinoGreenRessource.tres"),
+		preload("res://Scene/PlayerCharacter/Skin/DinoRed/dinoRedRessource.tres"),
+		
+	]
+
+var equipped_skin_id: String = "po"
+
+func get_equipped_skin() -> SkinData:
+	for skin in available_skins:
+		if skin.skin_id == equipped_skin_id:
+			return skin
+	push_warning("Skin '%s' introuvable, fallback sur le premier skin disponible." % equipped_skin_id)
+	return available_skins[0] if available_skins.size() > 0 else null
+
+func set_equipped_skin(skin_id: String) -> void:
+	equipped_skin_id = skin_id
+
+
+#################################

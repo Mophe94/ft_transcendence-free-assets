@@ -56,8 +56,8 @@ func start_intro():
 	await generate_asset()
 	await generate_banner()
 	
-func show_UI_player():
-	if GeneralData.player["currentMonster"]["name"] == "":
+func show_UI_player():aq
+if GeneralData.player["currentMonster"]["name"] == "":
 		$PlayerMonsterUI.hide()
 		return
 	playerUI.get_node("Name").text = GeneralData.player["currentMonster"]["name"]
