@@ -41,6 +41,7 @@ services:
     volumes:
       - ./backend:/app
       - game_service_modules:/app/node_modules
+
   chat_service:
     build:
       context: backend
@@ -53,8 +54,8 @@ services:
     volumes:
       - ./backend:/app
       - chat_service_modules:/app/node_modules
-  users_service:
 
+  users_service:
     build:
       context: backend
     container_name: users_service
