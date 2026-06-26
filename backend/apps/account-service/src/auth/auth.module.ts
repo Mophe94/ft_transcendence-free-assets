@@ -12,7 +12,7 @@ import { getSecret } from 'libs/shared/src/utils/secret.utils';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: () => ({
         secret: getSecret('jwt_secret_key'),
         signOptions: { expiresIn: '1d' },
       }),
