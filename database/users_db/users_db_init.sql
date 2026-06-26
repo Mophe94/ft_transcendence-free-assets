@@ -203,9 +203,9 @@ ALTER TABLE ONLY public.user_stats ALTER COLUMN id SET DEFAULT nextval('public.u
 COPY public.settings (id, theme, starter, "userId") FROM stdin;
 2	dark	0	2
 5	light	0	5
-6	aqua	0	6
-7	aqua	0	7
-4	aqua	1	4
+6	light	0	6
+7	light	0	7
+4	light	1	4
 \.
 
 

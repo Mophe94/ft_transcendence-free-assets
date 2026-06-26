@@ -8,19 +8,16 @@ import { HexMediaWindow } from '../components/HexMediaWindow';
 
 export default function Profile() {
   let { username } = useParams< {username?: string}>();
-
+  const { user } = useAuth();
+  if (!user) {
+    return null;
+  }
   if (!username){
-    const { user } = useAuth();
-    if (!user) {
-      return null;
-    }
     username = user?.username
   }
 
     return (
-        <div className="profile-content">
-            <ProfileBody username={username} />
-        </div>
+      <ProfileBody username={username} />
   );
 }
 
@@ -45,35 +42,53 @@ export function ProfileBody({ username }: ProfileBodyProps) {
     return null;
 
   const stats = {
-  "Stats": "",
-  "Number of games played": user.stats.nb_fights,
-  "Number of games won": user.stats.nb_victories,
-  "Number of games lost": user.stats.nb_defeats,
-  "Total Damage": user.stats.total_damage_given,
-  "Discovered monsters": `${user.stats.nb_monsters_discovered} / ??`,
-  "Discovered objects": `${user.stats.nb_objects_discovered} / ??`,
-  "Achievements": `${user.stats.nb_achievements} / ??`,
-}
+    "Stats": "",
+    "Number of games played": user.stats.nb_fights,
+    "Number of games won": user.stats.nb_victories,
+    "Number of games lost": user.stats.nb_defeats,
+    "Total Damage": user.stats.total_damage_given,
+    "Discovered monsters": `${user.stats.nb_monsters_discovered} / ??`,
+    "Discovered objects": `${user.stats.nb_objects_discovered} / ??`,
+    "Achievements": `${user.stats.nb_achievements} / ??`,
+  }
+
   return (
     <div className="profile-content-layout">
-      <div className="top-left">
-        <HexMediaWindow type="img" src={user?.avatarUrl} mediaId="avatar-pic"/>
-      </div>
+      <div className='profile-upperLeft' />
+      <div className='profile-upperMiddle' />
+      <div className='profile-upperRight' />
       
-      <div className="user-table">
-        <ul>
-          <li>Username :{user.username}</li>
-          <li>Email: {user?.email}</li>
-          <li>Title: MonsterMaster</li>
-        </ul>
+      <div className='profile-middleLeft' />
+      <div className='profile-middleMiddle'>
+        <div className='profile-table'>
+          <div className="top-left">
+            <HexMediaWindow type="img" src={user?.avatarUrl} mediaId="avatar-pic"/>
+          </div>
+          
+          <div className="user-info">
+            <div className='text-medium bold'>Username:</div>
+            <div className='text-medium'>{user?.username}</div>
+            <div className='text-medium bold'>Email:</div>
+            <div className='text-medium'>{user?.email}</div>
+            <div className='text-medium bold'>Title:</div>
+            <div className='text-medium'>MonsterMaster</div>
+          </div>
+        
+          <div className="stats-table">
+              {Object.entries(stats).map(([key, value]) => (
+                <React.Fragment key={key}>
+                  <div className='text-medium key'>{key}:</div>
+                  <div className='text-medium value'>{value}</div>
+                </React.Fragment>
+              ))}
+          </div>
+        </div>
       </div>
+      <div className='profile-middleRight' />
       
-      <div className="stats-table">
-          {Object.entries(stats).map(([key, value]) => (
-            <React.Fragment key={key}><div>{key}:</div><div>{value}</div></React.Fragment>
-          ))}
-      </div>
-
+      <div className='profile-bottomLeft' />
+      <div className='profile-bottomMiddle' />
+      <div className='profile-bottomRight' />
     </div>
   );
 }

@@ -8,8 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   app.enableCors({
-    origin:
-      configService.get<string>('FRONTEND_URL') ?? 'http://localhost:5173',
+    origin: configService.get<string>('FRONTEND_URL'),
     credentials: true,
   });
   app.useGlobalPipes(

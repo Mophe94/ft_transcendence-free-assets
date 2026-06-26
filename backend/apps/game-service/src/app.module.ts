@@ -7,6 +7,7 @@ import { LobbyModule } from './lobby/lobby.module';
 import { GameModule } from './game/game.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { getSecret } from 'libs/shared/src/utils/secret.utils';
 
 @Module({
   imports: [
@@ -19,9 +20,9 @@ import { ScheduleModule } from '@nestjs/schedule';
         type: 'postgres',
         host: configService.get<string>('DB_GAME_HOST') ?? 'localhost',
         port: configService.get<number>('DB_GAME_PORT') ?? 5432,
-        username: configService.get<string>('DB_GAME_USERNAME'),
-        password: configService.get<string>('DB_GAME_PASSWORD'),
-        database: configService.get<string>('DB_GAME_NAME') ?? 'test',
+        username: getSecret('db_game_username'),
+        password: getSecret('db_game_password'),
+        database: getSecret('db_game_db_name'),
         synchronize: true, // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Only for dev, remove for prod.
         autoLoadEntities: true,
       }),

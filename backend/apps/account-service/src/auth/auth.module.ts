@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from 'apps/account-service/src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { getSecret } from 'libs/shared/src/utils/secret.utils';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: getSecret('jwt_secret_key'),
         signOptions: { expiresIn: '1d' },
       }),
       global: true,

@@ -1,6 +1,6 @@
 .env
 .env.template
-node_modules
+# node_modules
 eslintcongig.js
 README.md
 theme-example.png

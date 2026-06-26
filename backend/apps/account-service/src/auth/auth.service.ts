@@ -12,6 +12,7 @@ import {
 } from './types/fortytwo-profile.interface';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'node_modules/@types/express';
+import { getSecret } from 'libs/shared/src/utils/secret.utils';
 
 @Injectable()
 export class AuthService {
@@ -47,10 +48,8 @@ export class AuthService {
     const redirect_uri = this.configService.get<string>(
       'FORTYTWO_REDIRECT_URI',
     );
-    const client_id = this.configService.get<string>('FORTYTWO_CLIENT_ID');
-    const client_secret = this.configService.get<string>(
-      'FORTYTWO_CLIENT_SECRET',
-    );
+    const client_id = getSecret('FORTYTWO_CLIENT_ID');
+    const client_secret = getSecret('FORTYTWO_CLIENT_SECRET');
     const tokenExchangeUrl = this.configService.get<string>(
       'FORTYTWO_API_TOKENEXCHANGE',
     );
