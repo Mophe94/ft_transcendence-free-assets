@@ -25,7 +25,7 @@ PASSWORD="Nd${NEW_USER}123"
 
 echo "[$SCRIPT_NAME] Creating user: $NEW_USER"
 
-adduser -D "$NEW_USER"
+adduser -D -h "$NEW_USER"
 echo "${NEW_USER}:${PASSWORD}" | chpasswd
 addgroup "$NEW_USER" wheel
 addgroup "$NEW_USER" docker
