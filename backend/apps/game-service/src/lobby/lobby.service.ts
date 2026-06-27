@@ -21,7 +21,7 @@ export class LobbyService {
   private rooms = new Map<string, Set<WebSocket>>();
 
   // JOIN LOBBY
-  joinLobby(client: WebSocket, user: ClientData['user']): void {
+  joinLobby(client: WebSocket, userSub: number): void {
     const roomId =
       this.roomService.findAvailableRoom() ?? this.roomService.createRoom();
 
@@ -33,7 +33,7 @@ export class LobbyService {
     if (clientData) clientData.roomId = roomId; */
 
     console.log(
-      `[LobbyService] User ${user.sub} joined room ${roomId} (${clients.size}/${FULL_LOBBY})`,
+      `[LobbyService] User ${userSub} joined room ${roomId} (${clients.size}/${FULL_LOBBY})`,
     );
 
     this.eventEmitter.emit('lobby.player_joined', {

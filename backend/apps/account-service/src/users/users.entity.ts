@@ -8,6 +8,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { UserRole } from './types/userRole.enum';
 
 @Entity()
 export class User {
@@ -25,6 +26,14 @@ export class User {
 
   @Column()
   avatarUrl!: string;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    enumName: 'user_role',
+    default: UserRole.USER,
+  })
+  role!: UserRole;
 
   @OneToOne(() => Settings, (settings) => settings.user, { cascade: true })
   settings!: Settings;

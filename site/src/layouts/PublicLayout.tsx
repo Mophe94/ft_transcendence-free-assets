@@ -7,11 +7,11 @@ export default function PublicLayout() {
     <>
       <PubNavBar />
       <div className='body-layout'>
-      <div className='side-padding-left'></div>
-      <div className="public-content">
-          <Outlet />
-      </div>
-      <div className='side-padding-right'></div>
+        <div className='side-padding-left'/>
+        <div className="public-content">
+            <Outlet />
+        </div>
+        <div className='side-padding-right'/>
       </div>
     </>
   )

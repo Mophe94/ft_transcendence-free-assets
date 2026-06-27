@@ -15,7 +15,7 @@ function NavMenu () {
   return (
     <div className='nav-menu'>
       <div className="nav-extreme">
-        <img src="src/assets/sword_beg.png" />
+        <img src="navbar/sword_beg.png" />
       </div>
       {Object.entries(menuLinks).map(([name, url]) => (
         <React.Fragment key={name}>
@@ -27,7 +27,7 @@ function NavMenu () {
         </React.Fragment>
       ))}
       <div className="nav-extreme">
-        <img src="src/assets/sword_end.png" />
+        <img src="navbar/sword_end.png" />
       </div>
     </div>
   )

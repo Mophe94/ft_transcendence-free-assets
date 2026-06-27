@@ -10,11 +10,7 @@ import {
 import { WebSocket, Server } from 'ws';
 import { OnEvent } from '@nestjs/event-emitter';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
-import {
-  FULL_LOBBY,
-  PHASE_DURATIONS,
-  createMockUser,
-} from 'apps/game-service/src/game/game.type';
+import { FULL_LOBBY, PHASE_DURATIONS, createMockUser } from 'apps/game-service/src/game/game.type';
 import { LobbyService } from 'apps/game-service/src/lobby/lobby.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 
@@ -29,7 +25,8 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   handleConnection(client: WebSocket): void {
-    clientsMap.set(client, { user: createMockUser() });
+    const { userId } = createMockUser();
+    clientsMap.set(client, { userId, isAlive: true});
     console.log('[LobbyGateway]: Client connected');
   }
 
@@ -57,7 +54,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.close();
       return;
     }
-    this.lobbyService.joinLobby(client, clientData.user);
+    this.lobbyService.joinLobby(client, clientData.userId);
   }
 
   @OnEvent('lobby.player_joined')
@@ -93,11 +90,9 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.broadcast(clients, {
       event: 'game',
-      state: 'map_enter',
+      state: 'start_game',
       data: {
-        server_time: serverTime,
-        time_duration: PHASE_DURATIONS.map,
-        map: 'forest_map', //TODO add winning map
+        roomId: roomId,
       },
     });
   }

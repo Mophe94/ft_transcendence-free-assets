@@ -23,18 +23,18 @@ services:
       - site/.env
     volumes:
       - ./site:/app
-      - frontend_modules:/app/node_modules
 
   game_service:
     build:
       context: backend
     container_name: game_service
     command: npm run start:dev game-service
-    # ports:
-    #   - "8081:8081"
-    #   - "8082:8082"
     env_file:
       - backend/.env.docker
+    secrets:
+      - db_game_db_name
+      - db_game_username
+      - db_game_password
     depends_on:
       users_db:
         condition: service_healthy
@@ -47,8 +47,6 @@ services:
       context: backend
     container_name: chat_service
     command: npm run start:dev chat-service
-    # ports:
-    #   - "3001:3001"
     env_file:
       - backend/.env.docker
     volumes:
@@ -60,10 +58,15 @@ services:
       context: backend
     container_name: users_service
     command: npm run start:dev account-service
-    # ports:
-    #   - "3000:3000"
     env_file:
       - backend/.env.docker
+    secrets:
+      - db_users_db_name
+      - db_users_username
+      - db_users_password
+      - fortytwo_client_id
+      - fortytwo_client_secret
+      - jwt_secret_key
     depends_on:
       users_db:
         condition: service_healthy
@@ -75,13 +78,10 @@ services:
       start_period: 5s
     volumes:
       - ./backend:/app
-      - users_service_modules:/app/node_modules
   game:
     build:
       context: game_test
     container_name: game
-    # ports:
-    #   - "8060:8060"
     volumes:
       - ./game_test:/app
 
@@ -89,10 +89,13 @@ services:
     build:
       context: database/users_db/
     container_name: users_db
-    # ports:
-    #   - "5433:5432"
     env_file:
       - database/users_db/.env
+    secrets:
+      - db_users_db_name
+      - db_users_username
+      - db_users_password
+      - db_users_postgres_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s   # Teste toutes les 3 secondes
@@ -103,14 +106,37 @@ services:
     build:
       context: database/game_db/
     container_name: game_db
-    # ports:
-    #   - "5434:5432"
     env_file:
       - database/game_db/.env
+    secrets:
+      - db_game_db_name
+      - db_game_username
+      - db_game_password
+      - db_game_postgres_password
 
 volumes:
-  frontend_modules:
-  game_service_modules:
-  users_service_modules:
-  chat_service_modules:
   nginx_ssl:
+
+secrets:
+  db_game_db_name:
+    file: ./.secrets/db_game_db_name.txt
+  db_game_username:
+    file: ./.secrets/db_game_username.txt
+  db_game_password:
+    file: ./.secrets/db_game_password.txt
+  db_game_postgres_password:
+    file: ./.secrets/db_game_postgres_password.txt
+  db_users_db_name:
+    file: ./.secrets/db_users_db_name.txt
+  db_users_username:
+    file: ./.secrets/db_users_username.txt
+  db_users_password:
+    file: ./.secrets/db_users_password.txt
+  db_users_postgres_password:
+    file: ./.secrets/db_users_postgres_password.txt
+  fortytwo_client_id:
+    file: ./.secrets/fortytwo_client_id.txt
+  fortytwo_client_secret:
+    file: ./.secrets/fortytwo_client_secret.txt
+  jwt_secret_key:
+    file: ./.secrets/jwt_secret_key.txt

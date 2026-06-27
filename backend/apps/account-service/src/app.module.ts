@@ -10,6 +10,7 @@ import { SettingsModule } from './settings/settings.module';
 import { Settings } from './settings/settings.entity';
 import { UserStatsModule } from './stats/stats.module';
 import { UserStats } from './stats/stats.entity';
+import { getSecret } from 'libs/shared/src/utils/secret.utils';
 
 @Module({
   imports: [
@@ -22,9 +23,9 @@ import { UserStats } from './stats/stats.entity';
         type: 'postgres',
         host: configService.get<string>('DB_USERS_HOST') ?? 'localhost',
         port: configService.get<number>('DB_USERS_PORT') ?? 5432,
-        username: configService.get<string>('DB_USERS_USERNAME'),
-        password: configService.get<string>('DB_USERS_PASSWORD'),
-        database: configService.get<string>('DB_USERS_NAME') ?? 'test',
+        username: getSecret('db_users_username'),
+        password: getSecret('db_users_password'),
+        database: getSecret('db_users_db_name'),
         entities: [User, Settings, UserStats],
         synchronize: true, // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Only for dev, remove for prod.
       }),

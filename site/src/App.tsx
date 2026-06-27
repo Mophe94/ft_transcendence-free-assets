@@ -9,6 +9,8 @@ import AppLayout from './layouts/AppLayout'
 import { Play } from './page/Play'
 import Profile from './page/Profile'
 import Settings from './page/Settings'
+import Preferences from './page/Preferences'
+import Contact from './page/Contact'
 
 function App() {
   return (
@@ -17,11 +19,13 @@ function App() {
           <Route element={<PublicLayout />}>
             <Route path='/' element={<Landing />}/>
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/contact" element={<Contact />} />
           </Route>
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route path='/home' element={<Home />} />
               <Route path='/play' element={<Play />} />
+              <Route path='/preferences' element={<Preferences />} />
               <Route path='/profile' element={<Profile />} />
               <Route path='/settings' element={<Settings />} />
             </Route>

@@ -23,6 +23,6 @@ let mockUserCounter = 0;
 export const createMockUser = () => {
   mockUserCounter++;
   return {
-    sub: mockUserCounter,
-  };
+    userId: mockUserCounter,
+    }
 };
