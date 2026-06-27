@@ -25,7 +25,7 @@ PASSWORD="Nd${NEW_USER}123"
 
 echo "[$SCRIPT_NAME] Creating user: $NEW_USER"
 
-adduser -D "$NEW_USER"
+adduser -D -h "$NEW_USER"
 echo "${NEW_USER}:${PASSWORD}" | chpasswd
 addgroup "$NEW_USER" wheel
 addgroup "$NEW_USER" docker
@@ -80,8 +80,8 @@ if [ ${TYPE} == "manager" ]; then
 EOF
     else
 	echo "[$SCRIPT_NAME] Found CA certificate, marking registry as secure"
-	mkdir -p "/etc/docker/certs.d/${IP}/"
-	cp "${CERT_DIR}/ca.crt" "/etc/docker/certs.d/${IP}/"
+	mkdir -p "/etc/docker/certs.d/${IP}:5050/"
+	cp "${CERT_DIR}/ca.crt" "/etc/docker/certs.d/${IP}:5050/"
     fi
 fi
 
