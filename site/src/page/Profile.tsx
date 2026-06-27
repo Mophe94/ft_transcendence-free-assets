@@ -37,7 +37,6 @@ export function ProfileBody({ username }: ProfileBodyProps) {
     .catch(() => {return null;})
   }, [username])
 
-  console.log(user);
   if (!user || !user.stats)
     return null;
 

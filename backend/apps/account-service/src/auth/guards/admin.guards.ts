@@ -1,6 +1,11 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@nestjs/common";
-import { AuthenticatedUser } from "libs/shared/src";
-import { UserRole } from "../../users/types/userRole.enum";
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { AuthenticatedUser } from 'libs/shared/src';
+import { UserRole } from '../../users/types/userRole.enum';
 
 @Injectable()
 export class AdminGuard implements CanActivate {

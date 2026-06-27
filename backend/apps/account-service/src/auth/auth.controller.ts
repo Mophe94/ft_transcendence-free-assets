@@ -71,6 +71,6 @@ export class AuthController {
   @Get('/isAdmin')
   @UseGuards(JwtAuthGuard, AdminGuard)
   isAdmin() {
-    return { message: 'Welcome to the dashboard.' };
+    return { isAdmin: true };
   }
 }

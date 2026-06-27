@@ -24,5 +24,5 @@ export const createMockUser = () => {
   mockUserCounter++;
   return {
     userId: mockUserCounter,
-    }
+  };
 };
