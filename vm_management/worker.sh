@@ -11,6 +11,9 @@ using_defaults=false
 DEFAULT_BASE_DIR="$HOME/sgoinfre/students/stempels/"
 BASE_IMG="vm_node_base.vdi"
 
+SSH_KEY_NAME="transcendence_node"
+SSH_KEY_PASSPHRASE=
+
 # VM Configuration
 DEFAULT_VM_DIR="$HOME/goinfre/"
 
@@ -39,7 +42,7 @@ wait_for_ssh() {
     ELAPSED=0
     echo -n "[$SCRIPT_NAME] Waiting for VM to boot."
     while :; do
-	status=$(ssh -v -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=5 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} 2>&1)
+	status=$(ssh -v -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=10 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} 2>&1)
 	RESULT=$?
 	if [ $RESULT -eq 0 ]; then
 	    echo " Connected"
@@ -214,6 +217,10 @@ else
     VBoxManage startvm "$VM_NAME" --type headless
 
     #Waiting for VM ssh to be ready
+    if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
+	ssh-keygen -f $HOME/.ssh/${SSH_KEY_NAME} -N "$SSH_KEY_PASSPHRASE"
+    fi
+    PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
     wait_for_ssh
 #    echo "[$SCRIPT_NAME] SSH is fully ready"
     echo "[$SCRIPT_NAME] Setting up worker"
@@ -223,7 +230,6 @@ else
 
     echo "[$SCRIPT_NAME] Setting up node"
     set +e
-    PUB_KEY="$HOME/.ssh/*.pub"
     ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
     scp -P "$SSH_PORT" -o StrictHostKeyChecking=no "vm_management/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
     ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER; exit 0"
@@ -241,7 +247,7 @@ else
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     set +e
     PUB_KEY="$HOME/.ssh/*.pub"
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; doas mkdir -p $VM_TARGET_DIR; exit 0"
+    ssh -vvv -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; doas mkdir -p $VM_TARGET_DIR; exit 0"
     scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
     set -e
 fi

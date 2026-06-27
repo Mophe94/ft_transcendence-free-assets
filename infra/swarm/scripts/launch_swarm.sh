@@ -62,15 +62,25 @@ if [ ! "$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then
 fi
 
 if [ ! -f $HOME/infra/cert_creation.sh ]; then
-  echo "[$SCRIPT_NAME] $HOME/infra/cert_creation.sh missing, skipping certificate creation"
+    echo "[$SCRIPT_NAME] $HOME/infra/cert_creation.sh missing, skipping certificate creation"
 else
-  chmod +x $HOME/infra/cert_creation.sh
-  bash $HOME/infra/cert_creation.sh "/etc/certs" "${HOST_IP}" nginx
-  docker secret create nginx_crt $HOME/certs/nginx.crt
-  docker secret create nginx_key $HOME/certs/nginx.key
-  bash $HOME/cert_creation.sh "/etc/certs" "${IP}" registry
-  docker secret create registry_crt $HOME/certs/registry.crt
-  docker secret create registry_key $HOME/certs/registry.key
+    chmod +x $HOME/infra/cert_creation.sh
+    if docker secret inspect nginx_crt >/dev/null 2>&1 && \
+       docker secret inspect nginx_key >/dev/null 2>&1; then
+	echo "[$SCRIPT_NAME] Nginx secrets already exist"
+    else
+	bash $HOME/infra/cert_creation.sh "/etc/certs" "${HOST_IP}" nginx
+	docker secret create nginx_crt $HOME/certs/nginx.crt
+	docker secret create nginx_key $HOME/certs/nginx.key
+    fi
+    if docker secret inspect registry_crt >/dev/null 2>&1 && \
+       docker secret inspect registry_key >/dev/null 2>&1; then
+	echo "[$SCRIPT_NAME] Registry secrets already exist"
+    else
+	bash $HOME/infra/cert_creation.sh "/etc/certs" "${IP}" registry
+	docker secret create registry_crt $HOME/certs/registry.crt
+	docker secret create registry_key $HOME/certs/registry.key
+    fi
 fi
 
 networks=("swarm_net" "obsrv_net" "games_net")
