@@ -14,6 +14,7 @@ import type { Response } from 'express';
 import type { AuthenticatedRequest } from 'libs/shared/src';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { UsersService } from 'apps/account-service/src/users/users.service';
+import { AdminGuard } from './guards/admin.guards';
 
 @Controller('auth')
 export class AuthController {
@@ -65,5 +66,11 @@ export class AuthController {
     }
 
     return userWithSettings;
+  }
+
+  @Get('/isAdmin')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  isAdmin() {
+    return { message: 'Welcome to the dashboard.' };
   }
 }

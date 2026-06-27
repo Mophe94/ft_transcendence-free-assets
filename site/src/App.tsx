@@ -11,6 +11,7 @@ import Profile from './page/Profile'
 import Settings from './page/Settings'
 import Preferences from './page/Preferences'
 import Contact from './page/Contact'
+import Dashboard from './page/Dashboard'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
               <Route path='/preferences' element={<Preferences />} />
               <Route path='/profile' element={<Profile />} />
               <Route path='/settings' element={<Settings />} />
+              <Route path='/dashboard' element={<Dashboard />} />
             </Route>
           </Route>
         </Routes>

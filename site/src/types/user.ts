@@ -24,4 +24,5 @@ export interface User {
     created_at: Date;
     settings?: Settings;
     stats?: Stats;
+    role: string;
 }

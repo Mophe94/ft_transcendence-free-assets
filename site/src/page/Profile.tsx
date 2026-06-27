@@ -28,7 +28,7 @@ interface ProfileBodyProps {
 export function ProfileBody({ username }: ProfileBodyProps) {
   const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/profile/${username}`, {
+    fetch(`${import.meta.env.VITE_USERS_SERVICE}/profile/${username}`, {
       method:'Get',
       credentials: 'include',
     })

@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from 'apps/account-service/src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { getSecret } from 'libs/shared/src/utils/secret.utils';
+import { getSecret } from 'app/shared/utils/secret.utils';
 
 @Module({
   imports: [

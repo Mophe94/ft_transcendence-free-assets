@@ -44,7 +44,7 @@ export default function Preferences() {
 
     useEffect (() => {
         if (!user?.username) { return;}
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/settings/${user.username}`, {
+        fetch(`${import.meta.env.VITE_USERS_SERVICE}/settings/${user.username}`, {
             method: 'GET',
             credentials: 'include',
         })
@@ -92,7 +92,7 @@ export default function Preferences() {
             }
         };
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/settings/update`, {
+            const response = await fetch(`${import.meta.env.VITE_USERS_SERVICE}/settings/update`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
