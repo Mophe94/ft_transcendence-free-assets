@@ -4,18 +4,18 @@
 
   display: grid;
   grid-template-columns: 1fr 3fr 1fr;
-  grid-template-rows: 100%; 
+  grid-template-rows: 100%;
 }
 
 .side-padding-left {
   background-image: var(--bg-image);
   background-repeat: no-repeat;
-  background-size: cover; 
+  background-size: cover;
 }
 
 .side-padding-right {
   background-image: var(--bg-image);
   background-repeat: no-repeat;
-  background-size: cover; 
-  transform:scaleX(-1);
+  background-size: cover;
+  transform: scaleX(-1);
 }

@@ -1,18 +1,18 @@
-import { Outlet } from "react-router-dom";
-import { PrivNavBar } from "../components/nav-bar/PrivNavBar";
-import './PublicLayout.css'
+import { Outlet } from 'react-router-dom';
+import { PrivNavBar } from '../components/nav-bar/PrivNavBar';
+import './PublicLayout.css';
 
 export default function AppLayout() {
   return (
     <>
-        <PrivNavBar />
-        <div className='body-layout'>
-        <div className='side-padding-left'></div>
+      <PrivNavBar />
+      <div className="body-layout">
+        <div className="side-padding-left"></div>
         <div className="public-content">
-            <Outlet />
+          <Outlet />
         </div>
-        <div className='side-padding-right'></div>
-        </div>
+        <div className="side-padding-right"></div>
+      </div>
     </>
-  )
+  );
 }
