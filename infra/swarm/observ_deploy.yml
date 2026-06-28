@@ -35,11 +35,11 @@ services:
           - node.role == manager
 
     environment:
-        GF_SERVER_ROOT_URL: http://localhost/grafana/
-        GF_SERVER_SERVE_FROM_SUB_PATH: "true"
-        GF_SECURITY_ALLOW_EMBEDDING: "true"
-        GF_SECURITY_ADMIN_USER: "admin"
-        GF_SECURITY_ADMIN_PASSWORD: "admin123"
+        - GF_SERVER_ROOT_URL=https://grafana.localhost/
+        - GF_SERVER_SERVE_FROM_SUB_PATH=false
+        - GF_SECURITY_ALLOW_EMBEDDING=true
+        - GF_SECURITY_ADMIN_USER=admin
+        - GF_SECURITY_ADMIN_PASSWORD=admin123
 
     volumes:
         - grafana_data:/var/lib/grafana
@@ -68,7 +68,7 @@ services:
       - loki-data:/loki
     configs:
       - source: loki_config
-        target: /etc/loki/loki-config.yml
+        target: /etc/loki/config.yml
     networks:
       - obsrv_net
     deploy:
@@ -80,7 +80,7 @@ services:
         condition: on-failure
 
   fluent-bit:
-    image: ${IP}:80/fluent-bit:latest
+    image: fluent/fluent-bit:3.0
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
