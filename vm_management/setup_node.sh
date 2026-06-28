@@ -10,6 +10,9 @@ if [ ! $# -eq 2 ]; then
 elif [ -z "$1" ] || [ -z "$2" ]; then
     echo "Usage: ${SCRIPT_NAME} <node type> <node new username>"
     exit 1
+elif [ "$USER" != "root" ]; then
+    echo "[$SCRIPT_NAME] This script need to be runned as root"
+    exit 1
 fi
 
 #Setup
@@ -21,23 +24,26 @@ SSH_CONFIG="/etc/ssh/sshd_config"
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"
 
 #Change for env procured password
-PASSWORD="Nd${NEW_USER}123"
+NEW_USER_HOME="/home/$NEW_USER"
+NEW_USER_PASSWORD="Nd${NEW_USER}123"
 
 echo "[$SCRIPT_NAME] Creating user: $NEW_USER"
+adduser -D -h "$NEW_USER_HOME" "$NEW_USER"
+echo "${NEW_USER}:${NEW_USER_PASSWORD}" | chpasswd
 
-adduser -D -h "$NEW_USER"
-echo "${NEW_USER}:${PASSWORD}" | chpasswd
+echo "[$SCRIPT_NAME] Setting up ${NEW_USER} permissions"
 addgroup "$NEW_USER" wheel
 addgroup "$NEW_USER" docker
 
-mkdir -p "/home/${NEW_USER}/.ssh"
-chown -R ${NEW_USER}:${NEW_USER} "/home/${NEW_USER}/.ssh/"
-chmod 700 "/home/${NEW_USER}/.ssh"
+echo "[$SCRIPT_NAME] Setting up ${NEW_USER} SSH login"
+mkdir -p "$NEW_USER_HOME/.ssh"
+chmod 700 "${NEW_USER_HOME}/.ssh"
+cat "${HOME}/.ssh/authorized_keys" > "${NEW_USER_HOME}/.ssh/authorized_keys" 
+chmod 600 "${NEW_USER_HOME}/.ssh/authorized_keys"
+chown -R ${NEW_USER}:${NEW_USER} "${NEW_USER_HOME}/.ssh"
 
 echo "[$SCRIPT_NAME] Disabling root SSH login"
-
 cp "$SSH_CONFIG" "${SSH_CONFIG}.bak"
-
 if grep -q "^#*PermitRootLogin" "$SSH_CONFIG"; then
     sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' "$SSH_CONFIG"
 else
