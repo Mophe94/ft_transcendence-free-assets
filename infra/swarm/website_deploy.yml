@@ -8,20 +8,13 @@ services:
         networks:
             - games_net
 
-        configs:
-          - source: load_secrets
-            target: /load_secrets.sh
-            mode: 0555
+#        configs:
+#          - source: load_secrets
+#            target: /load_secrets.sh
+#            mode: 0555
 
-        secrets:
-          - VITE_API_BASE_URL
-          - VITE_42_OAUTH_API
-          - VITE_42_OAUTH_CLIENT_ID
-          - VITE_42_OAUTH_REDIRECT_URI
-          - VITE_42_OAUTH_API_LINK
-
-        entrypoint:
-          - /load_secrets.sh
+#        entrypoint:
+#          - /load_secrets.sh
 
         command:
           - npm
@@ -31,7 +24,7 @@ services:
         deploy:
             replicas: 1
 
-    backend:
+    game_service:
         image: ${IP}:${REGISTRY_PORT}/backend:latest
 #        env_file:
 #          - "site/BackEnd/.env"
@@ -39,31 +32,78 @@ services:
         networks:
             - games_net
 
-        configs:
-          - source: load_secrets
-            target: /load_secrets.sh
-            mode: 0555
+#        configs:
+#          - source: load_secrets
+#            target: /load_secrets.sh
+#            mode: 0555
 
         environment:
-          - DB_HOST=website_users_db
-          - FRONT_END_URL=http://localhost:5173/
+          - DB_GAME_HOST=game_db
+#          - FRONT_END_URL=http://localhost:5173/
 
         secrets:
-          - FORTYTWO_CLIENT_ID
-          - FORTYTWO_CLIENT_SECRET
-          - FORTYTWO_REDIRECT_URI
-          - FORTYTWO_API_TOKENEXCHANGE
-          - FORTYTWO_API_GETUSER
-          - JWT_SECRET
+          - db_game_db_name
+          - db_game_username
+          - db_game_password
 
-
-        entrypoint:
-          - /load_secrets.sh
+#        entrypoint:
+#          - /load_secrets.sh
 
         command:
           - npm
           - run
-          - start
+          - start:dev
+          - game-service
+
+        deploy:
+            replicas: 1
+
+    chat_service:
+        image: ${IP}:${REGISTRY_PORT}/backend:latest
+#        env_file:
+#          - "site/BackEnd/.env"
+
+        networks:
+            - games_net
+
+        secrets:
+          - db_game_db_name
+          - db_game_username
+          - db_game_password
+
+        command:
+          - npm
+          - run
+          - start:dev
+          - game-service
+
+        deploy:
+            replicas: 1
+
+    users_service:
+        image: ${IP}:${REGISTRY_PORT}/backend:latest
+#        env_file:
+#          - "site/BackEnd/.env"
+
+        environment:
+          - DB_USERS_HOST=users_db
+
+        networks:
+            - games_net
+
+        secrets:
+          - db_users_db_name
+          - db_users_username
+          - db_users_password
+          - fortytwo_client_id
+          - fortytwo_client_secret
+          - jwt_secret_key
+
+        command:
+          - npm
+          - run
+          - start:dev
+          - account-service
 
         deploy:
             replicas: 1
@@ -74,8 +114,6 @@ services:
         networks:
             - games_net
 
-#        configs:
-#        entrypoint:
         command:
           - node
           - server.js
@@ -94,24 +132,26 @@ services:
         networks:
             - games_net
 
-        configs:
-          - source: load_secrets
-            target: /load_secrets.sh
-            mode: 0555
+#        configs:
+#          - source: load_secrets
+#            target: /load_secrets.sh
+#            mode: 0555
+
+        environment:
+          - POSTGRES_PASSWORD: cat "/run/secrets/db_users_postgres_password"
 
         secrets:
-          - POSTGRES_USER
-          - POSTGRES_PASSWORD
-          - USERS_DB_NAME
-          - USERS_DB_USER
-          - USERS_DB_PASSWORD
+          - db_users_db_name
+          - db_users_username
+          - db_users_password
+          - db_users_postgres_password
 
-        entrypoint:
-          - /load_secrets.sh
+#        entrypoint:
+#          - /load_secrets.sh
 
-        command:
-          - /usr/local/bin/docker-entrypoint.sh 
-          - postgres
+#        command:
+#          - /usr/local/bin/docker-entrypoint.sh 
+#          - postgres
 
         deploy:
             replicas: 1
@@ -127,24 +167,26 @@ services:
         networks:
             - games_net
 
-        configs:
-          - source: load_secrets
-            target: /load_secrets.sh
-            mode: 0555
+#        configs:
+#          - source: load_secrets
+#            target: /load_secrets.sh
+#            mode: 0555
+
+        environment:
+          - POSTGRES_PASSWORD: cat "/run/secrets/db_users_postgres_password"
 
         secrets:
-          - POSTGRES_USER
-          - POSTGRES_PASSWORD
-          - GAME_DB_NAME
-          - GAME_DB_USER
-          - GAME_DB_PASSWORD
+          - db_game_db_name
+          - db_game_username
+          - db_game_password
+          - db_game_postgres_password
 
-        entrypoint:
-          - /load_secrets.sh
+#        entrypoint:
+#          - /load_secrets.sh
 
-        command:
-          - /usr/local/bin/docker-entrypoint.sh 
-          - postgres
+#        command:
+#          - /usr/local/bin/docker-entrypoint.sh 
+#          - postgres
 
         deploy:
             replicas: 1
@@ -164,41 +206,25 @@ configs:
     file: "$HOME/infra/swarm/scripts/load_secrets.sh"
 
 secrets:
-    POSTGRES_USER:
-      external: true
-    POSTGRES_PASSWORD:
-      external: true
-    USERS_DB_NAME:
-      external: true
-    USERS_DB_USER:
-      external: true
-    USERS_DB_PASSWORD:
-      external: true
-    GAME_DB_NAME:
-      external: true
-    GAME_DB_USER:
-      external: true
-    GAME_DB_PASSWORD:
-      external: true
-    FORTYTWO_CLIENT_ID:
-      external: true
-    FORTYTWO_CLIENT_SECRET:
-      external: true
-    FORTYTWO_REDIRECT_URI:
-      external: true
-    FORTYTWO_API_TOKENEXCHANGE:
-      external: true
-    FORTYTWO_API_GETUSER:
-      external: true
-    VITE_API_BASE_URL:
-      external: true
-    VITE_42_OAUTH_API:
-      external: true
-    VITE_42_OAUTH_CLIENT_ID:
-      external: true
-    VITE_42_OAUTH_REDIRECT_URI:
-      external: true
-    VITE_42_OAUTH_API_LINK:
-      external: true
-    JWT_SECRET:
-      external: true
+  db_game_db_name:
+    external: true
+  db_game_username:
+    external: true
+  db_game_password:
+    external: true
+  db_game_postgres_password:
+    external: true
+  db_users_db_name:
+    external: true
+  db_users_username:
+    external: true
+  db_users_password:
+    external: true
+  db_users_postgres_password:
+    external: true
+  fortytwo_client_id:
+    external: true
+  fortytwo_client_secret:
+    external: true
+  jwt_secret_key:
+    external: true

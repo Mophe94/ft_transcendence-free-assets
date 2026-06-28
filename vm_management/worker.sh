@@ -45,7 +45,7 @@ wait_for_ssh() {
 	status=$(ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=10 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} "exit 0" 2>&1)
 	RESULT=$?
 	if [ $RESULT -eq 0 ]; then
-	    echo " Connected"
+	    echo " connected"
 	    break
 	fi
 	if [ $RESULT -eq 255 ]; then
@@ -56,7 +56,7 @@ wait_for_ssh() {
 	fi
 	TIMEOUT=$((TIMEOUT - 1))
 	if [ $TIMEOUT -eq 0 ]; then
-	    echo "Time out"
+	    echo " timed out"
 	    exit 1
 	fi
 	sleep 2
