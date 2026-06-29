@@ -1,4 +1,4 @@
-#! /bin/bash
+
 
 SCRIPT_NAME="${0##*/}"
 SCRIPT_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -231,6 +231,9 @@ else
     ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER; exit 0"
     set -e
 
+    while ssh -p $SSH_PORT -o ConnectTimeout=2 -o BatchMode=yes "$VM_USER"@"$SSH_HOST" true >/dev/null 2>&1; do
+	sleep 2
+    done
     echo "[$SCRIPT_NAME] Switching user"
     VM_USER=$USER
     VM_TARGET_DIR="/home/$USER"
