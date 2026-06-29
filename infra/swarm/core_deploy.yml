@@ -53,7 +53,7 @@ volumes:
     driver: local
     driver_opts:
       type: nfs
-      o: "${IP},nfsvers=4,rw,soft"
+      o: "addr=${IP},nfsvers=4,rw,soft"
       device: ":/nfs-storage/registry"
 
 configs:
