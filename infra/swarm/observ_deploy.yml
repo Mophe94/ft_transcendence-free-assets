@@ -85,7 +85,13 @@ services:
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - fluent-bit-config:/fluent-bit/etc
+      - fluent-bit_data:/fluent-bit/storage
+
+    configs:
+      - source: fluent-bit_config
+        target: /fluent-bit/etc/fluent-bit.conf
+      - source: parsers_config
+        target: /fluent-bit/etc/parsers.conf
     
     command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
     
@@ -116,7 +122,7 @@ volumes:
         type: nfs
         o: "addr=${IP},nfsvers=4,rw,soft"
         device: ":/nfs-storage/grafana"
-    fluent-bit-config:
+    fluent-bit_data:
 
 configs:
     prometheus_config:
@@ -127,6 +133,10 @@ configs:
         file: ../containers/grafana/provisioning/dashboards/dashboards.yml
     loki_config:
         file: ../containers/loki/loki_config.yml
+    fluent-bit_config:
+        file: ../containers/fluent-bit/fluent-bit.conf
+    parsers_config:
+        file: ../containers/fluent-bit/parsers.conf
 
 networks:
     obsrv_net:
