@@ -91,6 +91,18 @@ EOF
     fi
 fi
 
+echo "[$SCRIPT_NAME] Setting up NFS"
+apk add nfs-utils
+rc-update add rpcbind
+rc-update add nfs
+
+echo "[$SCRIPT_NAME] Setting up nfs-storage"
+mkdir -p "/nfs-storage/{registry,monitoring,backups}" \
+    && chown -R ${NEW_USER}:${NEW_USER} "/nfs-storage"
+echo "/nfs-storage *(rw,sync,no_subtree_check,no_root_squash)" >> "/etc/exports"
+exportfs -ra
+#check with exportfs -v
+
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"
 
 echo "[$SCRIPT_NAME] Restarting VM"
