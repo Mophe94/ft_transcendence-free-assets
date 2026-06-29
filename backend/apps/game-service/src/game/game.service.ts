@@ -14,6 +14,9 @@ import {
 } from 'apps/game-service/src/game/game.type';
 import { start_game } from './events/start_game';
 import { new_encounter } from './events/new_encounters';
+import { max } from 'node_modules/class-validator/types';
+import { MonsterType } from './entities/types/monster_type.enum';
+import { Skill } from './entities/skills.entity';
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -67,17 +70,19 @@ export class GameService implements OnModuleInit {
     });
 
     const player = this.playerService.getPlayer(userId)!;
-    player.timer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map * 1000; // server time + map time in millisec-> make it cleaner
+    player.timer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map; // server time + map time in millisec-> make it cleaner
+    //await this.initMonster(player, 1/* payload.data.monsterId */);
     const payload = start_game(player);
     console.log(`[GameService]: startMapPhase -> start_game payload built`);
+    console.log(payload);
     return payload;
   }
 
-  async handleMessage(userId: number, state: string): Promise<object> {
-    switch (state) {
+  async handleMessage(userId: number, payload: GamePayload): Promise<object> {
+    const player = this.playerService.getPlayer(userId)!;
+    switch (payload.state) {
       case 'new_encounter':
-        return this.handleNewEncounter(userId);
+        return this.handleNewEncounter(player, payload.data.tile);
       default:
         return {
           event: 'game',
@@ -86,9 +91,17 @@ export class GameService implements OnModuleInit {
     }
   }
 
-  private handleNewEncounter(userId: number): object {
-    const player = this.playerService.getPlayer(userId)!;
+  private async initMonster(player: Player, monsterId: number): Promise<object> {
+    const monster = await this.monstersService.findOneById(monsterId/* , { skills: true } */);
+    if (!monster)
+      return { event: 'game', data: { state: 'error', reason: 'monster not found'}};
+    console.log('ICI');
+    player.currentMonster.name = monster.name;
+    console.log(monster);
+    return { event: 'game', data: { state: 'monster retrived'}, monster};
+  }
 
+  private handleNewEncounter(player: Player, tile: string): object {
     //retrieve in DB
     player.current_monster = 'monster_test';
     //this.monstersService.findOneByName()

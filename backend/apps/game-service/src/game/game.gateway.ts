@@ -80,7 +80,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.send(JSON.stringify(message));
   }
 
-  @Interval(5000)
+  @Interval(10000)
   private heartbeat() {
     this.clients.forEach((data, socket) => {
       if (!data.isAlive) {
@@ -110,7 +110,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const response = await this.gameService.handleMessage(
       userId,
-      payload.data.state,
+      payload,
     );
     this.sendToClient(client, response);
   }

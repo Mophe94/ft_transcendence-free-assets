@@ -22,7 +22,7 @@ export function start_game(player: Player) {
       player: {
         id: player.id,
         name: 'Ce que tu veux',
-        asset: 'dino',
+        asset: 'dinoBlue',
         team: player.team,
       },
       timer: player.timer,
