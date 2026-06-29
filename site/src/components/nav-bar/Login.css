@@ -1,83 +1,83 @@
 .login-container {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
 }
 
-.username-container{
-    align-content: center;
-    margin-right: 10%;
+.username-container {
+  align-content: center;
+  margin-right: 10%;
 }
 
-#profile-pic{
-    border-radius: 50%;
-    object-fit: cover;
-    aspect-ratio: 1/1;
-    max-height: 5vh;
+#profile-pic {
+  border-radius: 50%;
+  object-fit: cover;
+  aspect-ratio: 1/1;
+  max-height: 5vh;
 }
 
 .auth-section {
-    position: relative;
-    z-index: 100;
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: 700;
-    font-size: 42px;
-    color: rgb(121, 121, 121);
-	padding: 1rem;
-    padding-right: 50px;
-	transition: 0.8s;
-	text-align: none;
-	align-self: center;
+  position: relative;
+  z-index: 100;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 700;
+  font-size: 42px;
+  color: rgb(121, 121, 121);
+  padding: 1rem;
+  padding-right: 50px;
+  transition: 0.8s;
+  text-align: none;
+  align-self: center;
 }
 
 .auth-section:hover {
-	opacity: 0.8;
-	transition: 0.8s ease-in-out;
+  opacity: 0.8;
+  transition: 0.8s ease-in-out;
 }
 
 .dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    min-width: 120px;
-    z-index: 10;
-    margin: 0;
-    padding: 0;
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
 }
 
 .dropdown-menu::before {
-    content: "";
-    position: absolute;
-    top: -20px;      /* Remonte de 20px au-dessus du menu */
-    left: 0;
-    right: 0;
-    height: 20px;    /* Fait 20px de haut */
-    background: transparent; /* Reste invisible à l'œil nu */
+  content: '';
+  position: absolute;
+  top: -20px; /* Remonte de 20px au-dessus du menu */
+  left: 0;
+  right: 0;
+  height: 20px; /* Fait 20px de haut */
+  background: transparent; /* Reste invisible à l'œil nu */
 }
 
-ul { 
-    list-style-type: none;
-    padding: 0; 
+ul {
+  list-style-type: none;
+  padding: 0;
 }
 
-.auth-section:hover .dropdown-menu{
-    display: block;
+.auth-section:hover .dropdown-menu {
+  display: block;
 }
-.login-container:hover .dropdown-menu{
-    display:block;
+.login-container:hover .dropdown-menu {
+  display: block;
 }
 
-.dropdown-menu:hover{
-    display:block;
+.dropdown-menu:hover {
+  display: block;
 }
 
 .auth-link {
-    font-family: 'Ubuntu', sans-serif;
-    font-weight: 700;
-    font-size: 42px;
-    color: rgb(121, 121, 121);
-    text-decoration: none;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 700;
+  font-size: 42px;
+  color: rgb(121, 121, 121);
+  text-decoration: none;
 }

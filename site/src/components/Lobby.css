@@ -1,12 +1,11 @@
 .lobby-container {
-    background-color: lightgray;
-    border-radius: 15px;
-    overflow: hidden;
+  background-color: lightgray;
+  border-radius: 15px;
+  overflow: hidden;
 }
 
 thead {
-    background-color: gray;
-
+  background-color: gray;
 }
 
 thead th {
@@ -14,9 +13,9 @@ thead th {
 }
 
 .lobby-table {
-    width: 100%;
-    border-collapse: collapse;
-    overflow: hidden;
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
 }
 
 td {

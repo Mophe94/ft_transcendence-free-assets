@@ -11,7 +11,7 @@ import {
   FortyTwoTokenResponse,
 } from './types/fortytwo-profile.interface';
 import { JwtService } from '@nestjs/jwt';
-import { getSecret } from 'libs/shared/src/utils/secret.utils';
+import { getSecret } from 'app/shared/utils/secret.utils';
 import { UserRole } from '../users/types/userRole.enum';
 
 @Injectable()
@@ -39,6 +39,7 @@ export class AuthService {
     const payload = {
       id: user.id,
       username: user.username,
+      role: user.role,
     };
     const token = await this.jwtService.signAsync(payload);
 
@@ -56,7 +57,6 @@ export class AuthService {
     );
     try {
       const tokenResponse = await axios.post<FortyTwoTokenResponse>(
-
         tokenExchangeUrl ?? 'https://api.intra.42.fr/oauth/token',
         {
           grant_type: 'authorization_code',

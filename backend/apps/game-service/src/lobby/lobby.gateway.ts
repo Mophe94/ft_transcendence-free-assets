@@ -10,7 +10,11 @@ import {
 import { WebSocket, Server } from 'ws';
 import { OnEvent } from '@nestjs/event-emitter';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
-import { FULL_LOBBY, PHASE_DURATIONS, createMockUser } from 'apps/game-service/src/game/game.type';
+import {
+  FULL_LOBBY,
+  PHASE_DURATIONS,
+  createMockUser,
+} from 'apps/game-service/src/game/game.type';
 import { LobbyService } from 'apps/game-service/src/lobby/lobby.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 
@@ -26,7 +30,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: WebSocket): void {
     const { userId } = createMockUser();
-    clientsMap.set(client, { userId, isAlive: true});
+    clientsMap.set(client, { userId, isAlive: true });
     console.log('[LobbyGateway]: Client connected');
   }
 

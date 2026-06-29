@@ -10,7 +10,7 @@ export default function AuthCallback() {
     useEffect(() => {
         const code = searchParams.get('code');
         if (code) {
-            const callbackUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/signin`;
+            const callbackUrl = `${import.meta.env.VITE_USERS_SERVICES}/auth/signin`;
             fetch(callbackUrl,
                 {
                     method: 'POST',

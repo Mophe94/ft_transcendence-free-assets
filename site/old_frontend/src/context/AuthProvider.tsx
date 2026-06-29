@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode}) => {
     const [loading, setLoading] = useState(true);
 
     const checkUserStatus = async () => {
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
+        fetch(`${import.meta.env.VITE_USERS_SERVICE}/auth/me`, {
             method: 'GET',
             credentials: 'include'
         })
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode}) => {
     }, [])
 
     const handleSignout = async () => {
-        const signoutUrl = `${import.meta.env.VITE_API_BASE_URL}/auth/signout`;
+        const signoutUrl = `${import.meta.env.VITE_USERS_SERVICE}/auth/signout`;
         await fetch(signoutUrl, {
             method: 'POST',
             credentials: 'include'

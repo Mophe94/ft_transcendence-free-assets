@@ -10,7 +10,7 @@ import { SettingsModule } from './settings/settings.module';
 import { Settings } from './settings/settings.entity';
 import { UserStatsModule } from './stats/stats.module';
 import { UserStats } from './stats/stats.entity';
-import { getSecret } from 'libs/shared/src/utils/secret.utils';
+import { getSecret } from 'app/shared/utils/secret.utils';
 
 @Module({
   imports: [

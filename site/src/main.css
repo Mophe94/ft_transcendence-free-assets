@@ -2,36 +2,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 
 .heading-medium {
-    font-family: "New Rocker";
-    color: rgb(112, 14, 14);
-    font-size: 64px;
-    font-weight: 400;
+  font-family: 'New Rocker';
+  color: rgb(112, 14, 14);
+  font-size: 64px;
+  font-weight: 400;
 }
 .heading-large {
-    font-family: "New Rocker";
-    color: rgba(103, 8, 8, 0.691);
-    font-size: 96px;
-    font-weight: 400;
+  font-family: 'New Rocker';
+  color: rgba(103, 8, 8, 0.691);
+  font-size: 96px;
+  font-weight: 400;
 }
 
 .text-medium {
-    font-size: 28px;
+  font-size: 28px;
 }
 .bold {
-    font-weight: 500;
+  font-weight: 500;
 }
 
-
 .centered {
-    justify-self: center;
+  justify-self: center;
 }
 
 .theme-dark {
-    --bg-image: url("background/dark_clouds.png");
-    --bg-color: rgb(5, 1, 31);
+  --bg-image: url('background/dark_clouds.png');
+  --bg-color: rgb(5, 1, 31);
 }
 
 .theme-light {
-    --bg-image: url("background/light_clouds.png");
-    --bg-color: rgb(71, 171, 169);
+  --bg-image: url('background/light_clouds.png');
+  --bg-color: rgb(71, 171, 169);
 }
