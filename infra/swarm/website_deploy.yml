@@ -5,15 +5,15 @@ services:
 
         environment:
           - VITE_DOMAIN_NAME=localhost:8443
-          - VITE_USERS_SERVICE="https://localhost:8443/users"
-          - VITE_CHAT_SERVICE="wss://localhost:8443/chat"
-          - VITE_GAME_SERVICE="wss://localhost:8443/game"
-          - VITE_LOBBY_SERVICE="wss://localhost:8443/lobby"
-          - VITE_IFRAME_SERVICE="https://localhost:8443/iframe"
-          - VITE_42_OAUTH_API="https://api.intra.42.fr/oauth/"
+          - VITE_USERS_SERVICE=https://localhost:8443/users
+          - VITE_CHAT_SERVICE=wss://localhost:8443/chat
+          - VITE_GAME_SERVICE=wss://localhost:8443/game
+          - VITE_LOBBY_SERVICE=wss://localhost:8443/lobby
+          - VITE_IFRAME_SERVICE=https://localhost:8443/iframe
+          - VITE_42_OAUTH_API=https://api.intra.42.fr/oauth/
           - VITE_42_OAUTH_CLIENT_ID=u-s4t2ud-e487562dd07b366dee9b3b29a8fd298cbcc4c96048e03e72a17e2de8e5211d57
-          - VITE_42_OAUTH_REDIRECT_URI="http://localhost:8080/auth/callback"
-          - VITE_42_OAUTH_API_LINK="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-e487562dd07b366dee9b3b29a8fd298cbcc4c96048e03e72a17e2de8e5211d57&redirect_uri=http://localhost:8080/auth/callback"
+          - VITE_42_OAUTH_REDIRECT_URI=https://localhost:8443/auth/callback
+          - VITE_42_OAUTH_API_LINK=https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-e487562dd07b366dee9b3b29a8fd298cbcc4c96048e03e72a17e2de8e5211d57&redirect_uri=https://localhost:8443/auth/callback&response_type=code
 
         secrets:
           - fortytwo_client_id

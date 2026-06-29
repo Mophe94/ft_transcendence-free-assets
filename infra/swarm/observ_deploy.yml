@@ -9,7 +9,7 @@ services:
         target: /etc/prometheus/prometheus.yml
 
     deploy:
-      replicas: 1
+      replicas: 0
       placement:
         constraints:
           - node.role == manager
@@ -58,7 +58,8 @@ services:
     networks:
       - obsrv_net
     deploy:
-      mode: global
+      #mode: global
+      replicas: 0
       
   loki:
     image: grafana/loki:3.5.2
@@ -98,8 +99,23 @@ services:
 
 volumes:
     loki-data:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: "addr=${IP},nfsvers=4,rw,soft"
+        device: ":/nfs-storage/loki"
     prom_data:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: "addr=${IP},nfsvers=4,rw,soft"
+        device: ":/nfs-storage/prometheus"
     grafana_data:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: "addr=${IP},nfsvers=4,rw,soft"
+        device: ":/nfs-storage/grafana"
     fluent-bit-config:
 
 configs:

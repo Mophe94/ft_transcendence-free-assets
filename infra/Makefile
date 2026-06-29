@@ -47,6 +47,9 @@ website:
 	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 observ:
+	@mkdir -p "/nfs-storage/grafana"
+	@mkdir -p "/nfs-storage/prometheus"
+	@mkdir -p "/nfs-storage/loki"
 	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 up: build
