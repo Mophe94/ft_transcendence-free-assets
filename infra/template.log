@@ -1,0 +1,10 @@
+#type json
+
+{
+    "timestamp": "DD-MM-YYYY",
+    "level": "info|warn|error",
+    "service": "grafana|auth|game|...",
+    "message": "...",
+    "trace_id": "...",
+    "node": "..."
+}
