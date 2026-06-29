@@ -15,18 +15,6 @@ services:
 
       volumes:
         - registry_data:/var/lib/registry
-#      ports:
-#        - "5000:5000"
-
-#      secrets:
-#        - registry_tls_cert
-#        - registry_tls_key
-
-#      environment:
-#          REGISTRY_HTTP_HOST=http://
-#        REGISTRY_HTTP_ADDR: 0.0.0.0:5000
-#        REGISTRY_HTTP_TLS_CERTIFICATE: /run/secrets/registry_tls_cert
-#        REGISTRY_HTTP_TLS_KEY: /run/secrets/registry_tls_key
 
       networks:
         - swarm_net
@@ -38,10 +26,6 @@ services:
             - "80:80"
             - "443:443"
             - "5050:5050"
-      #- target: 80
-      #  published: 8080
-      #  protocol: tcp
-      #  mode: ingress
 
         configs:
             - source: nginx_conf
@@ -66,6 +50,11 @@ services:
 
 volumes:
   registry_data:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: "${IP},nfsvers=4,rw,soft"
+      device: ":/nfs-storage/registry"
 
 configs:
     nginx_conf:

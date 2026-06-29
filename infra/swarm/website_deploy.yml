@@ -138,7 +138,7 @@ services:
 #            mode: 0555
 
         environment:
-          - POSTGRES_PASSWORD: cat "/run/secrets/db_users_postgres_password"
+          - POSTGRES_PASSWORD=$$(cat "/run/secrets/db_users_postgres_password")
 
         secrets:
           - db_users_db_name
@@ -173,7 +173,7 @@ services:
 #            mode: 0555
 
         environment:
-          - POSTGRES_PASSWORD: cat "/run/secrets/db_users_postgres_password"
+          - POSTGRES_PASSWORD=$$(cat "/run/secrets/db_users_postgres_password")
 
         secrets:
           - db_game_db_name
