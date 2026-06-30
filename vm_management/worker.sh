@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 SCRIPT_NAME="${0##*/}"
 SCRIPT_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -226,9 +226,15 @@ else
 #    VM_TARGET_DIR="/home/$USER"
 
     echo "[$SCRIPT_NAME] Setting up node"
-    set +e
     ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
-    scp -P "$SSH_PORT" -o StrictHostKeyChecking=no "vm_management/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
+    declare -A BUNDLE
+    BUNDLE[manager]="vm_management/setup_node.sh vm_management/cert_info.env"
+    BUNDLE[worker]="vm_management/setup_node.sh"
+    read -r -a files <<< "${BUNDLE[$TYPE]}"
+    echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
+    VM_TARGET_DIR="/"
+    set +e
+    scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
     ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER; exit 0"
     set -e
 
