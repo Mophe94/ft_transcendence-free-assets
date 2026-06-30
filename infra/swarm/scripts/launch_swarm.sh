@@ -94,7 +94,7 @@ done
 
 #Adding more node ?
 echo -n "[$SCRIPT_NAME] Do you want to add more node (y/N): " 
-read answer
+read -t 20 answer || true
 case "${answer,,}" in
 	[y]|[yes])
 	    chmod +x "${DIR}/add_node.sh"

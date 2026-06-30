@@ -92,6 +92,8 @@ services:
         target: /fluent-bit/etc/fluent-bit.conf
       - source: parsers_config
         target: /fluent-bit/etc/parsers.conf
+      - source: lua_http_level
+        target: /fluent-bit/scripts/http_level.lua
     
     command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
     
@@ -137,6 +139,8 @@ configs:
         file: ../containers/fluent-bit/fluent-bit.conf
     parsers_config:
         file: ../containers/fluent-bit/parsers.conf
+    lua_http_level:
+        file: ../containers/fluent-bit/http_level.lua
 
 networks:
     obsrv_net:
