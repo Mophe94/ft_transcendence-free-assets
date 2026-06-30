@@ -9,7 +9,7 @@ import {
 import { MonsterType } from './types/monster_type.enum';
 import { Skill } from './skills.entity';
 
-@Entity()
+@Entity("monsters")
 export class Monster {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -44,11 +44,11 @@ export class Monster {
   @Column()
   catch!: number;
 
-  @CreateDateColumn({
+/*   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  created_at!: Date;
+  created_at!: Date; */
 
   @ManyToMany(() => Skill, (skill: Skill) => skill.monsters)
   @JoinTable({

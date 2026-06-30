@@ -17,6 +17,7 @@ import { new_encounter } from './events/new_encounters';
 import { max } from 'node_modules/class-validator/types';
 import { MonsterType } from './entities/types/monster_type.enum';
 import { Skill } from './entities/skills.entity';
+import { CurrentMonster, Skill as PlayerSkill} from './player/player.interfaces';
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -44,11 +45,11 @@ export class GameService implements OnModuleInit {
     return this.autorizedPlayers.get(roomId)?.has(userId) ?? false;
   }
 
-  onGodotConnected(
+  async onGodotConnected(
     client: WebSocket,
     userId: number,
     roomId: string,
-  ): object | null {
+  ): Promise<object | null> {
     this.roomService.joinRoom(client, roomId);
     const size = this.roomService.getRoomSize(roomId);
     console.log(`Size = ${size}, RoomId = ${roomId}`);
@@ -64,15 +65,14 @@ export class GameService implements OnModuleInit {
     return null;
   }
 
-  startMapPhase(userId: number, roomId: string): object {
+  async startMapPhase(userId: number, roomId: string): Promise<object> {
     this.phaseTimer.start(roomId, 'map', () => {
       console.log(`Room ${roomId} map phase timeout`);
     });
 
     const player = this.playerService.getPlayer(userId)!;
     player.timer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map; // server time + map time in millisec-> make it cleaner
-    //await this.initMonster(player, 1/* payload.data.monsterId */);
-    const payload = start_game(player);
+    const payload = await this.start_game(player);
     console.log(`[GameService]: startMapPhase -> start_game payload built`);
     console.log(payload);
     return payload;
@@ -91,14 +91,26 @@ export class GameService implements OnModuleInit {
     }
   }
 
-  private async initMonster(player: Player, monsterId: number): Promise<object> {
+  private async initMonster(player: Player, monsterId: number): Promise<CurrentMonster | null> {
     const monster = await this.monstersService.findOneById(monsterId/* , { skills: true } */);
+    console.log('monster from DB:', monster);
     if (!monster)
-      return { event: 'game', data: { state: 'error', reason: 'monster not found'}};
-    console.log('ICI');
-    player.currentMonster.name = monster.name;
+      return null;
+    const currentMonster: CurrentMonster = {
+      name: monster.name,
+      type: String(monster.type), //add enum
+      slot: 0,
+      life: {
+        current: monster.hp_total,
+        max : monster.hp_total,
+      },
+      status: [],
+      skill: [], // 4 slots
+    };
+    
+    player.currentMonster = currentMonster;
     console.log(monster);
-    return { event: 'game', data: { state: 'monster retrived'}, monster};
+    return currentMonster;
   }
 
   private handleNewEncounter(player: Player, tile: string): object {
@@ -110,6 +122,41 @@ export class GameService implements OnModuleInit {
   }
 
   // JSON RESPONSE
+
+  async start_game(player: Player) {
+    // return {
+    //   event: 'game',
+    //   data: {
+    //     state: 'start_game',
+    //     player: {
+    //       id: player.id,
+    //       name: player.name,
+    //       asset: player.asset,
+    //       team: player.team,
+    //     },
+    //     timer: player.timer,
+    //     current_map: player.current_map,
+    //   },
+    // };
+    const monster = await this.initMonster(player, 1/* payload.data.monsterId */);
+    return {
+      event: 'game',
+      data: {
+        state: 'start_game',
+        player: {
+          id: player.id,
+          name: 'Ce que tu veux',
+          asset: 'dinoBlue',
+          team: player.team,
+          monster: player.currentMonster.name,
+  
+        },
+        timer: player.timer,
+        current_map: 'map_01',
+      },
+    };
+  }
+
   new_current_item: () => object;
   new_encounter: () => object;
   result_catch: (result: number) => object;

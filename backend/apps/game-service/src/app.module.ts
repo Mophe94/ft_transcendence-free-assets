@@ -22,7 +22,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         username: configService.get<string>('DB_GAME_USERNAME'),
         password: configService.get<string>('DB_GAME_PASSWORD'),
         database: configService.get<string>('DB_GAME_NAME') ?? 'test',
-        synchronize: true, // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Only for dev, remove for prod.
+        synchronize: false, // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Only for dev, remove for prod.
         autoLoadEntities: true,
       }),
     }), // switch for GAME DB
