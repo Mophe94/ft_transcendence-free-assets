@@ -257,4 +257,5 @@ else
 fi
 set +e
 ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP=$IP USER_NAME=$VM_USER; exit 0"
+ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST"
 set -e

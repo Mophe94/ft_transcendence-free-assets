@@ -1,4 +1,5 @@
 #type json
+#You can put more fields in it but these are the minimum I need
 
 {
     "timestamp": "DD-MM-YYYY",

@@ -30,6 +30,8 @@ services:
         configs:
             - source: nginx_conf
               target: /etc/nginx/nginx.conf
+            - source: nginx_log
+              target: /etc/nginx/conf.d/logging.conf
 
         secrets:
           - nginx_crt
@@ -58,7 +60,9 @@ volumes:
 
 configs:
     nginx_conf:
-        file: ../containers/nginx/nginx.conf
+      file: ../containers/nginx/nginx.conf
+    nginx_log:
+      file: ../containers/nginx/logging.conf
 
 secrets:
   nginx_crt:
