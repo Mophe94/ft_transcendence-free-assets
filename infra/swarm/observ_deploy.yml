@@ -80,30 +80,54 @@ services:
       restart_policy:
         condition: on-failure
 
-  fluent-bit:
-    image: fluent/fluent-bit:3.0
-    volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - fluent-bit_data:/fluent-bit/storage
+#  fluent-bit:
+#    image: fluent/fluent-bit:3.0
+#    volumes:
+#      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - fluent-bit_data:/fluent-bit/storage
+#
+#    configs:
+#      - source: fluent-bit_config
+#        target: /fluent-bit/etc/fluent-bit.conf
+#      - source: parsers_config
+#        target: /fluent-bit/etc/parsers.conf
+#      - source: lua_http_level
+#        target: /fluent-bit/scripts/http_level.lua
+#    
+#    command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+#    
+#    networks:
+#      - obsrv_net
+#    
+#    deploy:
+#      mode: global
+#      restart_policy:
+#        condition: any
+
+  alloy:
+    image: grafana/alloy:latest
+
+    command:
+      - run
+      - /etc/alloy/config.alloy
 
     configs:
-      - source: fluent-bit_config
-        target: /fluent-bit/etc/fluent-bit.conf
-      - source: parsers_config
-        target: /fluent-bit/etc/parsers.conf
-      - source: lua_http_level
-        target: /fluent-bit/scripts/http_level.lua
-    
-    command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
-    
-    networks:
-      - obsrv_net
-    
+      - source: alloy_config
+        target: /etc/alloy/config.alloy
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    environment:
+      - NODE_HOSTNAME="{{.Node.Hostname}}"
+      - NODE_ID="{{.Node.ID}}"
+
     deploy:
       mode: global
-      restart_policy:
-        condition: any
+
+    networks:
+      - obsrv_net
 
 volumes:
     loki-data:
@@ -135,6 +159,8 @@ configs:
         file: ../containers/grafana/provisioning/dashboards/dashboards.yml
     loki_config:
         file: ../containers/loki/loki_config.yml
+    alloy_config:
+        file: ../containers/alloy/alloy.conf
     fluent-bit_config:
         file: ../containers/fluent-bit/fluent-bit.conf
     parsers_config:
