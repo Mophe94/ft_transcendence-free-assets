@@ -43,6 +43,7 @@ services:
             - swarm_net
             - obsrv_net
             - games_net
+            - site_net
 
         deploy:
             replicas: 1
@@ -80,4 +81,6 @@ networks:
     obsrv_net:
         external: true
     games_net:
+        external: true
+    site_net:
         external: true

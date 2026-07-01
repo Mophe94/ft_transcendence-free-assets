@@ -83,7 +83,7 @@ else
     fi
 fi
 
-networks=("swarm_net" "obsrv_net" "games_net")
+networks=("swarm_net" "obsrv_net" "games_net" "site_net")
 #CREATE THE NEEDED OVERLAY NETWORKS#
 for network in "${networks[@]}"; do
     if ! docker network inspect "$network" >/dev/null 2>&1; then

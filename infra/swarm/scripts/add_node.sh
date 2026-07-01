@@ -1,5 +1,8 @@
 #! /bin/bash
 
+#TODO	- setup docker daeon certificate list
+#	- handling nfs storage mount for node
+
 SCRIPT_NAME="${0##*/}"
 
 users=("agaland" "bertmart" "dbajeux" "kprist" "stempels") 
@@ -28,7 +31,7 @@ for user in "${users[@]}"; do
     
     #need to add something as IP, wich ?
     #doas scp -p 2222 "$user"@"$HOST_IP":"/etc/docker/certs.d/"
-    ssh -p "$SSH_PORT" "$user"@"$HOST_IP" "$1; "$JOIN_CMD"; exit 0" > /dev/null 2>&1
+    ssh -p "$SSH_PORT" "$user"@"$HOST_IP" "$1; $JOIN_CMD; exit 0" > /dev/null 2>&1
     if [ "$?" != 0 ]; then
 	echo -e "[$SCRIPT_NAME] Error: could not connect to $user node\n"
     else

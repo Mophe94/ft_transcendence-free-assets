@@ -1,0 +1,100 @@
+services:
+    game_service:
+        image: ${IP}:${REGISTRY_PORT}/backend:latest
+#        env_file:
+#          - "site/BackEnd/.env"
+
+        networks:
+            - games_net
+
+#        configs:
+#          - source: load_secrets
+#            target: /load_secrets.sh
+#            mode: 0555
+
+        environment:
+          - DB_GAME_HOST=game_db
+#          - FRONT_END_URL=http://localhost:5173/
+
+        secrets:
+          - db_game_db_name
+          - db_game_username
+          - db_game_password
+
+#        entrypoint:
+#          - /load_secrets.sh
+
+        command:
+          - npm
+          - run
+          - start:dev
+          - game-service
+
+        deploy:
+            replicas: 1
+
+    game:
+        image: ${IP}:${REGISTRY_PORT}/game:latest
+
+        networks:
+            - games_net
+
+        command:
+          - node
+          - server.js
+
+        deploy:
+            replicas: 1
+
+    game_db:
+        image: ${IP}:${REGISTRY_PORT}/game_db:latest
+#        env_file:
+#          - "site/databases/game_db/.env"
+
+        volumes:
+          - game_data:/var/lib/postgresql/
+
+        networks:
+            - games_net
+
+#        configs:
+#          - source: load_secrets
+#            target: /load_secrets.sh
+#            mode: 0555
+
+        environment:
+          - POSTGRES_PASSWORD=$$(cat "/run/secrets/db_users_postgres_password")
+
+        secrets:
+          - db_game_db_name
+          - db_game_username
+          - db_game_password
+          - db_game_postgres_password
+
+#        entrypoint:
+#          - /load_secrets.sh
+
+#        command:
+#          - /usr/local/bin/docker-entrypoint.sh 
+#          - postgres
+
+        deploy:
+            replicas: 1
+
+networks:
+  games_net:
+    external: true
+
+volumes:
+  game_data:
+
+configs:
+secrets:
+  db_game_db_name:
+    external: true
+  db_game_username:
+    external: true
+  db_game_password:
+    external: true
+  db_game_postgres_password:
+    external: true

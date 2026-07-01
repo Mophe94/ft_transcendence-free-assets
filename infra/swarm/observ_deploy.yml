@@ -66,7 +66,7 @@ services:
     command:
       -config.file=/etc/loki/config.yml
     volumes:
-      - loki-data:/loki
+      - loki_data:/loki
     configs:
       - source: loki_config
         target: /etc/loki/config.yml
@@ -130,7 +130,7 @@ services:
       - obsrv_net
 
 volumes:
-    loki-data:
+    loki_data:
       driver: local
       driver_opts:
         type: nfs
@@ -148,7 +148,6 @@ volumes:
         type: nfs
         o: "addr=${IP},nfsvers=4,rw,soft"
         device: ":/nfs-storage/grafana"
-    fluent-bit_data:
 
 configs:
     prometheus_config:
@@ -161,12 +160,6 @@ configs:
         file: ../containers/loki/loki_config.yml
     alloy_config:
         file: ../containers/alloy/alloy.conf
-    fluent-bit_config:
-        file: ../containers/fluent-bit/fluent-bit.conf
-    parsers_config:
-        file: ../containers/fluent-bit/parsers.conf
-    lua_http_level:
-        file: ../containers/fluent-bit/http_level.lua
 
 networks:
     obsrv_net:
