@@ -67,7 +67,7 @@ services:
         environment:
           - DB_USERS_HOST=users_db
           - FORTYTWO_API_TOKENEXCHANGE=http://nginx/fortytwoapi/oauth/token
-          - FORTYTWO_API_GETUSER=http://fortytwoapi/v2/me
+          - FORTYTWO_API_GETUSER=http://nginx/fortytwoapi/v2/me
 
         networks:
             - site_net
