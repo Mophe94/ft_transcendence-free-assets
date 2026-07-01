@@ -11,20 +11,28 @@ import { Interval } from '@nestjs/schedule';
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
 import { PlayerService } from './player/player.service';
-import { GamePayload, PHASE_DURATIONS, PhaseName, createMockUser } from './game.type';
+import {
+  GamePayload,
+  PHASE_DURATIONS,
+  PhaseName,
+  createMockUser,
+} from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
 import { intervalProvider } from 'node_modules/rxjs/dist/types/internal/scheduler/intervalProvider';
 
-@WebSocketGateway(8082, { cors: {origin: true}, path: '/game' })
+@WebSocketGateway(8082, { cors: { origin: true }, path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  constructor(private gameService: GameService, private playerService: PlayerService) {}
-  private clients = new Map<WebSocket, ClientData>();;
+  constructor(
+    private gameService: GameService,
+    private playerService: PlayerService,
+  ) {}
+  private clients = new Map<WebSocket, ClientData>();
 
   handleConnection(client: WebSocket, request: IncomingMessage): void {
     const url = request.url!;
@@ -35,7 +43,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(token);
     console.log(roomId);
     // Add JWT token validation
-    const { userId }  = createMockUser();
+    const { userId } = createMockUser();
     if (
       !token ||
       !roomId
@@ -52,9 +60,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.on('pong', () => {
       console.log('pong received');
       const data = this.clients.get(client);
-      if (data)
-        data.isAlive = true; // 
-    })
+      if (data) data.isAlive = true; //
+    });
 
     this.gameService.onGodotConnected(client, userId, roomId)
       .then((payload) => {
@@ -93,12 +100,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!data.isAlive) {
         socket.terminate();
         this.clients.delete(socket);
-          console.log(`[Heartbeat]: client ${data.userId} terminated`)
+        console.log(`[Heartbeat]: client ${data.userId} terminated`);
         return;
       }
       data.isAlive = false;
       socket.ping();
-    })
+    });
   }
 
   @SubscribeMessage('game')

@@ -10,3 +10,5 @@ misc/*
 vm_management/worker_config.txt
 host_ip.txt
 !infra/template.secrets.env
+.secrets/
+.vite/

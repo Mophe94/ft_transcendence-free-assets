@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   NotFoundException,
   Post,
@@ -14,6 +15,7 @@ import type { Response } from 'express';
 import type { AuthenticatedRequest } from 'libs/shared/src';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { UsersService } from 'apps/account-service/src/users/users.service';
+import { UserRole } from '../users/types/userRole.enum';
 
 @Controller('auth')
 export class AuthController {
@@ -65,5 +67,21 @@ export class AuthController {
     }
 
     return userWithSettings;
+  }
+
+  @Get('/isAdmin')
+  @UseGuards(JwtAuthGuard)
+  async isAdmin(@Req() req: AuthenticatedRequest) {
+    const user = req.user;
+
+    if (!user) throw new ForbiddenException('User not Authenticated.');
+    else if (user.role !== UserRole.ADMIN)
+      throw new ForbiddenException('User is not Admin');
+
+    const db_user = await this.usersService.findOneById(user.id);
+    if (!db_user) throw new ForbiddenException('User not found in database.');
+    else if (db_user.role !== UserRole.ADMIN)
+      throw new ForbiddenException('User is not Admin.');
+    return { isAdmin: true };
   }
 }

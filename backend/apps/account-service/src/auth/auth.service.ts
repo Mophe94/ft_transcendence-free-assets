@@ -11,7 +11,8 @@ import {
   FortyTwoTokenResponse,
 } from './types/fortytwo-profile.interface';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'node_modules/@types/express';
+import { getSecret } from 'app/shared/utils/secret.utils';
+import { UserRole } from '../users/types/userRole.enum';
 
 @Injectable()
 export class AuthService {
@@ -32,11 +33,13 @@ export class AuthService {
         username: profile.login,
         email: profile.email,
         avatarUrl: profile.image?.link ?? '',
+        role: UserRole.USER,
       });
     }
     const payload = {
       id: user.id,
       username: user.username,
+      role: user.role,
     };
     const token = await this.jwtService.signAsync(payload);
 
@@ -47,16 +50,13 @@ export class AuthService {
     const redirect_uri = this.configService.get<string>(
       'FORTYTWO_REDIRECT_URI',
     );
-    const client_id = this.configService.get<string>('FORTYTWO_CLIENT_ID');
-    const client_secret = this.configService.get<string>(
-      'FORTYTWO_CLIENT_SECRET',
-    );
+    const client_id = getSecret('fortytwo_client_id');
+    const client_secret = getSecret('fortytwo_client_secret');
     const tokenExchangeUrl = this.configService.get<string>(
       'FORTYTWO_API_TOKENEXCHANGE',
     );
     try {
       const tokenResponse = await axios.post<FortyTwoTokenResponse>(
-
         tokenExchangeUrl ?? 'https://api.intra.42.fr/oauth/token',
         {
           grant_type: 'authorization_code',

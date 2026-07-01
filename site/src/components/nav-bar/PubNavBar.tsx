@@ -1,18 +1,18 @@
-import React from "react"
-import { Link } from "react-router-dom"
-import './NavBar.css'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './NavBar.css';
 
 const menuLinks = {
   'Learn More': '/project',
-  'About Us': '/about_us', 
-  'Contact': '/contact', 
-}
+  'About Us': '/about_us',
+  Contact: '/contact',
+};
 
-function NavMenu () {
+function NavMenu() {
   return (
-    <div className='nav-menu'>
+    <div className="nav-menu">
       <div className="nav-extreme">
-        <img src="src/assets/sword_beg.png" />
+        <img src="navbar/sword_beg.png" />
       </div>
       {Object.entries(menuLinks).map(([name, url]) => (
         <React.Fragment key={name}>
@@ -24,10 +24,10 @@ function NavMenu () {
         </React.Fragment>
       ))}
       <div className="nav-extreme">
-        <img src="src/assets/sword_end.png" />
+        <img src="navbar/sword_end.png" />
       </div>
     </div>
-  )
+  );
 }
 
 export function PubNavBar() {
@@ -35,5 +35,5 @@ export function PubNavBar() {
     <div className="pub-nav-bar">
       <NavMenu />
     </div>
-  )
+  );
 }

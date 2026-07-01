@@ -45,8 +45,8 @@ services:
             mode: 0555
 
         environment:
-          - DB_HOST: website_users_db
-          - FRONT_END_URL: http://localhost:5173/
+          - DB_HOST=website_users_db
+          - FRONT_END_URL=http://localhost:5173/
 
         secrets:
           - FORTYTWO_CLIENT_ID

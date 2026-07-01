@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import WebSocket from 'ws';
 import { AuthenticatedUser } from '../type/authentication.interface';
 import { IncomingMessage } from 'http';
+import { getSecret } from '../utils/secret.utils';
 
 @Injectable()
 export class wsAuthService {
@@ -24,7 +25,7 @@ export class wsAuthService {
 
     try {
       return await this.jwtService.verifyAsync<AuthenticatedUser>(token, {
-        secret: this.configService.getOrThrow<string>('JWT_SECRET'),
+        secret: getSecret('jwt_secret_key'),
       });
     } catch {
       throw new UnauthorizedException('Invalid or expired token');

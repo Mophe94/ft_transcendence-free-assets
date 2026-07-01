@@ -1,8 +1,8 @@
-import { Banner } from "../components/Banner";
-import { EnterButton } from "../components/EnterButton";
+import { Banner } from '../components/Banner';
+import { EnterButton } from '../components/EnterButton';
 import './Welcome.css';
 
-export function Landing () {
+export function Landing() {
   return (
     <div className="home-layout">
       <div className="game_banner">
@@ -10,5 +10,5 @@ export function Landing () {
       </div>
       <EnterButton />
     </div>
-  )
+  );
 }

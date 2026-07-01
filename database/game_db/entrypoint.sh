@@ -1,10 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
-: "${GAME_DB_USER:?GAME_DB_USER variable not defined}"
-: "${GAME_DB_PASSWORD:?GAME_DB_PASSWORD variable not defined}"
-: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD variable not defined}"
-: "${GAME_DB_NAME:?GAME_DB_NAME variable not defined}"
+GAME_DB_NAME=$(cat /run/secrets/db_game_db_name)
+GAME_DB_USER=$(cat /run/secrets/db_game_username)
+GAME_DB_PASSWORD=$(cat /run/secrets/db_game_password)
+POSTGRES_PASSWORD=$(cat /run/secrets/db_game_postgres_password)
+
 
 # 1. Create database and user
 psql -v ON_ERROR_STOP=1 \
