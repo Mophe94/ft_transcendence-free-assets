@@ -5,7 +5,6 @@ extends CharacterBody2D
 @onready var detection = $DetectionArea
 @onready var sprite: AnimatedSprite2D = $sprite
 var zones_active: int = 0
-
 var active_interactables: Array = []
 var current_interactable = null
 
@@ -17,10 +16,12 @@ func _ready():
 	detection.area_exited.connect(_on_area_exited)
 
 func apply_skin(skin: SkinData) -> void:
+	
 	if skin == null:
 		push_warning("Aucune skin valide à appliquer.")
 		return
 	sprite.sprite_frames = skin.sprite_frames
+	sprite.scale = skin.scale
 	sprite.play("idle")
 
 func _on_area_entered(area: Area2D):
@@ -52,11 +53,11 @@ func _physics_process(_delta: float) -> void:
 	move_and_slide()
 
 func animat():
-	if velocity.x < 0:
-		$sprite.flip_h = true
-		$sprite.play("run")
-	elif velocity.x > 0:
-		$sprite.flip_h = false
-		$sprite.play("run")
-	elif velocity == Vector2.ZERO:
-		$sprite.play("idle")
+	if velocity == Vector2.ZERO:
+		sprite.play("idle")
+	else:
+		if velocity.x < 0:
+			sprite.flip_h = true
+		elif velocity.x > 0:
+			sprite.flip_h = false
+		sprite.play("run")

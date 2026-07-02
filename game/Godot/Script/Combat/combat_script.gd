@@ -170,6 +170,7 @@ func transi_open():
 	transi_scene.queue_free()
 
 func _ready() -> void:
+	print(get_tree().current_scene.name)
 	_capture_battle_ratios()
 	_update_battle_positions()
 	get_viewport().size_changed.connect(_update_battle_positions)

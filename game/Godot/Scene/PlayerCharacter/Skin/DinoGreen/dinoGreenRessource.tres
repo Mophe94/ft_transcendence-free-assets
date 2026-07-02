@@ -8,4 +8,5 @@ script = ExtResource("1_wqfsf")
 skin_id = "dinoGreen"
 display_name = "dinoGreen"
 sprite_frames = ExtResource("2_ljfx7")
+scale = Vector2(3, 3)
 metadata/_custom_type_script = "uid://brt0iiv638g4g"

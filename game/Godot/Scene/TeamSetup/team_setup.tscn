@@ -7,7 +7,9 @@
 [ext_resource type="Script" uid="uid://b0y2tyw4p7bv" path="res://Script/TeamSetup/Label/Label.gd" id="3_r3dx7"]
 [ext_resource type="Script" uid="uid://dlj0x06vhlfx" path="res://Script/TeamSetup/ButtonTeamSetup/button_slot1.gd" id="3_saqoo"]
 [ext_resource type="Script" uid="uid://doc0b8w1nr3t4" path="res://Script/TeamSetup/CurrentTeam/current_team.gd" id="4_aslvp"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="4_ld8bc"]
 [ext_resource type="Script" uid="uid://bblhf43qu0piw" path="res://Script/TeamSetup/Asset/asset_player.gd" id="12_50khs"]
+[ext_resource type="PackedScene" uid="uid://cu0qyq3c4pgss" path="res://Scene/Timer/timer.tscn" id="13_f6nhm"]
 [ext_resource type="Script" uid="uid://3bnlilm7i22h" path="res://Script/TeamSetup/SlotSetup/slot_enemy.gd" id="14_ld8bc"]
 [ext_resource type="Script" uid="uid://px2lq1j8nsjh" path="res://Script/TeamSetup/Asset/asset_enemy.gd" id="15_f6nhm"]
 [ext_resource type="Script" uid="uid://c6k5aeej1ipwh" path="res://Script/TeamSetup/Effect/effect.gd" id="16_r3dx7"]
@@ -91,7 +93,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_p3dhh")
-expand_mode = 5
+expand_mode = 1
 
 [node name="NameVS" type="CenterContainer" parent="." unique_id=1130583131]
 z_index = 1
@@ -111,20 +113,25 @@ script = ExtResource("3_r3dx7")
 
 [node name="PlayerName" type="Label" parent="NameVS/VBoxContainer" unique_id=90486603]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_ld8bc")
 text = "????????"
 horizontal_alignment = 1
-visible_characters = 9
-visible_ratio = 1.125
+vertical_alignment = 1
+visible_characters = 8
 
 [node name="VS" type="Label" parent="NameVS/VBoxContainer" unique_id=1556867610]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_ld8bc")
 text = "VS"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Enemy" type="Label" parent="NameVS/VBoxContainer" unique_id=388193558]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_ld8bc")
 text = "????????"
 horizontal_alignment = 1
+vertical_alignment = 1
 visible_characters = 9
 visible_ratio = 1.125
 
@@ -160,6 +167,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_fonts/font = ExtResource("4_ld8bc")
 theme_override_font_sizes/font_size = 40
 text = "YOUR
 TEAM"
@@ -499,15 +507,4 @@ trail_sections = 2
 trail_section_subdivisions = 1
 process_material = SubResource("ParticleProcessMaterial_2ad6k")
 
-[node name="TimeDisplay" type="CenterContainer" parent="." unique_id=813442650]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 63.0
-grow_horizontal = 2
-mouse_filter = 2
-
-[node name="Timer" type="Label" parent="TimeDisplay" unique_id=452841527]
-layout_mode = 2
-theme_override_font_sizes/font_size = 45
-horizontal_alignment = 1
+[node name="Timer" parent="." unique_id=306374687 instance=ExtResource("13_f6nhm")]

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ud8c3pownn8g"]
 
-[ext_resource type="Script" path="res://Script/Inventory/panel_tooltip.gd" id="1_frmea"]
+[ext_resource type="Script" uid="uid://yb0kjfhatua7" path="res://Script/Inventory/panel_tooltip.gd" id="1_frmea"]
 [ext_resource type="Texture2D" uid="uid://c80bwfj2cerhg" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Banners/Banner_Slots.png" id="2_7p1mb"]
 [ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="3_i4usc"]
 
@@ -10,27 +10,48 @@
 
 [node name="PanelTooltip" type="Panel" parent="." unique_id=1063020927 groups=["tooltip"]]
 z_index = 15
-offset_right = 212.0
-offset_bottom = 241.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1640.0
+offset_bottom = -748.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_frmea")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="PanelTooltip" unique_id=1191627473]
-layout_mode = 0
-offset_right = 211.0
-offset_bottom = 240.0
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("2_7p1mb")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelTooltip/NinePatchRect" unique_id=2026844277]
-layout_mode = 0
-offset_left = 19.0
-offset_top = 20.0
-offset_right = 201.0
-offset_bottom = 244.0
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+metadata/_edit_use_anchors_ = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelTooltip/NinePatchRect/MarginContainer" unique_id=1765429636]
 layout_mode = 2
+size_flags_vertical = 0
 mouse_filter = 2
 theme_override_constants/separation = 8
 
@@ -39,16 +60,54 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("3_i4usc")
 theme_override_font_sizes/font_size = 23
 horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="HSeparator" type="HSeparator" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer" unique_id=895623972]
 layout_mode = 2
 theme_override_styles/separator = SubResource("StyleBoxFlat_7p1mb")
 
+[node name="HBoxContainer" type="VBoxContainer" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer" unique_id=541203148]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1495202561]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_i4usc")
+theme_override_font_sizes/font_size = 23
+horizontal_alignment = 1
+vertical_alignment = 3
+autowrap_mode = 3
+
+[node name="Label2" type="Label" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer/HBoxContainer" unique_id=938870118]
+custom_minimum_size = Vector2(100, 1)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_i4usc")
+theme_override_font_sizes/font_size = 23
+horizontal_alignment = 1
+vertical_alignment = 3
+autowrap_mode = 3
+
+[node name="Label3" type="Label" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1000156648]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_i4usc")
+theme_override_font_sizes/font_size = 23
+horizontal_alignment = 1
+vertical_alignment = 3
+autowrap_mode = 3
+
 [node name="TooltipDescription" type="Label" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer" unique_id=1696804875]
 custom_minimum_size = Vector2(180, 180)
 layout_mode = 2
+size_flags_vertical = 0
 theme_override_fonts/font = ExtResource("3_i4usc")
 theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelTooltip/NinePatchRect/MarginContainer" unique_id=1317137512]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+horizontal_scroll_mode = 0

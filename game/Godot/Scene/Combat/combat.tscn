@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://8jtepesdh8yf" path="res://Script/Combat/combat_script.gd" id="1_g5y1o"]
 [ext_resource type="Script" uid="uid://c5bq774x4p57m" path="res://Script/Combat/UIPrgressBar/CharactereUI.gd" id="2_2n7sj"]
+[ext_resource type="PackedScene" uid="uid://cu0qyq3c4pgss" path="res://Scene/Timer/timer.tscn" id="2_6r0b8"]
 [ext_resource type="PackedScene" uid="uid://bktfivjvrdagt" path="res://Scene/Combat/CombatBanner/combat_banner.tscn" id="2_hmmyv"]
 [ext_resource type="PackedScene" uid="uid://b3wokw8n0gxhc" path="res://Scene/Combat/CombatMenus/combat_menus.tscn" id="3_odnam"]
 [ext_resource type="Script" uid="uid://bk48efbd6ljn2" path="res://Script/Combat/Effect/particule.gd" id="4_00rey"]
@@ -63,6 +64,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 stretch_mode = 6
+
+[node name="Timer" parent="CanvasLayer" unique_id=306374687 instance=ExtResource("2_6r0b8")]
 
 [node name="Charactere" type="Node2D" parent="." unique_id=1892663939]
 

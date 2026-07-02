@@ -21,11 +21,19 @@ func _on_mouse_entered():
 	var tween = create_tween()
 	tween.tween_property(self, "scale", SCALE_HOVER, DURATION)\
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+
 	if not current_item.is_empty() and current_item["name"] != "":
-		tooltip.show_tooltip(current_item["name"], GeneralData.object_description.get(current_item["name"], ""))
+		var desc = GeneralData.object_description.get(current_item["name"], "")
+		tooltip.show_tooltip(current_item["name"], desc)
+
 	elif current_monster != "":
-		var description = GeneralData.monster_description.get(current_monster, "")
-		tooltip.show_tooltip(current_monster, description)
+		var full_desc = GeneralData.monster_description.get(current_monster, "")
+		var parts = full_desc.split("|")
+		var type = parts[0].strip_edges() if parts.size() > 0 else ""
+		var rarete = parts[1].strip_edges() if parts.size() > 1 else ""
+		var hp = parts[2].strip_edges() if parts.size() > 2 else ""
+		var desc = parts[3].strip_edges() if parts.size() > 3 else ""
+		tooltip.show_tooltip(current_monster, desc, type, rarete, hp)
 
 func _on_mouse_exited():
 	var tween = create_tween()

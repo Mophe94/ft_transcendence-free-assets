@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cu0qyq3c4pgss"]
 
-[ext_resource type="Script" uid="uid://burethxxvoe2n" path="res://timer.gd" id="1_l2lu8"]
+[ext_resource type="Script" uid="uid://burethxxvoe2n" path="res://Script/Timer/timer.gd" id="1_l2lu8"]
 [ext_resource type="Texture2D" uid="uid://dc0nsdic62tjc" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Buttons/SmallBlueSquareButton_Pressed.png" id="2_q5vpr"]
 [ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="3_q5vpr"]
 
@@ -8,13 +8,13 @@
 script = ExtResource("1_l2lu8")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="." unique_id=441179094]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -96.0
-offset_right = 96.0
-offset_bottom = 208.0
-grow_horizontal = 2
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -1056.0
+offset_right = -864.0
+offset_bottom = 176.0
+grow_horizontal = 0
 texture = ExtResource("2_q5vpr")
 patch_margin_left = 10
 patch_margin_top = 10
@@ -29,8 +29,8 @@ anchor_right = 1.0
 anchor_bottom = 0.5
 offset_left = 40.0
 offset_top = -8.0
-offset_right = -12.0
-offset_bottom = 32.0
+offset_right = -40.0
+offset_bottom = 40.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("3_q5vpr")

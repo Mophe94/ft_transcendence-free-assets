@@ -17,7 +17,7 @@ func instantiate_charactere():
 	$NameVS/VBoxContainer/Enemy.text = GeneralData.enemy["name"]
 	var player_scene = GeneralData.player_charactere_scene.instantiate()
 	$Player/AssetControl/Asset.add_child(player_scene)
-	var enemy_scene = GeneralData.player_charactere_scene.instantiate()
+	var enemy_scene = GeneralData.player_enemy_scene.instantiate()
 	enemy_scene.scale.x = -1
 	$Enemy/AssetControl/asset.add_child(enemy_scene)
 
@@ -57,22 +57,22 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _ready() -> void:
+	print(get_tree().current_scene.name)
+	$Timer.time_finish.connect(_signal_timer)
 	transi_open()
 	await instantiate_charactere()
 	await instanciate_monster_player()
 	await instanciate_monster_enemy()
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	var time = GeneralData.timer - Time.get_unix_time_from_system()
-	if time <= 0:
-		time = 0
-	$TimeDisplay/Timer.text = str(int(time))
-	if time <= 0:
-		if !message_sended:
-			Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TEAM_CHOICE], GeneralData.player["battle_team"])
-			message_sended = !message_sended
-		await Received.combat_scene
-		await transi_close()
-		get_tree().change_scene_to_packed(GeneralData.combat_scene)
+func _signal_timer():
+	print("signal timer received team_setup")
+	$Timer.send = true
+	$CurrentTeam.process_mode = Node.PROCESS_MODE_DISABLED
+	$Player.process_mode = Node.PROCESS_MODE_DISABLED
+#	if !message_sended:
+#		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TEAM_CHOICE], GeneralData.player["battle_team"])
+#		message_sended = !message_sended
+#	await Received.combat_scene
+	await transi_close()
+	$Timer.send = false
+	get_tree().change_scene_to_packed(GeneralData.combat_scene)
