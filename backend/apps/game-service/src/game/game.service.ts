@@ -17,7 +17,10 @@ import { new_encounter } from './events/new_encounters';
 import { max } from 'node_modules/class-validator/types';
 import { MonsterType } from './entities/types/monster_type.enum';
 import { Skill } from './entities/skills.entity';
-import { CurrentMonster, Skill as PlayerSkill} from './player/player.interfaces';
+import {
+  CurrentMonster,
+  Skill as PlayerSkill,
+} from './player/player.interfaces';
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -71,7 +74,8 @@ export class GameService implements OnModuleInit {
     });
 
     const player = this.playerService.getPlayer(userId)!;
-    player.timer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map; // server time + map time in millisec-> make it cleaner
+    player.timer =
+      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map; // server time + map time in millisec-> make it cleaner
     const payload = await this.start_game(player);
     console.log(`[GameService]: startMapPhase -> start_game payload built`);
     console.log(payload);
@@ -91,23 +95,27 @@ export class GameService implements OnModuleInit {
     }
   }
 
-  private async initMonster(player: Player, monsterId: number): Promise<CurrentMonster | null> {
-    const monster = await this.monstersService.findOneById(monsterId/* , { skills: true } */);
+  private async initMonster(
+    player: Player,
+    monsterId: number,
+  ): Promise<CurrentMonster | null> {
+    const monster = await this.monstersService.findOneById(
+      monsterId /* , { skills: true } */,
+    );
     console.log('monster from DB:', monster);
-    if (!monster)
-      return null;
+    if (!monster) return null;
     const currentMonster: CurrentMonster = {
       name: monster.name,
       type: String(monster.type), //add enum
       slot: 0,
       life: {
         current: monster.hp_total,
-        max : monster.hp_total,
+        max: monster.hp_total,
       },
       status: [],
       skill: [], // 4 slots
     };
-    
+
     player.currentMonster = currentMonster;
     console.log(monster);
     return currentMonster;
@@ -138,7 +146,10 @@ export class GameService implements OnModuleInit {
     //     current_map: player.current_map,
     //   },
     // };
-    const monster = await this.initMonster(player, 1/* payload.data.monsterId */);
+    const monster = await this.initMonster(
+      player,
+      1 /* payload.data.monsterId */,
+    );
     return {
       event: 'game',
       data: {
@@ -149,7 +160,6 @@ export class GameService implements OnModuleInit {
           asset: 'dinoBlue',
           team: player.team,
           monster: player.currentMonster.name,
-  
         },
         timer: player.timer,
         current_map: 'map_01',

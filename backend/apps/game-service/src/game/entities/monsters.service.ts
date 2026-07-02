@@ -24,4 +24,17 @@ export class MonstersService {
       relations,
     });
   }
+  findMonstersByTile(
+    tileId: number,
+    relations: FindOptionsRelations<Monster> = {},
+  ): Promise<Monster[]> {
+    return this.repo.find({
+      where: {
+        tiles: {
+          id: tileId,
+        },
+      },
+      relations,
+    });
+  }
 }
