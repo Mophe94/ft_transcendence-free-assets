@@ -88,7 +88,7 @@ networks:
 volumes:
   game_data:
 
-configs:
+#configs:
 secrets:
   db_game_db_name:
     external: true

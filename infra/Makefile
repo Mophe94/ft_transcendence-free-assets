@@ -43,7 +43,7 @@ core:
 website:
 	@doas mkdir -p "/var/lib/postgresql/data"
 	@doas mkdir -p "/var/lib/game/data"
-	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	IP=$(IP4) HOST_IP=$(HOST_IP) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 game:
 	@doas mkdir -p "/var/lib/postgresql/data"
