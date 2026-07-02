@@ -40,5 +40,5 @@ psql -v ON_ERROR_STOP=1 \
     ALTER TABLE public.monsters OWNER TO ${GAME_DB_USER};
     ALTER TABLE public.skills OWNER TO ${GAME_DB_USER};
     ALTER TABLE public.monsters_skills OWNER TO ${GAME_DB_USER};
-    ALTER TABLE public.objects OWNER TO ${GAME_DB_USER};
+    ALTER TABLE public.items OWNER TO ${GAME_DB_USER};
 EOF
