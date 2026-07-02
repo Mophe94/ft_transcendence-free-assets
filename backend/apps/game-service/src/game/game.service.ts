@@ -197,14 +197,7 @@ export class GameService implements OnModuleInit {
     //     current_map: player.current_map,
     //   },
     // };
-<<<<<<< HEAD
-    const monster = await this.initMonster(
-      player,
-      1 /* payload.data.monsterId */,
-    );
-=======
     //const monster = await this.initMonster(player, 2/* payload.data.monsterId */);
->>>>>>> ad24549ca76567961931be6489707d756d053ebd
     return {
       event: 'game',
       data: {
@@ -214,11 +207,7 @@ export class GameService implements OnModuleInit {
           name: 'Ce que tu veux',
           asset: 'dinoBlue',
           team: player.team,
-<<<<<<< HEAD
-          monster: player.currentMonster.name,
-=======
           //monster: player.currentMonster.name,
->>>>>>> ad24549ca76567961931be6489707d756d053ebd
         },
         timer: player.timer,
         current_map: 'map_01',
