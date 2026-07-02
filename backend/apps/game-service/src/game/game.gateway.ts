@@ -22,6 +22,9 @@ import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.serv
 import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
 import { intervalProvider } from 'node_modules/rxjs/dist/types/internal/scheduler/intervalProvider';
+import { OnEvent } from '@nestjs/event-emitter';
+
+import { clientsMap } from 'apps/chat-service/src/shared/clients.map';
 
 @WebSocketGateway(8082, { cors: { origin: true }, path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -33,6 +36,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private playerService: PlayerService,
   ) {}
   private clients = new Map<WebSocket, ClientData>();
+  private clientsById = new Map<number, WebSocket>();
 
   handleConnection(client: WebSocket, request: IncomingMessage): void {
     const url = request.url!;
@@ -55,6 +59,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     this.clients.set(client, { userId, roomId, isAlive: true });
+    this.clientsById.set(userId, client);
     console.log(`Client ${userId} connected in room ${roomId}`);
 
     client.on('pong', () => {
@@ -124,5 +129,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const response = await this.gameService.handleMessage(userId, payload);
     this.sendToClient(client, response);
+  }
+
+  @OnEvent('team_setup')
+  OnTeamSetUp({userId, payload}: {userId: number; payload: object}): void {
+
+    const client = this.clientsById.get(userId);
+    if (client) {
+      console.log(`Team Setup payload: ${payload}`);
+      this.sendToClient(client, payload)
+    }
   }
 }
