@@ -57,7 +57,6 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _ready() -> void:
-	print(get_tree().current_scene.name)
 	$Timer.time_finish.connect(_signal_timer)
 	transi_open()
 	await instantiate_charactere()
@@ -69,10 +68,14 @@ func _signal_timer():
 	$Timer.send = true
 	$CurrentTeam.process_mode = Node.PROCESS_MODE_DISABLED
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED
-#	if !message_sended:
-#		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TEAM_CHOICE], GeneralData.player["battle_team"])
-#		message_sended = !message_sended
-#	await Received.combat_scene
+	
+	var send_func = func():
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TEAM_CHOICE], GeneralData.player["battle_team"])
+	var success = await GeneralProcess.wait_signal(send_func, Received.combat_scene)
+
 	await transi_close()
 	$Timer.send = false
-	get_tree().change_scene_to_packed(GeneralData.combat_scene)
+	if success:
+		get_tree().change_scene_to_packed(GeneralData.combat_scene)
+	else:
+		get_tree().change_scene_to_packed(GeneralData.wait)

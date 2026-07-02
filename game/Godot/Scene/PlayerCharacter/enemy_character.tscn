@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://lo0vv36noy2w"]
 
-[ext_resource type="Script" uid="uid://blwbbvqulmivu" path="res://enemy_character.gd" id="1_k7gxo"]
+[ext_resource type="Script" path="res://Script/PlayerCharacter/enemy_character.gd" id="1_7dcdb"]
 [ext_resource type="SpriteFrames" uid="uid://b5rxktktvja4x" path="res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueSpriteSheet.tres" id="2_7dcdb"]
 
 [node name="Enemy_character" type="Node2D" unique_id=147646443]
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=262428665]
-script = ExtResource("1_k7gxo")
+script = ExtResource("1_7dcdb")
 
 [node name="sprite" type="AnimatedSprite2D" parent="CharacterBody2D" unique_id=1411398651]
 sprite_frames = ExtResource("2_7dcdb")

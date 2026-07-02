@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="transcendance_map_1"
-run/main_scene="uid://dreahfyspdeh6"
+run/main_scene="uid://b3rbbu0ysoihx"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -21,11 +21,12 @@ GeneralData="*uid://diqen0fl03d16"
 Network="*uid://ce6nfhimh5tq7"
 Received="*uid://demuhc0cll03l"
 Send="*uid://2uq5lxxmapte"
+GeneralProcess="*uid://rkkyrchdk1cb"
 
 [display]
 
-window/size/viewport_width=1920
-window/size/viewport_height=1080
+window/size/viewport_width=1500
+window/size/viewport_height=1500
 window/size/no_focus=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"

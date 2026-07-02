@@ -37,11 +37,4 @@ layout_mode = 1
 [node name="CaptureMenus" parent="." unique_id=1080234561 instance=ExtResource("3_bbbsk")]
 layout_mode = 1
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1738694503]
-layout_mode = 0
-offset_left = 128.0
-offset_top = 888.0
-offset_right = 312.0
-offset_bottom = 984.0
-
-[node name="Timer" parent="CenterContainer" unique_id=306374687 instance=ExtResource("4_emiat")]
+[node name="Timer" parent="." unique_id=306374687 instance=ExtResource("4_emiat")]

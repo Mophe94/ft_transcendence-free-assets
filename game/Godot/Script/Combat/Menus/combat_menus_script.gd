@@ -1,7 +1,7 @@
 extends Panel
 
 var battle_result: Dictionary = {
-#	"win": preload("res://Scene/Combat/CombatResult/win.tscn"),
+	"win": preload("res://Scene/Combat/CombatResult/win.tscn"),
 	"lose": preload("res://Scene/Combat/CombatResult/lose.tscn")
 }
 
@@ -103,10 +103,11 @@ func set_menus_select_monster():
 	for i in range(3):
 		if GeneralData.player["battle_team"][i]["name"] != "":
 			button[i].show()
-			button[i].text = GeneralData.player["battle_team"][i]["name"] + " : " + str(GeneralData.player["battle_team"][i]["life"]["current"]) + "/" + str(GeneralData.player["battle_team"][i]["life"]["max"])
 			if GeneralData.player["battle_team"][i]["life"]["current"] == 0:
+				button[i].text = GeneralData.player["battle_team"][i]["name"] + " : dead"
 				button[i].disabled = true
 			else:
+				button[i].text = GeneralData.player["battle_team"][i]["name"] + " : " + str(GeneralData.player["battle_team"][i]["life"]["current"]) + "/" + str(GeneralData.player["battle_team"][i]["life"]["max"])
 				button[i].action = "monster"
 				button[i].object = str(i)
 	if GeneralData.player["currentMonster"]["name"] != "":
@@ -122,10 +123,11 @@ func set_menus_change():
 			continue
 		if GeneralData.player["battle_team"][i]["name"] != "":
 			button[current_button].show()
-			button[current_button].text = GeneralData.player["battle_team"][i]["name"] + " : " + str(GeneralData.player["battle_team"][i]["life"]["current"]) + "/" + str(GeneralData.player["battle_team"][1]["life"]["max"])
 			if GeneralData.player["battle_team"][i]["life"]["current"] == 0:
+				button[current_button].text = GeneralData.player["battle_team"][i]["name"] + " : dead"
 				button[current_button].disabled = true
 			else:
+				button[current_button].text = GeneralData.player["battle_team"][i]["name"] + " : " + str(GeneralData.player["battle_team"][i]["life"]["current"]) + "/" + str(GeneralData.player["battle_team"][i]["life"]["max"])
 				button[current_button].action = "monster"
 				button[current_button].object = str(i)
 			current_button +=1

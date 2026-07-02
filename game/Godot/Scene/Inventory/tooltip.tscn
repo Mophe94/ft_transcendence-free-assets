@@ -4,19 +4,15 @@
 [ext_resource type="Texture2D" uid="uid://c80bwfj2cerhg" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Banners/Banner_Slots.png" id="2_7p1mb"]
 [ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="3_i4usc"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7p1mb"]
-
 [node name="Tooltip" type="CanvasLayer" unique_id=1901411104]
 
 [node name="PanelTooltip" type="Panel" parent="." unique_id=1063020927 groups=["tooltip"]]
 z_index = 15
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = -1640.0
-offset_bottom = -748.0
+anchors_preset = -1
+anchor_left = 0.1
+anchor_right = 0.25
+anchor_bottom = 0.3
 grow_horizontal = 2
-grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_frmea")
 
@@ -33,6 +29,7 @@ patch_margin_left = 10
 patch_margin_top = 10
 patch_margin_right = 10
 patch_margin_bottom = 10
+metadata/_edit_use_anchors_ = true
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelTooltip/NinePatchRect" unique_id=2026844277]
 clip_contents = true
@@ -53,7 +50,7 @@ metadata/_edit_use_anchors_ = true
 layout_mode = 2
 size_flags_vertical = 0
 mouse_filter = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
 [node name="TooltipName" type="Label" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer" unique_id=699870699]
 layout_mode = 2
@@ -62,10 +59,6 @@ theme_override_font_sizes/font_size = 23
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
-
-[node name="HSeparator" type="HSeparator" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer" unique_id=895623972]
-layout_mode = 2
-theme_override_styles/separator = SubResource("StyleBoxFlat_7p1mb")
 
 [node name="HBoxContainer" type="VBoxContainer" parent="PanelTooltip/NinePatchRect/MarginContainer/VBoxContainer" unique_id=541203148]
 layout_mode = 2
@@ -106,8 +99,3 @@ theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
-
-[node name="ScrollContainer" type="ScrollContainer" parent="PanelTooltip/NinePatchRect/MarginContainer" unique_id=1317137512]
-custom_minimum_size = Vector2(0, 220)
-layout_mode = 2
-horizontal_scroll_mode = 0

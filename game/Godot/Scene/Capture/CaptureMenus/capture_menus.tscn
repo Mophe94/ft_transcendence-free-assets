@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://duu1tp1at0kqb" path="res://Script/Capture/Menus/capture_menus.gd" id="1_y8lya"]
 [ext_resource type="Script" uid="uid://bc0a1v7x7lv30" path="res://Script/Combat/Menus/Button/button1.gd" id="2_lc5p7"]
 [ext_resource type="Script" uid="uid://cy45tokcn3k46" path="res://Script/Capture/Menus/text.gd" id="2_qouho"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="3_hpe8x"]
 [ext_resource type="Script" uid="uid://c10oqrdst0hxr" path="res://Script/Combat/Menus/Button/button5.gd" id="3_undh4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yygnf"]
@@ -53,7 +54,9 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("3_hpe8x")
 horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 2
 script = ExtResource("2_qouho")
 min_font_size = 2
@@ -70,10 +73,12 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("3_hpe8x")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_tpejk")
 autowrap_trim_flags = 192
 clip_text = true
+icon_alignment = 1
 script = ExtResource("2_lc5p7")
 
 [node name="Button2" type="Button" parent="." unique_id=1071157202]
@@ -88,6 +93,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("3_hpe8x")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_tpejk")
 autowrap_trim_flags = 192
@@ -106,6 +112,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("3_hpe8x")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_tpejk")
 autowrap_trim_flags = 192
@@ -124,6 +131,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("3_hpe8x")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_tpejk")
 autowrap_trim_flags = 192
@@ -142,6 +150,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("3_hpe8x")
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_tpejk")
 text = "X"

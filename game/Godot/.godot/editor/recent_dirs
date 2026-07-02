@@ -1,16 +1,12 @@
+res://Script/PlayerCharacter/
+res://Script/General/
+res://Scene/Capture/
+/media/bertrmar/SSD_1T/trans/game/Export/
+res://Scene/Wait/
 res://Assets/Font/
-res://Scene/PlayerCharacter/Skin/DinoBlue/
-res://Scene/PlayerCharacter/
-res://
-res://Assets/Character/
-res://Assets/Character/dinoCharactersVersion1.1/sheets/
-res://Scene/PlayerCharacter/Skin/Satyr03/
-res://Scene/PlayerCharacter/Skin/Satyr02/
-res://Scene/PlayerCharacter/Skin/Satyr01/
-res://Scene/PlayerCharacter/Skin/Ghost03/
-res://Scene/PlayerCharacter/Skin/DinoGreen/
-res://Scene/PlayerCharacter/Skin/Ghost/
-res://Scene/PlayerCharacter/Skin/ghost/
+res://Assets/Monster/spritesheet/Pisciner/
+res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Buttons/
+res://Script/Combat/Win/
 res://Script/Inventory/
 res://Script/TeamSetup/ButtonTeamSetup/
 res://Script/Combat/Lose/
@@ -20,3 +16,8 @@ res://Script/Combat/Banners/
 res://Script/TeamSetup/Effect/
 res://Script/TeamSetup/Asset/
 res://Script/TeamSetup/SlotSetup/
+res://Script/TeamSetup/CurrentTeam/
+res://Script/TeamSetup/Label/
+res://Scene/Capture/CaptureMenus/
+res://Script/World/Map_01/
+res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Cursors/

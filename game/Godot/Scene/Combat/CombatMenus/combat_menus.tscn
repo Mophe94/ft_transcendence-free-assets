@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b3wokw8n0gxhc"]
 
 [ext_resource type="Script" uid="uid://brpxfet53sr8k" path="res://Script/Combat/Menus/combat_menus_script.gd" id="1_idpst"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="2_dimms"]
 [ext_resource type="Script" uid="uid://rk3tokfreolp" path="res://Script/Combat/Menus/text.gd" id="2_hsiif"]
 [ext_resource type="Script" uid="uid://bc0a1v7x7lv30" path="res://Script/Combat/Menus/Button/button1.gd" id="3_h412s"]
 
@@ -52,7 +53,9 @@ anchor_bottom = 0.5
 grow_horizontal = 0
 grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
 horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 2
 text_direction = 1
 script = ExtResource("2_hsiif")
@@ -67,6 +70,7 @@ anchor_bottom = 0.43
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
 theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
 action_mode = 0
 autowrap_trim_flags = 192
@@ -83,6 +87,7 @@ anchor_bottom = 0.43
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
 theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
 action_mode = 0
 autowrap_trim_flags = 192
@@ -99,6 +104,7 @@ anchor_bottom = 0.9
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
 theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
 action_mode = 0
 autowrap_trim_flags = 192
@@ -115,6 +121,7 @@ anchor_bottom = 0.9
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
 theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
 action_mode = 0
 autowrap_trim_flags = 192
@@ -131,6 +138,7 @@ anchor_bottom = 0.9
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
 theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
 action_mode = 0
 text = "X"

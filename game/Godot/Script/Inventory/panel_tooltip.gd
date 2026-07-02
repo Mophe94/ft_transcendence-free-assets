@@ -11,7 +11,7 @@ var tooltip_size = Vector2.ZERO
 
 func _ready():
 	visible = false
-	await get_tree().process_frame
+	await get_tree().process_frame   
 	await get_tree().process_frame
 	tooltip_size = get_rect().size
 

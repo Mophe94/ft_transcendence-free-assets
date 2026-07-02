@@ -13,7 +13,6 @@ func _enter_tree() -> void:
 	Received.start_game_scene.connect(_on_start_game)
 	Network.fail_connection.connect(_scene_fail)
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
+func _ready() -> void:
+	if Network.connection == false:
+		_scene_fail()

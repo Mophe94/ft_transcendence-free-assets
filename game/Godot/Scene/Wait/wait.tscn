@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dreahfyspdeh6"]
 
 [ext_resource type="Script" uid="uid://2uq6tkcjeaqp" path="res://Script/Wait/wait.gd" id="1_ettim"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="2_8utrb"]
 
 [sub_resource type="Animation" id="Animation_ud3sl"]
 length = 0.001
@@ -68,6 +69,7 @@ grow_vertical = 2
 
 [node name="Label" type="Label" parent="CenterContainer" unique_id=1666332822]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_8utrb")
 theme_override_font_sizes/font_size = 47
 text = "Waiting for connection"
 

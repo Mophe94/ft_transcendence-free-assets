@@ -25,7 +25,7 @@ var enemy_monster_base_scale: Vector2
 
 @onready var monsterTab = GeneralData.monster_database
 
-@onready var assetEnemy = GeneralData.player_charactere_scene
+@onready var assetEnemy = GeneralData.player_enemy_scene
 @onready var assetPlayer = GeneralData.player_charactere_scene
 
 @onready var combatBanner = $CombatBanner
@@ -84,10 +84,9 @@ func generate_charactere():
 	var player_scene = assetPlayer.instantiate()
 	player.get_node("PlayerAsset").add_child(player_scene)
 
-#	A modifier quand assetEnemy fait (scene de recup du skin enemy)
-	var enemy_scene = assetPlayer.instantiate()
+	var enemy_scene = assetEnemy.instantiate()
 	enemy.get_node("EnemyAsset").add_child(enemy_scene)
-	enemy_scene.scale.x *= -1
+	enemy_scene.scale.x = -1
 
 	var monsterEnemy = GeneralData.enemy["currentMonster"]["name"]
 	var monster_enemy_scene = monsterTab[monsterEnemy].instantiate()
@@ -170,10 +169,16 @@ func transi_open():
 	transi_scene.queue_free()
 
 func _ready() -> void:
-	print(get_tree().current_scene.name)
+	$Timer.time_finish.connect(_time_finish)
 	_capture_battle_ratios()
 	_update_battle_positions()
 	get_viewport().size_changed.connect(_update_battle_positions)
 	transi_open()
 	await start_intro()
 	show_UI()
+
+func _time_finish():
+	print("signal received combat")
+	$Timer.send = true
+	await Received.new_turn
+	$Timer.send = false

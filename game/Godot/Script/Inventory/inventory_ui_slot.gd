@@ -22,7 +22,7 @@ func _on_mouse_entered():
 	tween.tween_property(self, "scale", SCALE_HOVER, DURATION)\
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
-	if not current_item.is_empty() and current_item["name"] != "":
+	if not current_item.is_empty() and current_item["name"] != "" and current_item["current"] !=0:
 		var desc = GeneralData.object_description.get(current_item["name"], "")
 		tooltip.show_tooltip(current_item["name"], desc)
 

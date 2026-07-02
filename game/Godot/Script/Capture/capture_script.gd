@@ -99,8 +99,7 @@ func _update_battle_positions() -> void:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-#	$Timer.time_finish.connect(_scene_team_setup)
-	print(get_tree().current_scene.name)
+	$Timer.time_finish.connect(_signal_timer)
 	_update_battle_positions()
 	get_tree().get_root().size_changed.connect(_update_battle_positions)
 	capture_menus.hide()
@@ -108,10 +107,19 @@ func _ready() -> void:
 	await start_intro()
 	capture_menus.show()
 
-func _scene_team_setup():
-	print("signal received capture")
+
+func _signal_timer():
+	print("signal timer received capture")
+	$CaptureMenus.process_mode = Node.PROCESS_MODE_DISABLED
 	$Timer.send = true
-#	await Received.combat_scene
+	
+	var send_func = func():
+		null
+	var success = await GeneralProcess.wait_signal(send_func, Received.team_setup_scene)
+
 	await transi_close()
 	$Timer.send = false
-	get_tree().change_scene_to_packed(GeneralData.team_setup_scene)
+	if success:
+		get_tree().change_scene_to_packed(GeneralData.team_setup_scene)
+	else:
+		get_tree().change_scene_to_packed(GeneralData.wait)

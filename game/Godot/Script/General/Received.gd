@@ -20,6 +20,7 @@ signal finish
 
 func handle_message_receive(msg):
 	#VERIF GOOD MESSAGE
+	print("MSG RECEIVED:\n", msg)
 	if not msg.has("event"):
 		print("func handle_message_receive EVENT missing")
 		return
@@ -29,7 +30,6 @@ func handle_message_receive(msg):
 	if not msg.has("data"):
 		print("func handle_message_receive DATA missing")
 		return
-	print("MSG RECEIVED:", msg)
 	
 	var data = msg["data"]
 	if data.has("state"):

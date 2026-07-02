@@ -1,5 +1,6 @@
 extends Node
 
+@onready var wait = preload("res://Scene/Wait/wait.tscn")
 @onready var transi = preload("res://Scene/Transition/blur_transition.tscn")
 @onready var team_setup_scene = preload("res://Scene/TeamSetup/team_setup.tscn")
 @onready var combat_scene = preload("res://Scene/Combat/combat.tscn")
@@ -62,13 +63,13 @@ const monster_description: Dictionary = {
 }
 
 const object_description: Dictionary = {
-	"potion": "tous est dans le nom j'",
-	"golden ticket": "golden ticket",
-	"rage": "rage",
-	"bomb": "bomb"
+	"potion": "Heal 50hp for your current monster",
+	"golden ticket": "100% chance to catch monster",
+	"rage": "Stat up for 20 your attack",
+	"bomb": "Damage for 50hp on your opponent current monster"
 }
 
-@export var available_skins: Array[SkinData] = [
+const available_skins: Array[SkinData] = [
 		preload("res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueRessource.tres"),
 		preload("res://Scene/PlayerCharacter/Skin/DinoYellow/dinoYellowRessource.tres"),
 		preload("res://Scene/PlayerCharacter/Skin/DinoGreen/dinoGreenRessource.tres"),
@@ -85,7 +86,7 @@ func get_equipped_skin() -> SkinData:
 	for skin in available_skins:
 		if skin.skin_id == player["asset"]:
 			return skin
-	push_warning("Skin introuvable, fallback sur le premier skin disponible." )
+	print("Skin introuvable, fallback on first skin disponible.")
 	return available_skins[0] if available_skins.size() > 0 else null
 
 func set_equipped_skin(skin_id: String) -> void:
@@ -102,12 +103,12 @@ func set_equipped_skin_enemy(skin_id: String) -> void:
 	enemy["asset"] = skin_id
 
 const player_charactere_scene = preload("res://Scene/PlayerCharacter/character.tscn") 
-const player_enemy_scene = preload("res://Scene/PlayerCharacter/enemy_character.tscn") 
+const player_enemy_scene = preload("res://Scene/PlayerCharacter/enemy_character.tscn")
 
 var player: Dictionary = {
 	"id": 0,
 	"name": "archimedee",
-	"asset": "satyr03",
+	"asset": "ghost",
 	"currentMonster": {
 		"name": "",
 		"slot": -1,
@@ -141,7 +142,7 @@ var player: Dictionary = {
 	},
 	"battle_team": [
 		{
-			"name": "",
+			"name": "burpy",
 			"slot": 0,
 			"life": {
 				"current": 100,
@@ -165,7 +166,7 @@ var player: Dictionary = {
 			},
 		},
 	],
-	"team": ["fishet", "leafs", "squirel", "burpy", "sharky", ""],
+	"team": ["pisciner", "leafs", "squirel", "burpy", "", "fishet"],
 	"inventory": [
 		{
 			"name": "rage",
@@ -193,7 +194,7 @@ var player: Dictionary = {
 var enemy: Dictionary = {
 	"id": 0,
 	"name": "gg",
-	"asset": "satyr03",
+	"asset": "dinoGreen",
 	"currentMonster": {
 		"name": "burpy",
 		"life": {
@@ -210,7 +211,7 @@ const WAIT_TEXT = 0.3
 
 var position_player = Vector2(0.0, 0.0)
 var player_speed = 0.0
-var timer = 1781786220
+var timer = 1782808480
 
 var current_item = ""
 var current_map = "map_01"

@@ -1,8 +1,9 @@
 extends Node
 
 signal fail_connection
+var connection = false
 
-@export var timeToConnect = 5.0
+@export var timeToConnect = 10.0
 var ws = WebSocketPeer.new()
 var wsSate = WebSocketPeer.STATE_CLOSED
 var sceneLaunch = false
@@ -16,7 +17,7 @@ var sceneLaunch = false
 func connect_server():
 	#CONNECT AND SEND TOKEN
 	print("Try to connect server")
-	var url = "wss://free-assets.42belgium.com/game/?token=" + token + "&room=" + room
+	var url = "wss://free-assets.42belgium.com/game?token=" + token + "&room=" + room
 	print("url : " + url)
 	var err = ws.connect_to_url(url)
 	print("response of connect fonction: " + str(err))
@@ -25,6 +26,7 @@ func connect_server():
 		print("WebSocket connection failed")
 		return
 	else:
+		connection = true
 		print("Connected to server")
 
 

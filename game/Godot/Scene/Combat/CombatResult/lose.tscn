@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dedf3uk1uxvpr" path="res://Script/Combat/Lose/text.gd" id="1_7w4gb"]
 [ext_resource type="Script" uid="uid://cjuiuam7a8dka" path="res://Script/Combat/Lose/pliue_particule.gd" id="1_fhdb4"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="2_b0w2r"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vaksa"]
 particle_flag_disable_z = true
@@ -106,8 +107,11 @@ grow_vertical = 2
 
 [node name="Lose" type="Label" parent="Control/CenterContainer" unique_id=1006893142]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_b0w2r")
 theme_override_font_sizes/font_size = 56
 text = "YOU LOSE"
+horizontal_alignment = 1
+vertical_alignment = 1
 script = ExtResource("1_7w4gb")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Control/CenterContainer" unique_id=599412664]
