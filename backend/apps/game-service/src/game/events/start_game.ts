@@ -22,8 +22,9 @@ export function start_game(player: Player) {
       player: {
         id: player.id,
         name: 'Ce que tu veux',
-        asset: 'dino',
+        asset: 'dinoBlue',
         team: player.team,
+        monster: player.currentMonster.name,
       },
       timer: player.timer,
       current_map: 'map_01',

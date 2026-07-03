@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { SkillEffect } from './types/Skill_effect.enum';
+import { SkillEffect } from './types/skill_effect.enum';
 import { SkillType } from './types/skill_type.entity';
 import { MonsterStat } from './types/monster_stat.enum';
 import { Monster } from './monsters.entity';

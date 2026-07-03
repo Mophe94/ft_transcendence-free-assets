@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict pclAC35BFDA4aJdi7T0b3mBFQp9ftTeI84p5LfFTnLIqr0lCRdKRYPY0AhYzUnB
+\restrict PPBg6n138lnsNPXDtcVoFxvnosieNNSxR3vETur60OgSCaarkPeUAi5PLE8Di1w
 
 -- Dumped from database version 18.4 (Ubuntu 18.4-1.pgdg25.10+1)
 -- Dumped by pg_dump version 18.4 (Ubuntu 18.4-1.pgdg25.10+1)
 
--- Started on 2026-05-30 13:42:01 CEST
+-- Started on 2026-07-02 12:09:13 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,6 +20,38 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+--
+-- TOC entry 886 (class 1247 OID 17229)
+-- Name: monster_rarity; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.monster_rarity AS ENUM (
+    'legendary',
+    'common',
+    'uncommon',
+    'rare',
+    'not_foundable'
+);
+
+
+ALTER TYPE public.monster_rarity OWNER TO postgres;
+
+--
+-- TOC entry 895 (class 1247 OID 17076)
+-- Name: monster_stat_enum; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.monster_stat_enum AS ENUM (
+    'attack',
+    'attack_spe',
+    'defense',
+    'defense_spe',
+    'speed'
+);
+
+
+ALTER TYPE public.monster_stat_enum OWNER TO postgres;
 
 --
 -- TOC entry 880 (class 1247 OID 17174)
@@ -39,37 +71,23 @@ CREATE TYPE public.monster_type_enum AS ENUM (
 ALTER TYPE public.monster_type_enum OWNER TO postgres;
 
 --
--- TOC entry 871 (class 1247 OID 17109)
+-- TOC entry 874 (class 1247 OID 17109)
 -- Name: object_type_enum; Type: TYPE; Schema: public; Owner: postgres
 --
 
 CREATE TYPE public.object_type_enum AS ENUM (
     'heal',
     'damage',
-    'capture'
+    'capture',
+    'stat_up',
+    'stat_down'
 );
 
 
 ALTER TYPE public.object_type_enum OWNER TO postgres;
 
 --
--- TOC entry 868 (class 1247 OID 17076)
--- Name: skill_data_enum; Type: TYPE; Schema: public; Owner: postgres
---
-
-CREATE TYPE public.skill_data_enum AS ENUM (
-    'attack',
-    'attack_spe',
-    'defense',
-    'defense_spe',
-    'speed'
-);
-
-
-ALTER TYPE public.skill_data_enum OWNER TO postgres;
-
---
--- TOC entry 865 (class 1247 OID 17041)
+-- TOC entry 871 (class 1247 OID 17041)
 -- Name: skill_effect_enum; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -84,7 +102,7 @@ CREATE TYPE public.skill_effect_enum AS ENUM (
 ALTER TYPE public.skill_effect_enum OWNER TO postgres;
 
 --
--- TOC entry 862 (class 1247 OID 17055)
+-- TOC entry 868 (class 1247 OID 17055)
 -- Name: skill_type_enum; Type: TYPE; Schema: public; Owner: postgres
 --
 
@@ -104,9 +122,95 @@ CREATE TYPE public.skill_type_enum AS ENUM (
 
 ALTER TYPE public.skill_type_enum OWNER TO postgres;
 
+--
+-- TOC entry 892 (class 1247 OID 17248)
+-- Name: tile_type; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.tile_type AS ENUM (
+    'grass',
+    'water',
+    'tree'
+);
+
+
+ALTER TYPE public.tile_type OWNER TO postgres;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- TOC entry 222 (class 1259 OID 17143)
+-- Name: items; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.items (
+    id integer CONSTRAINT items_id_not_null NOT NULL,
+    name character varying(30) CONSTRAINT items_name_not_null NOT NULL,
+    type public.object_type_enum CONSTRAINT items_type_not_null NOT NULL,
+    value integer CONSTRAINT items_value_not_null NOT NULL,
+    target public.monster_stat_enum
+);
+
+
+ALTER TABLE public.items OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 17142)
+-- Name: items_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.items ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.items_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 228 (class 1259 OID 17241)
+-- Name: maps; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.maps (
+    id integer NOT NULL,
+    name character varying(30) NOT NULL
+);
+
+
+ALTER TABLE public.maps OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 17240)
+-- Name: maps_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.maps ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.maps_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 230 (class 1259 OID 17263)
+-- Name: maps_tiles; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.maps_tiles (
+    map_id integer NOT NULL,
+    tile_id integer NOT NULL
+);
+
+
+ALTER TABLE public.maps_tiles OWNER TO postgres;
 
 --
 -- TOC entry 220 (class 1259 OID 17018)
@@ -123,7 +227,7 @@ CREATE TABLE public.monsters (
     defense_spe integer CONSTRAINT monster_defense_spe_not_null NOT NULL,
     speed integer CONSTRAINT monster_speed_not_null NOT NULL,
     type public.monster_type_enum NOT NULL,
-    catch integer NOT NULL
+    rarity public.monster_rarity NOT NULL
 );
 
 
@@ -173,36 +277,6 @@ ALTER TABLE public.monsters_skills ALTER COLUMN monster_id ADD GENERATED BY DEFA
 
 
 --
--- TOC entry 222 (class 1259 OID 17143)
--- Name: objects; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.objects (
-    id integer NOT NULL,
-    name character varying(30) NOT NULL,
-    type public.object_type_enum NOT NULL,
-    value integer NOT NULL
-);
-
-
-ALTER TABLE public.objects OWNER TO postgres;
-
---
--- TOC entry 221 (class 1259 OID 17142)
--- Name: objects_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-ALTER TABLE public.objects ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.objects_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
-
---
 -- TOC entry 223 (class 1259 OID 17154)
 -- Name: skills; Type: TABLE; Schema: public; Owner: postgres
 --
@@ -216,7 +290,7 @@ CREATE TABLE public.skills (
     value real DEFAULT 0.0 NOT NULL,
     repetition integer DEFAULT 1 NOT NULL,
     "precision" integer DEFAULT 100 NOT NULL,
-    data public.skill_data_enum
+    data public.monster_stat_enum
 );
 
 
@@ -238,27 +312,106 @@ ALTER TABLE public.skills ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- TOC entry 3520 (class 0 OID 17018)
--- Dependencies: 220
--- Data for Name: monsters; Type: TABLE DATA; Schema: public; Owner: postgres
+-- TOC entry 229 (class 1259 OID 17255)
+-- Name: tiles; Type: TABLE; Schema: public; Owner: postgres
 --
 
-COPY public.monsters (id, name, hp_total, attack, attack_spe, defense, defense_spe, speed, type, catch) FROM stdin;
-1	Pisciner	50	10	10	5	5	50	neutral	100
-2	Fishet	120	10	15	5	15	100	water	70
-3	Burpy	100	20	30	0	20	80	water	50
-4	Sharky	150	20	30	0	20	150	water	30
-5	Squirrel	100	20	20	5	10	110	neutral	50
-6	Papate	180	10	15	5	10	80	earth	50
-7	Gigantomakia	200	20	30	15	25	50	earth	20
-8	Leaves	50	35	45	0	10	100	plant	30
-9	Monkel	130	15	15	10	20	100	neutral	50
-10	Pigeonne	120	25	25	10	10	160	fly	40
+CREATE TABLE public.tiles (
+    id integer CONSTRAINT "Tiles_id_not_null" NOT NULL,
+    type public.tile_type CONSTRAINT "Tiles_type_not_null" NOT NULL
+);
+
+
+ALTER TABLE public.tiles OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 17270)
+-- Name: tiles_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.tiles ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.tiles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 232 (class 1259 OID 17273)
+-- Name: tiles_monsters; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tiles_monsters (
+    tile_id integer NOT NULL,
+    monster_id integer NOT NULL
+);
+
+
+ALTER TABLE public.tiles_monsters OWNER TO postgres;
+
+--
+-- TOC entry 3556 (class 0 OID 17143)
+-- Dependencies: 222
+-- Data for Name: items; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.items (id, name, type, value, target) FROM stdin;
+1	potion	heal	50	\N
+2	bomb	damage	50	\N
+3	lucky clover	capture	100	\N
+4	rage	stat_up	20	attack
 \.
 
 
 --
--- TOC entry 3526 (class 0 OID 17190)
+-- TOC entry 3562 (class 0 OID 17241)
+-- Dependencies: 228
+-- Data for Name: maps; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.maps (id, name) FROM stdin;
+1	first_map
+\.
+
+
+--
+-- TOC entry 3564 (class 0 OID 17263)
+-- Dependencies: 230
+-- Data for Name: maps_tiles; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.maps_tiles (map_id, tile_id) FROM stdin;
+1	2
+1	3
+1	1
+\.
+
+
+--
+-- TOC entry 3554 (class 0 OID 17018)
+-- Dependencies: 220
+-- Data for Name: monsters; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.monsters (id, name, hp_total, attack, attack_spe, defense, defense_spe, speed, type, rarity) FROM stdin;
+1	Pisciner	50	10	10	5	5	50	neutral	not_foundable
+2	Fishet	120	10	15	5	15	100	water	common
+3	Burpy	100	20	30	0	20	80	water	uncommon
+4	Sharky	150	20	30	0	20	150	water	rare
+5	Squirrel	100	20	20	5	10	110	neutral	common
+6	Papate	180	10	15	5	10	80	earth	uncommon
+7	Gigantomakia	200	20	30	15	25	50	earth	rare
+9	Monkel	130	15	15	10	20	100	neutral	uncommon
+10	Pigeonne	120	25	25	10	10	160	fly	rare
+8	Leaves	80	35	45	0	10	100	plant	common
+\.
+
+
+--
+-- TOC entry 3560 (class 0 OID 17190)
 -- Dependencies: 226
 -- Data for Name: monsters_skills; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -300,20 +453,7 @@ COPY public.monsters_skills (monster_id, skill_id) FROM stdin;
 
 
 --
--- TOC entry 3522 (class 0 OID 17143)
--- Dependencies: 222
--- Data for Name: objects; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.objects (id, name, type, value) FROM stdin;
-1	potion	heal	50
-2	bomb	damage	50
-3	lucky clover	capture	100
-\.
-
-
---
--- TOC entry 3523 (class 0 OID 17154)
+-- TOC entry 3557 (class 0 OID 17154)
 -- Dependencies: 223
 -- Data for Name: skills; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -342,7 +482,57 @@ COPY public.skills (id, name, power_point, effect, type, value, repetition, "pre
 
 
 --
--- TOC entry 3532 (class 0 OID 0)
+-- TOC entry 3563 (class 0 OID 17255)
+-- Dependencies: 229
+-- Data for Name: tiles; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tiles (id, type) FROM stdin;
+1	tree
+2	water
+3	grass
+\.
+
+
+--
+-- TOC entry 3566 (class 0 OID 17273)
+-- Dependencies: 232
+-- Data for Name: tiles_monsters; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tiles_monsters (tile_id, monster_id) FROM stdin;
+3	10
+3	9
+3	8
+2	4
+2	3
+2	2
+1	7
+1	6
+1	5
+\.
+
+
+--
+-- TOC entry 3572 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.items_id_seq', 4, true);
+
+
+--
+-- TOC entry 3573 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: maps_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.maps_id_seq', 1, true);
+
+
+--
+-- TOC entry 3574 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: monster_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -351,7 +541,7 @@ SELECT pg_catalog.setval('public.monster_id_seq', 10, true);
 
 
 --
--- TOC entry 3533 (class 0 OID 0)
+-- TOC entry 3575 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: monsters_skills_monster_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -360,16 +550,7 @@ SELECT pg_catalog.setval('public.monsters_skills_monster_id_seq', 1, false);
 
 
 --
--- TOC entry 3534 (class 0 OID 0)
--- Dependencies: 221
--- Name: objects_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.objects_id_seq', 3, true);
-
-
---
--- TOC entry 3535 (class 0 OID 0)
+-- TOC entry 3576 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: skills_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -378,7 +559,16 @@ SELECT pg_catalog.setval('public.skills_id_seq', 19, true);
 
 
 --
--- TOC entry 3365 (class 2606 OID 17171)
+-- TOC entry 3577 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: tiles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tiles_id_seq', 3, true);
+
+
+--
+-- TOC entry 3389 (class 2606 OID 17171)
 -- Name: skills Skill_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -387,7 +577,43 @@ ALTER TABLE ONLY public.skills
 
 
 --
--- TOC entry 3357 (class 2606 OID 17032)
+-- TOC entry 3385 (class 2606 OID 17153)
+-- Name: items item_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.items
+    ADD CONSTRAINT item_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 3387 (class 2606 OID 17151)
+-- Name: items items_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.items
+    ADD CONSTRAINT items_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3395 (class 2606 OID 17246)
+-- Name: maps maps_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.maps
+    ADD CONSTRAINT maps_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3399 (class 2606 OID 17269)
+-- Name: maps_tiles maps_tiles_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.maps_tiles
+    ADD CONSTRAINT maps_tiles_pk PRIMARY KEY (map_id, tile_id);
+
+
+--
+-- TOC entry 3381 (class 2606 OID 17032)
 -- Name: monsters monster_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -396,7 +622,7 @@ ALTER TABLE ONLY public.monsters
 
 
 --
--- TOC entry 3359 (class 2606 OID 17030)
+-- TOC entry 3383 (class 2606 OID 17030)
 -- Name: monsters monster_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -405,7 +631,7 @@ ALTER TABLE ONLY public.monsters
 
 
 --
--- TOC entry 3369 (class 2606 OID 17196)
+-- TOC entry 3393 (class 2606 OID 17196)
 -- Name: monsters_skills monster_skills_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -414,25 +640,7 @@ ALTER TABLE ONLY public.monsters_skills
 
 
 --
--- TOC entry 3361 (class 2606 OID 17153)
--- Name: objects object_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.objects
-    ADD CONSTRAINT object_name_key UNIQUE (name);
-
-
---
--- TOC entry 3363 (class 2606 OID 17151)
--- Name: objects objects_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.objects
-    ADD CONSTRAINT objects_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 3367 (class 2606 OID 17169)
+-- TOC entry 3391 (class 2606 OID 17169)
 -- Name: skills skills_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -441,7 +649,25 @@ ALTER TABLE ONLY public.skills
 
 
 --
--- TOC entry 3370 (class 2606 OID 17197)
+-- TOC entry 3401 (class 2606 OID 17279)
+-- Name: tiles_monsters tile_monster_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tiles_monsters
+    ADD CONSTRAINT tile_monster_pk PRIMARY KEY (monster_id, tile_id);
+
+
+--
+-- TOC entry 3397 (class 2606 OID 17272)
+-- Name: tiles tiles_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tiles
+    ADD CONSTRAINT tiles_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3402 (class 2606 OID 17197)
 -- Name: monsters_skills fk_monster; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -450,7 +676,7 @@ ALTER TABLE ONLY public.monsters_skills
 
 
 --
--- TOC entry 3371 (class 2606 OID 17202)
+-- TOC entry 3403 (class 2606 OID 17202)
 -- Name: monsters_skills fk_skill; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -458,11 +684,29 @@ ALTER TABLE ONLY public.monsters_skills
     ADD CONSTRAINT fk_skill FOREIGN KEY (skill_id) REFERENCES public.skills(id) NOT VALID;
 
 
--- Completed on 2026-05-30 13:42:02 CEST
+--
+-- TOC entry 3404 (class 2606 OID 17285)
+-- Name: tiles_monsters monster_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tiles_monsters
+    ADD CONSTRAINT monster_id FOREIGN KEY (monster_id) REFERENCES public.monsters(id);
+
+
+--
+-- TOC entry 3405 (class 2606 OID 17280)
+-- Name: tiles_monsters tile_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tiles_monsters
+    ADD CONSTRAINT tile_id FOREIGN KEY (tile_id) REFERENCES public.tiles(id);
+
+
+-- Completed on 2026-07-02 12:09:13 CEST
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict pclAC35BFDA4aJdi7T0b3mBFQp9ftTeI84p5LfFTnLIqr0lCRdKRYPY0AhYzUnB
+\unrestrict PPBg6n138lnsNPXDtcVoFxvnosieNNSxR3vETur60OgSCaarkPeUAi5PLE8Di1w
 

@@ -1,6 +1,5 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
@@ -8,8 +7,10 @@ import {
 } from 'typeorm';
 import { MonsterType } from './types/monster_type.enum';
 import { Skill } from './skills.entity';
+import { Tile } from './tiles.entity';
+import { MonsterRarity } from './types/monster_rarity.enum';
 
-@Entity()
+@Entity('monsters')
 export class Monster {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -41,18 +42,21 @@ export class Monster {
   })
   type!: MonsterType;
 
-  @Column()
-  catch!: number;
+  @Column({
+    type: 'enum',
+    enum: MonsterRarity,
+  })
+  rarity!: MonsterRarity;
 
-  @CreateDateColumn({
+  /*   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  created_at!: Date;
+  created_at!: Date; */
 
   @ManyToMany(() => Skill, (skill: Skill) => skill.monsters)
   @JoinTable({
-    name: 'monster_skill',
+    name: 'monsters_skills',
     joinColumn: {
       name: 'monster_id',
       referencedColumnName: 'id',
@@ -63,4 +67,7 @@ export class Monster {
     },
   })
   skills!: Skill[];
+
+  @ManyToMany(() => Tile, (tile: Tile) => tile.monsters)
+  tiles!: Tile[];
 }

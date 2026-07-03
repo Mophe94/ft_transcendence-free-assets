@@ -40,7 +40,7 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
-      - game_service_modules:/app/node_modules
+      - /app/node_modules
 
   chat_service:
     build:
@@ -51,7 +51,7 @@ services:
       - backend/.env.docker
     volumes:
       - ./backend:/app
-      - chat_service_modules:/app/node_modules
+      - /app/node_modules
 
   users_service:
     build:

@@ -13,7 +13,7 @@ export class PhaseTimerService {
   start(roomId: string, phase: PhaseName, onTimeout: () => void): void {
     this.clear(roomId);
     const duration = PHASE_DURATIONS[phase];
-    this.startTimes.set(roomId, Date.now());
+    this.startTimes.set(roomId, Math.floor(Date.now() / 1000));
     this.timers.set(roomId, setTimeout(onTimeout, duration * 1000));
   }
 
