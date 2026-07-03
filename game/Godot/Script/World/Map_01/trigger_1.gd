@@ -3,7 +3,6 @@ extends Area2D
 @export var encounter_rate: float = 0.10
 @export var steps_between_rolls: int = 10
 @export var encounter_cooldown: float = 1.5
-@export var capture_scene: String = "res://Scene/Capture/capture.tscn"
 
 var player: Node2D = null
 var inside: bool = false
@@ -16,6 +15,26 @@ var can_roll: bool = true
 
 var danger_level: float = 0.0
 
+#############################
+func transi_close():
+	var transi_scene = GeneralData.transi.instantiate()
+	add_child(transi_scene)
+	await transi_scene.get_node("CanvasLayer/ColorRect").close()
+	transi_scene.queue_free()
+
+func _new_encounter():
+	print("signal timer received new encounter")
+	GeneralData.tile = "grass"
+	var send_func = func():
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.NEW_ENCOUNTER])
+	var success = await GeneralProcess.wait_signal(send_func, Received.monster_encounter_received)
+
+	await transi_close()
+	if success:
+		get_tree().change_scene_to_packed(GeneralData.capture_scene)
+	else:
+		get_tree().change_scene_to_packed(GeneralData.wait)
+#############################
 
 func _ready():
 	body_entered.connect(_on_body_entered)
@@ -65,7 +84,7 @@ func _start_battle():
 		player.set_physics_process(false)
 	GeneralData.position_player = player.global_position
 	await get_tree().create_timer(0.4).timeout
-	get_tree().change_scene_to_file(capture_scene)
+	_new_encounter()
 
 
 func _on_body_entered(body):

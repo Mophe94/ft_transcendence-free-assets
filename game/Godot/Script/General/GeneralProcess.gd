@@ -16,6 +16,7 @@ func wait_signal(send_func: Callable, signal_to_wait: Signal) -> bool:
 	while time < TIMEOUT and not received:
 		await get_tree().create_timer(TIMEVAL).timeout
 		time += TIMEVAL
+		print("TIME WAITING FOR RECEIVED : ", str(time), "/", str(TIMEOUT))
 		if not received:
 			send_func.call()
 	if not received:

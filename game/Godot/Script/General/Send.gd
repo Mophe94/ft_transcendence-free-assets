@@ -55,8 +55,11 @@ func send_mesage(event, value = null):
 			_try_attack(packet, value)
 		"use_item_combat":
 			_use_item_combat(packet, value)
-	print("MSG SEND:\n", JSON.stringify(packet))
-	Network.ws.send_text(JSON.stringify(packet))
+	if Network.wsSate != WebSocketPeer.STATE_CLOSED:
+		print("-------- MSG SEND --------  :\n", JSON.stringify(packet))
+		Network.ws.send_text(JSON.stringify(packet))
+	else:
+		print("-------- WEBSOCKET CLOSE--------  ")
 
 
 func _use_item_combat(packet, item):

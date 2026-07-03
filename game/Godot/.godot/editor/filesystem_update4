@@ -1,3 +1,9 @@
+res://Script/Capture/capture_script.gd
+res://Script/General/Received.gd
+res://Script/General/Send.gd
+res://Script/Timer/timer.gd
+res://Script/World/Map_01/world_01.gd
+res://Scene/Wait/wait.tscn
 res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueSpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/DinoYellow/dinoYellowSpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/DinoGreen/dinoGreenSpriteSheet.tres
@@ -8,3 +14,9 @@ res://Scene/PlayerCharacter/Skin/Ghost03/ghost03SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr01/satyr01SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr02/satyr02SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr03/satyr03SpriteSheet.tres
+res://Script/Wait/wait.gd
+res://Script/General/GeneralData.gd
+res://Scene/World01/world_01.tscn
+res://Script/General/GeneralProcess.gd
+res://Scene/Inventory/nine_patch_rect.gd
+res://Script/TeamSetup/team_setup_script.gd

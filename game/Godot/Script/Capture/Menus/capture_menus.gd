@@ -68,7 +68,7 @@ func set_menus_flee_choice(object):
 		await tween.finished
 		hide()
 		await transi_close()
-		get_tree().change_scene_to_packed(GeneralData.map[GeneralData.current_map])
+		get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
 	else:
 		_back()
 	
@@ -116,7 +116,7 @@ func set_menus_catch(object):
 			emit_signal("catch_ok")
 			await text_show("You success to capture " + GeneralData.monster_encounter + " !")
 			await transi_close()
-			get_tree().change_scene_to_packed(GeneralData.map[GeneralData.current_map])
+			get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
 		else:
 			emit_signal("catch_fail")
 			await text_show("You fail to capture " + GeneralData.monster_encounter)

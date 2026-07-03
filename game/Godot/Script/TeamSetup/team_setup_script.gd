@@ -57,14 +57,22 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _ready() -> void:
+	Received.combat_scene.connect(_combat_received)
 	$Timer.time_finish.connect(_signal_timer)
 	transi_open()
 	await instantiate_charactere()
 	await instanciate_monster_player()
 	await instanciate_monster_enemy()
 
+func _combat_received():
+	print("signal combat received ===> scene : team set up")
+	$CurrentTeam.process_mode = Node.PROCESS_MODE_DISABLED
+	$Player.process_mode = Node.PROCESS_MODE_DISABLED 
+	await transi_close()
+	get_tree().change_scene_to_packed(GeneralData.combat_scene)
+
 func _signal_timer():
-	print("signal timer received team_setup")
+	print("signal timer received ===> scene : team_setup")
 	$Timer.send = true
 	$CurrentTeam.process_mode = Node.PROCESS_MODE_DISABLED
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED

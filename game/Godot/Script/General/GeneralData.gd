@@ -1,19 +1,21 @@
 extends Node
 
-@onready var wait = preload("res://Scene/Wait/wait.tscn")
-@onready var transi = preload("res://Scene/Transition/blur_transition.tscn")
-@onready var team_setup_scene = preload("res://Scene/TeamSetup/team_setup.tscn")
-@onready var combat_scene = preload("res://Scene/Combat/combat.tscn")
+
+const map: Dictionary = {
+	"map_01" = "res://Scene/World01/world_01.tscn"
+}
+
+const wait = preload("res://Scene/Wait/wait.tscn")
+const transi = preload("res://Scene/Transition/blur_transition.tscn")
+const capture_scene = preload("res://Scene/Capture/capture.tscn")
+const team_setup_scene = preload("res://Scene/TeamSetup/team_setup.tscn")
+const combat_scene = preload("res://Scene/Combat/combat.tscn")
 
 const background_database: Dictionary = {
 	"plains_dawn": preload("res://Assets/Capture/plains_dawn.png"),
 	"plains_night": preload("res://Assets/Capture/plains_night.png"),
 	"plains_day": preload("res://Assets/Capture/plains_day.png"),
 	"beach_day": preload("res://Assets/Capture/beach_day.png")
-}
-
-const map: Dictionary = {
-	"map_01" = preload("res://Scene/World01/world_01.tscn")
 }
 
 const monster_database: Dictionary = {
@@ -107,8 +109,8 @@ const player_enemy_scene = preload("res://Scene/PlayerCharacter/enemy_character.
 
 var player: Dictionary = {
 	"id": 0,
-	"name": "archimedee",
-	"asset": "ghost",
+	"name": "",
+	"asset": "",
 	"currentMonster": {
 		"name": "",
 		"slot": -1,
@@ -142,11 +144,11 @@ var player: Dictionary = {
 	},
 	"battle_team": [
 		{
-			"name": "burpy",
+			"name": "",
 			"slot": 0,
 			"life": {
-				"current": 100,
-				"max": 200
+				"current": 0,
+				"max": 0
 			},
 		},
 		{
@@ -161,49 +163,49 @@ var player: Dictionary = {
 			"name": "",
 			"slot": 0,
 			"life": {
-				"current": 1,
-				"max": 200
+				"current": 0,
+				"max": 0
 			},
 		},
 	],
-	"team": ["pisciner", "leafs", "squirel", "burpy", "", "fishet"],
+	"team": ["", "", "", "", "", ""],
 	"inventory": [
 		{
-			"name": "rage",
+			"name": "",
 			"scene": "",
 			"current": 0
 		},
 		{
-			"name": "golden ticket",
-			"scene": "map",
-			"current": 1
-		},
-		{
-			"name": "bomb",
+			"name": "",
 			"scene": "",
 			"current": 0
 		},
 		{
-			"name": "bomb",
-			"scene": "combat",
-			"current": 1
+			"name": "",
+			"scene": "",
+			"current": 0
+		},
+		{
+			"name": "",
+			"scene": "",
+			"current": 0
 		},
 	]
 }
 
 var enemy: Dictionary = {
 	"id": 0,
-	"name": "gg",
-	"asset": "dinoGreen",
+	"name": "",
+	"asset": "",
 	"currentMonster": {
-		"name": "burpy",
+		"name": "",
 		"life": {
 			"current": 0,
 			"max": 0
 		},
 		"status": []
 	},
-	"team": ["burpy", "burpy", "pisciner", "pisciner", "sharky", "sharky"],
+	"team": ["", "", "", "", "", ""],
 }
 
 const SPEED_TEXT = 0.03
@@ -211,10 +213,10 @@ const WAIT_TEXT = 0.3
 
 var position_player = Vector2(0.0, 0.0)
 var player_speed = 0.0
-var timer = 1782808480
+var timer = 0
 
 var current_item = ""
-var current_map = "map_01"
+var current_map = ""
 var monster_encounter = "burpy"
 var text = []
 

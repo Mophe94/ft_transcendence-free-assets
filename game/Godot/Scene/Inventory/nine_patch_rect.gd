@@ -4,7 +4,6 @@ var drag_offset = Vector2.ZERO
 
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		print("_gui_input reçu | pressed: ", event.pressed)
 		if event.pressed:
 			dragging = true
 			drag_offset = get_global_mouse_position() - global_position
@@ -14,7 +13,6 @@ func _gui_input(event):
 
 func _unhandled_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		print("_input reçu | pressed: ", event.pressed)
 		if not event.pressed:
 			dragging = false
 

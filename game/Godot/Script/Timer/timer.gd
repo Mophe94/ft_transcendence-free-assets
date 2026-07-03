@@ -1,8 +1,10 @@
 extends CanvasLayer
 signal time_finish
+
 @onready var label = $NinePatchRect/Label
 @onready var nine_patch = $NinePatchRect
 @onready var send = false
+
 var total_time: float = GeneralData.timer - float(Time.get_unix_time_from_system())
 var time_remaining: float = total_time
 var last_minute: int = -1
@@ -11,8 +13,7 @@ var flash_timer: float = 0.0
 var flash_duration: float = 1.0
 
 func _ready():
-		# TEST UNIQUEMENT - à enlever après
-	time_remaining = 320.0  # 5 minutes
+	time_remaining = 50.0
 	_apply_scene_style()
 	_update_scale()
 	get_viewport().size_changed.connect(_update_scale)

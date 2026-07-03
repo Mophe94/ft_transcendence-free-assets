@@ -3016,11 +3016,6 @@ script = ExtResource("1_xrrma")
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1232063011]
 
 [node name="Inventory_UI" parent="CanvasLayer" unique_id=260175515 instance=ExtResource("82_rk1so")]
-clip_contents = true
-offset_left = 520.0
-offset_top = 34.0
-offset_right = 936.0
-offset_bottom = 554.0
 
 [node name="Tooltip2" parent="." unique_id=1901411104 instance=ExtResource("83_cm8ci")]
 
