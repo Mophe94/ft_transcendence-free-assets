@@ -79,7 +79,7 @@ export class GameService implements OnModuleInit {
     return payload;
   }
 
-  async handleMessage(userId: number, payload: GamePayload): Promise<object | undefined> {
+  async handleMessage(userId: number, payload: any): Promise<object | undefined> {
     const player = this.playerService.getPlayer(userId)!;
     switch (payload.state) {
 /*       case "add_item":
