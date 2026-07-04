@@ -61,12 +61,14 @@ export class GameService implements OnModuleInit {
     const player = this.playerService.getPlayer(userId)!;
     this.phaseTimer.start(roomId, 'map', () => {
       console.log(`Room ${roomId} map phase timeout`);
-      //this.eventEmitter.emit('team_setup', {userId: userId, paylod: this.team_setup(player, player)}); //Player B
       this.phaseTimer.start(roomId, 'team_setup', () => {
         console.log(`Room ${roomId} team_setup phase timeout`);
       });
       player.timer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
       this.eventEmitter.emit('team_setup', {userId: userId, payload: this.team_setup(player, player)}); //Player A
+      //this.eventEmitter.emit('team_setup', {userId: userId, paylod: this.team_setup(player, player)}); //Player B
+      console.log(payload);
+      
       
     });
 
@@ -93,9 +95,12 @@ export class GameService implements OnModuleInit {
       case "try_catch":
         return this.received_try_catch(player)
       case "delete_monster":
-        return this.received_delete_monster(player, payload.data.monster)
+        return this.received_delete_monster(player, payload.monster)
       case "team_choice":
-        return this.received_team_choice(player, payload.data.battle_team)
+        {
+          console.log(`Payload team_choice: ${payload.battle_team}`);
+          return this.received_team_choice(player, payload.battle_team);
+        }
 /*       case "change_current_monster":
         return this.received_update_current_monster(player, payload.data.slot)
       case "use_item_combat":
@@ -192,7 +197,6 @@ export class GameService implements OnModuleInit {
           break;
       }
     }
-
     else{
       for (let i = 0; i < player.battle_team.length; ++i){
         player.battle_team[i]["name"] === monster[i]
