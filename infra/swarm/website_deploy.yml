@@ -13,7 +13,7 @@ services:
           - VITE_42_OAUTH_REDIRECT_URI=https://${HOST_IP}:8443/auth/callback
           - VITE_42_OAUTH_API_LINK=https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-e487562dd07b366dee9b3b29a8fd298cbcc4c96048e03e72a17e2de8e5211d57&redirect_uri=https://${HOST_IP}:8443/auth/callback&response_type=code
           - VITE_42_OAUTH_API=http://nginx:420/fortytwoapi/oauth/token
-          - VITE_IFRAME_SERVICE=http://nginx:420/iframe
+          - VITE_IFRAME_SERVICE=https://${HOST_IP}:8443/iframe
 
         secrets:
           - fortytwo_client_id
