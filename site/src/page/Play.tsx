@@ -38,10 +38,11 @@ export function Play() {
     console.log('function called');
     if (gameStart && iframeRef?.current && userToken && roomToken) {
       console.log('sent');
+      console.log(`${import.meta.env.VITE_DOMAIN_NAME}`);
       iframeRef.current.contentWindow.postMessage(
         {
           type: 'SET_GAME_TOKEN',
-          token: { user_token: userToken, room_token: roomToken },
+          token: { user_token: userToken, room_token: roomToken , domain_token: `${import.meta.env.VITE_DOMAIN_NAME}`},
         },
         `${import.meta.env.VITE_IFRAME_SERVICE}`,
       );

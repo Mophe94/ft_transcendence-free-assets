@@ -397,16 +397,16 @@ COPY public.maps_tiles (map_id, tile_id) FROM stdin;
 --
 
 COPY public.monsters (id, name, hp_total, attack, attack_spe, defense, defense_spe, speed, type, rarity) FROM stdin;
-1	Pisciner	50	10	10	5	5	50	neutral	not_foundable
-2	Fishet	120	10	15	5	15	100	water	common
-3	Burpy	100	20	30	0	20	80	water	uncommon
-4	Sharky	150	20	30	0	20	150	water	rare
-5	Squirrel	100	20	20	5	10	110	neutral	common
-6	Papate	180	10	15	5	10	80	earth	uncommon
-7	Gigantomakia	200	20	30	15	25	50	earth	rare
-9	Monkel	130	15	15	10	20	100	neutral	uncommon
-10	Pigeonne	120	25	25	10	10	160	fly	rare
-8	Leaves	80	35	45	0	10	100	plant	common
+1	pisciner	50	10	10	5	5	50	neutral	not_foundable
+2	fishet	120	10	15	5	15	100	water	common
+3	burpy	100	20	30	0	20	80	water	uncommon
+4	sharky	150	20	30	0	20	150	water	rare
+5	squirrel	100	20	20	5	10	110	neutral	common
+6	papate	180	10	15	5	10	80	earth	uncommon
+7	gigantomakia	200	20	30	15	25	50	earth	rare
+9	monkel	130	15	15	10	20	100	neutral	uncommon
+10	pigeonne	120	25	25	10	10	160	fly	rare
+8	leaves	80	35	45	0	10	100	plant	common
 \.
 
 

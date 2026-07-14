@@ -8,19 +8,11 @@ import { GamePayload } from './game.type';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
-import {
-  FULL_LOBBY,
-  PHASE_DURATIONS,
-} from 'apps/game-service/src/game/game.type';
-import { start_game } from './events/start_game';
-import { new_encounter } from './events/new_encounters';
+import { FULL_LOBBY, PHASE_DURATIONS,} from 'apps/game-service/src/game/game.type';
 import { max } from 'node_modules/class-validator/types';
 import { MonsterType } from './entities/types/monster_type.enum';
 import { Skill } from './entities/skills.entity';
-import {
-  CurrentMonster,
-  Skill as PlayerSkill,
-} from './player/player.interfaces';
+import { CurrentMonster, Skill as PlayerSkill,} from './player/player.interfaces';
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -69,12 +61,14 @@ export class GameService implements OnModuleInit {
     const player = this.playerService.getPlayer(userId)!;
     this.phaseTimer.start(roomId, 'map', () => {
       console.log(`Room ${roomId} map phase timeout`);
-      this.eventEmitter.emit('team_setup', {userId: userId, payload: this.team_setup(player, player)}); //Player A
-      //this.eventEmitter.emit('team_setup', {userId: userId, paylod: this.team_setup(player, player)}); //Player B
       this.phaseTimer.start(roomId, 'team_setup', () => {
         console.log(`Room ${roomId} team_setup phase timeout`);
       });
       player.timer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
+      this.eventEmitter.emit('team_setup', {userId: userId, payload: this.team_setup(player, player)}); //Player A
+      //this.eventEmitter.emit('team_setup', {userId: userId, paylod: this.team_setup(player, player)}); //Player B
+      console.log(payload);
+      
       
     });
 
@@ -85,7 +79,7 @@ export class GameService implements OnModuleInit {
     return payload;
   }
 
-  async handleMessage(userId: number, payload: GamePayload): Promise<object> {
+  async handleMessage(userId: number, payload: any): Promise<object | undefined> {
     const player = this.playerService.getPlayer(userId)!;
     switch (payload.state) {
 /*       case "add_item":
@@ -97,14 +91,17 @@ export class GameService implements OnModuleInit {
       case "use_item":
         return this.received_use_item(player, payload.data.item) */
       case 'new_encounter':
-        return this.received_new_encounter(player, payload.data.tile);
+        return this.received_new_encounter(player, 2/* payload.data.tile */);
       case "try_catch":
         return this.received_try_catch(player)
       case "delete_monster":
-        return this.received_delete_monster(player, payload.data.monster)
+        return this.received_delete_monster(player, payload.monster)
       case "team_choice":
-/*         return this.received_team_choice(player, payload.data.battle_team)
-      case "change_current_monster":
+        {
+          console.log(`Payload team_choice: ${payload.battle_team}`);
+          return this.received_team_choice(player, payload.battle_team);
+        }
+/*       case "change_current_monster":
         return this.received_update_current_monster(player, payload.data.slot)
       case "use_item_combat":
         return this.received_use_item_combat(player, enemy, payload.data.item)
@@ -113,7 +110,7 @@ export class GameService implements OnModuleInit {
       default:
         return {
           event: 'game',
-          data: { state: 'action_rejected', reason: 'invalid_action' },
+          data: { state: payload.state, reason: 'invalid_action' },
         };
     }
   }
@@ -121,12 +118,12 @@ export class GameService implements OnModuleInit {
   private async initMonster(
     player: Player,
     monsterId: number,
-  ): Promise<CurrentMonster | null> {
+  ): Promise<CurrentMonster | undefined> {
     const monster = await this.monstersService.findOneById(
       monsterId /* , { skills: true } */,
     );
     console.log('monster from DB:', monster);
-    if (!monster) return null;
+    if (!monster) return undefined;
     const currentMonster: CurrentMonster = {
       name: monster.name,
       type: String(monster.type), //add enum
@@ -147,15 +144,14 @@ export class GameService implements OnModuleInit {
 
   // HANDLERS
   // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
-  received_new_encounter(player: Player, tile: string){
-    //monster = this.monstersService(tile);
-    //demande object existant +++++ monster = name of item select
-    //player.current_monster = monster.name;
-    //player.current_monster_catch = 0
-    return new_encounter(player);
+  async received_new_encounter(player: Player, tile: number) : Promise<object | undefined>{
+    const monsters = await this.monstersService.findMonstersByTile(tile);
+    player.current_monster = monsters[1].name; //
+    console.log(`Monsters by tile: ${monsters[1]}`);
+    return this.new_encounter(player);
   }
 
-  received_delete_monster(player: Player, monster: string){
+  private received_delete_monster(player: Player, monster: string){
     for (let i = 0; i < player.team.length; ++i){
       if (player.team[i] === monster){
         player.team[i] = "";
@@ -165,7 +161,7 @@ export class GameService implements OnModuleInit {
     return this.update_team(player);
   }
 
-  received_try_catch(player: Player){
+  private received_try_catch(player: Player){
     let result = Math.floor(Math.random() * 101);
   
     if (result <= player.current_monster_catch /* rarity now? */){
@@ -179,6 +175,36 @@ export class GameService implements OnModuleInit {
     }
     else
       return this.result_catch(player, 0);
+  }
+
+  // CHECK TEAM SENDED AND IF IT'S EMPTY, ELSE AUTO FULLY BATTLE_TEAM IF IT'S POSSIBLE
+  // WHEN BATTLE_TEAM OK CALL DB GAME AND RETURN COMBAT
+  private received_team_choice(player: Player, monster: string[]){
+
+    let count:number = 0
+    for (let i = 0; i < monster.length; ++i){
+      if (monster[i] !== "")
+        count++;
+    }
+    if (count === 0){
+      for (let i = 0; i < player.team.length; ++i){
+        if (player.team[i] !== ""){
+          player.battle_team[count]["name"] = player.team[i]
+          player.battle_team[count]["slot"] = count
+          ++count;
+        }
+        if (count === 3)
+          break;
+      }
+    }
+    else{
+      for (let i = 0; i < player.battle_team.length; ++i){
+        player.battle_team[i]["name"] === monster[i]
+        player.battle_team[count]["slot"] = i
+      }
+    }
+    // call pour avoir toutes les data des monstre
+    return this.combat(player);
   }
 
   // JSON RESPONSE
@@ -215,7 +241,7 @@ export class GameService implements OnModuleInit {
     };
   }
 
-  new_encounter(player: Player) {
+  private new_encounter(player: Player) {
     return {
       event: 'game',
       data: {
@@ -225,7 +251,7 @@ export class GameService implements OnModuleInit {
     };
   }
 
-  result_catch(player: Player, result: number) {
+  private result_catch(player: Player, result: number) {
     return {
         event: "game",
         data: {
@@ -242,7 +268,7 @@ export class GameService implements OnModuleInit {
     };
   }
 
-  update_inventory(player: Player){
+  private update_inventory(player: Player){
     return {
       event: "game",
       data: {
@@ -254,7 +280,7 @@ export class GameService implements OnModuleInit {
     }
   }
 
-  new_current_item(player: Player){
+  private new_current_item(player: Player){
     return {
       event: "game",
       data: {
@@ -264,7 +290,7 @@ export class GameService implements OnModuleInit {
     }
   }
 
-  update_team(player: Player){
+  private update_team(player: Player){
     return {
         event: "game",
         data: {
@@ -276,7 +302,7 @@ export class GameService implements OnModuleInit {
     }
   }
 
-  team_setup(player: Player, enemy: Player){
+  private team_setup(player: Player, enemy: Player){
     return {
         event: "game",
         data: {
@@ -295,7 +321,19 @@ export class GameService implements OnModuleInit {
     }
   }
 
-  combat: () => object;
+  private combat(player: Player){
+    return {
+    event: "game",
+        data: {
+            state: "combat",
+            timer: player.timer,
+            player: {
+                battle_team: player.battle_team
+            }
+        }
+    }
+  }
+
   changeMonster: (new_monster: number) => object;
   attack: (enemy: Player, attackName: string) => object;
 

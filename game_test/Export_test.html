@@ -112,16 +112,22 @@ body {
 		<script src="Export_test.js"></script>
 		<script>
 		window.addEventListener("message", (event) => {
-
     if (event.data && event.data.type === "SET_GAME_TOKEN") {
-        const token = event.data.token;
-		console.log(event.data);
+        const tokenData = event.data.token;
 
-        if (typeof Godot !== 'undefined' && Godot.Instance) {
-            Godot.Instance.get_main_loop().get_root().get_node("MonNodeJeu").call("set_token", event.data.token);
-        } else {
-            window.userToken = token.user_token;
-			window.roomToken = token.room_token;
+        if (tokenData) {
+            window.userToken = tokenData.user_token || "";
+            window.roomToken = tokenData.room_token || "";
+            window.domainToken = tokenData.domain_token || "";
+
+            console.log("Tokens stockés dans window :", window.userToken, window.roomToken, window.domainToken);
+
+            if (typeof Godot !== 'undefined' && Godot.Instance) {
+                const nodeJeu = Godot.Instance.get_main_loop().get_root().get_node("MonNodeJeu");
+                if (nodeJeu && typeof nodeJeu.set_token === 'function') {
+                    nodeJeu.set_token(tokenData);
+                }
+            }
         }
     }
 });
