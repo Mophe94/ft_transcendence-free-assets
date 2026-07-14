@@ -66,7 +66,7 @@ if [ ${TYPE} == "manager" ]; then
     openssl genrsa -out ca.key 4096
     if [ -f /cert_info.env ]; then
 	source "/cert_info.env"
-	SUBJECT="/C=${CONTRY}/ST=${STATE}/L=${CITY}/O=${ORG}/OU=${OU}/CN=${IP}"
+	SUBJECT="/C=${COUNTRY}/ST=${STATE}/L=${CITY}/O=${ORG}/OU=${OU}/CN=${IP}"
 	openssl req -x509 -new -nodes \
 			-key ca.key \
 			-sha256 \
