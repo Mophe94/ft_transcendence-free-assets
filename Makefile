@@ -32,12 +32,12 @@ vm :
 
 setup_worker:
 	@ssh-keygen -f "/home/stempels/.ssh/known_hosts" -R "[localhost]:2222"
-	@if [ ! -f $(VM_SCRIPTS)/worker.sh ]; then \
-		echo "worker.sh file missing"; \
+	@if [ ! -f $(VM_SCRIPTS)/node.sh ]; then \
+		echo "node.sh file missing"; \
 		exit 1; \
 	fi
-	@chmod +x $(VM_SCRIPTS)/worker.sh;
-	@bash $(VM_SCRIPTS)/worker.sh $(TYPE) $(IP4);
+	@chmod +x $(VM_SCRIPTS)/node.sh;
+	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4);
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"

@@ -1,8 +1,6 @@
-FROM alpine:3.22.4
+FROM base-image
 
 WORKDIR /app
-
-RUN apk upgrade && apk add npm
 
 COPY . /app
 

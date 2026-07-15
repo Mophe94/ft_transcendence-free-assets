@@ -58,28 +58,13 @@ if [ ${TYPE} == "manager" ]; then
 
     echo "[$SCRIPT_NAME] Setting up directory"
     mkdir -p ${CERT_DIR}
+    mv /cert_info.env ${CERT_DIR}/cert_info.env 
 
     #Server CA generation
     echo "[$SCRIPT_NAME] Generating CA"
-    cd ${CERT_DIR}
 
-    openssl genrsa -out ca.key 4096
-    if [ -f /cert_info.env ]; then
-	source "/cert_info.env"
-	SUBJECT="/C=${COUNTRY}/ST=${STATE}/L=${CITY}/O=${ORG}/OU=${OU}/CN=${IP}"
-	openssl req -x509 -new -nodes \
-			-key ca.key \
-			-sha256 \
-			-days 30 \
-			-out ca.crt \
-			-subj "$SUBJECT"
-    else
-	openssl req -x509 -new -nodes \
-			-key ca.key \
-			-sha256 \
-			-days 30 \
-			-out ca.crt 
-    fi
+    chmod +x /cert_rootCA.sh
+    bash /cert_rootCA.sh ${CERT_DIR}
 
     echo "[$SCRIPT_NAME] Setting up Docker Daemon"
     mkdir -p "/etc/docker"
@@ -101,6 +86,9 @@ EOF
 	cp "${CERT_DIR}/ca.crt" "/etc/docker/certs.d/${IP}:5050/"
     fi
 fi
+
+echo "[$SCRIPT_NAME] Adding utils"
+apk add curl
 
 echo "[$SCRIPT_NAME] Setting up NFS"
 apk add nfs-utils

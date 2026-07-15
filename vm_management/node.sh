@@ -228,8 +228,8 @@ else
     echo "[$SCRIPT_NAME] Setting up node"
     ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
     declare -A BUNDLE
-    BUNDLE[manager]="vm_management/setup_node.sh vm_management/cert_info.env"
-    BUNDLE[worker]="vm_management/setup_node.sh"
+    BUNDLE[manager]=" vm_management/setup_node.sh vm_management/cert_rootCA.sh vm_management/cert_info.env"
+    BUNDLE[worker]="  vm_management/setup_node.sh"
     read -r -a files <<< "${BUNDLE[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     VM_TARGET_DIR="/"
@@ -256,9 +256,6 @@ else
     set -e
 fi
 set +e
-ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP=$IP USER_NAME=$VM_USER; exit 0"
-ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR/infra/ push TYPE=$TYPE HOST_IP=$IP USER_NAME=$VM_USER; exit 0"
-ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR/infra/ website TYPE=$TYPE HOST_IP=$IP USER_NAME=$VM_USER; exit 0"
-ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR/infra/ game TYPE=$TYPE HOST_IP=$IP USER_NAME=$VM_USER; exit 0"
-ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST"
+ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR/infra/ TYPE=$TYPE HOST_IP=$IP USER_NAME=$VM_USER; exit 0"
+ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "cd $VM_TARGET_DIR/infra/"
 set -e
