@@ -42,7 +42,7 @@ test:
 	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake fluent-bit --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl
 
 core:
-	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 	chmod +x $(SWARM_SCRIPT)/registry-check.sh
 	bash $(SWARM_SCRIPT)/registry-check.sh $(REGISTRY)
 
@@ -56,17 +56,17 @@ game:
 	@doas mkdir -p "/var/lib/postgresql/data"
 	@doas mkdir -p "/var/lib/game/data"
 	make image TARGET=game
-	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 observ:
 	@mkdir -p "/nfs-storage/grafana"
 	@mkdir -p "/nfs-storage/prometheus"
 	@mkdir -p "/nfs-storage/loki"
 	make image TARGET=observ
-	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 up: build
-	IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 down:
 	chmod 777 $(SWARM_SCRIPTS)/end_swarm.sh
