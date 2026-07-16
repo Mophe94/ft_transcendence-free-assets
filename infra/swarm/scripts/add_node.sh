@@ -33,7 +33,7 @@ for user in "${users[@]}"; do
     #doas scp -p 2222 "$user"@"$HOST_IP":"/etc/docker/certs.d/"
     VM_TARGET_DIR="/tmp"
     doas scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "/etc/certs/ca.crt" "$user"@"$HOST_IP":"$VM_TARGET_DIR"
-    ssh -p "$SSH_PORT" "$user"@"$HOST_IP" "chmod +x /setup_for_swarm && /setup_for_swarm  ${IP}; $JOIN_CMD; exit 0" > /dev/null 2>&1
+    ssh -p "$SSH_PORT" "$user"@"$HOST_IP" "chmod +x /setup_for_swarm.sh && /setup_for_swarm.sh ${IP} 2049; $JOIN_CMD; exit 0" > /dev/null 2>&1
     if [ "$?" != 0 ]; then
 	echo -e "[$SCRIPT_NAME] Error: could not connect to $user node\n"
     else

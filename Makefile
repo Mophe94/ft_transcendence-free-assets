@@ -42,8 +42,8 @@ setup_worker:
 worker:
 	@$(MAKE) setup_worker TYPE="worker"
 
-manager:
-	@$(MAKE) setup_worker TYPE="manager"
+leader:
+	@$(MAKE) setup_worker TYPE="leader"
 
 iso_test/image/*.iso:
 	mkdir -p iso_test/image

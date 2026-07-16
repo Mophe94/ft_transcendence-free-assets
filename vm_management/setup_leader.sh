@@ -16,7 +16,7 @@ elif [ "$USER" != "root" ]; then
 fi
 
 #Setup
-TYPE="manager"
+TYPE="leader"
 NEW_USER="$2"
 IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
 CERT_DIR="/etc/certs/"
@@ -54,7 +54,7 @@ echo "[$SCRIPT_NAME] Changing VM hostname to: swarmnode.${NEW_USER}"
 echo "swarmnode.${NEW_USER}" > /etc/hostname
 
 #Server CA creation
-if [ ${TYPE} == "manager" ]; then
+if [ ${TYPE} == "leader" ]; then
 
     echo "[$SCRIPT_NAME] Setting up directory"
     mkdir -p ${CERT_DIR}

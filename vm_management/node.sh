@@ -228,14 +228,14 @@ else
     echo "[$SCRIPT_NAME] Setting up node"
     ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
     declare -A BUNDLE
-    BUNDLE[manager]=" vm_management/setup_node.sh vm_management/cert_rootCA.sh vm_management/cert_info.env"
-    BUNDLE[worker]="  vm_management/setup_node.sh"
+    BUNDLE[leader]=" vm_management/setup_leader.sh vm_management/cert_rootCA.sh vm_management/cert_info.env"
+    BUNDLE[worker]="  vm_management/setup_worker.sh vm_management/setup_for_swarm.sh"
     read -r -a files <<< "${BUNDLE[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     VM_TARGET_DIR="/"
     set +e
     scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER; exit 0"
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_${TYPE}.sh; bash /setup_${TYPE}.sh $USER; exit 0"
     set -e
 
     while ssh -p $SSH_PORT -o ConnectTimeout=2 -o BatchMode=yes "$VM_USER"@"$SSH_HOST" true >/dev/null 2>&1; do
@@ -247,8 +247,8 @@ else
     echo "[$SCRIPT_NAME] Current user: $VM_USER"
     wait_for_ssh
     declare -A PACK
-    PACK[manager]="infra site backend database game_test"
-    PACK[worker]="infra/Makefile"
+    PACK[leader]="infra site backend database game_test"
+    PACK[worker]="infra/Makefile vm_mana"
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     set +e

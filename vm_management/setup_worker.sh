@@ -5,10 +5,10 @@ set -e
 SCRIPT_NAME="${0##*/}"
 
 if [ ! $# -eq 2 ]; then
-    echo "Usage: ${SCRIPT_NAME} <leader host ip> <node new username>"
+    echo "Usage: ${SCRIPT_NAME} <node new username>"
     exit 1
 elif [ -z "$1" ] || [ -z "$2" ]; then
-    echo "Usage: ${SCRIPT_NAME} <node type> <node new username>"
+    echo "Usage: ${SCRIPT_NAME} <node new username>"
     exit 1
 elif [ "$USER" != "root" ]; then
     echo "[$SCRIPT_NAME] This script need to be runned as root"
