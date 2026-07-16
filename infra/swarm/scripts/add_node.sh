@@ -49,7 +49,7 @@ for user in "${users[@]}"; do
     doas scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "/etc/certs/ca.crt /home/${USER}/certs/worker_crt /home/${USER}/certs/worker_key" "$user"@"${HOST_IP}":"$VM_TARGET_DIR"
     try=0
 	while $try < 3; do
-	ssh -p "$SSH_PORT" "$user"@"$HOST_IP" "chmod +x /setup_for_swarm.sh && /setup_for_swarm.sh ${IP} 2049; docker swarm join --advertise-addr ${HOST_IP} --token $JOIN_CMD ${IP}:2377; exit 0" > /dev/null 2>&1
+	ssh -p "$SSH_PORT" "$user"@"$HOST_IP" "chmod +x /setup_for_swarm.sh && /setup_for_swarm.sh ${IP} ${HOST_IP} ${JOIN_CMD} 2049; exit 0" > /dev/null 2>&1
 	if [ "$?" != 0 ]; then
 	    echo -e "[$SCRIPT_NAME] Error: could not connect to $user node\n"
 	    try=$((try + 1))
