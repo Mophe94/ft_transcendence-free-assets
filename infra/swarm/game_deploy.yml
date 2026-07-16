@@ -1,6 +1,6 @@
 services:
     game_service:
-        image: ${IP}:${REGISTRY_PORT}/backend:latest
+        image: ${HOST_IP}:${REGISTRY_PORT}/backend:latest
 #        env_file:
 #          - "site/BackEnd/.env"
 
@@ -34,7 +34,7 @@ services:
             replicas: 1
 
     game:
-        image: ${IP}:${REGISTRY_PORT}/game:latest
+        image: ${HOST_IP}:${REGISTRY_PORT}/game:latest
 
         networks:
             - games_net
@@ -47,7 +47,7 @@ services:
             replicas: 1
 
     game_db:
-        image: ${IP}:${REGISTRY_PORT}/game_db:latest
+        image: ${HOST_IP}:${REGISTRY_PORT}/game_db:latest
 #        env_file:
 #          - "site/databases/game_db/.env"
 
