@@ -106,7 +106,7 @@ read -t 20 answer || true
 case "${answer,,}" in
 	[y]|[yes])
 	    chmod +x "${DIR}/add_node.sh"
-	   bash "${DIR}/add_node.sh";;
+	   bash "${DIR}/add_node.sh" ${HOST_IP};;
 	*) echo "[$SCRIPT_NAME] No node added"
 esac
 
