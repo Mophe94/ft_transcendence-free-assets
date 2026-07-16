@@ -38,6 +38,8 @@ services:
           - nginx_key
           - registry_crt
           - registry_key
+          - worker_crt
+          - worker_key
 
         networks:
             - swarm_net
@@ -73,6 +75,10 @@ secrets:
   registry_crt:
     external: true
   registry_key:
+    external: true
+  worker_crt:
+    external: true
+  worker_key:
     external: true
 
 networks:
