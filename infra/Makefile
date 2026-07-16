@@ -19,7 +19,7 @@ TARGET=""
 all: node_launch
 
 node_launch:
-	@if [ "$(TYPE)" == "manager" ]; then \
+	@if [ "$(TYPE)" == "leader" ]; then \
 	    $(MAKE) swarm_setup; \
 	    $(MAKE) core; \
 	    $(MAKE) push website game; \

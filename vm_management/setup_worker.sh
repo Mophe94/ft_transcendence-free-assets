@@ -55,7 +55,6 @@ mkdir -p /etc/docker
 
 cat >/etc/docker/daemon.json <<EOF
 {
-  "live-restore": true,
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "10m",
