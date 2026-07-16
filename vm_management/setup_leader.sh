@@ -14,7 +14,7 @@ fi
 
 #Setup
 TYPE="leader"
-NEW_USER="$2"
+NEW_USER="$1"
 IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
 CERT_DIR="/etc/certs/"
 SSH_CONFIG="/etc/ssh/sshd_config"
