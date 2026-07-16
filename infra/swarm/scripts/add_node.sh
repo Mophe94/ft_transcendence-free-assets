@@ -46,7 +46,7 @@ for user in "${users[@]}"; do
     #need to add something as IP, wich ?
     #doas scp -p 2222 "$user"@"$HOST_IP":"/etc/docker/certs.d/"
     VM_TARGET_DIR="/tmp"
-    doas scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "/etc/certs/ca.crt" "$user"@"${HOST_IP}":"$VM_TARGET_DIR"
+    doas scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "/etc/certs/ca.crt /home/${USER}/certs/worker_crt /home/${USER}/certs/worker_key" "$user"@"${HOST_IP}":"$VM_TARGET_DIR"
     try=0
 	while $try < 3; do
 	ssh -p "$SSH_PORT" "$user"@"$HOST_IP" "chmod +x /setup_for_swarm.sh && /setup_for_swarm.sh ${IP} 2049; docker swarm join --advertise-addr ${HOST_IP} --token $JOIN_CMD ${IP}:2377; exit 0" > /dev/null 2>&1
