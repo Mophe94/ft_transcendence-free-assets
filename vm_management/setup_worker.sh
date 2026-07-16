@@ -5,7 +5,7 @@ set -e
 SCRIPT_NAME="${0##*/}"
 
 if [ ! $# -eq 2 ]; then
-    echo "Usage: ${SCRIPT_NAME} <node type> <node new username>"
+    echo "Usage: ${SCRIPT_NAME} <leader host ip> <node new username>"
     exit 1
 elif [ -z "$1" ] || [ -z "$2" ]; then
     echo "Usage: ${SCRIPT_NAME} <node type> <node new username>"
@@ -16,7 +16,7 @@ elif [ "$USER" != "root" ]; then
 fi
 
 #Setup
-TYPE="$1"
+TYPE="worker"
 NEW_USER="$2"
 IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
 CERT_DIR="/etc/certs/"
@@ -53,54 +53,26 @@ fi
 echo "[$SCRIPT_NAME] Changing VM hostname to: swarmnode.${NEW_USER}"
 echo "swarmnode.${NEW_USER}" > /etc/hostname
 
-#Server CA creation
-if [ ${TYPE} == "manager" ]; then
+# Docker configuration
+mkdir -p /etc/docker
 
-    echo "[$SCRIPT_NAME] Setting up directory"
-    mkdir -p ${CERT_DIR}
-    mv /cert_info.env ${CERT_DIR}/cert_info.env 
-
-    #Server CA generation
-    echo "[$SCRIPT_NAME] Generating CA"
-
-    chmod +x /cert_rootCA.sh
-    bash /cert_rootCA.sh ${CERT_DIR}
-
-    echo "[$SCRIPT_NAME] Setting up Docker Daemon"
-    mkdir -p "/etc/docker"
-    if [ ! -f ${CERT_DIR}/ca.crt ]; then
-	echo "[$SCRIPT_NAME] Missing CA certificate, marking registry as insecure"
-	if [ -f "/etc/docker/daemon.json" ]; then
-	    rm -f "/etc/docker/daemon.json"
-	fi
-	cat > "/etc/docker/daemon.json" << EOF
-	{
-	    "insecure-registries": [
-		"${IP}:5050"
-	    ]
-	}
+cat >/etc/docker/daemon.json <<EOF
+{
+  "live-restore": true,
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
 EOF
-    else
-	echo "[$SCRIPT_NAME] Found CA certificate, marking registry as secure"
-	mkdir -p "/etc/docker/certs.d/${IP}:5050/"
-	cp "${CERT_DIR}/ca.crt" "/etc/docker/certs.d/${IP}:5050/"
-    fi
-fi
 
-echo "[$SCRIPT_NAME] Adding utils"
-apk add curl
+#echo "[$SCRIPT_NAME] Adding utils"
 
 echo "[$SCRIPT_NAME] Setting up NFS"
 apk add nfs-utils
 rc-update add rpcbind
 rc-update add nfs
-
-echo "[$SCRIPT_NAME] Setting up nfs-storage"
-mkdir -p /nfs-storage/{registry,monitoring,backups} \
-    && chown -R ${NEW_USER}:${NEW_USER} "/nfs-storage"
-echo "/nfs-storage *(rw,sync,no_subtree_check,no_root_squash)" >> "/etc/exports"
-exportfs -ra
-#check with exportfs -v
 
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"
 
