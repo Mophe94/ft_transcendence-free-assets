@@ -4,17 +4,19 @@
 SCRIPT_NAME="${0##*/}"
 set -eu
 
-if [ ! $# -eq 2 ]; then
-    echo "Usage: ${SCRIPT_NAME} <leader host ip> <NFS port>"
+if [ ! $# -eq 4 ]; then
+    echo "Usage: ${SCRIPT_NAME} <leader host ip> <node host ip> <join command> <NFS port>"
     exit 1
 elif [ -z "$1" ] || [ -z "$2" ]; then
-    echo "Usage: ${SCRIPT_NAME} <node type> <NFS port>"
+    echo "Usage: ${SCRIPT_NAME} <leader host ip> <node host ip> <join command> <NFS port>"
     exit 1
 fi
 
 # Setup
-NFS_SERVER="$1"
-NFS_PORT="$2"
+LEADER_IP="$1"
+NODE_IP="$2"
+JOIN_COMD="$3"
+NFS_PORT="$4"
 
 # Path to the CA certificate copied by the leader
 CA_CERT="/tmp/ca.crt"
@@ -43,10 +45,29 @@ if ! command -v mount.nfs >/dev/null 2>&1; then
 fi
 
 # Check NFS connectivity
-if ! nc -z "$NFS_SERVER" ${NFS_PORT}; then
-    echo "[WARNING][$SCRIPT_NAME]: Could not reach NFS server ${NFS_SERVER}:${NFS_PORT}i"
+if ! nc -z "$LEADER_IP" ${NFS_PORT}; then
+    echo "[WARNING][$SCRIPT_NAME]: Could not reach NFS server ${LEADER_IP}:${NFS_PORT}i"
 else
-    echo "[INFO][$SCRIPT_NAME]: NFS server ${NFS_SERVER}:${NFS_PORT} reached"
+    echo "[INFO][$SCRIPT_NAME]: NFS server ${LEADER_IP}:${NFS_PORT} reached"
 fi
 
-echo "Worker successfully configured."
+# Adding certificates to docker
+doas mkdir -p /etc/docker/certs.d/${LEADER_IP}:5050
+doas cp /tmp/worker_crt /tmp/workerkey /etc/docker/certs.d/${LEADER_IP}:5050/
+
+doas rc-service docker restart
+COUNTER=0
+TIMEOUT=30
+echo "[INFO][$SCRIPT_NAME] Waiting for docker to restart"
+while ! docker info >/dev/null 2>&1; do
+    if [ "$COUNTER" -ge "$TIMEOUT" ]; then
+        echo "[ERROR][$SCRIPT_NAME] Docker took to much time"
+        exit 1
+    fi
+    COUNTER=$((COUNTER + 1))
+    sleep 2
+    echo -n "."
+done
+
+docker swarm join --advertise-addr ${NODE_IP} --token ${JOIN_CMD} ${LEADER_IP}:2377
+echo "[INFO][$SCRIPT_NAME] Worker successfully configured."
