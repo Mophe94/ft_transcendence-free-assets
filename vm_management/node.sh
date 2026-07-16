@@ -168,6 +168,7 @@ else
 	    --natpf1 "node_communication-TCP,tcp,,7946,,7946" \
 	    --natpf1 "node_communication-UDP,udp,,7946,,7946" \
 	    --natpf1 "overlay_networks,udp,,4789,,4789" \
+		--natpf1 "local_registry,tcp,,5050,,5050" \
 	    --paravirtprovider default \
 	    --nictype1 virtio \
 	    --natdnshostresolver1 on \
