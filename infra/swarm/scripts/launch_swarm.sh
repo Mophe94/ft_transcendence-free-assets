@@ -81,6 +81,14 @@ else
 	docker secret create registry_crt $HOME/certs/registry.crt
 	docker secret create registry_key $HOME/certs/registry.key
     fi
+	 if docker secret inspect worker_crt >/dev/null 2>&1 && \
+       docker secret inspect worker_key >/dev/null 2>&1; then
+	echo "[$SCRIPT_NAME] Registry secrets already exist"
+    else
+	bash $HOME/infra/cert_creation.sh "/etc/certs" "${IP}" worker
+	docker secret create worker_crt $HOME/certs/worker.crt
+	docker secret create worker_key $HOME/certs/worker.key
+    fi
 fi
 
 networks=("swarm_net" "obsrv_net" "games_net" "site_net")
