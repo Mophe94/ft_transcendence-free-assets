@@ -70,7 +70,7 @@ VM_DIR=""
 
 # Define role of VM
 if [ $# -eq 2 ]; then
-    if [ "$1" == "manager" ] || [ "$1" == "worker" ]; then
+    if [ "$1" == "leader" ] || [ "$1" == "worker" ]; then
 	TYPE="${1,,}"
     else
 	echo "[$SCRIPT_NAME] invalid argument $1"
@@ -256,6 +256,5 @@ else
     set -e
 fi
 set +e
-ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR/infra/ TYPE=$TYPE HOST_IP=$IP USER_NAME=$VM_USER; exit 0"
 ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "cd $VM_TARGET_DIR/infra/"
 set -e
