@@ -4,14 +4,11 @@ set -e
 #Safeguard
 SCRIPT_NAME="${0##*/}"
 
-if [ ! $# -eq 2 ]; then
+if [ ! $# -eq 1 ]; then
     echo "Usage: ${SCRIPT_NAME} <node new username>"
     exit 1
-elif [ -z "$1" ] || [ -z "$2" ]; then
+elif [ -z "$1" ]; then
     echo "Usage: ${SCRIPT_NAME} <node new username>"
-    exit 1
-elif [ "$USER" != "root" ]; then
-    echo "[$SCRIPT_NAME] This script need to be runned as root"
     exit 1
 fi
 

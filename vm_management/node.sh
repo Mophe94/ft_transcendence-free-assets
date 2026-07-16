@@ -235,7 +235,7 @@ else
     VM_TARGET_DIR="/"
     set +e
     scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_${TYPE}.sh; bash /setup_${TYPE}.sh $USER; exit 0"
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_${TYPE}.sh; bash /setup_${TYPE}.sh ${USER}; exit 0"
     set -e
 
     while ssh -p $SSH_PORT -o ConnectTimeout=2 -o BatchMode=yes "$VM_USER"@"$SSH_HOST" true >/dev/null 2>&1; do
