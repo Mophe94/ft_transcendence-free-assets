@@ -4,11 +4,11 @@ set -e
 #Safeguard
 SCRIPT_NAME="${0##*/}"
 
-if [ ! $# -eq 1 ]; then
-    echo "Usage: ${SCRIPT_NAME} <node new username>"
+if [ ! $# -eq 2 ]; then
+    echo "Usage: ${SCRIPT_NAME} <node new username> <host ip>"
     exit 1
 elif [ -z "$1" ]; then
-    echo "Usage: ${SCRIPT_NAME} <node new username>"
+    echo "Usage: ${SCRIPT_NAME} <node new username> <host ip>"
     exit 1
 fi
 
@@ -16,6 +16,7 @@ fi
 TYPE="worker"
 NEW_USER="$1"
 IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
+HOST_IP="$2"
 CERT_DIR="/etc/certs/"
 SSH_CONFIG="/etc/ssh/sshd_config"
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"

@@ -45,7 +45,8 @@ fi
 
 # Adding certificates to docker
 doas mkdir -p /etc/docker/certs.d/${LEADER_IP}:5050
-doas cp /tmp/worker_crt /tmp/worker_key /etc/docker/certs.d/${LEADER_IP}:5050/
+doas cp /tmp/worker.crt /etc/docker/certs.d/${LEADER_IP}:5050/client.cert
+doas cp /tmp/worker.key /etc/docker/certs.d/${LEADER_IP}:5050/client.key
 
 doas rc-service docker restart
 COUNTER=0

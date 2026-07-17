@@ -4,17 +4,19 @@ set -e
 #Safeguard
 SCRIPT_NAME="${0##*/}"
 
-if [ ! $# -eq 1 ]; then
-    echo "Usage: ${SCRIPT_NAME} <node new username>"
+if [ ! $# -eq 2 ]; then
+    echo "Usage: ${SCRIPT_NAME} <node new username> <host_ip>"
     exit 1
 elif [ -z "$1" ]; then
-    echo "Usage: ${SCRIPT_NAME} <node new username>"
+    echo "Usage: ${SCRIPT_NAME} <node new username> <host_ip>"
     exit 1
+else
+    NEW_USER="$1"
+    HOST_IP="$2"
 fi
 
 #Setup
 TYPE="leader"
-NEW_USER="$1"
 IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
 CERT_DIR="/etc/certs/"
 SSH_CONFIG="/etc/ssh/sshd_config"
@@ -73,14 +75,31 @@ if [ ${TYPE} == "leader" ]; then
 	cat > "/etc/docker/daemon.json" << EOF
 	{
 	    "insecure-registries": [
-		"${IP}:5050"
+		"${HOST_IP}:5050"
 	    ]
+	    "log-driver": "json-file",
+	    "log-opts": {
+		"max-size": "10m",
+		"max-file": "3"
+	    }
 	}
 EOF
     else
 	echo "[$SCRIPT_NAME] Found CA certificate, marking registry as secure"
-	mkdir -p "/etc/docker/certs.d/${IP}:5050/"
-	cp "${CERT_DIR}/ca.crt" "/etc/docker/certs.d/${IP}:5050/"
+	mkdir -p "/etc/docker/certs.d/${HOST_IP}:5050/"
+	cp "${CERT_DIR}/ca.crt" "/etc/docker/certs.d/${HOST_IP}:5050/"
+	if [ -f "/etc/docker/daemon.json" ]; then
+	    rm -f "/etc/docker/daemon.json"
+	fi
+	cat > "/etc/docker/daemon.json" << EOF
+	{
+	    "log-driver": "json-file",
+	    "log-opts": {
+		"max-size": "10m",
+		"max-file": "3"
+	    }
+	}
+EOF
     fi
 fi
 

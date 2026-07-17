@@ -8,7 +8,7 @@ CONTAINER_FILES:= "$(LOCATION)/containers"
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 HOST_IP:= $(shell cat host_ip.txt)
 REG_PORT ?=5050
-REGISTRY ?= $(IP4):$(REG_PORT)
+REGISTRY ?= $(HOST_IP):$(REG_PORT)
 TAG ?= latest
 BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) REGISTRY=$(REGISTRY) TAG=$(TAG)
 DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) REGISTRY_PORT=$(REG_PORT) 
@@ -20,8 +20,8 @@ all: node_launch
 
 node_launch:
 	@if [ "$(TYPE)" == "leader" ]; then \
-	    $(MAKE) swarm_setup; \
-	    $(MAKE) core; \
+	    $(MAKE) swarm_setup && \
+	    $(MAKE) core && \
 	    $(MAKE) push website game; \
 	fi
 
@@ -43,8 +43,8 @@ test:
 
 core:
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
-	chmod +x $(SWARM_SCRIPT)/registry-check.sh
-	bash $(SWARM_SCRIPT)/registry-check.sh $(REGISTRY)
+	chmod +x $(SWARM_SCRIPTS)/registry_check.sh
+	bash $(SWARM_SCRIPTS)/registry_check.sh "$(REGISTRY)"
 
 website:
 	@doas mkdir -p "/var/lib/postgresql/data"
@@ -81,6 +81,21 @@ swarm-status:
 	else \
 	    echo "Swarm status: inactive"; \
 	fi
+
+addnote:
+	echo -n "[$SCRIPT_NAME] Do you want to add more node (y/N): " 
+	read -t 15 answer || true
+	case "${answer,,}" in
+		[y]|[yes])
+		    answer=""
+		    echo -n "[$SCRIPT_NAME] Node(s) user(s): " 
+		    read -t 15 answer || true
+		    if [ ! -z "$answer" ]; then
+			chmod +x "${DIR}/add_node.sh"
+			bash "${DIR}/add_node.sh" ${HOST_IP} ${answer}
+		    fi ;;
+		*) echo "[$SCRIPT_NAME] No node added"
+	esac
 
 image:
 	@case "$(TARGET)" in \
