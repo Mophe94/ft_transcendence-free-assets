@@ -227,8 +227,8 @@ else
 
     echo "[$SCRIPT_NAME] Adding needed file"
     declare -A BUNDLE
-    BUNDLE[leader]=" vm_management/setup_leader.sh vm_management/cert_rootCA.sh vm_management/cert_info.env"
-    BUNDLE[worker]="  vm_management/setup_worker.sh vm_management/setup_for_swarm.sh"
+    BUNDLE[leader]="vm_management/setup_leader.sh vm_management/cert_rootCA.sh vm_management/cert_info.env"
+    BUNDLE[worker]="vm_management/setup_worker.sh vm_management/setup_for_swarm.sh"
     read -r -a files <<< "${BUNDLE[$TYPE]}"
     #echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     VM_TARGET_DIR="/"
@@ -247,7 +247,7 @@ else
     wait_for_ssh
     declare -A PACK
     PACK[leader]="infra site backend database game_test"
-    PACK[worker]="infra/Makefile vm_mana"
+    PACK[worker]="infra/Makefile"
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     set +e
