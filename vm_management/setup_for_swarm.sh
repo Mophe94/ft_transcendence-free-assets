@@ -15,19 +15,11 @@ fi
 # Setup
 LEADER_IP="$1"
 NODE_IP="$2"
-JOIN_COMD="$3"
+JOIN_CMD="$3"
 NFS_PORT="$4"
 
 # Path to the CA certificate copied by the leader
 CA_CERT="/tmp/ca.crt"
-SSH_KEY="/tmp/host_ssh_key"
-
-#echo "[$SCRIPT_NAME] Setting up leader SSH login"
-#mkdir -p "$USER/.ssh"
-#chmod 700 "/home/${USER}/.ssh"
-#cat "${SSH_KEY}" > "/home/${USER}/.ssh/authorized_keys" 
-#chmod 600 "/home/${USER}/.ssh/authorized_keys"
-#chown -R ${USER}:${USER} "/home/${USER}/.ssh"
 
 # Install leader CA
 if [ -f "$CA_CERT" ]; then
@@ -53,7 +45,7 @@ fi
 
 # Adding certificates to docker
 doas mkdir -p /etc/docker/certs.d/${LEADER_IP}:5050
-doas cp /tmp/worker_crt /tmp/workerkey /etc/docker/certs.d/${LEADER_IP}:5050/
+doas cp /tmp/worker_crt /tmp/worker_key /etc/docker/certs.d/${LEADER_IP}:5050/
 
 doas rc-service docker restart
 COUNTER=0
@@ -71,3 +63,12 @@ done
 
 docker swarm join --advertise-addr ${NODE_IP} --token ${JOIN_CMD} ${LEADER_IP}:2377
 echo "[INFO][$SCRIPT_NAME] Worker successfully configured."
+
+#echo "[$SCRIPT_NAME] Setting up leader SSH login"
+#SSH_KEY="/tmp/host_ssh_key"
+#mkdir -p "$USER/.ssh"
+#chmod 700 "/home/${USER}/.ssh"
+#cat "${SSH_KEY}" > "/home/${USER}/.ssh/authorized_keys" 
+#chmod 600 "/home/${USER}/.ssh/authorized_keys"
+#chown -R ${USER}:${USER} "/home/${USER}/.ssh"
+

@@ -168,7 +168,7 @@ else
 	    --natpf1 "node_communication-TCP,tcp,,7946,,7946" \
 	    --natpf1 "node_communication-UDP,udp,,7946,,7946" \
 	    --natpf1 "overlay_networks,udp,,4789,,4789" \
-		--natpf1 "local_registry,tcp,,5050,,5050" \
+	    --natpf1 "local_registry,tcp,,5050,,5050" \
 	    --paravirtprovider default \
 	    --nictype1 virtio \
 	    --natdnshostresolver1 on \
@@ -214,25 +214,23 @@ else
     echo "[$SCRIPT_NAME] Starting VM..."
     VBoxManage startvm "$VM_NAME" --type headless
 
-    #Waiting for VM ssh to be ready
+    # Generating ssh key
     if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
 	ssh-keygen -f $HOME/.ssh/${SSH_KEY_NAME} -N "$SSH_KEY_PASSPHRASE"
     fi
-    PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
     wait_for_ssh
-#    echo "[$SCRIPT_NAME] SSH is fully ready"
-    echo "[$SCRIPT_NAME] Setting up worker"
-    echo "$IP" > "infra/host_ip.txt"
-
-#    VM_TARGET_DIR="/home/$USER"
 
     echo "[$SCRIPT_NAME] Setting up node"
+    echo "$IP" > "infra/host_ip.txt"
+    PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
     ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
+
+    echo "[$SCRIPT_NAME] Adding needed file"
     declare -A BUNDLE
     BUNDLE[leader]=" vm_management/setup_leader.sh vm_management/cert_rootCA.sh vm_management/cert_info.env"
     BUNDLE[worker]="  vm_management/setup_worker.sh vm_management/setup_for_swarm.sh"
     read -r -a files <<< "${BUNDLE[$TYPE]}"
-    echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
+    #echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     VM_TARGET_DIR="/"
     set +e
     scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"

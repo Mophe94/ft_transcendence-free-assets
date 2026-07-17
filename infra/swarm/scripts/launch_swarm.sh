@@ -13,49 +13,6 @@ DIR="$1"
 HOST_IP="$2"
 IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
 
-#SETUP DOCKER DEAMON
-#mkdir -p /etc/docker
-#if [ ! -f "/etc/docker/daemon.json" ]; then
-#    cat << EOF > /etc/docker/daemon.json
-#{
-#    "insecure-registries": [
-#        "registry",
-#        "registry:5000",
-#        "$IP:80"
-#    ]
-#}
-#EOF
-#
-#    if [ -f /etc/os-release ]; then
-#	DISTRO=$(grep -E '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
-#    else
-#	echo "Can not detect os-version"
-#	exit 1
-#    fi
-#
-#    case "$DISTRO" in
-#	alpine)
-#	    rc-service docker restart
-#	    ;;
-#	*)
-#	    echo "Os-version unsupported by this script"
-#	    exit 1
-#	    ;;
-#    esac
-#
-#    COUNTER=0
-#    TIMEOUT=30
-#    echo "Waiting for docker to restart"
-#    while ! docker info >/dev/null 2>&1; do
-#	if [ "$COUNTER" -ge "$TIMEOUT" ]; then
-#	    echo "Docker took to much time"
-#	    exit 1
-#	fi
-#	COUNTER=$((COUNTER + 1))
-#	sleep 2
-#	echo -n "."
-#    done
-#fi
 #INIT THE SWARM AND PUBLISH IS IP OF CONTACT(HOST_IP)#
 if [ ! "$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then
     docker swarm init --advertise-addr ${HOST_IP}
@@ -103,13 +60,28 @@ for network in "${networks[@]}"; do
     fi
 done
 
-#Adding more node ?
-echo -n "[$SCRIPT_NAME] Do you want to add more node (y/N): " 
-read -t 20 answer || true
+#Adding preconfigured nodes
+echo -n "[$SCRIPT_NAME] Do you want to add preconfigured node (y/N): " 
+read -t 15 answer || true
 case "${answer,,}" in
 	[y]|[yes])
 	    chmod +x "${DIR}/add_node.sh"
-	   bash "${DIR}/add_node.sh" ${HOST_IP};;
+	   bash "${DIR}/add_node.sh" ${HOST_IP} agaland bertrmar dbajeux kprist stempels;;
+	*) echo "[$SCRIPT_NAME] No node added"
+esac
+
+#Adding more node
+echo -n "[$SCRIPT_NAME] Do you want to add more node (y/N): " 
+read -t 15 answer || true
+case "${answer,,}" in
+	[y]|[yes])
+	    answer=""
+	    echo -n "[$SCRIPT_NAME] Node(s) user(s): " 
+	    read -t 15 answer || true
+	    if [ -z "$answer" ]; then
+		chmod +x "${DIR}/add_node.sh"
+		bash "${DIR}/add_node.sh" ${HOST_IP};;
+	    fi
 	*) echo "[$SCRIPT_NAME] No node added"
 esac
 

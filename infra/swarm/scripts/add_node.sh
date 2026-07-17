@@ -6,68 +6,128 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/07/16 15:09:22 by stempels         ###   ########.fr        #
+#    Updated: 2026/07/17 08:55:57 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #! /bin/bash
 
-#TODO	- setup docker daeon certificate list
-#	- handling nfs storage mount for node
-IP="$1"
-
 SCRIPT_NAME="${0##*/}"
 
-users=("agaland" "bertmart" "dbajeux" "kprist" "stempels") 
+if [ ! $# -lt 2 ]; then
+    help
+fi
 
-MANAGER_JOIN_CMD=$(docker swarm joint-token -q manager)
+help() {
+    echo "[INFO] Usage ${SCRIPT_NAME}: <leader ip> <node user> <node user> <...>"
+}
+
+is_ip() {
+    local ip="$1"
+    local octet
+
+    echo "$ip" | grep -Eq '^([0-9]{1,3}\.){3}[0-9]{1,3}$' || return 1
+
+    IFS='.' read -r -a octets <<< "$ip"
+
+    for octet in "${octets[@]}"; do
+        if [ "$octet" -gt 255 ]; then
+            return 1
+        fi
+    done
+
+    return 0
+}
+
+if [ is_ip "$1" ]; then
+    LEADER_IP="$1"
+else
+    help
+fi
+shift
+
+NODE_USERS="$@"
+
 WORKER_JOIN_CMD=$(docker swarm joint-token -q worker)
 
+TARGET_MANAGERS=3
 NODE_CONNECTED=0
-JOIN_CMD="$MANAGER_JOIN_CMD"
+JOIN_CMD="$WORKER_JOIN_CMD"
 
-NBR_MANAGER=0
-for user in "${users[@]}"; do
-    if [ "$user" == "$USER" ]; then
+SSH_KEY_NAME="${USER}_transcendence_node"
+SSH_KEY_PASSPHRASE=
+SSH_PORT=2222
+PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
+
+# Generating ssh key
+if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
+    ssh-keygen -f $HOME/.ssh/${SSH_KEY_NAME} -N "$SSH_KEY_PASSPHRASE"
+fi
+
+for user in "${NODE_USERS[@]}"; do
+    if [ "$user" = "$USER" ]; then
 	continue
-    fi
-    if [ "$NBR_MANAGER" -eq 3 ]; then
-	JOIN_CMD="$WORKER_JOIN_CMD"
+    else docker node ls --format '{{.Hostname}}' | grep -Fxq "$user"; then
+	echo "[INFO][$SCRIPT_NAME] $user already belongs to the swarm."
+	continue
     fi
     echo "[$SCRIPT_NAME] Connecting to $user node:"
     read -p "[$SCRIPT_NAME]    IP of $user node host machine: " answer
     HOST_IP=$answer
-    #-->add validation of IP then prompt again, maybe max 3 times
-
-    #handling password automaticaly ?
-#    read -p "[$SCRIPT_NAME] Password of $user node:" answer
-#    NODE_PASS=$answer
-    
-    #need to add something as IP, wich ?
-    #doas scp -p 2222 "$user"@"$HOST_IP":"/etc/docker/certs.d/"
-    VM_TARGET_DIR="/tmp"
-    doas scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "/etc/certs/ca.crt /home/${USER}/certs/worker_crt /home/${USER}/certs/worker_key" "$user"@"${HOST_IP}":"$VM_TARGET_DIR"
     try=0
-	while $try < 3; do
-	ssh -p "$SSH_PORT" "$user"@"$HOST_IP" "chmod +x /setup_for_swarm.sh && /setup_for_swarm.sh ${IP} ${HOST_IP} ${JOIN_CMD} 2049; exit 0" > /dev/null 2>&1
+    while [ "$try" -lt 3 ]; do
+	ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "${user}"@"${HOST_IP}" \
+		    "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || \
+		    echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
 	if [ "$?" != 0 ]; then
-	    echo -e "[$SCRIPT_NAME] Error: could not connect to $user node\n"
+	    echo -e "[ERROR][$SCRIPT_NAME] Could not connect to $user node\n"
 	    try=$((try + 1))
 	else
-	    NODE_CONNECTED=($NODE_CONNECTED + 1)
+	    doas scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no \
+		"/etc/certs/ca.crt /home/${user}/certs/worker_crt /home/${user}/certs/worker_key" \
+		"$user"@"${HOST_IP}":"$VM_TARGET_DIR"
+	    VM_TARGET_DIR="/tmp"
+	    ssh -p "$SSH_PORT" "$user"@"$HOST_IP" \
+		"chmod +x /setup_for_swarm.sh && \
+		nohup /setup_for_swarm.sh ${LEADER_IP} ${HOST_IP} ${JOIN_CMD} 2049; \
+		>/tmp/setup_for_swarm.log 2>&1 < /dev/null &"
+	    NODE_CONNECTED=$(($NODE_CONNECTED + 1))
 	    break
 	fi
     done
-    NBR_MANAGER = $(docker node ls --format '{{.ManagerStatus}}' | grep -E 'Leader|Reachable' | wc -l)
 done
 
-echo "[$SCRIPT_NAME] Number of node connected $NODE_CONNECTED"
+# Wait for node to join
+for user in "${NODE_USERS[@]}"; do
+    [ "$user" = "$USER" ] && continue
+    while ! docker node ls --format '{{.Hostname}}' | grep -Fxq "$user"; do
+	sleep 2
+    done
+done
 
-#scp root-ca.crt worker:/tmp/root-ca.crt
-#scp setup-worker.sh worker:/tmp/
+# Promote to reach manager target
+current_managers() {
+    docker node ls --format '{{.ManagerStatus}}' |
+        grep -Ec 'Leader|Reachable'
+}
+while :; do
+    managers=$(current_managers)
 
-#ssh worker <<'EOF'
-#chmod +x /tmp/setup-worker.sh
-#/tmp/setup-worker.sh
-#docker swarm join --token <TOKEN> <LEADER_IP>:2377
-#EOF
+    if [ "$managers" -ge "$TARGET_MANAGERS" ]; then
+        exit 0
+    fi
+
+    docker node ls --format '{{.Hostname}} {{.ManagerStatus}}' |
+    awk '$2 == "" {print $1}' |
+    while read -r worker; do
+        [ -z "$worker" ] && continue
+
+        echo "Promoting $worker"
+        docker node promote "$worker"
+
+        managers=$((managers + 1))
+        [ "$managers" -ge "$TARGET_MANAGERS" ] && exit 0
+    done
+
+    sleep 2
+done
