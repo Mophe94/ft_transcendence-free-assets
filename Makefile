@@ -31,7 +31,7 @@ vm :
 	@bash $(VM_SCRIPTS)/vm.sh
 
 setup_worker:
-	@ssh-keygen -f "/home/stempels/.ssh/known_hosts" -R "[localhost]:2222"
+	@ssh-keygen -f "/home/$(USER)/.ssh/known_hosts" -R "[localhost]:2222"
 	@if [ ! -f $(VM_SCRIPTS)/node.sh ]; then \
 		echo "node.sh file missing"; \
 		exit 1; \
