@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/07/17 11:00:32 by stempels         ###   ########.fr        #
+#    Updated: 2026/07/17 18:55:54 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -17,7 +17,7 @@ addnote_help() {
 }
 
 
-if [ ! $# -lt 2 ]; then
+if [ $# -lt 2 ]; then
     addnote_help
     exit 1
 fi
@@ -47,7 +47,7 @@ else
 fi
 shift
 
-NODE_USERS="$@"
+NODE_USERS=("$@")
 
 WORKER_JOIN_CMD=$(docker swarm join-token -q worker)
 
@@ -61,6 +61,7 @@ SSH_PORT=2222
 PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
 
 VM_TARGET_DIR="/tmp/"
+ADDED_NODES=0
 
 # Generating ssh key
 if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
@@ -70,13 +71,27 @@ fi
 for user in "${NODE_USERS[@]}"; do
     if [ "$user" = "$USER" ]; then
 	continue
-    elif docker node ls --format '{{.Hostname}}' | grep -Fxq "$user"; then
+    elif docker node ls --format '{{.Hostname}}' | grep -Fxq swarmnode."$user"; then
 	echo "[INFO][$SCRIPT_NAME] $user already belongs to the swarm."
 	continue
     fi
     echo "[$SCRIPT_NAME] Connecting to $user node:"
-    read -p "[$SCRIPT_NAME]    IP of $user node host machine: " answer
-    HOST_IP=$answer
+    try=0
+    while [ "$try" -lt 3 ]; do
+	read -p "[$SCRIPT_NAME]    IP of $user node host machine: " answer
+	if [ -z "$answer" ] || ! is_ip "$answer"; then
+	    echo "[$SCRIPT_NAME] Invalid IP input, try again."
+	    answer=""
+	else
+	    HOST_IP=$answer
+	    break
+	fi
+    done
+
+    if [ "$try" -eq 3 ]; then
+	echo "[$SCRIPT_NAME] Too many try, aborting."
+	continue
+    fi
     try=0
     while [ "$try" -lt 3 ]; do
 	ssh -i $HOME/.ssh/${SSH_KEY_NAME} -p "$SSH_PORT" -o StrictHostKeyChecking=no "${user}"@"${HOST_IP}" \
@@ -92,20 +107,40 @@ for user in "${NODE_USERS[@]}"; do
 		/home/${USER}/certs/worker.key \
 		"${user}"@"${HOST_IP}":"$VM_TARGET_DIR"
 	    ssh -i $HOME/.ssh/${SSH_KEY_NAME} -p "$SSH_PORT" "$user"@"$HOST_IP" \
-		"chmod +x /setup_for_swarm.sh && \
-		nohup /setup_for_swarm.sh ${LEADER_IP} ${HOST_IP} ${JOIN_CMD} 2049; \
+		"doas chmod +x /setup_for_swarm.sh; \
+		doas nohup /setup_for_swarm.sh ${LEADER_IP} ${HOST_IP} "${JOIN_CMD}" 2049 \
 		>/tmp/setup_for_swarm.log 2>&1 < /dev/null &"
-	    NODE_CONNECTED=$(($NODE_CONNECTED + 1))
+	    CONNECTED_NODES+=("$user")
+	    ADDED_NODES=$((ADDED_NODES + 1))
 	    break
 	fi
     done
+    if [ "$try" -eq 3 ]; then
+	echo "[$SCRIPT_NAME] Too many try, aborting."
+	continue
+    fi
 done
 
+# Timeout values (seconds)
+NODE_JOIN_TIMEOUT=120
+PROMOTE_TIMEOUT=120
+
 # Wait for node to join
-for user in "${NODE_USERS[@]}"; do
+start_time=$(date +%s)
+
+for user in "${NODE_CONNECTED[@]}"; do
     [ "$user" = "$USER" ] && continue
-    while ! docker node ls --format '{{.Hostname}}' | grep -Fxq "$user"; do
-	sleep 2
+
+    while ! docker node ls --format '{{.Hostname}}' | grep -Fxq swarmnode."$user"; do
+        now=$(date +%s)
+        elapsed=$((now - start_time))
+
+        if [ "$elapsed" -ge "$NODE_JOIN_TIMEOUT" ]; then
+            echo "[ERROR][$SCRIPT_NAME] Timeout waiting for node $user to join swarm"
+            break
+        fi
+
+        sleep 2
     done
 done
 
@@ -114,6 +149,9 @@ current_managers() {
     docker node ls --format '{{.ManagerStatus}}' |
         grep -Ec 'Leader|Reachable'
 }
+
+start_time=$(date +%s)
+
 while :; do
     managers=$(current_managers)
 
@@ -121,8 +159,14 @@ while :; do
         exit 0
     fi
 
-    docker node ls --format '{{.Hostname}} {{.ManagerStatus}}' |
-    awk '$2 == "" {print $1}' |
+    now=$(date +%s)
+    elapsed=$((now - start_time))
+
+    if [ "$elapsed" -ge "$PROMOTE_TIMEOUT" ]; then
+        echo "[ERROR][$SCRIPT_NAME] Timeout waiting to reach $TARGET_MANAGERS managers (current: $managers)"
+        exit 1
+    fi
+
     while read -r worker; do
         [ -z "$worker" ] && continue
 
@@ -130,8 +174,15 @@ while :; do
         docker node promote "$worker"
 
         managers=$((managers + 1))
-        [ "$managers" -ge "$TARGET_MANAGERS" ] && exit 0
-    done
+	ADDED_NODES=$((ADDED_NODES - 1))
+
+        if [ "$managers" -ge "$TARGET_MANAGERS" ]; then
+            exit 0
+        fi
+    done < <(
+        docker node ls --format '{{.Hostname}} {{.ManagerStatus}}' |
+        awk 'NF == 1 {print $1}'
+    )
 
     sleep 2
 done

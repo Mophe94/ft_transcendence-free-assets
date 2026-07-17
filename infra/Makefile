@@ -35,7 +35,7 @@ build:
 	BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl 
 
 push:
-	$(BAKE_ARG) LOCAL=true docker buildx bake base databases website game --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
+	$(BAKE_ARG) LOCAL=true docker buildx bake base databases website game -f $(CONTAINER_FILES)/docker-bake.hcl --push
 #	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
 #	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake observ --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
 test:
@@ -117,7 +117,7 @@ image:
 	done; \
 	if [ $$MISSING -eq 1 ]; then \
 	    echo "Building missing images for $(TARGET)"; \
-	    $(BAKE_ARG) docker buildx bake $$MISSING_TARGETS --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push; \
+	    $(BAKE_ARG) docker buildx bake $$MISSING_TARGETS -f $(CONTAINER_FILES)/docker-bake.hcl --push; \
 	else \
 	    echo "All images for $(TARGET) already exist"; \
 	fi
