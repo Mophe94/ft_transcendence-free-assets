@@ -30,10 +30,6 @@ swarm_setup:
 	@$(SWARM_SCRIPTS)/launch_swarm.sh "$(SWARM_SCRIPTS)" "$(HOST_IP)"
 	@BUILDX_BAKE_ENTITLEMENTS_FS=0 IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
-build:
-	echo $(CONTAINER_FILES)
-	BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl 
-
 push:
 	$(BAKE_ARG) LOCAL=true docker buildx bake base databases website game -f $(CONTAINER_FILES)/docker-bake.hcl --push
 #	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
@@ -122,4 +118,4 @@ image:
 	    echo "All images for $(TARGET) already exist"; \
 	fi
 
-PHONY: all node_launch swarm_setup build push test core website game observ up down swarm-status image
+PHONY: all node_launch swarm_setup push test core website game observ up down swarm-status image
