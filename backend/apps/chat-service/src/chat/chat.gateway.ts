@@ -1,39 +1,70 @@
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { IncomingMessage } from 'http';
-import type { AuthenticatedSocket, AuthenticatedUser } from 'libs/shared/src';
+import type { AuthenticatedSocket } from 'libs/shared/src';
 import { wsAuthService } from 'libs/shared/src/auth/ws-auth.service';
 import { ConfigService } from '@nestjs/config';
 import { Server, WebSocket } from 'ws';
 import { clientsMap } from '../shared/clients.map';
 
+type HeartbeatSocket = AuthenticatedSocket & { isAlive?: boolean };
+
 @WebSocketGateway({ cors: { origin: '*' }, path: '/chat' })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
+{
   @WebSocketServer()
-  server: Server;
+  server!: Server;
+  private heartbeatInterval!: NodeJS.Timeout;
 
   constructor(
     private configService: ConfigService,
     private wsAuthService: wsAuthService,
   ) {}
+  destroy() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+    }
+  }
+
+  afterInit(server: Server) {
+    this.heartbeatInterval = setInterval(() => {
+      server.clients.forEach((wsClient: WebSocket) => {
+        const client = wsClient as HeartbeatSocket;
+        if (client.isAlive === false) {
+          return client.terminate();
+        }
+        client.isAlive = false;
+
+        if (client.readyState === WebSocket.OPEN) {
+          client.ping();
+        }
+      });
+    }, 30000);
+  }
 
   async handleConnection(
-    client: AuthenticatedSocket,
+    client: HeartbeatSocket,
     request: IncomingMessage,
   ): Promise<void> {
     try {
       const user = await this.wsAuthService.authenticateClient(client, request);
+      console.log(client);
       client.user = user;
       clientsMap.set(client, user);
+      client.isAlive = true;
+      client.on('pong', () => {
+        client.isAlive = true;
+      });
     } catch {
       client.close(1008, 'Unauthorized');
     }
-    console.log(`New connection: ${client.user} ${client.user}`);
   }
 
   handleDisconnect(client: AuthenticatedSocket) {

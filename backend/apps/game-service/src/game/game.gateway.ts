@@ -132,12 +132,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @OnEvent('team_setup')
-  OnTeamSetUp({userId, payload}: {userId: number; payload: object}): void {
-
+  OnTeamSetUp({ userId, payload }: { userId: number; payload: object }): void {
     const client = this.clientsById.get(userId);
     if (client) {
       console.log(`Team Setup payload: ${payload}`);
-      this.sendToClient(client, payload)
+      this.sendToClient(client, payload);
     }
   }
 }

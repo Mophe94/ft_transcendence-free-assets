@@ -1,6 +1,7 @@
 import React from 'react';
 import './Settings.css'
-
+import Stats from '../content/Stats';
+import Preferences from '../content/Preferences';
 
 import imgUL from '../assets/background/regular_paper/regular_paper_UL.png';
 import imgUM from '../assets/background/regular_paper/regular_paper_UM.png';
@@ -11,9 +12,6 @@ import imgMR from '../assets/background/regular_paper/regular_paper_MR.png';
 import imgDL from '../assets/background/regular_paper/regular_paper_DL.png';
 import imgDM from '../assets/background/regular_paper/regular_paper_DM.png';
 import imgDR from '../assets/background/regular_paper/regular_paper_DR.png';
-import Stats from '../content/Stats';
-import Preferences from '../content/Preferences';
-
 
 const prefStyles = {
   '--img-ul': `url(${imgUL})`,

@@ -8,11 +8,17 @@ import { GamePayload } from './game.type';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
-import { FULL_LOBBY, PHASE_DURATIONS,} from 'apps/game-service/src/game/game.type';
+import {
+  FULL_LOBBY,
+  PHASE_DURATIONS,
+} from 'apps/game-service/src/game/game.type';
 import { max } from 'node_modules/class-validator/types';
 import { MonsterType } from './entities/types/monster_type.enum';
 import { Skill } from './entities/skills.entity';
-import { CurrentMonster, Skill as PlayerSkill,} from './player/player.interfaces';
+import {
+  CurrentMonster,
+  Skill as PlayerSkill,
+} from './player/player.interfaces';
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -40,7 +46,10 @@ export class GameService implements OnModuleInit {
     return this.autorizedPlayers.get(roomId)?.has(userId) ?? false;
   }
 
-  async onGodotConnected( client: WebSocket, userId: number,roomId: string,
+  async onGodotConnected(
+    client: WebSocket,
+    userId: number,
+    roomId: string,
   ): Promise<object | null> {
     this.roomService.joinRoom(client, roomId);
     const size = this.roomService.getRoomSize(roomId);
@@ -64,25 +73,31 @@ export class GameService implements OnModuleInit {
       this.phaseTimer.start(roomId, 'team_setup', () => {
         console.log(`Room ${roomId} team_setup phase timeout`);
       });
-      player.timer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
-      this.eventEmitter.emit('team_setup', {userId: userId, payload: this.team_setup(player, player)}); //Player A
+      player.timer =
+        this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
+      this.eventEmitter.emit('team_setup', {
+        userId: userId,
+        payload: this.team_setup(player, player),
+      }); //Player A
       //this.eventEmitter.emit('team_setup', {userId: userId, paylod: this.team_setup(player, player)}); //Player B
       console.log(payload);
-      
-      
     });
 
-    player.timer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map;
+    player.timer =
+      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map;
     const payload = await this.start_game(player);
     console.log(`[GameService]: startMapPhase -> start_game payload built`);
     console.log(payload);
     return payload;
   }
 
-  async handleMessage(userId: number, payload: any): Promise<object | undefined> {
+  async handleMessage(
+    userId: number,
+    payload: any,
+  ): Promise<object | undefined> {
     const player = this.playerService.getPlayer(userId)!;
     switch (payload.state) {
-/*       case "add_item":
+      /*       case "add_item":
         return this.received_add_item(player)
       case "delete_item":
         return this.received_delete_item(player, payload.data.item)
@@ -91,17 +106,16 @@ export class GameService implements OnModuleInit {
       case "use_item":
         return this.received_use_item(player, payload.data.item) */
       case 'new_encounter':
-        return this.received_new_encounter(player, 2/* payload.data.tile */);
-      case "try_catch":
-        return this.received_try_catch(player)
-      case "delete_monster":
-        return this.received_delete_monster(player, payload.monster)
-      case "team_choice":
-        {
-          console.log(`Payload team_choice: ${payload.battle_team}`);
-          return this.received_team_choice(player, payload.battle_team);
-        }
-/*       case "change_current_monster":
+        return this.received_new_encounter(player, 2 /* payload.data.tile */);
+      case 'try_catch':
+        return this.received_try_catch(player);
+      case 'delete_monster':
+        return this.received_delete_monster(player, payload.monster);
+      case 'team_choice': {
+        console.log(`Payload team_choice: ${payload.battle_team}`);
+        return this.received_team_choice(player, payload.battle_team);
+      }
+      /*       case "change_current_monster":
         return this.received_update_current_monster(player, payload.data.slot)
       case "use_item_combat":
         return this.received_use_item_combat(player, enemy, payload.data.item)
@@ -141,66 +155,62 @@ export class GameService implements OnModuleInit {
     return currentMonster;
   }
 
-
   // HANDLERS
   // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
-  async received_new_encounter(player: Player, tile: number) : Promise<object | undefined>{
+  async received_new_encounter(
+    player: Player,
+    tile: number,
+  ): Promise<object | undefined> {
     const monsters = await this.monstersService.findMonstersByTile(tile);
     player.current_monster = monsters[1].name; //
     console.log(`Monsters by tile: ${monsters[1]}`);
     return this.new_encounter(player);
   }
 
-  private received_delete_monster(player: Player, monster: string){
-    for (let i = 0; i < player.team.length; ++i){
-      if (player.team[i] === monster){
-        player.team[i] = "";
+  private received_delete_monster(player: Player, monster: string) {
+    for (let i = 0; i < player.team.length; ++i) {
+      if (player.team[i] === monster) {
+        player.team[i] = '';
         break;
       }
     }
     return this.update_team(player);
   }
 
-  private received_try_catch(player: Player){
+  private received_try_catch(player: Player) {
     let result = Math.floor(Math.random() * 101);
-  
-    if (result <= player.current_monster_catch /* rarity now? */){
-      for (let i = 0; i < player.team.length; ++i){
-        if (player.team[i] === ""){
-        player.team[i] = player.current_monster;
-        break;
+
+    if (result <= player.current_monster_catch /* rarity now? */) {
+      for (let i = 0; i < player.team.length; ++i) {
+        if (player.team[i] === '') {
+          player.team[i] = player.current_monster;
+          break;
         }
       }
       return this.result_catch(player, 1);
-    }
-    else
-      return this.result_catch(player, 0);
+    } else return this.result_catch(player, 0);
   }
 
   // CHECK TEAM SENDED AND IF IT'S EMPTY, ELSE AUTO FULLY BATTLE_TEAM IF IT'S POSSIBLE
   // WHEN BATTLE_TEAM OK CALL DB GAME AND RETURN COMBAT
-  private received_team_choice(player: Player, monster: string[]){
-
-    let count:number = 0
-    for (let i = 0; i < monster.length; ++i){
-      if (monster[i] !== "")
-        count++;
+  private received_team_choice(player: Player, monster: string[]) {
+    let count: number = 0;
+    for (let i = 0; i < monster.length; ++i) {
+      if (monster[i] !== '') count++;
     }
-    if (count === 0){
-      for (let i = 0; i < player.team.length; ++i){
-        if (player.team[i] !== ""){
-          player.battle_team[count]["name"] = player.team[i]
-          player.battle_team[count]["slot"] = count
+    if (count === 0) {
+      for (let i = 0; i < player.team.length; ++i) {
+        if (player.team[i] !== '') {
+          player.battle_team[count]['name'] = player.team[i];
+          player.battle_team[count]['slot'] = count;
           ++count;
         }
-        if (count === 3)
-          break;
+        if (count === 3) break;
       }
-    }
-    else{
-      for (let i = 0; i < player.battle_team.length; ++i){
-        player.battle_team[i]["name"] === monster[i]
-        player.battle_team[count]["slot"] = i
+    } else {
+      for (let i = 0; i < player.battle_team.length; ++i) {
+        player.battle_team[i]['name'] === monster[i];
+        player.battle_team[count]['slot'] = i;
       }
     }
     // call pour avoir toutes les data des monstre
@@ -253,85 +263,81 @@ export class GameService implements OnModuleInit {
 
   private result_catch(player: Player, result: number) {
     return {
-        event: "game",
-        data: {
-            state: "result_catch",
-            success: result !== 0
-                ? "ok"
-                : "fail",
-            player: {
-				team: result !== 0
-                	? player.team
-                	: undefined
-			}
-        }
+      event: 'game',
+      data: {
+        state: 'result_catch',
+        success: result !== 0 ? 'ok' : 'fail',
+        player: {
+          team: result !== 0 ? player.team : undefined,
+        },
+      },
     };
   }
 
-  private update_inventory(player: Player){
+  private update_inventory(player: Player) {
     return {
-      event: "game",
+      event: 'game',
       data: {
-        state: "update_inventory",
+        state: 'update_inventory',
         player: {
-          inventory: player.inventory
-        }
-      }
-    }
+          inventory: player.inventory,
+        },
+      },
+    };
   }
 
-  private new_current_item(player: Player){
+  private new_current_item(player: Player) {
     return {
-      event: "game",
+      event: 'game',
       data: {
-        state: "new_current_item",
-        current_item: player.current_item
-      }
-    }
+        state: 'new_current_item',
+        current_item: player.current_item,
+      },
+    };
   }
 
-  private update_team(player: Player){
+  private update_team(player: Player) {
     return {
-        event: "game",
-        data: {
-            state: "update_team",
-			player: {
-            	team: player.team
-			}
-        }
-    }
+      event: 'game',
+      data: {
+        state: 'update_team',
+        player: {
+          team: player.team,
+        },
+      },
+    };
   }
 
-  private team_setup(player: Player, enemy: Player){
+  private team_setup(player: Player, enemy: Player) {
     return {
-        event: "game",
-        data: {
-            state: "team_setup",
-            timer: player.timer,
-            player: {
-                team: player.team
-            },
-            enemy: {
-                id: enemy.id,
-                name: enemy.name,
-                asset: enemy.asset,
-                team: enemy.team
-            }
-        }
-    }
+      event: 'game',
+      data: {
+        state: 'team_setup',
+        timer: player.timer,
+        player: {
+          team: player.team,
+        },
+        enemy: {
+          id: enemy.id,
+          name: enemy.name,
+          asset: enemy.asset,
+          team: enemy.team,
+        },
+      },
+    };
   }
 
-  private combat(player: Player){
+  private combat(player: Player) {
     return {
-    event: "game",
-        data: {
-            state: "combat",
-            timer: player.timer,
-            player: {
-                battle_team: player.battle_team
-            }
-        }
-    }
+      event: 'game',
+      data: {
+        state: 'combat',
+        timer: player.timer,
+        player: {
+          battle_team: player.battle_team,
+        },
+      },
+    };
   }
 
   changeMonster: (new_monster: number) => object;
