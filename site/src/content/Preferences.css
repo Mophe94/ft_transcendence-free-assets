@@ -1,0 +1,33 @@
+
+.settings-grid {
+  grid-template-columns: 1fr 1fr 1fr;
+  display: grid;
+}
+
+.pref-header {
+  display: grid;
+  grid-template-columns: 300px 1fr 300px; 
+  align-items: center;
+  
+  width: 100%;
+  margin-top: 120px;
+  margin-bottom: 70px;
+}
+.preferences-title {
+  grid-column: 2;
+  text-align: center;
+  margin: 0;
+}
+
+.pref-buttons {
+  grid-column: 3;
+  justify-self: end;
+  display: inline-block;
+}
+
+.aligned {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}

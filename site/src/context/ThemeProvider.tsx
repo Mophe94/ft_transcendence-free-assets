@@ -3,6 +3,14 @@ import type { PropsWithChildren } from 'react';
 import { ThemeContext } from './ThemeContext';
 import { useAuth } from './AuthContext';
 
+import lightCloudsBg from '../assets/background/light_clouds.png'
+import darkCloudsBg from '../assets/background/dark_clouds.png'
+
+const themeStyles = {
+  '--light-cloud-img': `url(${lightCloudsBg})`,
+  '--dark-cloud-img': `url(${darkCloudsBg})`,
+}  as React.CSSProperties;
+
 export function ThemeProvider({ children }: PropsWithChildren) {
   const { user } = useAuth();
   const [theme, setTheme] = useState(() => {
@@ -29,7 +37,7 @@ export function ThemeProvider({ children }: PropsWithChildren) {
   }, [theme]);
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
-      <div className={`theme-${theme}`}>{children}</div>
+      <div className={`theme-${theme}`} style={themeStyles}>{children}</div>
     </ThemeContext.Provider>
   );
 }

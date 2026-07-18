@@ -3,7 +3,7 @@
   flex-grow: 1;
 
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-columns: 200px 1fr 200px;
   grid-template-rows: 100%;
 }
 

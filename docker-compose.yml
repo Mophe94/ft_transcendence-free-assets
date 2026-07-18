@@ -98,10 +98,10 @@ services:
       - db_users_postgres_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 3s   # Teste toutes les 3 secondes
-      timeout: 5s    # Temps max accordé au test
-      retries: 5     # Nombre d'essais avant de considérer la DB comme en panne
-      start_period: 5s # Laisse 5 secondes au démarrage avant de commencer à tester
+      interval: 3s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
   game_db:
     build:
       context: database/game_db/

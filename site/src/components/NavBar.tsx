@@ -2,10 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './NavBar.css';
 
+import bannerBeg from '../assets/navBar/sword_beg.png';
+
 const menuLinks = {
   'Learn More': '/project',
   'About Us': '/about_us',
-  Contact: '/contact',
+  'Contact': '/contact',
 };
 
 function NavMenu() {

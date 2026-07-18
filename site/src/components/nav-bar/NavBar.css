@@ -1,7 +1,9 @@
 .pub-nav-bar {
   height: 15ch;
 }
+
 .priv-nav-bar {
+  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -29,7 +31,7 @@
 
   white-space: nowrap;
 
-  background-image: url('navbar/sword_mid.png');
+  background-image: var(--sword-mid);
   background-repeat: round no-repeat;
   background-size: auto 100%;
 

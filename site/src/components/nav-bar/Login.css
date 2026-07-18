@@ -51,11 +51,11 @@
 .dropdown-menu::before {
   content: '';
   position: absolute;
-  top: -20px; /* Remonte de 20px au-dessus du menu */
+  top: -20px;
   left: 0;
   right: 0;
-  height: 20px; /* Fait 20px de haut */
-  background: transparent; /* Reste invisible à l'œil nu */
+  height: 20px;
+  background: transparent;
 }
 
 ul {

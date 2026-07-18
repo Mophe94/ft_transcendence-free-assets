@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { PrivNavBar } from '../components/nav-bar/PrivNavBar';
-import './PublicLayout.css';
+import './AppLayout.css';
 
 export default function AppLayout() {
   return (

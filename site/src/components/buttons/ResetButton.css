@@ -1,0 +1,23 @@
+.reset-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: inherit;
+  width: 115px;
+  height: 70px;
+  margin-left: 10px;
+  margin-right: 10px;
+
+  background-image: var(--img-reset);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.reset-button:hover {
+  background-image: var(--img-reset-hover);
+}
+.reset-button.pressed {
+  background-image: var(--img-reset-pressed);
+}

@@ -3,9 +3,9 @@ import { useAuth } from '../../context/AuthContext';
 import './Login.css';
 
 export function AuthSection() {
-  const { user, loading, handleSignout } = useAuth();
+  const { user, isLoading, handleSignout } = useAuth();
 
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
@@ -14,20 +14,15 @@ export function AuthSection() {
       {user ? (
         <div className="login-container">
           <div className="username-container">{user.username}</div>
-          <img id="profile-pic" src={user.avatarUrl}></img>
+          <img id="profile-pic" src={user.avatarUrl} />
           <ul className="dropdown-menu">
             <li>
-              <Link to={'/profile'} className="auth-link">
-                Profile
-              </Link>
-            </li>
-            <li>
-              <Link to={'/preferences'} className="auth-link">
+              <Link to={'/settings'} className="auth-link">
                 Settings
               </Link>
             </li>
             <li>
-              <button onClick={handleSignout} className="auth clean-btn">
+              <button onClick={handleSignout} className="auth-link clean-btn">
                 Logout
               </button>
             </li>
@@ -41,4 +36,3 @@ export function AuthSection() {
     </div>
   );
 }
-<Link to="/ma-page"></Link>;
