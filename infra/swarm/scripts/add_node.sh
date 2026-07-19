@@ -180,10 +180,10 @@ while :; do
         if [ "$managers" -ge "$TARGET_MANAGERS" ]; then
             exit 0
         fi
-    done < <(
-        docker node ls --format '{{.Hostname}} {{.ManagerStatus}}' |
-        awk 'NF == 1 {print $1}'
-    )
+    done < <(docker node ls --filter role=worker --format '{{.Hostname}}')
+#        (docker node ls --format '{{.Hostname}} {{.ManagerStatus}}' |
+#        awk 'NF == 1 {print $1}'
+#    )
 
     sleep 2
 done
