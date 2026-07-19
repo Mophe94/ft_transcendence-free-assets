@@ -62,7 +62,7 @@ while ! docker info >/dev/null 2>&1; do
     echo -n "."
 done
 
-docker swarm join --advertise-addr ${NODE_IP} --token ${JOIN_CMD} ${LEADER_IP}:2377
+docker swarm join --advertise-addr ${NODE_IP} --data-path-addr ${NODE_IP} --token ${JOIN_CMD} ${LEADER_IP}:2377
 echo "[INFO][$SCRIPT_NAME] Worker successfully configured."
 
 #echo "[$SCRIPT_NAME] Setting up leader SSH login"
