@@ -56,7 +56,7 @@ fi
 
 #INIT THE SWARM AND PUBLISH IS IP OF CONTACT(HOST_IP)#
 if [ ! "$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then
-    docker swarm init --advertise-addr ${HOST_IP}
+    docker swarm init --advertise-addr ${HOST_IP} --data-path-addr ${HOST_IP}
 fi
 
 docker node update --label-add leader=true $(docker node ls --format '{{.ID}} {{.ManagerStatus}}' | awk '/Leader/ {print $1}')
