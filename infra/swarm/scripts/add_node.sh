@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/07/17 18:55:54 by stempels         ###   ########.fr        #
+#    Updated: 2026/07/19 17:48:29 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -52,7 +52,6 @@ NODE_USERS=("$@")
 WORKER_JOIN_CMD=$(docker swarm join-token -q worker)
 
 TARGET_MANAGERS=3
-NODE_CONNECTED=0
 JOIN_CMD="$WORKER_JOIN_CMD"
 
 SSH_KEY_NAME="${USER}_transcendence_node"
@@ -61,7 +60,12 @@ SSH_PORT=2222
 PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
 
 VM_TARGET_DIR="/tmp/"
+
 ADDED_NODES=0
+CONNECTED_NODES=("")
+NODE_JOIN_TIMEOUT=120
+PROMOTE_TIMEOUT=120
+
 
 # Generating ssh key
 if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
@@ -82,6 +86,7 @@ for user in "${NODE_USERS[@]}"; do
 	if [ -z "$answer" ] || ! is_ip "$answer"; then
 	    echo "[$SCRIPT_NAME] Invalid IP input, try again."
 	    answer=""
+	    try=$((try + 1))
 	else
 	    HOST_IP=$answer
 	    break
@@ -121,10 +126,6 @@ for user in "${NODE_USERS[@]}"; do
     fi
 done
 
-# Timeout values (seconds)
-NODE_JOIN_TIMEOUT=120
-PROMOTE_TIMEOUT=120
-
 # Wait for node to join
 start_time=$(date +%s)
 
@@ -155,7 +156,7 @@ start_time=$(date +%s)
 while :; do
     managers=$(current_managers)
 
-    if [ "$managers" -ge "$TARGET_MANAGERS" ]; then
+    if [ "$managers" -ge "$TARGET_MANAGERS" ] || [ $ADDED_NODES -eq 0 ]; then
         exit 0
     fi
 

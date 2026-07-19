@@ -45,6 +45,12 @@ services:
                     - node.labels.leader == true
 
 volumes:
+#  registry_data:
+#    driver: local
+#    driver_opts:
+#      type: nfs
+#      o: "addr=${IP},nfsvers=4,rw,soft"
+#      device: ":/nfs-storage/registry"
   registry_data:
     driver: local
     driver_opts:
