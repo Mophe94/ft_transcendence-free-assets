@@ -15,9 +15,9 @@ export function MessagesWindow() {
       {messages.map((msg, index) => {
         return (
           <div key={index}>
-            <span>{msg.time}</span>
-            <span>{msg.username}</span>
-            <p>{msg.content}</p>
+            <span>[{msg.time}] </span>
+            <span>{msg.username}: </span>
+            <span>{msg.content}</span>
           </div>
         );
       })}

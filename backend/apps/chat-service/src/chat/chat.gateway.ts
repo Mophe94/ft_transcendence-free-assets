@@ -73,13 +73,12 @@ export class ChatGateway
   }
 
   @SubscribeMessage('message')
-  handleMessage(client: AuthenticatedSocket, content: string): string {
+  handleMessage(client: AuthenticatedSocket, content: string) {
     const date = new Date();
     const sender = client.user.username;
 
     const message = { time: date, username: sender, content };
     this.broadcast(message);
-    return 'Hello world!';
   }
 
   private broadcast(message: object) {

@@ -4,6 +4,7 @@ import type { User } from '../types/user';
 import { useAuth } from '../context/AuthContext';
 import { useParams } from 'react-router-dom';
 import ShieldFrame from '../components/ShieldFrame';
+import ImgFrame from '../components/ImgFrame';
 
 
 export default function Stats() {
@@ -61,7 +62,7 @@ export function ProfileBody({ username }: ProfileBodyProps) {
       </div>
       <div className="stats-table">
         <div className="top-left">
-          <ShieldFrame
+          <ImgFrame
             imgSrc={user?.avatarUrl}
             imgAlt="avatar-pic"
           />

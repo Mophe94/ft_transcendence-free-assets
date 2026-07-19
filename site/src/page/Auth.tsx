@@ -1,6 +1,7 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Loading } from './Loading';
 
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();
@@ -18,6 +19,7 @@ export default function AuthCallback() {
         credentials: 'include',
       })
         .then(() => checkUserStatus())
+        .then(() => new Promise((resolve) => setTimeout(resolve, 1500)))
         .then(() => navigate('/home'))
         .catch((err) => navigate(`/login?error=${err}`));
     } else {
@@ -25,8 +27,6 @@ export default function AuthCallback() {
     }
   }, [searchParams, navigate, checkUserStatus]);
   return (
-    <div className="auth-loading-screen">
-      <p>Loading...</p>
-    </div>
+    <Loading />
   );
 }

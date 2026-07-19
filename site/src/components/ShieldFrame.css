@@ -8,7 +8,7 @@
   display: block;
   width: 100%;
   height: auto;
-  position: relative; /* Permet d'activer le z-index sur le cadre */
+  position: relative;
   z-index: 2;
 }
 

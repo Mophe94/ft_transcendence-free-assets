@@ -1,5 +1,6 @@
-import { Route, Routes } from 'react-router-dom';
 import './App.css';
+
+import { Route, Routes } from 'react-router-dom';
 import { Landing } from './page/Welcome';
 import { Home } from './page/Home';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -10,8 +11,18 @@ import { Play } from './page/Play';
 import Settings from './page/Settings';
 import Contact from './page/Contact';
 import Dashboard from './page/Dashboard';
+import { useAuth } from './context/AuthContext';
+import { Loading } from './page/Loading';
 
 function App() {
+  const { isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <Loading />
+    );
+  }
+
   return (
     <div className="main-layout">
       <Routes>
@@ -19,6 +30,7 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path='/loading' element={<Loading />} />
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
