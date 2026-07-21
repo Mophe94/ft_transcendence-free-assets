@@ -1,5 +1,5 @@
 import React from 'react';
-import './Settings.css'
+import './Profile.css'
 import Stats from '../content/Stats';
 import Preferences from '../content/Preferences';
 
@@ -25,22 +25,22 @@ const prefStyles = {
   '--img-dr': `url(${imgDR})`,
 } as React.CSSProperties;
 
-export default function Settings() {
+export default function Profile() {
   return (
-    <div className="settings-content-layout" style={prefStyles}>
-      <div className="settings-upperLeft" />
-      <div className="settings-upperMiddle" />
-      <div className="settings-upperRight" />
-      <div className="settings-middleLeft" />
-      <div className="settings-middleMiddle">
+    <div className="profile-content-layout" style={prefStyles}>
+      <div className="profile-upperLeft" />
+      <div className="profile-upperMiddle" />
+      <div className="profile-upperRight" />
+      <div className="profile-middleLeft" />
+      <div className="profile-middleMiddle">
         <Stats />
         <Preferences />
       </div>
-      <div className="settings-middleRight" />
+      <div className="profile-middleRight" />
 
-      <div className="settings-bottomLeft" />
-      <div className="settings-bottomMiddle" />
-      <div className="settings-bottomRight" />
+      <div className="profile-bottomLeft" />
+      <div className="profile-bottomMiddle" />
+      <div className="profile-bottomRight" />
     </div>
   );
 }

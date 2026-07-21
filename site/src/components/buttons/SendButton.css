@@ -1,0 +1,23 @@
+.send-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: inherit;
+  width: 115px;
+  height: 70px;
+  margin-left: 10px;
+  margin-right: 10px;
+
+  background-image: var(--img-save);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.send-button:hover {
+  background-image: var(--img-save-hover);
+}
+.send-button.pressed {
+  background-image: var(--img-save-pressed);
+}

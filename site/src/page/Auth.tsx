@@ -19,7 +19,7 @@ export default function AuthCallback() {
         credentials: 'include',
       })
         .then(() => checkUserStatus())
-        .then(() => new Promise((resolve) => setTimeout(resolve, 1500)))
+        .then(() => new Promise((resolve) => setTimeout(resolve, 2000)))
         .then(() => navigate('/home'))
         .catch((err) => navigate(`/login?error=${err}`));
     } else {

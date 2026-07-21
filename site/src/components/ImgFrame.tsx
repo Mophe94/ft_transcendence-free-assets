@@ -1,6 +1,6 @@
 import "./ImgFrame.css"
 
-import picFrame from '../assets/frame/picture_frame_tree.png'
+import picFrame from '../assets/frame/picture_frame_fire.png'
 interface PicFrameProps {
   imgSrc?: string;
   imgAlt?: string;

@@ -1,38 +1,110 @@
 .chat-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column-reverse;
-  margin-left: 15px;
+  display: grid;
+  gap: 0px;
+
+  grid-template-columns: 98px 400px 64px;
+  grid-template-rows: 188px 1fr 172px;
+}
+
+.chat-msg {
+  margin-bottom: 15px;
 }
 
 .message-container {
-  width: auto;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-
-  background-color: black;
-  padding: 5px;
-  color: green;
-
-  flex-grow: 1;
-  min-height: 0;
+  height: 400px;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
 }
 
-.response-container {
+.chat-heading {
+  font-family: 'New Rocker';
+  color: rgb(112, 14, 14);
+  justify-self: center;
+  font-size: 64px;
+  font-weight: 400;
+  padding-top: 40px;
+}
+
+/* .response-container {
   height: 100%;
   display: flex;
   flex-direction: row;
   grid-template-columns: 1fr 50px;
-}
+} */
 
-#chat-input {
-  width: 100%;
-
-  background-color: rgb(56, 56, 56);
-  color: greenyellow;
-}
 
 #send-button {
   width: 50px;
+}
+
+.chat-upperLeft img,
+.chat-upperRight img,
+.chat-bottomLeft img,
+.chat-bottomRight img {
+  display: block;
+}
+.chat-upperLeft {
+  background-image: var(--img-ul);
+  background-repeat: no-repeat no-repeat;
+  grid-row: 1;
+  grid-column: 1;
+}
+.chat-upperMiddle {
+  background-image: var(--img-um);
+  background-repeat: round no-repeat;
+  background-size: auto 100%;
+  grid-row: 1;
+  grid-column: 2;
+}
+.chat-upperRight {
+  background-image: var(--img-ur);
+  background-repeat: no-repeat no-repeat;
+  grid-row: 1;
+  grid-column: 3;
+}
+
+.chat-middleLeft {
+  background-image: var(--img-ml);
+  background-repeat: no-repeat round;
+  background-size: 100% auto;
+  grid-row: 2;
+  grid-column: 1;
+}
+.chat-middleMiddle {
+  min-height: 128px;
+  background-image: var(--img-mm);
+  background-repeat: round round;
+  background-size: auto auto;
+  grid-row: 2;
+  grid-column: 2;
+}
+.chat-middleRight {
+  background-image: var(--img-mr);
+  background-repeat: repeat-y;
+  background-size: 100% auto;
+  grid-row: 2;
+  grid-column: 3;
+}
+
+.chat-bottomLeft {
+  background-image: var(--img-dl);
+  background-repeat: no-repeat no-repeat;
+  grid-row: 3;
+  grid-column: 1;
+}
+.chat-bottomMiddle {
+  background-image: var(--img-dm);
+  background-repeat: round no-repeat;
+  background-size: auto 100%;
+  grid-row: 3;
+  grid-column: 2;
+}
+.chat-bottomRight {
+  background-image: var(--img-dr);
+  background-repeat: no-repeat no-repeat;
+  grid-row: 3;
+  grid-column: 3;
+
 }

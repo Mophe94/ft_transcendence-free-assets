@@ -8,11 +8,12 @@ import AuthCallback from './page/Auth';
 import PublicLayout from './layouts/PublicLayout';
 import AppLayout from './layouts/AppLayout';
 import { Play } from './page/Play';
-import Settings from './page/Settings';
+import Profile from './page/Profile';
 import Contact from './page/Contact';
 import Dashboard from './page/Dashboard';
 import { useAuth } from './context/AuthContext';
 import { Loading } from './page/Loading';
+import { Test } from './page/Test';
 
 function App() {
   const { isLoading } = useAuth();
@@ -36,8 +37,9 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/home" element={<Home />} />
             <Route path="/play" element={<Play />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path='/test' element={<Test />} />
           </Route>
         </Route>
       </Routes>
