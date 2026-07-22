@@ -19,7 +19,7 @@ import {
 } from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
-import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
+import { FULL } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
 import { intervalProvider } from 'node_modules/rxjs/dist/types/internal/scheduler/intervalProvider';
 import { OnEvent } from '@nestjs/event-emitter';
@@ -70,11 +70,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.gameService
       .onGodotConnected(client, userId, roomId)
-      .then((payload) => {
-        if (payload) {
-          this.sendToClient(client, payload);
-        }
-      })
       .catch((err) => {
         console.log('handleConnection error');
         client.close();
@@ -82,8 +77,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: WebSocket): void {
+    this.cleanupClient(client);
+  }
+
+  private cleanupClient(client: WebSocket): void {
     const user = this.clients.get(client);
     this.clients.delete(client);
+    if (!user) return;
+
+    this.clientsById.delete(user.userId);
+    if (user.roomId) {
+      this.gameService.onGodotDisconnected(user.userId, user.roomId);
+    }
     console.log(`Client ${user?.userId} disconnected`);
   }
 
@@ -104,7 +109,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.clients.forEach((data, socket) => {
       if (!data.isAlive) {
         socket.terminate();
-        this.clients.delete(socket);
+        this.cleanupClient(socket);
         console.log(`[Heartbeat]: client ${data.userId} terminated`);
         return;
       }
@@ -131,12 +136,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.sendToClient(client, response);
   }
 
-  @OnEvent('team_setup')
-  OnTeamSetUp({ userId, payload }: { userId: number; payload: object }): void {
+  @OnEvent('send_to_player')
+  onStartGame({ userId, payload}: {userId: number; payload: object}): void {
     const client = this.clientsById.get(userId);
     if (client) {
-      console.log(`Team Setup payload: ${payload}`);
-      this.sendToClient(client, payload);
+        this.sendToClient(client, payload);
     }
   }
+
 }

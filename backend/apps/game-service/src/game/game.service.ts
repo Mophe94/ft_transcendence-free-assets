@@ -9,7 +9,7 @@ import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import {
-  FULL_LOBBY,
+  FULL,
   PHASE_DURATIONS,
 } from 'apps/game-service/src/game/game.type';
 import { max } from 'node_modules/class-validator/types';
@@ -30,7 +30,25 @@ export class GameService implements OnModuleInit {
     private monstersService: MonstersService,
   ) {}
 
-  private rooms = new Map<string, Set<WebSocket>>();
+  private gameRooms = new Map<string, Set<number>>();
+
+  private joinGameRoom(roomId: string, userId: number): Set<number> {
+    let room = this.gameRooms.get(roomId);
+    if (!room) {
+      room = new Set();
+      this.gameRooms.set(roomId, room);
+    }
+    room.add(userId);
+    return room
+  }
+
+  private leaveGameRoom(roomId: string, userId: number): void {
+    const room = this.gameRooms.get(roomId);
+    if (!room) return;
+    room.delete(userId);
+    if (room.size === 0)
+      this.gameRooms.delete(roomId);
+  }
 
   // TEST with hardcoded values
   onModuleInit(): void {
@@ -50,45 +68,67 @@ export class GameService implements OnModuleInit {
     client: WebSocket,
     userId: number,
     roomId: string,
-  ): Promise<object | null> {
-    this.roomService.joinRoom(client, roomId);
-    const size = this.roomService.getRoomSize(roomId);
-    console.log(`Size = ${size}, RoomId = ${roomId}`);
+  ): Promise<void> {
+    const room = this.joinGameRoom(roomId, userId);
+    console.log(`Size = ${room.size}, RoomId = ${roomId}`);
 
     if (!this.playerService.getPlayer(userId)) {
       this.playerService.initPlayer(userId);
     }
 
-    if (size === FULL_LOBBY) {
-      return this.startMapPhase(userId, roomId);
+    if (room.size === FULL) {
+      await this.startMapPhase(roomId, room);
       console.log('[GameService]: StartMapPhase');
     }
-    return null;
   }
 
-  async startMapPhase(userId: number, roomId: string): Promise<object> {
-    const player = this.playerService.getPlayer(userId)!;
+  onGodotDisconnected(userId: number, roomId: string): void {
+    this.leaveGameRoom(roomId, userId);
+  }
+
+  private sendToPlayer(userId: number, payload: object): void {
+    this.eventEmitter.emit('send_to_player', { userId, payload });
+    console.log(`Send_to_player: ${userId} -> ${payload}`);
+  }
+
+  private async startMapPhase(roomId: string, room: Set<number>): Promise<void> {
     this.phaseTimer.start(roomId, 'map', () => {
       console.log(`Room ${roomId} map phase timeout`);
-      this.phaseTimer.start(roomId, 'team_setup', () => {
-        console.log(`Room ${roomId} team_setup phase timeout`);
-      });
-      player.timer =
-        this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
-      this.eventEmitter.emit('team_setup', {
-        userId: userId,
-        payload: this.team_setup(player, player),
-      }); //Player A
-      //this.eventEmitter.emit('team_setup', {userId: userId, paylod: this.team_setup(player, player)}); //Player B
-      console.log(payload);
+      this.startTeamSetupPhase(roomId, room);
     });
 
-    player.timer =
+    const mapTimer =
       this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map;
-    const payload = await this.start_game(player);
-    console.log(`[GameService]: startMapPhase -> start_game payload built`);
-    console.log(payload);
-    return payload;
+
+    const payloads = await Promise.all(
+      [...room].map(async (userId) => {
+      const player = this.playerService.getPlayer(userId)!;
+      player.timer = mapTimer;
+      return { userId, payload: await this.start_game(player) };
+      }),
+    );
+    
+    payloads.forEach(({ userId, payload }) => {
+      this.sendToPlayer(userId, payload);
+    });
+
+    console.log(`[GameService]: startMapPhase -> start_game sent to ${room.size} players of ${roomId}`  
+    );
+  } 
+
+
+  private startTeamSetupPhase(roomId: string, room: Set<number>) {
+    this.phaseTimer.start(roomId, 'team_setup', () => {
+      console.log(`Room ${roomId} team_setup phase timeout`);
+    });
+    const TeamSetupTimer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
+
+    // TODO: combat room: player/enemy
+    for (const userId of room) {
+      const player = this.playerService.getPlayer(userId)!;
+      player.timer = TeamSetupTimer;
+      this.sendToPlayer(userId, this.team_setup(player, player)) //replace by enemy
+    }  
   }
 
   async handleMessage(
@@ -129,33 +169,8 @@ export class GameService implements OnModuleInit {
     }
   }
 
-  private async initMonster(
-    player: Player,
-    monsterId: number,
-  ): Promise<CurrentMonster | undefined> {
-    const monster = await this.monstersService.findOneById(
-      monsterId /* , { skills: true } */,
-    );
-    console.log('monster from DB:', monster);
-    if (!monster) return undefined;
-    const currentMonster: CurrentMonster = {
-      name: monster.name,
-      type: String(monster.type), //add enum
-      slot: 0,
-      life: {
-        current: monster.hp_total,
-        max: monster.hp_total,
-      },
-      status: [],
-      skill: [], // 4 slots
-    };
-
-    player.currentMonster = currentMonster;
-    console.log(monster);
-    return currentMonster;
-  }
-
   // HANDLERS
+
   // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
   private async received_new_encounter(
     player: Player,
@@ -197,7 +212,7 @@ export class GameService implements OnModuleInit {
     //retrieve monsters stat from db
     for (let i = 0; i < monsters.length; ++i) {
       if (monsters[i] != "") {
-        const monster = await this.monstersService.findOneByName(monsters[i]);
+        const monster = await this.monstersService.findOneByName(monsters[i], /* , { skills: true } */);
         if (!monster) return undefined;
         console.log(monster);
         const currentMonster: CurrentMonster = {
@@ -366,10 +381,10 @@ export class GameService implements OnModuleInit {
   changeMonster: (new_monster: number) => object;
   attack: (enemy: Player, attackName: string) => object;
 
-  //Events
+/*   //Events
   @OnEvent('lobby.start')
   initGameRoom({ roomId }: { roomId: string }): void {
     console.log('OnEvent -> createRoom()');
     this.roomService.createRoom(roomId);
-  }
+  } */
 }

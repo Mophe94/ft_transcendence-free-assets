@@ -11,7 +11,7 @@ import { WebSocket, Server } from 'ws';
 import { OnEvent } from '@nestjs/event-emitter';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import {
-  FULL_LOBBY,
+  FULL,
   PHASE_DURATIONS,
   createMockUser,
 } from 'apps/game-service/src/game/game.type';
@@ -74,7 +74,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.broadcast(clients, {
       event: 'lobby',
       state: 'player_joigned',
-      data: { roomId, playerCount, maxPlayers: FULL_LOBBY },
+      data: { roomId, playerCount, maxPlayers: FULL },
     });
   }
 
