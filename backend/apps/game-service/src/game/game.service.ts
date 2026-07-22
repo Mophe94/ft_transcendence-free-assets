@@ -157,7 +157,7 @@ export class GameService implements OnModuleInit {
 
   // HANDLERS
   // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
-  async received_new_encounter(
+  private async received_new_encounter(
     player: Player,
     tile: number,
   ): Promise<object | undefined> {
@@ -193,10 +193,33 @@ export class GameService implements OnModuleInit {
 
   // CHECK TEAM SENDED AND IF IT'S EMPTY, ELSE AUTO FULLY BATTLE_TEAM IF IT'S POSSIBLE
   // WHEN BATTLE_TEAM OK CALL DB GAME AND RETURN COMBAT
-  private received_team_choice(player: Player, monster: string[]) {
+  private async received_team_choice(player: Player, monsters: string[]) : Promise<object | undefined> {
+    //retrieve monsters stat from db
+    for (let i = 0; i < monsters.length; ++i) {
+      if (monsters[i] != "") {
+        const monster = await this.monstersService.findOneByName(monsters[i]);
+        if (!monster) return undefined;
+        console.log(monster);
+        const currentMonster: CurrentMonster = {
+          name: monster.name,
+          type: String(monster.type), //add enum
+          slot: i,
+          life: {
+            current: monster.hp_total,
+            max: monster.hp_total,
+          },
+          status: [],
+          skill: [], // 4 slots
+        };
+    
+        player.battle_team[i] = currentMonster;
+        
+      }
+    }
+
     let count: number = 0;
-    for (let i = 0; i < monster.length; ++i) {
-      if (monster[i] !== '') count++;
+    for (let i = 0; i < monsters.length; ++i) {
+      if (monsters[i] !== '') count++;
     }
     if (count === 0) {
       for (let i = 0; i < player.team.length; ++i) {
@@ -209,11 +232,11 @@ export class GameService implements OnModuleInit {
       }
     } else {
       for (let i = 0; i < player.battle_team.length; ++i) {
-        player.battle_team[i]['name'] === monster[i];
+        player.battle_team[i]['name'] === monsters[i];
         player.battle_team[count]['slot'] = i;
       }
     }
-    // call pour avoir toutes les data des monstre
+
     return this.combat(player);
   }
 
