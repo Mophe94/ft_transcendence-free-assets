@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ia43sbprlgyb"]
 
 [ext_resource type="Texture2D" uid="uid://lyfu70hey7o8" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Particle FX/Water Splash.png" id="1_6l85b"]
-[ext_resource type="Script" uid="uid://b3mhp8ld772rm" path="res://Scene/World01/Water_trigger/water_trigger.gd" id="1_wh6x1"]
+[ext_resource type="Script" uid="uid://b3mhp8ld772rm" path="res://Script/World/WaterTrigger/water_trigger.gd" id="1_wh6x1"]
 [ext_resource type="PackedScene" uid="uid://cvc4hnsdm5b8g" path="res://Scene/World01/Water_trigger/mash_bar_water.tscn" id="3_eka46"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_wh6x1"]

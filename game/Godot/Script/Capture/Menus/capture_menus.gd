@@ -205,9 +205,3 @@ func _ready() -> void:
 	for i in range(button.size()):
 		button[i].action_pressed.connect(_on_button_action)
 	back_button.action_pressed.connect(_on_button_action)
-	
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass

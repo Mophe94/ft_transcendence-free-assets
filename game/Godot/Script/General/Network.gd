@@ -8,8 +8,9 @@ var ws = WebSocketPeer.new()
 var wsSate = WebSocketPeer.STATE_CLOSED
 var sceneLaunch = false
 
-@onready var token = ""
+@onready var user = ""
 @onready var room = ""
+@onready var domain = ""
 
 @onready var messageQueue = []
 
@@ -17,7 +18,7 @@ var sceneLaunch = false
 func connect_server():
 	#CONNECT AND SEND TOKEN
 	print("Try to connect server")
-	var url = "wss://free-assets.42belgium.com/game?token=" + token + "&room=" + room
+	var url = "wss://" + domain + "/game?token=" + user + "&room=" + room
 	print("url : " + url)
 	var err = ws.connect_to_url(url)
 	print("response of connect fonction: " + str(err))
@@ -32,25 +33,33 @@ func connect_server():
 
 func receive_token():
 	print("received_token start")
-	var token_ok = false
+	var user_ok = false
 	var room_ok = false
+	var domain_ok = false
 	var currentTime = 0.0
 	while (currentTime < timeToConnect):
-		var result_token = JavaScriptBridge.eval("userToken")
+		var result_user = JavaScriptBridge.eval("userToken")
 		var result_room = JavaScriptBridge.eval("roomToken")
-		if result_token != null:
-			token = result_token
-			if token != null && token != "":
-				if token_ok == false:
-					token_ok = true
-					print("TOKEN USER RECEIVE: " +  token)
+		var result_domain = JavaScriptBridge.eval("domainToken")
+		if result_user != null:
+			user = result_user
+			if user != null && user != "":
+				if user_ok == false:
+					user_ok = true
+					print("TOKEN USER RECEIVE: " +  user)
 		if result_room != null:
 			room = result_room
 			if room != null && room != "":
 				if room_ok == false:
 					room_ok = true
 					print("TOKEN ROOM RECEIVE: " +  room)
-		if token_ok == true && room_ok == true:
+		if result_domain != null:
+			domain = result_domain
+			if domain != null && domain != "":
+				if domain_ok == false:
+					domain_ok = true
+					print("TOKEN DOMAIN RECEIVE: " +  domain)
+		if user_ok == true && room_ok == true && domain_ok == true:
 			print("All token receiped")
 			return true
 		await get_tree().create_timer(0.2).timeout
@@ -60,6 +69,7 @@ func receive_token():
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	print("STP my friend")
 	if OS.has_feature("web"):
 		print("OS web ok")
 		var result = await receive_token()

@@ -36,7 +36,7 @@ func handle_message_receive(msg):
 	if data.has("state"):
 		var state = data["state"]
 		match state:
-			"start_game":
+			"start_game": 
 				_start_game(data)
 			"team_setup":
 				_team_setup(data)
@@ -435,9 +435,10 @@ func _result_catch(data):
 
 
 func _new_encounter(data):
-	if not data.has("monster_encounter"):
+	if not data.has("current_monster"):
+		print("PAS BON LE MONSTRE")
 		return
-	GeneralData.monster_encounter = data["monster_encounter"]
+	GeneralData.monster_encounter = data["current_monster"]
 	emit_signal("monster_encounter_received")
 
 

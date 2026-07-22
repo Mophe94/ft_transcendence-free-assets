@@ -1,7 +1,7 @@
 extends Node
 
 var TIMEOUT = 10.0
-var TIMEVAL = 1.0
+var TIMEVAL = 2.0
 
 func wait_signal(send_func: Callable, signal_to_wait: Signal) -> bool:
 	var time = 0.0

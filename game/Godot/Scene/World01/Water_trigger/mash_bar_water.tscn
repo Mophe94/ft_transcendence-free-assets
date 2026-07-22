@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cvc4hnsdm5b8g"]
 
-[ext_resource type="Script" uid="uid://u1u5wvwfe3nm" path="res://Scene/World01/Water_trigger/mash_bar_water.gd" id="1_e8gxi"]
+[ext_resource type="Script" uid="uid://u1u5wvwfe3nm" path="res://Script/World/WaterTrigger/mash_bar_water.gd" id="1_e8gxi"]
 [ext_resource type="Texture2D" uid="uid://bsaghdqh68u5e" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Bars/bar_assembled.png" id="2_awm6s"]
 
 [node name="MashBar_water" type="Node2D" unique_id=2124034120]

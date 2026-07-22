@@ -48,7 +48,7 @@ func send_mesage(event, value = null):
 		"use_item":
 			_use_item(packet, value)
 		"team_choice":
-			_team_choice(packet, value)
+			_team_choice(packet)
 		"change_current_monster":
 			_change_current_monster(packet, value)
 		"try_attack":
@@ -83,10 +83,10 @@ func _change_current_monster(packet, slot):
 	}
 
 
-func _team_choice(packet, battle_team):
+func _team_choice(packet):
 	var tab = ["", "", ""]
-	for i in range(battle_team.size()):
-		tab[i] = battle_team[i]["name"]
+	for i in range(GeneralData.player["battle_team"].size()):
+		tab[i] = GeneralData.player["battle_team"][i]["name"]
 	packet["data"] = {
 		"state": "team_choice",
 		"battle_team": tab

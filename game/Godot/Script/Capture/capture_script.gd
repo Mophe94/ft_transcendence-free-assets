@@ -97,7 +97,6 @@ func _update_battle_positions() -> void:
 		monster_ref.position = viewport_size * MONSTER_RATIO
 		monster_ref.scale = monster_base_scale * ratio
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	Received.team_setup_scene.connect(_team_set_up_received)
 	$Timer.time_finish.connect(_signal_timer)

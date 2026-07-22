@@ -33,6 +33,11 @@ func instanciate_monster_player():
 		slot_player[current].get_node("Button").slot_ref = current
 		current += 1
 		
+	while current < slot_player.size():
+		slot_player[current].get_node("Button").hide()
+		slot_player[current].get_node("Button").disabled = false
+		current += 1
+		
 func instanciate_monster_enemy():
 	var current = 0
 	for i in range(6):
@@ -57,19 +62,11 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _ready() -> void:
-	Received.combat_scene.connect(_combat_received)
 	$Timer.time_finish.connect(_signal_timer)
 	transi_open()
 	await instantiate_charactere()
 	await instanciate_monster_player()
 	await instanciate_monster_enemy()
-
-func _combat_received():
-	print("signal combat received ===> scene : team set up")
-	$CurrentTeam.process_mode = Node.PROCESS_MODE_DISABLED
-	$Player.process_mode = Node.PROCESS_MODE_DISABLED 
-	await transi_close()
-	get_tree().change_scene_to_packed(GeneralData.combat_scene)
 
 func _signal_timer():
 	print("signal timer received ===> scene : team_setup")
@@ -78,12 +75,13 @@ func _signal_timer():
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED
 	
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TEAM_CHOICE], GeneralData.player["battle_team"])
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TEAM_CHOICE])
 	var success = await GeneralProcess.wait_signal(send_func, Received.combat_scene)
 
-	await transi_close()
+	print("Result fonction send/received : ", success)
 	$Timer.send = false
 	if success:
+		print("Message transition combat received ===> scene : team_setup")
 		get_tree().change_scene_to_packed(GeneralData.combat_scene)
 	else:
 		get_tree().change_scene_to_packed(GeneralData.wait)

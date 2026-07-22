@@ -20,8 +20,5 @@ func _update_font_size() -> void:
 	target_size = clamp(target_size, min_font_size, max_font_size)
 	add_theme_font_size_override("font_size", target_size)
  
-## Force le Button à ignorer sa taille minimale calculée à partir du
-## texte/police/thème, pour qu'il respecte STRICTEMENT le rectangle
-## donné par son anchor.
 func _get_minimum_size() -> Vector2:
 	return Vector2.ZERO

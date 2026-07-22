@@ -89,6 +89,9 @@ func generate_charactere():
 	enemy_scene.scale.x = -1
 
 	var monsterEnemy = GeneralData.enemy["currentMonster"]["name"]
+	if monsterEnemy == "":
+		print("monsterEnemy missing, remplace by burpy")
+		monsterEnemy = "burpy"
 	var monster_enemy_scene = monsterTab[monsterEnemy].instantiate()
 	monster_enemy_scene.scale.x = -1
 	enemy.get_node("EnemyMonster").add_child(monster_enemy_scene)
