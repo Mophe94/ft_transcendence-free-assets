@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://bfloh5jxxbld6"]
+
+[ext_resource type="Script" uid="uid://c8g2uxe1tenu4" path="res://three.gd" id="1_yar85"]
+
+[node name="Tree" type="Node2D" unique_id=2052834693]
+script = ExtResource("1_yar85")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=172968680]
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1210833137]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=227379005]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2100984827]

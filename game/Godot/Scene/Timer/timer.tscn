@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cu0qyq3c4pgss"]
 
 [ext_resource type="Script" uid="uid://burethxxvoe2n" path="res://Script/Timer/timer.gd" id="1_l2lu8"]
-[ext_resource type="Texture2D" uid="uid://dc0nsdic62tjc" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Buttons/SmallBlueSquareButton_Pressed.png" id="2_q5vpr"]
+[ext_resource type="Texture2D" uid="uid://dc0nsdic62tjc" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Buttons/SmallBlueSquareButton_Pressed.png" id="2_q5vpr"]
 [ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="3_q5vpr"]
 
 [node name="Timer" type="CanvasLayer" unique_id=306374687]

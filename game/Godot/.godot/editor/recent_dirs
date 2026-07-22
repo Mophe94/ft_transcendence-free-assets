@@ -1,11 +1,15 @@
-/media/bertrmar/SSD_1T/transs/game/Export/
+res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Particle FX/
+res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Bars/
+res://Scene/World01/Water_trigger/
+res://Script/World/Map_01/
+res://Script/World/Tree/
+res://
 res://Scene/Wait/
 res://Script/PlayerCharacter/
 res://Script/General/
 res://Scene/Capture/
 res://Assets/Font/
 res://Assets/Monster/spritesheet/Pisciner/
-res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Buttons/
 res://Script/Combat/Win/
 res://Script/Inventory/
 res://Script/TeamSetup/ButtonTeamSetup/
@@ -15,9 +19,3 @@ res://Script/Combat/
 res://Script/Combat/Banners/
 res://Script/TeamSetup/Effect/
 res://Script/TeamSetup/Asset/
-res://Script/TeamSetup/SlotSetup/
-res://Script/TeamSetup/CurrentTeam/
-res://Script/TeamSetup/Label/
-res://Scene/Capture/CaptureMenus/
-res://Script/World/Map_01/
-res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Cursors/

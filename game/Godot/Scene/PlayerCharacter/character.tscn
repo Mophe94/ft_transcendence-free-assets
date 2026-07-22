@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://dxuhjorkcu4py"]
 
 [ext_resource type="Script" uid="uid://dvo2eyy83jlrn" path="res://Script/PlayerCharacter/character_body_2d.gd" id="1_7pea8"]
-[ext_resource type="Texture2D" uid="uid://btvf2sflgd7e6" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Icons/press_e_spritesheet.png" id="2_yxahg"]
+[ext_resource type="Texture2D" uid="uid://btvf2sflgd7e6" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Icons/press_e_spritesheet.png" id="2_yxahg"]
+[ext_resource type="Texture2D" uid="uid://cd3j166nqaks7" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Buttons/TinySquareBlueButton.png" id="3_7pea8"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_j3pg4"]
 animations = [{
@@ -100,9 +101,9 @@ size = Vector2(18.5, 24.125)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qclio"]
 size = Vector2(37, 48)
 
-[node name="Player" type="Node2D" unique_id=622233450]
+[node name="Player" type="Node2D" unique_id=622233450 groups=["player", "trigger_zone"]]
 
-[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=981589697 groups=["player"]]
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=981589697 groups=["player", "trigger_zone"]]
 disable_mode = 2
 collision_mask = 3
 motion_mode = 1
@@ -114,6 +115,7 @@ sprite_frames = SubResource("SpriteFrames_j3pg4")
 animation = &"run"
 
 [node name="exclamationTooltip2" type="CanvasModulate" parent="CharacterBody2D" unique_id=1159890501]
+visible = false
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D/exclamationTooltip2" unique_id=1518511990]
 z_index = 15
@@ -137,3 +139,16 @@ shape = SubResource("RectangleShape2D_g4843")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D/DetectionArea" unique_id=1523842451]
 shape = SubResource("RectangleShape2D_qclio")
+
+[node name="ItemPopup" type="Node2D" parent="CharacterBody2D" unique_id=1681309461]
+
+[node name="received_object" type="Sprite2D" parent="CharacterBody2D/ItemPopup" unique_id=175508253]
+z_index = 15
+position = Vector2(2.0000033, -86)
+scale = Vector2(1.4375, 1.4375)
+texture = ExtResource("3_7pea8")
+
+[node name="ItemIcon" type="Sprite2D" parent="CharacterBody2D/ItemPopup" unique_id=2124883590]
+z_index = 15
+position = Vector2(0, -85)
+scale = Vector2(1.5, 1.5)

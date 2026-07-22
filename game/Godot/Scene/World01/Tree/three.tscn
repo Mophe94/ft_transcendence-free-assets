@@ -1,0 +1,94 @@
+[gd_scene format=3 uid="uid://bfloh5jxxbld6"]
+
+[ext_resource type="Script" uid="uid://c8g2uxe1tenu4" path="res://Script/World/Tree/three.gd" id="1_yar85"]
+[ext_resource type="PackedScene" uid="uid://dm3rb1i3bq0kw" path="res://Scene/World01/Tree/mash_bar.tscn" id="3_r1f5i"]
+[ext_resource type="Texture2D" uid="uid://d2dll7fhn8pkk" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Units/Red Units/Monk/Heal_Effect.png" id="3_xbiq1"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r1f5i"]
+atlas = ExtResource("3_xbiq1")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tkjne"]
+atlas = ExtResource("3_xbiq1")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_76nrp"]
+atlas = ExtResource("3_xbiq1")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2vuiq"]
+atlas = ExtResource("3_xbiq1")
+region = Rect2(1152, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fnket"]
+atlas = ExtResource("3_xbiq1")
+region = Rect2(1344, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2ey8k"]
+atlas = ExtResource("3_xbiq1")
+region = Rect2(1536, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b5kqk"]
+atlas = ExtResource("3_xbiq1")
+region = Rect2(1728, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0a1m6"]
+atlas = ExtResource("3_xbiq1")
+region = Rect2(1920, 0, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xbiq1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r1f5i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tkjne")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_76nrp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2vuiq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fnket")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2ey8k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b5kqk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0a1m6")
+}],
+"loop": true,
+"name": &"active",
+"speed": 10.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_r1f5i"]
+radius = 80.0
+
+[node name="Tree" type="Node2D" unique_id=2052834693]
+script = ExtResource("1_yar85")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=2007744028]
+
+[node name="Fireflies" type="AnimatedSprite2D" parent="." unique_id=1657192468]
+visible = false
+position = Vector2(0, 24)
+sprite_frames = SubResource("SpriteFrames_xbiq1")
+animation = &"active"
+frame_progress = 0.09267164
+
+[node name="TriggerZone" type="Area2D" parent="." unique_id=1210833137 groups=["trigger_zone"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerZone" unique_id=227379005 groups=["trigger_zone"]]
+shape = SubResource("CircleShape2D_r1f5i")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=344661536]
+
+[node name="MashBar" parent="." unique_id=1315619967 instance=ExtResource("3_r1f5i")]
+position = Vector2(-120, -152)

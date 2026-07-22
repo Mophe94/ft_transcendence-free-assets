@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bk8mkrekusx3p"]
 
 [ext_resource type="Script" uid="uid://blccmmn2i2put" path="res://Script/Inventory/inventory_ui_slot.gd" id="1_v1nwp"]
-[ext_resource type="Texture2D" uid="uid://c5ypd8gkg5csp" path="res://Assets/World01/Tiny Swords (Free Pack)/Tiny Swords (Free Pack)/UI Elements/UI Elements/Buttons/TinySquareRedButton.png" id="1_y6qex"]
+[ext_resource type="Texture2D" uid="uid://c5ypd8gkg5csp" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Buttons/TinySquareRedButton.png" id="1_y6qex"]
 [ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="3_6jcij"]
 
 [node name="inventory_UI_slot" type="Panel" unique_id=1201840829]

@@ -101,6 +101,12 @@ func get_equipped_skin_enemy() -> SkinData:
 	print("Skin introuvable, fallback sur le premier skin disponible.")
 	return available_skins[0] if available_skins.size() > 0 else null
 
+func get_item_current(item_name: String) -> int:
+	for item in player["inventory"]:
+		if item["name"] == item_name:
+			return item["current"]
+	return 0  
+
 func set_equipped_skin_enemy(skin_id: String) -> void:
 	enemy["asset"] = skin_id
 
@@ -110,7 +116,7 @@ const player_enemy_scene = preload("res://Scene/PlayerCharacter/enemy_character.
 var player: Dictionary = {
 	"id": 0,
 	"name": "",
-	"asset": "",
+	"asset": "dinoRed",
 	"currentMonster": {
 		"name": "",
 		"slot": -1,
@@ -168,27 +174,27 @@ var player: Dictionary = {
 			},
 		},
 	],
-	"team": ["", "", "", "", "", ""],
+	"team": ["burpy", "papate", "", "", "", ""],
 	"inventory": [
 		{
-			"name": "",
+			"name": "potion",
 			"scene": "",
-			"current": 0
+			"current": 2
 		},
 		{
-			"name": "",
+			"name": "rage",
 			"scene": "",
-			"current": 0
+			"current": 1
 		},
 		{
-			"name": "",
+			"name": "rage",
 			"scene": "",
-			"current": 0
+			"current": 1
 		},
 		{
-			"name": "",
+			"name": "rage",
 			"scene": "",
-			"current": 0
+			"current": 1
 		},
 	]
 }
@@ -215,7 +221,7 @@ var position_player = Vector2(0.0, 0.0)
 var player_speed = 0.0
 var timer = 0
 
-var current_item = ""
+var current_item = "rage"
 var current_map = ""
 var monster_encounter = "burpy"
 var text = []
