@@ -6,7 +6,7 @@ export interface GamePayload {
   };
 }
 
-export const FULL_LOBBY = 1;
+export const FULL = 1;
 
 export const PHASE_DURATIONS = {
   lobby: 10,

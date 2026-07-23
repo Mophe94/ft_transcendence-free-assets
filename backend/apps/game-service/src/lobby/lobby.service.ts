@@ -6,7 +6,7 @@ import {
   clientsMap,
   ClientData,
 } from 'apps/game-service/src/shared/clients.map';
-import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
+import { FULL } from 'apps/game-service/src/game/game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 
@@ -33,7 +33,7 @@ export class LobbyService {
     if (clientData) clientData.roomId = roomId; */
 
     console.log(
-      `[LobbyService] User ${userSub} joined room ${roomId} (${clients.size}/${FULL_LOBBY})`,
+      `[LobbyService] User ${userSub} joined room ${roomId} (${clients.size}/${FULL})`,
     );
 
     this.eventEmitter.emit('lobby.player_joined', {
@@ -42,7 +42,7 @@ export class LobbyService {
       playerCount: clients.size,
     });
 
-    if (clients.size === FULL_LOBBY) {
+    if (clients.size === FULL) {
       this.phaseTimer.clear(roomId);
       this.eventEmitter.emit('lobby.start', { roomId, clients });
     } else if (clients.size === 1) {

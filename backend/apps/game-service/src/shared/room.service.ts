@@ -5,7 +5,7 @@ import {
   clientsMap,
   ClientData,
 } from 'apps/game-service/src/shared/clients.map';
-import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
+import { FULL } from 'apps/game-service/src/game/game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class RoomService {
 
   findAvailableRoom(): string | null {
     for (const [roomId, clients] of this.rooms) {
-      if (clients.size < FULL_LOBBY) return roomId;
+      if (clients.size < FULL) return roomId;
     }
     return null;
   }
