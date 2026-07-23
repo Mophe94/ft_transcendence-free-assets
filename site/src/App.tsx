@@ -1,19 +1,20 @@
 import './App.css';
 
 import { Route, Routes } from 'react-router-dom';
-import { Landing } from './page/Welcome';
-import { Home } from './page/Home';
+import Landing from './page/Welcome';
+import Home from './page/Home';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import AuthCallback from './page/Auth';
-import PublicLayout from './layouts/PublicLayout';
 import AppLayout from './layouts/AppLayout';
-import { Play } from './page/Play';
+import Play from './page/Play';
 import Profile from './page/Profile';
-import Contact from './page/Contact';
 import Dashboard from './page/Dashboard';
 import { useAuth } from './context/AuthContext';
-import { Loading } from './page/Loading';
-import { Test } from './page/Test';
+import { Loading } from './content/Loading';
+import Test from './page/Test';
+import AboutUs from './page/AboutUs';
+import ErrorDisplay from './content/Error';
+import Readme from './page/Readme';
 
 function App() {
   const { isLoading } = useAuth();
@@ -27,20 +28,25 @@ function App() {
   return (
     <div className="main-layout">
       <Routes>
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<Landing />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path='/loading' element={<Loading />} />
-        </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/home" element={<Home />} />
             <Route path="/play" element={<Play />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:username" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path='/test' element={<Test />} />
           </Route>
+        </Route>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Landing />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path='/loading' element={<Loading />} />
+          <Route path='/readme' element={<Readme />} />
+          <Route path='/aboutus' element={<AboutUs />} />
+        </Route>
+        <Route element={<AppLayout />}>
+          <Route path="*" element={<ErrorDisplay msg="Page not found" code={404} />} />
         </Route>
       </Routes>
     </div>

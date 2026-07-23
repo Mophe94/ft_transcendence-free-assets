@@ -3,7 +3,7 @@ import { Lobby } from '../components/Lobby';
 import { ChatProvider } from '../context/ChatProvider';
 import './Home.css';
 
-export function Home() {
+export default function Home() {
   return (
     <div className="home-container">
       <Lobby />

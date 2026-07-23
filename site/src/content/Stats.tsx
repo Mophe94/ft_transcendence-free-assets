@@ -1,45 +1,15 @@
-import React, { useEffect, useState } from 'react';
+
 import './Stats.css';
 import type { User } from '../types/user';
-import { useAuth } from '../context/AuthContext';
-import { useParams } from 'react-router-dom';
 import ShieldFrame from '../components/ShieldFrame';
 import ImgFrame from '../components/ImgFrame';
+import React from 'react';
 
-
-export default function Stats() {
-  let { username } = useParams<{ username?: string }>();
-  const { user } = useAuth();
-  if (!user) {
-    return null;
-  }
-  if (!username) {
-    username = user?.username;
-  }
-
-  return <ProfileBody username={username} />;
+interface StatsProps {
+  user: User | null;
 }
 
-interface ProfileBodyProps {
-  username: string;
-}
-
-export function ProfileBody({ username }: ProfileBodyProps) {
-  const [user, setUser] = useState<User | null>(null);
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_USERS_SERVICE}/profile/${username}`, {
-      method: 'Get',
-      credentials: 'include',
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setUser(data.user);
-      })
-      .catch(() => {
-        return null;
-      });
-  }, [username]);
-
+export default function Stats({ user }: StatsProps) {
   if (!user || !user.stats) return null;
 
   const stats = {
@@ -65,6 +35,7 @@ export function ProfileBody({ username }: ProfileBodyProps) {
           <ImgFrame
             imgSrc={user?.avatarUrl}
             imgAlt="avatar-pic"
+            color='blue'
           />
         </div>
 

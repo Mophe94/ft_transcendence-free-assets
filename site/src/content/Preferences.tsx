@@ -6,6 +6,7 @@ import { LeftArrowButton, RightArrowButton } from '../components/buttons/ArrowBu
 import SaveButton from '../components/buttons/SaveButton';
 import ResetButton from '../components/buttons/ResetButton';
 import { useNotification } from '../context/NotifContext';
+import { useParams } from 'react-router-dom';
 import type { Settings } from '../types/user';
 
 import dinoBlue from '../assets/avatars/DinoBlue.gif';
@@ -18,13 +19,14 @@ import ghost03 from '../assets/avatars/Ghost03.gif';
 import satyr01 from '../assets/avatars/Satyr01.gif';
 import satyr02 from '../assets/avatars/Satyr02.gif';
 import satyr03 from '../assets/avatars/Satyr03.gif';
+import sunTheme from '../assets/theme/sun_icon.png';
+import moonTheme from '../assets/theme/moon_icon.png';
 import pisciner from '../assets/starters/pisciner.gif';
 
 
-
 const THEMES = [
-  ['light', 'theme/sun_icon.png'],
-  ['dark', 'theme/moon_icon.png'],
+  ['light', sunTheme],
+  ['dark', moonTheme],
 ];
 
 const AVATARS = [
@@ -45,6 +47,7 @@ const STARTERS = [
 ];
 
 export default function Preferences() {
+  const { username } = useParams();
   const { showNotification } = useNotification();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [starter_id, setStarterId] = useState<number>(0);
@@ -55,15 +58,16 @@ export default function Preferences() {
   const { setTheme } = useTheme();
 
   useEffect(() => {
-    if (!user?.username) {
+    if (username || !user?.username) {
       return;
     }
-    fetch(`${import.meta.env.VITE_USERS_SERVICE}/settings/${user.username}`, {
+    fetch(`${import.meta.env.VITE_USERS_SERVICE}/settings`, {
       method: 'GET',
       credentials: 'include',
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log("=>",data.settings);
         setSettings(data.settings);
         if (data.settings) {
           if (data.settings.theme) {
@@ -85,7 +89,10 @@ export default function Preferences() {
       .catch(() => {
         return null;
       });
-  }, [user?.username, setTheme]);
+  }, [user?.username, username, setTheme]);
+
+
+  if (username) return ;
 
   if (!user) {
     return <div>Loading...</div>;
@@ -120,6 +127,7 @@ export default function Preferences() {
     event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>,
   ) => {
     event.preventDefault();
+    console.log("hello", settings);
     if (!settings) {
       return;
     }

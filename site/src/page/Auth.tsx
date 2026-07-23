@@ -1,7 +1,7 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Loading } from './Loading';
+import { Loading } from '../content/Loading';
 
 export default function AuthCallback() {
   const [searchParams] = useSearchParams();

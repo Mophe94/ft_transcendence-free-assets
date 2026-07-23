@@ -1,10 +1,10 @@
-import NewChat from '../components/Chat/Chat';
-import { ChatProvider } from '../context/ChatProvider';
+import { NewLobby } from "../components/NewLobby";
 
-export function Test() {
-    return (
-        <ChatProvider>
-            <NewChat />
-        </ChatProvider>
-    );
+
+export default function Test() {
+  return (
+    <>
+      <NewLobby />
+    </>
+  );
 }

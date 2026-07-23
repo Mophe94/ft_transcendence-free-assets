@@ -3,15 +3,21 @@
 
 .heading-medium {
   font-family: 'New Rocker';
-  color: rgb(112, 14, 14);
+  color: rgba(103, 8, 8, 0.691);
+  -webkit-text-stroke: 2px black;
   font-size: 64px;
   font-weight: 400;
 }
 .heading-large {
   font-family: 'New Rocker';
-  color: rgba(103, 8, 8, 0.691);
+  color: rgb(112, 14, 14);
+  
+  -webkit-text-stroke: 3px black;
   font-size: 96px;
   font-weight: 400;
+
+  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 .text-medium {

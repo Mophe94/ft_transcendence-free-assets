@@ -23,6 +23,7 @@ services:
       - site/.env
     volumes:
       - ./site:/app
+      - /app/node_modules
 
   game_service:
     build:

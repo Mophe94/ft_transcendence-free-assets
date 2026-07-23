@@ -17,8 +17,8 @@ export function AuthSection() {
           <img id="profile-pic" src={user.avatarUrl} />
           <ul className="dropdown-menu">
             <li>
-              <Link to={'/settings'} className="auth-link">
-                Settings
+              <Link to={'/profile'} className="auth-link">
+                Profile
               </Link>
             </li>
             <li>

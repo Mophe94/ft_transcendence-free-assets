@@ -1,46 +1,64 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import './Profile.css'
 import Stats from '../content/Stats';
 import Preferences from '../content/Preferences';
+import ErrorDisplay from '../content/Error';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { Loading } from '../content/Loading';
+import type { User } from '../types/user';
+import RegularBG from '../background/RegularBg';
 
-import imgUL from '../assets/background/regular_paper/regular_paper_UL.png';
-import imgUM from '../assets/background/regular_paper/regular_paper_UM.png';
-import imgUR from '../assets/background/regular_paper/regular_paper_UR.png';
-import imgML from '../assets/background/regular_paper/regular_paper_ML.png';
-import imgMM from '../assets/background/regular_paper/regular_paper_MM.png';
-import imgMR from '../assets/background/regular_paper/regular_paper_MR.png';
-import imgDL from '../assets/background/regular_paper/regular_paper_DL.png';
-import imgDM from '../assets/background/regular_paper/regular_paper_DM.png';
-import imgDR from '../assets/background/regular_paper/regular_paper_DR.png';
-
-const prefStyles = {
-  '--img-ul': `url(${imgUL})`,
-  '--img-um': `url(${imgUM})`,
-  '--img-ur': `url(${imgUR})`,
-  '--img-ml': `url(${imgML})`,
-  '--img-mm': `url(${imgMM})`,
-  '--img-mr': `url(${imgMR})`,
-  '--img-dl': `url(${imgDL})`,
-  '--img-dm': `url(${imgDM})`,
-  '--img-dr': `url(${imgDR})`,
-} as React.CSSProperties;
 
 export default function Profile() {
-  return (
-    <div className="profile-content-layout" style={prefStyles}>
-      <div className="profile-upperLeft" />
-      <div className="profile-upperMiddle" />
-      <div className="profile-upperRight" />
-      <div className="profile-middleLeft" />
-      <div className="profile-middleMiddle">
-        <Stats />
-        <Preferences />
-      </div>
-      <div className="profile-middleRight" />
+  const { username } = useParams();
+  const { user } = useAuth();
+  const [profileUser, setProfileUser] = useState<User | null>(null);
+  const [error, setError] = useState<{msg: string; code: number} | null>(null);
+  const [loading, setLoading] = useState(true);
 
-      <div className="profile-bottomLeft" />
-      <div className="profile-bottomMiddle" />
-      <div className="profile-bottomRight" />
-    </div>
+  const targetUsername = username || user?.username;
+
+  useEffect(() => {
+    if (!targetUsername) return;
+    fetch(`${import.meta.env.VITE_USERS_SERVICE}/profile/${targetUsername}`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then((res) => {
+        // if (!res.ok) {
+        //   throw new Error("Utilisateur introuvable");
+        // }
+        return res.json();
+      })
+      .then((data) => {
+        if (data && data.user) {
+          setProfileUser(data.user);
+        } else {
+          setError({ msg: "User not found", code: 404 });
+        }
+      })
+      .catch(() => {
+        setError({ msg: "User not found", code: 404 });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [targetUsername]);
+
+  if (!targetUsername) {
+    return <ErrorDisplay msg="User not found" code={404} />;
+  }
+  if (loading) return <Loading />;
+
+  if (error) {
+    return <ErrorDisplay msg={error.msg} code={error.code} />;
+  }
+
+  return (
+    <RegularBG>
+      <Stats user={profileUser}/>
+      <Preferences />
+    </RegularBG>
   );
 }

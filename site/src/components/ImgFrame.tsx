@@ -1,17 +1,50 @@
-import "./ImgFrame.css"
+import "./ImgFrame.css";
 
-import picFrame from '../assets/frame/picture_frame_fire.png'
+import regFrame from '../assets/frame/picture_frame.png';
+import redFrame from '../assets/frame/picture_frame_fire.png';
+import blueFrame from '../assets/frame/picture_frame_water.png';
+import greenFrame from '../assets/frame/picture_frame_tree.png';
+import purpleFrame from '../assets/frame/picture_frame_purple.png';
+import yellowFrame from '../assets/frame/picture_frame_yellow.png';
+import blackFrame from '../assets/frame/picture_frame_black.png';
+import cacaFrame from '../assets/frame/picture_frame_caca.png';
+
 interface PicFrameProps {
-  imgSrc?: string;
+  imgSrc: string;
   imgAlt?: string;
+  color?:string
 }
 
-export default function ImgFrame ({imgSrc, imgAlt}: PicFrameProps) {
+export default function ImgFrame ({imgSrc, imgAlt, color='none'}: PicFrameProps) {
+  let frame = regFrame;
+  switch(color) {
+    case 'red':
+      frame = redFrame;
+      break;
+    case 'blue':
+      frame = blueFrame;
+      break;
+    case 'green':
+      frame = greenFrame;
+      break;
+    case 'purple':
+      frame = purpleFrame;
+      break;
+    case 'yellow':
+      frame = yellowFrame;
+      break;
+    case 'black':
+      frame = blackFrame;
+      break;
+    case 'caca':
+      frame = cacaFrame;
+      break;
+    }
     return (
         <div className="pic-frame-container">
             
-            <img className="pic-frame-content" src={imgSrc} alt={imgAlt} />
-            <img className="pic-frame" src={picFrame} alt="picture frame"/>
+            <img id='connard' className="pic-frame-content" src={imgSrc} alt={imgAlt} />
+            <img className="pic-frame" src={frame} alt="picture frame"/>
         </div>
     )
 }

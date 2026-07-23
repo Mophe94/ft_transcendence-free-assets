@@ -21,15 +21,4 @@ export class UsersController {
     }
     return { user };
   }
-
-  @Get('settings/:username')
-  @UseGuards(JwtAuthGuard)
-  async getSettings(@Param('username') username: string) {
-    const user = await this.usersService.findSettingsByUsername(username);
-
-    if (!user || !user.settings) {
-      throw new NotFoundException('Settings not found');
-    }
-    return { settings: user.settings };
-  }
 }

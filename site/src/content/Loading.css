@@ -1,0 +1,14 @@
+.loading-screen {
+    background-color: rgb(26, 105, 184);
+    background-image:
+        radial-gradient(circle, rgba(15, 52, 90, 0.3) 30%, rgba(0, 0, 0, 0.8) 100%),
+        var(--img42);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 600px;
+}
+.loading-text {
+    font-family: 'New Rocker';
+    font-size: 128px;
+}
