@@ -4,6 +4,7 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { PlayerService } from './player/player.service';
 import { MonstersService } from './entities/monsters.service';
 import { Player } from './player/player';
+import { CombatService } from './combat.service';
 import { GamePayload } from './game.type';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
@@ -27,6 +28,7 @@ export class GameService implements OnModuleInit {
     private eventEmitter: EventEmitter2,
     private phaseTimer: PhaseTimerService,
     private playerService: PlayerService,
+    private combatService: CombatService,
     private monstersService: MonstersService,
   ) {}
 
@@ -77,6 +79,7 @@ export class GameService implements OnModuleInit {
     }
 
     if (room.size === FULL) {
+      //this.combatService.matchmake(room);
       await this.startMapPhase(roomId, room);
       console.log('[GameService]: StartMapPhase');
     }
@@ -87,8 +90,8 @@ export class GameService implements OnModuleInit {
   }
 
   private sendToPlayer(userId: number, payload: object): void {
-    this.eventEmitter.emit('send_to_player', { userId, payload });
     console.log(`Send_to_player: ${userId} -> ${payload}`);
+    this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
   private async startMapPhase(roomId: string, room: Set<number>): Promise<void> {
@@ -97,8 +100,7 @@ export class GameService implements OnModuleInit {
       this.startTeamSetupPhase(roomId, room);
     });
 
-    const mapTimer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map;
+    const mapTimer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map;
 
     const payloads = await Promise.all(
       [...room].map(async (userId) => {
@@ -127,7 +129,16 @@ export class GameService implements OnModuleInit {
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;
       player.timer = TeamSetupTimer;
-      this.sendToPlayer(userId, this.team_setup(player, player)) //replace by enemy
+
+/*       const opponentId = this.combatService.getOpponentId(userId);
+      const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
+      if (!enemy) {
+        console.log(`[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`);
+      }
+
+      this.sendToPlayer(userId, this.team_setup(player, enemy ?? player)); */
+
+      this.sendToPlayer(userId, this.team_setup(player, player)); //replace by enemy
     }  
   }
 
@@ -136,37 +147,42 @@ export class GameService implements OnModuleInit {
     payload: any,
   ): Promise<object | undefined> {
     const player = this.playerService.getPlayer(userId)!;
+    let result: object | undefined;
     switch (payload.state) {
       /*       case "add_item":
-        return this.received_add_item(player)
+        result = await this.received_add_item(player); break;
       case "delete_item":
-        return this.received_delete_item(player, payload.data.item)
+        result = await this.received_delete_item(player, payload.data.item); break;
       case "item_request":
-        return this.received_request_item(player)
+        result = await this.received_request_item(player); break;
       case "use_item":
-        return this.received_use_item(player, payload.data.item) */
-      case 'new_encounter':
-        return this.received_new_encounter(player, 2 /* payload.data.tile */);
+        result = await this.received_use_item(player, payload.data.item); break; */
+      case 'new_encounter': {
+        result = await this.received_new_encounter(player, 2 /* payload.data.tile */); break;
+      }
       case 'try_catch':
-        return this.received_try_catch(player);
+        result = await this.received_try_catch(player); break;
       case 'delete_monster':
-        return this.received_delete_monster(player, payload.monster);
+        result = await this.received_delete_monster(player, payload.monster); break;
       case 'team_choice': {
-        console.log(`Payload team_choice: ${payload.battle_team}`);
-        return this.received_team_choice(player, payload.battle_team);
+        result = await this.received_team_choice(player, payload.battle_team); break;
       }
       /*       case "change_current_monster":
-        return this.received_update_current_monster(player, payload.data.slot)
+        result = await this.received_update_current_monster(player, payload.data.slot); break;
       case "use_item_combat":
-        return this.received_use_item_combat(player, enemy, payload.data.item)
+        result = await this.received_use_item_combat(player, enemy, payload.data.item); break;
       case "try_attack":
-        return this.received_try_attack(player, enemy, payload.data.skill) */
+        result = await this.received_try_attack(player, enemy, payload.data.skill); break; */
       default:
         return {
           event: 'game',
           data: { state: payload.state, reason: 'invalid_action' },
         };
     }
+    if (!result)
+      console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
+    console.log('Result payload: ', result);
+    return result;
   }
 
   // HANDLERS
@@ -178,7 +194,7 @@ export class GameService implements OnModuleInit {
   ): Promise<object | undefined> {
     const monsters = await this.monstersService.findMonstersByTile(tile);
     player.current_monster = monsters[1].name; //
-    console.log(`Monsters by tile: ${monsters[1]}`);
+    //console.log('Monsters by tile', monsters[1]);
     return this.new_encounter(player);
   }
 

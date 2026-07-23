@@ -37,8 +37,14 @@ psql -v ON_ERROR_STOP=1 \
 
     -- Transfer ownership of all tables to the game DB user
     -- Required to allow TypeORM (synchronize: true) to alter tables at startup
-    ALTER TABLE public.monsters OWNER TO ${GAME_DB_USER};
-    ALTER TABLE public.skills OWNER TO ${GAME_DB_USER};
-    ALTER TABLE public.monsters_skills OWNER TO ${GAME_DB_USER};
-    ALTER TABLE public.items OWNER TO ${GAME_DB_USER};
+    -- not mandatory if synchronize is false !
+    --ALTER TABLE public.monsters OWNER TO ${GAME_DB_USER};
+    --ALTER TABLE public.skills OWNER TO ${GAME_DB_USER};
+    --ALTER TABLE public.monsters_skills OWNER TO ${GAME_DB_USER};
+    --ALTER TABLE public.items OWNER TO ${GAME_DB_USER};
+    --ALTER TABLE public.tiles OWNER TO ${GAME_DB_USER};
+    --ALTER TABLE public.tiles_monsters OWNER TO ${GAME_DB_USER};
+    --ALTER TABLE public.maps OWNER TO ${GAME_DB_USER};
+    --ALTER TABLE public.maps_tiles OWNER TO ${GAME_DB_USER};
+
 EOF

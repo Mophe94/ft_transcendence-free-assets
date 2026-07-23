@@ -132,6 +132,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const userId = clientData.userId;
 
+    console.log(`[GG]: payload received: ${payload.state}`);
     const response = await this.gameService.handleMessage(userId, payload);
     this.sendToClient(client, response);
   }

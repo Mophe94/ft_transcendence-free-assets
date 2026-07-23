@@ -10,7 +10,7 @@ export const FULL = 1;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 5,
+  map: 120,
   team_setup: 10,
   choose_monster: 30,
   choose_action: 30,

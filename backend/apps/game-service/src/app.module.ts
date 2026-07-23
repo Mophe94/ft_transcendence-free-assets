@@ -23,7 +23,7 @@ import { getSecret } from 'libs/shared/src/utils/secret.utils';
         username: getSecret('db_game_username'),
         password: getSecret('db_game_password'),
         database: getSecret('db_game_db_name'),
-        synchronize: false, // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Only for dev, remove for prod.
+        synchronize: false,
         autoLoadEntities: true,
       }),
     }), // switch for GAME DB
