@@ -8,10 +8,7 @@ import { GamePayload } from './game.type';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
-import {
-  FULL,
-  PHASE_DURATIONS,
-} from 'apps/game-service/src/game/game.type';
+import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { max } from 'node_modules/class-validator/types';
 import { MonsterType } from './entities/types/monster_type.enum';
 import { Skill } from './entities/skills.entity';
@@ -39,15 +36,14 @@ export class GameService implements OnModuleInit {
       this.gameRooms.set(roomId, room);
     }
     room.add(userId);
-    return room
+    return room;
   }
 
   private leaveGameRoom(roomId: string, userId: number): void {
     const room = this.gameRooms.get(roomId);
     if (!room) return;
     room.delete(userId);
-    if (room.size === 0)
-      this.gameRooms.delete(roomId);
+    if (room.size === 0) this.gameRooms.delete(roomId);
   }
 
   // TEST with hardcoded values
@@ -91,7 +87,10 @@ export class GameService implements OnModuleInit {
     console.log(`Send_to_player: ${userId} -> ${payload}`);
   }
 
-  private async startMapPhase(roomId: string, room: Set<number>): Promise<void> {
+  private async startMapPhase(
+    roomId: string,
+    room: Set<number>,
+  ): Promise<void> {
     this.phaseTimer.start(roomId, 'map', () => {
       console.log(`Room ${roomId} map phase timeout`);
       this.startTeamSetupPhase(roomId, room);
@@ -102,33 +101,34 @@ export class GameService implements OnModuleInit {
 
     const payloads = await Promise.all(
       [...room].map(async (userId) => {
-      const player = this.playerService.getPlayer(userId)!;
-      player.timer = mapTimer;
-      return { userId, payload: await this.start_game(player) };
+        const player = this.playerService.getPlayer(userId)!;
+        player.timer = mapTimer;
+        return { userId, payload: await this.start_game(player) };
       }),
     );
-    
+
     payloads.forEach(({ userId, payload }) => {
       this.sendToPlayer(userId, payload);
     });
 
-    console.log(`[GameService]: startMapPhase -> start_game sent to ${room.size} players of ${roomId}`  
+    console.log(
+      `[GameService]: startMapPhase -> start_game sent to ${room.size} players of ${roomId}`,
     );
-  } 
-
+  }
 
   private startTeamSetupPhase(roomId: string, room: Set<number>) {
     this.phaseTimer.start(roomId, 'team_setup', () => {
       console.log(`Room ${roomId} team_setup phase timeout`);
     });
-    const TeamSetupTimer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
+    const TeamSetupTimer =
+      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
 
     // TODO: combat room: player/enemy
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;
       player.timer = TeamSetupTimer;
-      this.sendToPlayer(userId, this.team_setup(player, player)) //replace by enemy
-    }  
+      this.sendToPlayer(userId, this.team_setup(player, player)); //replace by enemy
+    }
   }
 
   async handleMessage(
@@ -208,11 +208,16 @@ export class GameService implements OnModuleInit {
 
   // CHECK TEAM SENDED AND IF IT'S EMPTY, ELSE AUTO FULLY BATTLE_TEAM IF IT'S POSSIBLE
   // WHEN BATTLE_TEAM OK CALL DB GAME AND RETURN COMBAT
-  private async received_team_choice(player: Player, monsters: string[]) : Promise<object | undefined> {
+  private async received_team_choice(
+    player: Player,
+    monsters: string[],
+  ): Promise<object | undefined> {
     //retrieve monsters stat from db
     for (let i = 0; i < monsters.length; ++i) {
-      if (monsters[i] != "") {
-        const monster = await this.monstersService.findOneByName(monsters[i], /* , { skills: true } */);
+      if (monsters[i] != '') {
+        const monster = await this.monstersService.findOneByName(
+          monsters[i] /* , { skills: true } */,
+        );
         if (!monster) return undefined;
         console.log(monster);
         const currentMonster: CurrentMonster = {
@@ -226,9 +231,8 @@ export class GameService implements OnModuleInit {
           status: [],
           skill: [], // 4 slots
         };
-    
+
         player.battle_team[i] = currentMonster;
-        
       }
     }
 
@@ -381,7 +385,7 @@ export class GameService implements OnModuleInit {
   changeMonster: (new_monster: number) => object;
   attack: (enemy: Player, attackName: string) => object;
 
-/*   //Events
+  /*   //Events
   @OnEvent('lobby.start')
   initGameRoom({ roomId }: { roomId: string }): void {
     console.log('OnEvent -> createRoom()');

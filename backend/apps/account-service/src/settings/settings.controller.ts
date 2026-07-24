@@ -40,7 +40,7 @@ export class SettingsController {
   @Get('/')
   @UseGuards(JwtAuthGuard)
   async getSettings(@Req() req: AuthenticatedRequest) {
-    console.log("JPP");
+    console.log('JPP');
     const { id } = req.user;
     const settings = await this.settingsService.findSettingsByUserId(id);
 

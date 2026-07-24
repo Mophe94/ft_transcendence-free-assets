@@ -17,6 +17,7 @@ import {
 } from 'apps/game-service/src/game/game.type';
 import { LobbyService } from 'apps/game-service/src/lobby/lobby.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
+import { RedisService } from '../redis/redis.service';
 
 @WebSocketGateway(8081, { cors: { origin: true }, path: '/lobby' })
 export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -26,6 +27,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private lobbyService: LobbyService,
     private roomService: RoomService,
+    private redisService: RedisService,
   ) {}
 
   handleConnection(client: WebSocket): void {

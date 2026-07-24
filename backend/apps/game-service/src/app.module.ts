@@ -8,6 +8,8 @@ import { GameModule } from './game/game.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { getSecret } from 'libs/shared/src/utils/secret.utils';
+import { RedisModule } from './redis/redis.module';
+import { RedisService } from './redis/redis.service';
 
 @Module({
   imports: [
@@ -31,8 +33,9 @@ import { getSecret } from 'libs/shared/src/utils/secret.utils';
     GameModule,
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
+    RedisModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, RedisService],
 })
 export class AppModule {}

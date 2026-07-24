@@ -1,0 +1,7 @@
+FROM redis:8.8.0-alpine3.23
+
+COPY redis.conf /usr/local/etc/redis/ 
+COPY entrypoint.sh /app/
+RUN chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]

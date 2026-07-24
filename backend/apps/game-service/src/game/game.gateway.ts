@@ -68,12 +68,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (data) data.isAlive = true; //
     });
 
-    this.gameService
-      .onGodotConnected(client, userId, roomId)
-      .catch((err) => {
-        console.log('handleConnection error');
-        client.close();
-      });
+    this.gameService.onGodotConnected(client, userId, roomId).catch((err) => {
+      console.log('handleConnection error');
+      client.close();
+    });
   }
 
   handleDisconnect(client: WebSocket): void {
@@ -137,11 +135,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @OnEvent('send_to_player')
-  onStartGame({ userId, payload}: {userId: number; payload: object}): void {
+  onStartGame({ userId, payload }: { userId: number; payload: object }): void {
     const client = this.clientsById.get(userId);
     if (client) {
-        this.sendToClient(client, payload);
+      this.sendToClient(client, payload);
     }
   }
-
 }
