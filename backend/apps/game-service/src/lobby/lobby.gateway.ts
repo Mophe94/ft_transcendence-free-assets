@@ -60,7 +60,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.close();
       return;
     }
-    this.lobbyService.joinLobby(client, clientData.userId);
+    void this.lobbyService.joinLobby(client, clientData.userId);
   }
 
   @OnEvent('lobby.player_joined')

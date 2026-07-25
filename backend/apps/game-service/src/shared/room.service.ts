@@ -7,10 +7,14 @@ import {
 } from 'apps/game-service/src/shared/clients.map';
 import { FULL } from 'apps/game-service/src/game/game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class RoomService {
-  constructor(private phaseTimer: PhaseTimerService) {}
+  constructor(
+    private phaseTimer: PhaseTimerService,
+    private readonly redis: RedisService,
+  ) {}
 
   private rooms = new Map<string, Set<WebSocket>>();
 
@@ -21,9 +25,10 @@ export class RoomService {
   }
 
   // ROOMID HARDCODEE
-  createRoom(roomId?: string): string {
+  async createRoom(roomId?: string): Promise<string> {
     const id = roomId ?? 'test-room'; //randomUUID();
     this.rooms.set(id, new Set());
+    await this.redis.addInactiveRoom(id);
     console.log(`Room created: ${id}`);
     return id;
   }
@@ -52,7 +57,11 @@ export class RoomService {
     return this.rooms.get(roomId)?.size;
   }
 
-  deleteRoom(roomId: string): void {
+  async deleteRoom(roomId: string): Promise<void> {
+    await Promise.all([
+      this.redis.removeActiveRoom(roomId),
+      this.redis.removeInactiveRoom(roomId),
+    ]);
     this.rooms.delete(roomId);
   }
 
@@ -68,6 +77,6 @@ export class RoomService {
     const clients = this.rooms.get(roomId);
     if (!clients) return;
     clients.delete(client);
-    if (clients.size === 0) this.deleteRoom(roomId);
+    if (clients.size === 0) void this.deleteRoom(roomId);
   }
 }

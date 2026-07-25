@@ -10,6 +10,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { getSecret } from 'libs/shared/src/utils/secret.utils';
 import { RedisModule } from './redis/redis.module';
 import { RedisService } from './redis/redis.service';
+import { LobbyController } from './lobby/lobby.controller';
+import { AuthModule } from 'apps/account-service/src/auth/auth.module';
 
 @Module({
   imports: [
@@ -35,7 +37,7 @@ import { RedisService } from './redis/redis.service';
     ScheduleModule.forRoot(),
     RedisModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, LobbyController],
   providers: [AppService, RedisService],
 })
 export class AppModule {}

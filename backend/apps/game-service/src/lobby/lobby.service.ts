@@ -9,6 +9,7 @@ import {
 import { FULL } from 'apps/game-service/src/game/game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class LobbyService {
@@ -16,16 +17,20 @@ export class LobbyService {
     private roomService: RoomService,
     private eventEmitter: EventEmitter2,
     private phaseTimer: PhaseTimerService,
+    private redisService: RedisService,
   ) {}
 
   private rooms = new Map<string, Set<WebSocket>>();
 
   // JOIN LOBBY
-  joinLobby(client: WebSocket, userSub: number): void {
+  async joinLobby(client: WebSocket, userSub: number): Promise<void> {
     const roomId =
-      this.roomService.findAvailableRoom() ?? this.roomService.createRoom();
+      this.roomService.findAvailableRoom() ?? await this.roomService.createRoom();
 
     this.roomService.joinRoom(client, roomId);
+    console.log('room id: ', roomId);
+
+    await this.redisService.addPlayerToRoom(userSub.toString(), roomId);
 
     const clients = this.roomService.getClients(roomId)!;
 

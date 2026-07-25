@@ -7,7 +7,13 @@ import { CombatService } from './combat.service';
 import { EntityModule } from './entities/entity.module';
 import { RedisService } from '../redis/redis.service';
 @Module({
-  providers: [GameGateway, GameService, PlayerService, CombatService, RedisService],
+  providers: [
+    GameGateway,
+    GameService,
+    PlayerService,
+    CombatService,
+    RedisService,
+  ],
   imports: [SharedModule, EntityModule],
 })
 export class GameModule {}

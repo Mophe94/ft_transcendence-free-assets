@@ -99,7 +99,8 @@ export class GameService implements OnModuleInit {
       this.startTeamSetupPhase(roomId, room);
     });
 
-    const mapTimer = this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map;
+    const mapTimer =
+      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map;
 
     const payloads = await Promise.all(
       [...room].map(async (userId) => {
@@ -130,7 +131,7 @@ export class GameService implements OnModuleInit {
       const player = this.playerService.getPlayer(userId)!;
       player.timer = TeamSetupTimer;
 
-/*       const opponentId = this.combatService.getOpponentId(userId);
+      /*       const opponentId = this.combatService.getOpponentId(userId);
       const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
       if (!enemy) {
         console.log(`[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`);
@@ -139,7 +140,7 @@ export class GameService implements OnModuleInit {
       this.sendToPlayer(userId, this.team_setup(player, enemy ?? player)); */
 
       this.sendToPlayer(userId, this.team_setup(player, player)); //replace by enemy
-    }  
+    }
   }
 
   async handleMessage(
@@ -158,14 +159,21 @@ export class GameService implements OnModuleInit {
       case "use_item":
         result = await this.received_use_item(player, payload.data.item); break; */
       case 'new_encounter': {
-        result = await this.received_new_encounter(player, 2 /* payload.data.tile */); break;
+        result = await this.received_new_encounter(
+          player,
+          2 /* payload.data.tile */,
+        );
+        break;
       }
       case 'try_catch':
-        result = await this.received_try_catch(player); break;
+        result = await this.received_try_catch(player);
+        break;
       case 'delete_monster':
-        result = await this.received_delete_monster(player, payload.monster); break;
+        result = await this.received_delete_monster(player, payload.monster);
+        break;
       case 'team_choice': {
-        result = await this.received_team_choice(player, payload.battle_team); break;
+        result = await this.received_team_choice(player, payload.battle_team);
+        break;
       }
       /*       case "change_current_monster":
         result = await this.received_update_current_monster(player, payload.data.slot); break;
@@ -179,8 +187,7 @@ export class GameService implements OnModuleInit {
           data: { state: payload.state, reason: 'invalid_action' },
         };
     }
-    if (!result)
-      console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
+    if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
     console.log('Result payload: ', result);
     return result;
   }

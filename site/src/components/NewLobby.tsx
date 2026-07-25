@@ -1,14 +1,22 @@
 import './NewLobby.css';
+import { useEffect, useState } from 'react';
 
-import imgUL from '../assets/background/regular_paper/regular_paper_UL.png';
-import imgUM from '../assets/background/regular_paper/regular_paper_UM.png';
-import imgUR from '../assets/background/regular_paper/regular_paper_UR.png';
-import imgML from '../assets/background/regular_paper/regular_paper_ML.png';
-import imgMM from '../assets/background/regular_paper/regular_paper_MM.png';
-import imgMR from '../assets/background/regular_paper/regular_paper_MR.png';
-import imgDL from '../assets/background/regular_paper/regular_paper_DL.png';
-import imgDM from '../assets/background/regular_paper/regular_paper_DM.png';
-import imgDR from '../assets/background/regular_paper/regular_paper_DR.png';
+import imgUL from '../assets/background/special/special_UL.png';
+import imgUM from '../assets/background/special/special_UM.png';
+import imgUR from '../assets/background/special/special_UR.png';
+import imgML from '../assets/background/special/special_ML.png';
+import imgMM from '../assets/background/special/special_MM.png';
+import imgMR from '../assets/background/special/special_MR.png';
+import imgDL from '../assets/background/special/special_DL.png';
+import imgDM from '../assets/background/special/special_DM.png';
+import imgDR from '../assets/background/special/special_DR.png';
+
+
+interface Room {
+  roomId: string,
+  status: string,
+  nb_player: number,
+}
 
 const lobbyStyles = {
   '--img-ul': `url(${imgUL})`,
@@ -23,11 +31,27 @@ const lobbyStyles = {
 } as React.CSSProperties;
 
 export function NewLobby() {
-  const data = [
-    { id: 0, name: 'Lobby One', nb_player: 6, status: "waiting for players" },
-    { id: 1, name: 'Lobby Two', nb_player: 1, status: "waiting for players" },
-    { id: 3, name: 'Lobby Three', nb_player: 8, status: "Ongoing"},
-  ];
+  const [listGames, setListGames] = useState<Array<Room>>([]);
+
+  useEffect(() => {
+    console.log('hello');
+    fetch(`${import.meta.env.VITE_ROOM_SERVICE}/get_rooms`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      console.log("data =>", data);
+      if (data?.rooms)
+        setListGames(data.rooms)
+      })
+    .catch((e) => console.log(e))
+  }, [])
+  console.log(listGames);
+
+
   return (
     <div className="lobby-content-layout" style={lobbyStyles}>
       <div className="lobby-upperLeft" />
@@ -35,7 +59,33 @@ export function NewLobby() {
       <div className="lobby-upperRight" />
       <div className="lobby-middleLeft" />
       <div className="lobby-middleMiddle">
-        Hello
+        <div className='heading-medium centered'>Games</div>
+        <div className='table-games'>
+          <table className="lobby-table">
+        <colgroup>
+          <col style={{ width: '10%' }} />
+          <col style={{ width: '70%' }} />
+          <col style={{ width: '20%' }} />
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Room Id</th>
+            <th>Nb players</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {listGames.map((room) => (
+            <tr key={room.roomId}>
+              <td>{room.roomId}</td>
+              <td>{room.nb_player}/8</td>
+              <td>{room.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+        </div>
+
       </div>
       <div className="lobby-middleRight" />
 
