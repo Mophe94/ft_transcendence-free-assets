@@ -1,5 +1,6 @@
 import './NewLobby.css';
 import { useEffect, useState } from 'react';
+import SpecialBG from '../background/SpecialBg';
 
 import imgUL from '../assets/background/special/special_UL.png';
 import imgUM from '../assets/background/special/special_UM.png';
@@ -10,6 +11,9 @@ import imgMR from '../assets/background/special/special_MR.png';
 import imgDL from '../assets/background/special/special_DL.png';
 import imgDM from '../assets/background/special/special_DM.png';
 import imgDR from '../assets/background/special/special_DR.png';
+
+import join_button from '../assets/buttons/join_button_regular.png';
+
 
 
 interface Room {
@@ -53,45 +57,33 @@ export function NewLobby() {
 
 
   return (
-    <div className="lobby-content-layout" style={lobbyStyles}>
-      <div className="lobby-upperLeft" />
-      <div className="lobby-upperMiddle" />
-      <div className="lobby-upperRight" />
-      <div className="lobby-middleLeft" />
-      <div className="lobby-middleMiddle">
-        <div className='heading-medium centered'>Games</div>
-        <div className='table-games'>
-          <table className="lobby-table">
-        <colgroup>
-          <col style={{ width: '10%' }} />
-          <col style={{ width: '70%' }} />
-          <col style={{ width: '20%' }} />
-        </colgroup>
-        <thead>
-          <tr>
-            <th>Room Id</th>
-            <th>Nb players</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {listGames.map((room) => (
-            <tr key={room.roomId}>
-              <td>{room.roomId}</td>
-              <td>{room.nb_player}/8</td>
-              <td>{room.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <SpecialBG>
+      <div className='heading-medium centered'>Games</div>
+      <div className='table-games'>
+        <div className='table-games-header'>
+          <div className='table-col-templ'>
+            <div className='table-head centered'>Room Id</div>
+            <div className='table-head centered'>Players</div>
+            <div className='table-head centered'>Status</div>
+            <div className='table-head centered'>Join?</div>
+          </div>
         </div>
-
+        <div className='table-games-content'>
+          {
+          listGames.length?
+            (listGames.map((room) => (
+                <div className='table-col-templ' key={room.roomId}>
+                  <div className='table-data centered'>{room.roomId}</div>
+                  <div className='table-data centered'>{room.nb_player}/8</div>
+                  <div className='table-data centered'>{room.status}</div>
+                  <button className='clean-btn join-button centered'>
+                    <img src={join_button} className='centered'/>
+                  </button>
+                </div>
+            ))):
+            <div className='centered'>No ongoing games</div>}
+        </div>
       </div>
-      <div className="lobby-middleRight" />
-
-      <div className="lobby-bottomLeft" />
-      <div className="lobby-bottomMiddle" />
-      <div className="lobby-bottomRight" />
-    </div>
+    </SpecialBG>
   );
 }
