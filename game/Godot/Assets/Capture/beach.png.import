@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dln75a08bdfmw"
-path="res://.godot/imported/plains_dawn.png-fdf762e1aaf2e335ad18dfa39e16b859.ctex"
+uid="uid://by7qkvc552gkw"
+path="res://.godot/imported/beach.png-118d75b35af0bdee7c88eb159525a8dc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Capture/plains_dawn.png"
-dest_files=["res://.godot/imported/plains_dawn.png-fdf762e1aaf2e335ad18dfa39e16b859.ctex"]
+source_file="res://Assets/Capture/beach.png"
+dest_files=["res://.godot/imported/beach.png-118d75b35af0bdee7c88eb159525a8dc.ctex"]
 
 [params]
 

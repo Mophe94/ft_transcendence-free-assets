@@ -1,4 +1,5 @@
-res://Scene/World01/world_01.tscn
+res://Script/General/GeneralData.gd
+res://Scene/Capture/capture.tscn
 res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueSpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/DinoYellow/dinoYellowSpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/DinoGreen/dinoGreenSpriteSheet.tres
@@ -9,17 +10,10 @@ res://Scene/PlayerCharacter/Skin/Ghost03/ghost03SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr01/satyr01SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr02/satyr02SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr03/satyr03SpriteSheet.tres
+res://Scene/World01/world_01.tscn
 res://Scene/World01/Tree/tree.tres
 res://Scene/World01/Tree/tree3.tres
 res://Script/World/Tree/three.gd
-res://Script/World/WaterTrigger/water_trigger.gd
-res://Script/World/world_01.gd
 res://Script/World/Map_01/trigger_1.gd
-res://Script/General/GeneralProcess.gd
-res://Script/General/Network.gd
-res://Script/General/GeneralData.gd
-res://Script/Inventory/inventory_ui.gd
-res://Script/World/Collectible/CollectibleSpot.gd
+res://Script/World/WaterTrigger/water_trigger.gd
 res://Script/General/Received.gd
-res://Script/Capture/Menus/capture_menus.gd
-res://Scene/Capture/capture.tscn

@@ -68,8 +68,8 @@ func handle_message_receive(msg):
 				_action_item_stat(data)
 			"attack":
 				_attack(data)
-			"damage":
-				_take_damage(data)
+			"action_battle":
+				_action_battle(data)
 			"new_turn":
 				_new_turn(data)
 			"lose":
@@ -99,7 +99,7 @@ func _new_turn(data):
 	GeneralData.timer = data["timer"]
 	emit_signal("new_turn")
 
-func _take_damage(data):
+func _action_battle(data):
 	if not data.has("player"):
 		return
 	var player = data["player"]

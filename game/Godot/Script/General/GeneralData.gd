@@ -12,9 +12,10 @@ const team_setup_scene = preload("res://Scene/TeamSetup/team_setup.tscn")
 const combat_scene = preload("res://Scene/Combat/combat.tscn")
 
 const background_database: Dictionary = {
-	"plains_dawn": preload("res://Assets/Capture/plains_dawn.png"),
 	"plains_night": preload("res://Assets/Capture/plains_night.png"),
-	"plains_day": preload("res://Assets/Capture/plains_day.png")
+	"plains_day": preload("res://Assets/Capture/plains_day.png"),
+	"beach": preload("res://Assets/Capture/beach.png"),
+	"three": preload("res://Assets/Capture/three.png")
 }
 
 const monster_database: Dictionary = {
@@ -176,17 +177,17 @@ var player: Dictionary = {
 	"team": ["", "", "", "", "", ""],
 	"inventory": [
 		{
-			"name": "potion",
+			"name": "",
 			"scene": "",
-			"current": 2
+			"current": 0
 		},
 		{
-			"name": "potion",
+			"name": "",
 			"scene": "",
-			"current": 1
+			"current": 0
 		},
 		{
-			"name": "golden ticket",
+			"name": "",
 			"scene": "map",
 			"current": 0
 		},
@@ -222,9 +223,9 @@ var timer = 0
 
 var current_item = ""
 var current_map = ""
-var monster_encounter = "burpy"
+var monster_encounter = ""
 var text = []
 
 var tile = ""
-var background_capture = "plains_day"
+var background_capture = ""
 var background_battle = "plains_night"

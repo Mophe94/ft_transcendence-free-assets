@@ -29,8 +29,9 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _new_encounter():
-	print("signal timer received new encounter")
+	print("new encounter function call")
 	GeneralData.tile = "three"
+	GeneralData.background_capture = "three"
 	var send_func = func():
 		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.NEW_ENCOUNTER])
 	var success = await GeneralProcess.wait_signal(send_func, Received.monster_encounter_received)
