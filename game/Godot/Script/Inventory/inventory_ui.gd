@@ -10,6 +10,39 @@ var is_open = false
 var pending_action: String = ""   # NOUVEAU : "quit" / "delete_monster" / "delete_object"
 var pending_index: int = -1       # NOUVEAU
 
+signal stop_inventory
+signal run_inventory
+
+
+#############################
+func transi_close():
+	var transi_scene = GeneralData.transi.instantiate()
+	add_child(transi_scene)
+	await transi_scene.get_node("CanvasLayer/ColorRect").close()
+	transi_scene.queue_free()
+
+func _delete_monster():
+	print("delete monster send")
+	var send_func = func():
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.DELETE_MONSTER])
+	var success = await GeneralProcess.wait_signal(send_func, Received.update_team)
+
+	if ! success:
+		await transi_close()
+		get_tree().change_scene_to_packed(GeneralData.wait)
+		
+func _delete_item():
+	print("delete item send")
+	var send_func = func():
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.DELETE_ITEM])
+	var success = await GeneralProcess.wait_signal(send_func, Received.update_inventory)
+
+	if ! success:
+		await transi_close()
+		get_tree().change_scene_to_packed(GeneralData.wait)
+#############################
+
+
 func _ready():
 	update_slots()
 	buttonQuit.pressed.connect(_on_quit_pressed)
@@ -31,19 +64,25 @@ func _on_object_delete_requested(index: int):      # NOUVEAU
 	pending_index = index
 	confirmation_dialog.visible = true
 
-func _on_yes_pressed():                            # MODIFIÉ
+func _on_yes_pressed():   
+	confirmation_dialog.visible = false                         # MODIFIÉ
 	match pending_action:
 		"quit":
 			get_tree().quit()
 		"delete_monster":
 			GeneralData.player["team"][pending_index] = ""
+			emit_signal("stop_inventory")
+			await _delete_monster()
+			emit_signal("run_inventory")
 			update_slots()
 		"delete_object":
 			GeneralData.player["inventory"][pending_index] = {"name": "", "scene": "", "current": 0}
+			emit_signal("stop_inventory")
+			await _delete_item()
+			emit_signal("run_inventory")
 			update_slots()
 	pending_action = ""
 	pending_index = -1
-	confirmation_dialog.visible = false
 
 func _on_no_pressed():                             # MODIFIÉ
 	pending_action = ""

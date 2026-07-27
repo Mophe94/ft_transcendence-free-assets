@@ -14,8 +14,7 @@ const combat_scene = preload("res://Scene/Combat/combat.tscn")
 const background_database: Dictionary = {
 	"plains_dawn": preload("res://Assets/Capture/plains_dawn.png"),
 	"plains_night": preload("res://Assets/Capture/plains_night.png"),
-	"plains_day": preload("res://Assets/Capture/plains_day.png"),
-	"beach_day": preload("res://Assets/Capture/beach_day.png")
+	"plains_day": preload("res://Assets/Capture/plains_day.png")
 }
 
 const monster_database: Dictionary = {
@@ -151,7 +150,7 @@ var player: Dictionary = {
 	"battle_team": [
 		{
 			"name": "",
-			"slot": 0,
+			"slot": -1,
 			"life": {
 				"current": 0,
 				"max": 0
@@ -159,7 +158,7 @@ var player: Dictionary = {
 		},
 		{
 			"name": "",
-			"slot": 0,
+			"slot": -1,
 			"life": {
 				"current": 0,
 				"max": 0
@@ -167,14 +166,14 @@ var player: Dictionary = {
 		},
 		{
 			"name": "",
-			"slot": 0,
+			"slot": -1,
 			"life": {
 				"current": 0,
 				"max": 0
 			},
 		},
 	],
-	"team": ["burpy", "papate", "", "", "", ""],
+	"team": ["", "", "", "", "", ""],
 	"inventory": [
 		{
 			"name": "potion",
@@ -182,19 +181,19 @@ var player: Dictionary = {
 			"current": 2
 		},
 		{
-			"name": "rage",
+			"name": "potion",
 			"scene": "",
 			"current": 1
 		},
 		{
-			"name": "rage",
-			"scene": "",
-			"current": 1
+			"name": "golden ticket",
+			"scene": "map",
+			"current": 0
 		},
 		{
-			"name": "rage",
+			"name": "",
 			"scene": "",
-			"current": 1
+			"current": 0
 		},
 	]
 }
@@ -217,11 +216,11 @@ var enemy: Dictionary = {
 const SPEED_TEXT = 0.03
 const WAIT_TEXT = 0.3
 
-var position_player = Vector2(0.0, 0.0)
+var position_player = Vector2(4929.0, 1064.0)
 var player_speed = 0.0
 var timer = 0
 
-var current_item = "rage"
+var current_item = ""
 var current_map = ""
 var monster_encounter = "burpy"
 var text = []

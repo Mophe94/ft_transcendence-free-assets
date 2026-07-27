@@ -15,6 +15,8 @@ var can_roll: bool = true
 
 var danger_level: float = 0.0
 
+signal stop_player
+
 #############################
 func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
@@ -79,11 +81,8 @@ func _try_encounter():
 
 
 func _start_battle():
-	if player:
-		player.set_process(false)
-		player.set_physics_process(false)
-	GeneralData.position_player = player.global_position
 	await get_tree().create_timer(0.4).timeout
+	emit_signal("stop_player")
 	_new_encounter()
 
 

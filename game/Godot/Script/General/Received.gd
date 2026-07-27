@@ -6,6 +6,8 @@ signal monster_encounter_received
 signal catch_result(success)
 signal team_setup_scene
 signal item_received
+signal update_inventory
+signal update_team
 
 signal combat_scene
 signal battle_start
@@ -413,6 +415,7 @@ func _update_team(data):
 	
 	for i in range(team.size()):
 		GeneralData.player["team"][i] = team[i] 
+	emit_signal("update_team")
 
 
 func _update_inventory(data):
@@ -420,6 +423,7 @@ func _update_inventory(data):
 		return
 	for i in range(4):
 		GeneralData.player["inventory"][i] = data["inventory"][i]
+	emit_signal("update_inventory")
 
 
 func _result_catch(data):
@@ -431,6 +435,8 @@ func _result_catch(data):
 			_update_team(data)
 			emit_signal("catch_result", true)
 		"fail":
+			emit_signal("catch_result", false)
+		_:
 			emit_signal("catch_result", false)
 
 

@@ -3190,7 +3190,7 @@ shape = SubResource("CapsuleShape2D_o3u8c")
 
 [node name="Trigger" type="Area2D" parent="GrassTrigger_layer" unique_id=1238515515]
 
-[node name="Trigger_2" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1347733727]
+[node name="Trigger_2" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1347733727 groups=["trigger_zone"]]
 collision_layer = 2
 script = ExtResource("45_q5ax3")
 
@@ -3198,35 +3198,35 @@ script = ExtResource("45_q5ax3")
 position = Vector2(476, 568)
 shape = SubResource("RectangleShape2D_xp4x0")
 
-[node name="Trigger_3" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=314116104]
+[node name="Trigger_3" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=314116104 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GrassTrigger_layer/Trigger/Trigger_3" unique_id=176393795]
 position = Vector2(931.5, 184.5)
 shape = SubResource("RectangleShape2D_gc1ye")
 
-[node name="Trigger_4" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=2136107337]
+[node name="Trigger_4" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=2136107337 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionShape2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_4" unique_id=1157411203]
 position = Vector2(957, 896)
 polygon = PackedVector2Array(-60, -120, -60, -80, -36, -80, -36, -72, -60, -64, -60, 40, -36, 40, -36, 64, -60, 64, -60, 112, 68, 112, 68, 72, 36, 72, 36, 48, 60, 40, 68, 8, 36, 8, 36, -16, 60, -24, 68, -56, 36, -64, 36, -80, 68, -88, 68, -120, 44, -136, 4, -128, 4, -112)
 
-[node name="Trigger_6" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=421349307]
+[node name="Trigger_6" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=421349307 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_6" unique_id=1229316092]
 position = Vector2(716, 1530)
 polygon = PackedVector2Array(-183, -16, -202, -48, -162, -85, -117, -57, -80, -43, 49, -43, 84, -64, 149, -65, 157, -44, 184, -27, 140, -4, 154, 14, 206, -3, 238, 40, 212, 54, 129, 55, 96, 33, 53, 45, 22, 52, -12, 47, -33, 54, -53, 55, -83, 43, -109, 52, -142, 46, -151, 31, -153, 18, -133, 4, -123, -4, -138, -17, -154, -23)
 
-[node name="Trigger_5" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1429622859]
+[node name="Trigger_5" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1429622859 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionShape2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_5" unique_id=592219410]
 position = Vector2(683, 1147)
 polygon = PackedVector2Array(-107, 39, -41, -38, 17, -54, 79, -39, 141, 29, 138, 49, -100, 52)
 
-[node name="Trigger_1" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=2105569275]
+[node name="Trigger_1" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=2105569275 groups=["trigger_zone"]]
 collision_layer = 2
 script = ExtResource("45_q5ax3")
 
@@ -3234,208 +3234,208 @@ script = ExtResource("45_q5ax3")
 position = Vector2(132, 288.5)
 polygon = PackedVector2Array(-68, -144.5, -4, -144.5, -4, -96.5, 53, -96.5, 46.726288, -4.161209, 45, 55.5, -4, 79.5, -12, 159.5, -11, 199.5, -67, 199.5)
 
-[node name="Trigger_7" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1429402407]
+[node name="Trigger_7" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1429402407 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GrassTrigger_layer/Trigger/Trigger_7" unique_id=599988784]
 position = Vector2(1697, 2265.5)
 shape = SubResource("RectangleShape2D_rk1so")
 
-[node name="Trigger_8" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=826932214]
+[node name="Trigger_8" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=826932214 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_8" unique_id=869780889]
 polygon = PackedVector2Array(1737, 1832, 1768, 1764, 1808, 1766, 1854, 1809, 1855, 1828, 1796, 1866, 1763, 1858)
 
-[node name="Trigger_9" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1848810330]
+[node name="Trigger_9" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1848810330 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionShape2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_9" unique_id=422308681]
 polygon = PackedVector2Array(1777, 2969, 1683, 3062, 1739, 3116, 1770, 3127, 1809, 3105, 1843, 3096, 1867, 3122, 1931, 3117, 2041, 3119, 2054, 3090, 2021, 3069, 2025, 3055, 2049, 3047, 2053, 3023, 2024, 2997, 2055, 2978, 2051, 2953, 2013, 2939, 1986, 2951, 1948, 2935, 1995, 2911, 1980, 2882, 1860, 2883, 1859, 2923, 1831, 2940, 1805, 2907, 1763, 2908, 1763, 2937)
 
-[node name="Trigger_10" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=546462632]
+[node name="Trigger_10" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=546462632 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_10" unique_id=791549575]
 polygon = PackedVector2Array(325, 3504, 493, 3499, 696, 3505, 705, 3470, 651, 3463, 612, 3463, 607, 3439, 634, 3431, 644, 3405, 601, 3383, 556, 3395, 536, 3376, 522, 3366, 477, 3385, 460, 3400, 372, 3405, 336, 3400, 315, 3455)
 
-[node name="Trigger_11" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1632996379]
+[node name="Trigger_11" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1632996379 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_11" unique_id=899638635]
 polygon = PackedVector2Array(966, 3372, 1083, 3374, 1083, 3208, 996, 3209, 964, 3229, 971, 3245, 982, 3247, 973, 3270, 960, 3293, 978, 3314, 980, 3326, 960, 3354)
 
-[node name="Trigger_12" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=2098534489]
+[node name="Trigger_12" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=2098534489 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_12" unique_id=709012218]
 polygon = PackedVector2Array(745, 2992, 769, 2992, 769, 2952, 777, 2952, 801, 2944, 801, 2928, 825, 2920, 828, 2892, 799, 2879, 804, 2862, 827, 2852, 821, 2817, 805, 2810, 818, 2798, 832, 2791, 811, 2760, 788, 2744, 730, 2746, 723, 2761, 709, 2769, 690, 2786, 668, 2802, 668, 2817, 698, 2825, 700, 2841, 711, 2861, 723, 2872, 709, 2886, 710, 2912, 730, 2928, 725, 2945, 711, 2958, 706, 2980, 724, 2994)
 
-[node name="Trigger_13" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=2002507961]
+[node name="Trigger_13" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=2002507961 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_13" unique_id=165812536]
 polygon = PackedVector2Array(993, 2415, 966, 2531, 1006, 2542, 1041, 2539, 1129, 2543, 1151, 2534, 1172, 2544, 1261, 2545, 1272, 2535, 1311, 2550, 1396, 2539, 1413, 2533, 1415, 2514, 1381, 2491, 1382, 2471, 1400, 2469, 1403, 2441, 1079, 2438, 1030, 2410)
 
-[node name="Trigger_14" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=812401287]
+[node name="Trigger_14" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=812401287 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_14" unique_id=235205511]
 polygon = PackedVector2Array(1537, 1928, 1537, 2024, 1665, 2024, 1665, 1920, 1537, 1920)
 
-[node name="Trigger_15" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=958284539]
+[node name="Trigger_15" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=958284539 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_15" unique_id=1059935840]
 polygon = PackedVector2Array(1537, 2184, 1537, 2288, 1657, 2288, 1657, 2184)
 
-[node name="Trigger_16" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=115164727]
+[node name="Trigger_16" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=115164727 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_16" unique_id=2093222342]
 polygon = PackedVector2Array(2041, 2128, 2041, 2416, 1929, 2416, 1929, 2120, 2041, 2120)
 
-[node name="Trigger_17" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1990828739]
+[node name="Trigger_17" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1990828739 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_17" unique_id=686646998]
 polygon = PackedVector2Array(1865, 336, 1817, 376, 1817, 392, 1849, 400, 1841, 416, 1817, 432, 1817, 456, 1841, 464, 1849, 480, 1873, 496, 1905, 496, 1913, 488, 1937, 496, 1953, 496, 1969, 488, 1985, 488, 2001, 496, 2017, 496, 2041, 488, 2041, 472, 2057, 456, 2073, 456, 2073, 432, 2065, 416, 2049, 416, 2049, 392, 2065, 392, 2081, 368, 2065, 360, 2049, 352, 2049, 336, 2017, 328, 1873, 328)
 
-[node name="Trigger_18" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=696193724]
+[node name="Trigger_18" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=696193724 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_18" unique_id=1786447857]
 polygon = PackedVector2Array(3009, 560, 3193, 560, 3193, 520, 3169, 512, 3169, 496, 3193, 488, 3201, 464, 3169, 448, 3169, 432, 3193, 424, 3193, 400, 3169, 384, 3169, 368, 3193, 360, 3193, 336, 3073, 336, 3009, 416, 3009, 432, 3033, 440, 3025, 456, 3009, 480, 3009, 488, 3033, 496, 3033, 512, 3009, 528)
 
-[node name="Trigger_19" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=906382359]
+[node name="Trigger_19" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=906382359 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_19" unique_id=1023189551]
 polygon = PackedVector2Array(3201, 200, 3201, 304, 3329, 304, 3329, 280, 3353, 264, 3353, 240, 3313, 200)
 
-[node name="Trigger_20" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=435482353]
+[node name="Trigger_20" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=435482353 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionShape2D" parent="GrassTrigger_layer/Trigger/Trigger_20" unique_id=1658947574]
 position = Vector2(1697, 277)
 shape = SubResource("RectangleShape2D_aecvj")
 
-[node name="Trigger_21" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=691291933]
+[node name="Trigger_21" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=691291933 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_21" unique_id=584263908]
 polygon = PackedVector2Array(1417, 1192, 1449, 1120, 1553, 1128, 1593, 1176, 1593, 1200, 1561, 1208, 1593, 1224, 1593, 1256, 1569, 1264, 1593, 1296, 1593, 1320, 1569, 1328, 1569, 1352, 1465, 1360, 1441, 1344, 1425, 1328, 1417, 1320, 1417, 1296, 1441, 1288, 1441, 1272, 1417, 1256, 1417, 1240, 1433, 1224)
 
-[node name="Trigger_22" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1385997928]
+[node name="Trigger_22" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1385997928 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_22" unique_id=27271731]
 polygon = PackedVector2Array(3208, 875, 3378, 879, 3386, 851, 3315, 785, 3268, 787, 3208, 845)
 
-[node name="Trigger_23" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1222250438]
+[node name="Trigger_23" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1222250438 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionShape2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_23" unique_id=2010433591]
 polygon = PackedVector2Array(3769, 1512, 3769, 1488, 3745, 1472, 3745, 1456, 3769, 1448, 3769, 1424, 3713, 1424, 3681, 1408, 3681, 1392, 3649, 1384, 3617, 1400, 3601, 1416, 3585, 1440, 3585, 1520, 3769, 1520)
 
-[node name="Trigger_24" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1648070386]
+[node name="Trigger_24" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1648070386 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_24" unique_id=907267410]
 polygon = PackedVector2Array(3393, 1704, 3401, 1672, 3465, 1616, 3585, 1616, 3577, 1640, 3553, 1640, 3553, 1664, 3577, 1688, 3577, 1704, 3401, 1704)
 
-[node name="Trigger_25" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=995962861]
+[node name="Trigger_25" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=995962861 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_25" unique_id=959973564]
 polygon = PackedVector2Array(3201, 2128, 3249, 2120, 3321, 2128, 3329, 2144, 3353, 2152, 3353, 2176, 3329, 2184, 3329, 2200, 3353, 2224, 3353, 2240, 3329, 2256, 3329, 2280, 3289, 2288, 3209, 2288, 3201, 2248, 3225, 2240, 3225, 2224, 3201, 2224, 3185, 2200, 3193, 2176, 3201, 2168, 3217, 2168)
 
-[node name="Trigger_26" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1645043597]
+[node name="Trigger_26" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1645043597 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_26" unique_id=71797848]
 polygon = PackedVector2Array(3777, 2168, 3777, 2216, 3801, 2224, 3801, 2240, 3777, 2256, 3777, 2280, 3881, 2280, 3865, 2232, 3881, 2224, 3889, 2216, 3889, 2184, 3849, 2184, 3817, 2176)
 
-[node name="Trigger_27" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1323910569]
+[node name="Trigger_27" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1323910569 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_27" unique_id=270393465]
 polygon = PackedVector2Array(3617, 2736, 3633, 2728, 3641, 2720, 3641, 2696, 3617, 2688, 3617, 2672, 3641, 2664, 3641, 2640, 3593, 2640, 3529, 2640, 3529, 2664, 3545, 2672, 3545, 2688, 3529, 2696, 3529, 2712, 3529, 2728, 3569, 2720)
 
-[node name="Trigger_28" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1939400319]
+[node name="Trigger_28" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1939400319 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_28" unique_id=924876214]
 polygon = PackedVector2Array(4097, 2496, 4217, 2496, 4217, 2536, 4193, 2544, 4193, 2560, 4217, 2566.8599, 4217, 2600, 4193, 2608, 4193, 2624, 4217, 2625.2754, 4217, 2664, 4097, 2664, 4105, 2640, 4121, 2624, 4121, 2608, 4097, 2605.5203, 4097, 2576, 4121, 2560, 4121, 2544, 4097, 2536)
 
-[node name="Trigger_29" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1330498695]
+[node name="Trigger_29" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1330498695 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_29" unique_id=1667369138]
 polygon = PackedVector2Array(4233, 2824, 4233, 2856, 4249, 2864, 4249, 2880, 4233, 2896, 4233, 2920, 4249, 2920, 4257, 2936, 4233, 2968, 4233, 2992, 4401, 2992, 4401, 2952, 4385, 2944, 4385, 2920, 4401, 2920, 4401, 2888, 4385, 2888, 4385, 2864, 4401, 2864, 4401, 2824)
 
-[node name="Trigger_30" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1723682234]
+[node name="Trigger_30" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1723682234 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_30" unique_id=232715985]
 polygon = PackedVector2Array(4233, 1936, 4409, 1936, 4401, 1960, 4385, 1976, 4385, 1984, 4401, 2000, 4401, 2024, 4385, 2032, 4385, 2048, 4401, 2064, 4401, 2088, 4385, 2096, 4385, 2112, 4353, 2128, 4353, 2136, 4369, 2152, 4385, 2168, 4385, 2184, 4401, 2184, 4401, 2216, 4385, 2224, 4385, 2232, 4385, 2248, 4409, 2256, 4409, 2272, 4409, 2280, 4385, 2288, 4377, 2304, 4361, 2312, 4353, 2320, 4353, 2344, 4337, 2352, 4313, 2352, 4297, 2352, 4297, 2328, 4305, 2312, 4313, 2304, 4313, 2296, 4297, 2280, 4273, 2280, 4249, 2280, 4241, 2256, 4249, 2240, 4249, 2224, 4241, 2216, 4241, 2184, 4257, 2168, 4265, 2160, 4281, 2136, 4281, 2120, 4265, 2120, 4233, 2096, 4241, 2056, 4249, 2056, 4249, 2040, 4241, 2024, 4233, 2008, 4241, 1992, 4249, 1984, 4249, 1968, 4233, 1960)
 
-[node name="Trigger_31" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=13902440]
+[node name="Trigger_31" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=13902440 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_31" unique_id=1328999998]
 polygon = PackedVector2Array(3081, 1296, 3081, 1344, 3041, 1352, 2945, 1352, 2945, 1448, 2961, 1456, 3185, 1448, 3185, 1416, 3169, 1408, 3169, 1392, 3185, 1384, 3193, 1352, 3169, 1344, 3169, 1320, 3185, 1320, 3185, 1296)
 
-[node name="Trigger_32" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=994399218]
+[node name="Trigger_32" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=994399218 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GrassTrigger_layer/Trigger/Trigger_32" unique_id=644127907]
 position = Vector2(3388.75, 3485.75)
 shape = SubResource("RectangleShape2D_0vbr2")
 
-[node name="Trigger_33" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1419359652]
+[node name="Trigger_33" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1419359652 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_33" unique_id=1789612876]
 polygon = PackedVector2Array(5313, 2688, 5497, 2688, 5505, 2720, 5537, 2752, 5561, 2768, 5561, 2784, 5537, 2792, 5529, 2824, 5281, 2824, 5297, 2792, 5313, 2784, 5305, 2752)
 
-[node name="Trigger_34" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=369956300]
+[node name="Trigger_34" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=369956300 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_34" unique_id=51240715]
 polygon = PackedVector2Array(5769, 3080, 5881, 3080, 5881, 3240, 5833, 3248, 5817, 3208, 5785, 3208, 5761, 3176, 5769, 3152, 5785, 3136, 5785, 3120, 5769, 3112)
 
-[node name="Trigger_35" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=377430263]
+[node name="Trigger_35" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=377430263 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_35" unique_id=29288318]
 polygon = PackedVector2Array(5033, 3240, 5017, 3272, 5049, 3272, 5049, 3296, 5017, 3312, 5017, 3328, 5049, 3336, 5057, 3368, 5113, 3368, 5145, 3376, 5153, 3392, 5393, 3392, 5385, 3360, 5377, 3336, 5401, 3328, 5401, 3304, 5377, 3296, 5385, 3272, 5401, 3272, 5401, 3240)
 
-[node name="Trigger_36" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=584648773]
+[node name="Trigger_36" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=584648773 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_36" unique_id=912601420]
 polygon = PackedVector2Array(5193, 256, 5561, 264, 5569, 288, 5537, 304, 5529, 320, 5561, 328, 5561, 352, 5537, 368, 5537, 384, 5569, 408, 5569, 424, 5185, 424, 5185, 392, 5217, 384, 5209, 368, 5185, 368, 5185, 328, 5201, 320, 5209, 304, 5193, 304)
 
-[node name="Trigger_37" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1912282450]
+[node name="Trigger_37" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1912282450 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_37" unique_id=719042450]
 polygon = PackedVector2Array(4865, 848, 4865, 936, 5049, 936, 5057, 912, 5025, 896, 5017, 880, 5057, 872, 5049, 840)
 
-[node name="Trigger_38" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1447716966]
+[node name="Trigger_38" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1447716966 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_38" unique_id=1383770752]
 polygon = PackedVector2Array(4673, 968, 4673, 1000, 4705, 1008, 4697, 1016, 4673, 1040, 4673, 1064, 4697, 1064, 4697, 1080, 4673, 1104, 4673, 1136, 4777, 1136, 4801, 1120, 4793, 1096, 4769, 1088, 4769, 1072, 4801, 1064, 4793, 1040, 4769, 1032, 4769, 1008, 4793, 1000, 4793, 976)
 
-[node name="Trigger_39" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1267078150]
+[node name="Trigger_39" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=1267078150 groups=["trigger_zone"]]
 script = ExtResource("45_q5ax3")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="GrassTrigger_layer/Trigger/Trigger_39" unique_id=1870621807]
 polygon = PackedVector2Array(4801, 1224, 5113, 1224, 5121, 1240, 5145, 1248, 5153, 1280, 5121, 1296, 5121, 1320, 5089, 1328, 4801, 1328, 4801, 1296, 4777, 1288, 4769, 1264)
 
-[node name="Trigger_40" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=2095205649]
+[node name="Trigger_40" type="Area2D" parent="GrassTrigger_layer/Trigger" unique_id=2095205649 groups=["trigger_zone"]]
 position = Vector2(-15, 128)
 script = ExtResource("45_q5ax3")
 
@@ -3788,7 +3788,7 @@ tile_set = SubResource("TileSet_277l5")
 
 [node name="Player" parent="." unique_id=622233450 instance=ExtResource("72_benk5")]
 z_index = 4
-position = Vector2(4081, 1352)
+position = Vector2(4929, 1064)
 
 [node name="Collision" type="StaticBody2D" parent="." unique_id=828704952]
 

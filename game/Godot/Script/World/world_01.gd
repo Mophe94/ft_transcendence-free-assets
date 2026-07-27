@@ -1,5 +1,21 @@
 extends Node2D
 
+func _stop_player():
+	GeneralData.position_player = $Player/CharacterBody2D.global_position
+	$Player/CharacterBody2D.process_mode = Node.PROCESS_MODE_DISABLED
+	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED
+	$CanvasLayer/Inventory_UI.hide()
+
+func _stop_inventory():
+	print("coucou")
+	$Player/CharacterBody2D.process_mode = Node.PROCESS_MODE_DISABLED
+	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED
+
+func _run_inventory():
+	print("aurevoir")
+	$Player/CharacterBody2D.process_mode = Node.PROCESS_MODE_ALWAYS
+	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_ALWAYS
+
 #####################################
 func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
@@ -36,6 +52,16 @@ func _signal_timer():
 #####################################
 
 func _ready() -> void:
+	for node in get_tree().get_nodes_in_group("trigger_zone"):
+		if node.has_signal("stop_player"):
+			node.stop_player.connect(_stop_player)
+		if node.has_signal("run_inventory"):
+			node.run_inventory.connect(_run_inventory)
+		if node.has_signal("stop_inventory"):
+			node.stop_inventory.connect(_stop_inventory)
+	$CanvasLayer/Inventory_UI.stop_inventory.connect(_stop_inventory)
+	$CanvasLayer/Inventory_UI.run_inventory.connect(_run_inventory)
+	
 	Received.team_setup_scene.connect(_team_set_up_received)
 	$Timer.time_finish.connect(_signal_timer)
 	$Player/CharacterBody2D/Camera2D.enabled = true

@@ -13,11 +13,37 @@ signal try_catch
 signal catch_fail
 signal catch_ok
 
+#############################
 func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
 	await transi_scene.get_node("CanvasLayer/ColorRect").close()
 	transi_scene.queue_free()
+
+func _result_catch():
+	print("result catch send")
+	var send_func = func():
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TRY_CATCH])
+	var success = await GeneralProcess.wait_signal_return(send_func, Received.catch_result)
+
+	if success >= 0:
+		return success
+	else:
+		await transi_close()
+		get_tree().change_scene_to_packed(GeneralData.wait)
+
+func _result_item():
+	print("result use item")
+	var send_func = func():
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.USE_ITEM])
+	var success = await GeneralProcess.wait_signal_return(send_func, Received.catch_result)
+
+	if success >= 0:
+		return success
+	else:
+		await transi_close()
+		get_tree().change_scene_to_packed(GeneralData.wait)
+#############################
 
 func text_show(new_text):
 	$Text.show()
@@ -62,8 +88,6 @@ func set_menus_flee_choice(object):
 	if object == "yes":
 		await text_show("you flee")
 		var tween = create_tween()
-#		tween.set_trans(Tween.TRANS_SINE)
-#		tween.set_ease(Tween.EASE_OUT)
 		tween.tween_property(self, "modulate:a", 0.0, 1.0)
 		await tween.finished
 		hide()
@@ -111,8 +135,9 @@ func set_menus_catch(object):
 		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TRY_CATCH])
 		emit_signal("try_catch")
 		await text_show("You try to catch " + GeneralData.monster_encounter)
-		var success = await Received.catch_result
-		if success:
+		var success = await _result_catch()
+		
+		if success > 0:
 			emit_signal("catch_ok")
 			await text_show("You success to capture " + GeneralData.monster_encounter + " !")
 			await transi_close()
@@ -129,17 +154,23 @@ func set_menus_use(object):
 	await text_show("You use " + object)
 	Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.USE_ITEM], object)
 	emit_signal("try_catch")
-	await Received.catch_result
-	emit_signal("catch_ok")
-	await text_show("You success to capture " + GeneralData.monster_encounter + " !")
-	await transi_close()
-	get_tree().change_scene_to_packed(GeneralData.map[GeneralData.current_map])
+	var success = await _result_catch()
+		
+	if success >= 0:
+		emit_signal("catch_ok")
+		await text_show("You success to capture " + GeneralData.monster_encounter + " !")
+		await transi_close()
+		get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
+	else:
+		emit_signal("catch_fail")
+		await text_show("You fail to capture " + GeneralData.monster_encounter)
+		_back()
 
 func set_menus_items():
 	hide_button("all")
 	var j = 0
 	for i in range(4):
-		if inventory[i]["name"] != "" && inventory[i]["scene"] == "map":
+		if inventory[i]["name"] != "" && inventory[i]["scene"] == "map" && inventory[i]["current"] != 0:
 			button[j].show()
 			button[j].text = inventory[i]["name"] + " x " + str(inventory[i]["current"])
 			button[j].action = "use"

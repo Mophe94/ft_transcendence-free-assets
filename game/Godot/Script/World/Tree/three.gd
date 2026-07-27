@@ -14,9 +14,33 @@ extends Interactable
 @onready var fireflies: AnimatedSprite2D = $Fireflies
 @onready var mash_bar: MashBar = $MashBar
 
+signal stop_player
+
 var is_active: bool = false
 var mash_started: bool = false
 var already_used: bool = false
+
+
+#############################
+func transi_close():
+	var transi_scene = GeneralData.transi.instantiate()
+	add_child(transi_scene)
+	await transi_scene.get_node("CanvasLayer/ColorRect").close()
+	transi_scene.queue_free()
+
+func _new_encounter():
+	print("signal timer received new encounter")
+	GeneralData.tile = "three"
+	var send_func = func():
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.NEW_ENCOUNTER])
+	var success = await GeneralProcess.wait_signal(send_func, Received.monster_encounter_received)
+
+	await transi_close()
+	if success:
+		get_tree().change_scene_to_packed(GeneralData.capture_scene)
+	else:
+		get_tree().change_scene_to_packed(GeneralData.wait)
+#############################
 
 
 func _ready() -> void:
@@ -62,8 +86,8 @@ func interact(_player: Node2D) -> void:
 
 func _on_mash_completed() -> void:
 	mash_started = false
-	# get_tree().change_scene_to_file(next_scene_path)
-	print("scene capture")
+	emit_signal("stop_player")
+	_new_encounter()
 
 
 func _on_mash_failed() -> void:

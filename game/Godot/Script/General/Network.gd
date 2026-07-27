@@ -32,7 +32,6 @@ func connect_server():
 
 
 func receive_token():
-	print("received_token start")
 	var user_ok = false
 	var room_ok = false
 	var domain_ok = false
@@ -60,7 +59,6 @@ func receive_token():
 					domain_ok = true
 					print("TOKEN DOMAIN RECEIVE: " +  domain)
 		if user_ok == true && room_ok == true && domain_ok == true:
-			print("All token receiped")
 			return true
 		await get_tree().create_timer(0.2).timeout
 		currentTime += 0.2
@@ -69,9 +67,7 @@ func receive_token():
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	print("STP my friend")
 	if OS.has_feature("web"):
-		print("OS web ok")
 		var result = await receive_token()
 		if !result:
 			print("TOKEN TIMEOUT")
@@ -101,7 +97,6 @@ func _process(_delta: float) -> void:
 func process_network_messages():
 	while messageQueue.size() > 0:
 		var msg = messageQueue.pop_front()
-		print(msg)
 		Received.handle_message_receive(msg)
 
 
