@@ -6,10 +6,11 @@ import { Skill } from './skills.entity';
 import { Tile } from './tiles.entity';
 import { Item } from './items.entity';
 import { MapEntity } from './maps.entity';
+import { ItemsService } from './items.service';
 
 @Module({
-  providers: [MonstersService],
+  providers: [MonstersService, ItemsService],
   imports: [TypeOrmModule.forFeature([MapEntity, Tile, Monster, Skill, Item])],
-  exports: [MonstersService],
+  exports: [MonstersService, ItemsService],
 })
 export class EntityModule {}

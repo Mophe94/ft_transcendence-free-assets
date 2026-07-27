@@ -3,6 +3,7 @@ import { WebSocket } from 'ws';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { PlayerService } from './player/player.service';
 import { MonstersService } from './entities/monsters.service';
+import { ItemsService } from './entities/items.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { GamePayload } from './game.type';
@@ -27,6 +28,7 @@ export class GameService implements OnModuleInit {
     private playerService: PlayerService,
     private combatService: CombatService,
     private monstersService: MonstersService,
+    private itemsService: ItemsService,
   ) {}
 
   private gameRooms = new Map<string, Set<number>>();
@@ -150,14 +152,14 @@ export class GameService implements OnModuleInit {
     const player = this.playerService.getPlayer(userId)!;
     let result: object | undefined;
     switch (payload.state) {
-      /*       case "add_item":
+            case "add_item":
         result = await this.received_add_item(player); break;
       case "delete_item":
         result = await this.received_delete_item(player, payload.data.item); break;
       case "item_request":
         result = await this.received_request_item(player); break;
       case "use_item":
-        result = await this.received_use_item(player, payload.data.item); break; */
+        result = await this.received_use_item(player, payload.data.item); break;
       case 'new_encounter': {
         result = await this.received_new_encounter(
           player,
@@ -207,7 +209,7 @@ export class GameService implements OnModuleInit {
 
   private received_delete_monster(player: Player, monster: string) {
     for (let i = 0; i < player.team.length; ++i) {
-      if (player.team[i] === monster) {
+      if (player.team[i] === monster) { 
         player.team[i] = '';
         break;
       }
@@ -218,7 +220,7 @@ export class GameService implements OnModuleInit {
   private received_try_catch(player: Player) {
     let result = Math.floor(Math.random() * 101);
 
-    if (result <= player.current_monster_catch /* rarity now? */) {
+    if (result <= 50) {
       for (let i = 0; i < player.team.length; ++i) {
         if (player.team[i] === '') {
           player.team[i] = player.current_monster;
@@ -280,6 +282,44 @@ export class GameService implements OnModuleInit {
     }
 
     return this.combat(player);
+  }
+
+  // RECEIVED REQUEST FOR ITEM, CALL DB GAME + CHOICE ONE RANDOM ITEM AND RETURN THIS
+  private received_request_item(player: Player){
+    let item = 'golden ticket';
+    //demande object existant +++++ item = name of item select
+    player.current_item = item
+    return this.new_current_item(player);
+  }
+
+  // ADD ITEM + RETURN UPDATE_ITEM
+  private received_add_item(player: Player){
+    for (let i = 0; i < player.inventory.length; ++i){
+      if (player.inventory[i]["name"] === ""){
+        player.inventory[i]["name"] = player.current_item;
+        player.inventory[i]["current"] = 1;
+        //call pour scene et value et target
+        break;
+      }
+      else if (player.inventory[i]["name"] === player.current_item){
+        player.inventory[i]["current"] += 1;
+        break;
+      }
+    }
+    return this.update_inventory(player);
+  }
+
+
+  // CALL REMOVE ITEM + ADD MONSTER IN TEAM + SEND RESULT_CATCH WITH UPDATE_TEAM
+  private received_use_item(player: Player, item: string){
+    this.received_delete_item(player, item);
+
+    for (let i = 0; i < player.team.length; ++i){
+      if (player.team[i] === "")
+      player.team[i] = player.current_monster;
+      break;
+    }
+    return this.result_catch(player, 1);
   }
 
   // JSON RESPONSE
@@ -359,6 +399,21 @@ export class GameService implements OnModuleInit {
         current_item: player.current_item,
       },
     };
+  }
+
+    // // DELETE ITEM + SEND UPDATE_ITEM
+  private received_delete_item(player: Player, item: string){
+    for (let i = 0; i < player.inventory.length; ++i){
+      if (player.inventory[i]["name"] === item){
+          player.inventory[i]["name"] = "";
+          player.inventory[i]["scene"] = "";
+          player.inventory[i]["type"] = "";
+          player.inventory[i]["target"] = "";
+          player.inventory[i]["value"] = 0;
+        }
+        break;
+      }
+    return this.update_inventory(player);
   }
 
   private update_team(player: Player) {
