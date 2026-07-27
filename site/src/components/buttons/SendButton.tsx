@@ -1,9 +1,9 @@
 import './SendButton.css';
 
 import { useState } from 'react';
-import sendBtn from '../../assets/buttons/send_button.png';
-import sendBtnHover from '../../assets/buttons/send_button_hover.png';
-import sendBtnPressed from '../../assets/buttons/send_button_pressed.png';
+import sendBtn from '../../assets/buttons/send_button/send_button.png';
+import sendBtnHover from '../../assets/buttons/send_button/send_button_hover.png';
+import sendBtnPressed from '../../assets/buttons/send_button/send_button_pressed.png';
 
 export default function SendButton() {
   const [isPressed, setIsPressed] = useState(false);

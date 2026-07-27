@@ -3,9 +3,9 @@ import './ResetButton.css'
 import { useState } from 'react';
 
 
-import resetBtn from '../../assets/buttons/reset_button.png';
-import resetBtnHover from '../../assets/buttons/reset_button_hover.png';
-import resetBtnPressed from '../../assets/buttons/reset_button_pressed.png';
+import resetBtn from '../../assets/buttons/reset_button/reset_button.png';
+import resetBtnHover from '../../assets/buttons/reset_button/reset_button_hover.png';
+import resetBtnPressed from '../../assets/buttons/reset_button/reset_button_pressed.png';
 
 interface ResetButtonProps {
   onClick: () => void | Promise<void>;

@@ -12,7 +12,9 @@ import imgDL from '../assets/background/special/special_DL.png';
 import imgDM from '../assets/background/special/special_DM.png';
 import imgDR from '../assets/background/special/special_DR.png';
 
-import join_button from '../assets/buttons/join_button_regular.png';
+import join_button from '../assets/buttons/join_button/join_button_regular.png';
+import QuickPairingButton from './buttons/QuickPairingButton';
+import CreateRoomButton from './buttons/CreateRoomButton';
 
 
 
@@ -76,13 +78,22 @@ export function NewLobby() {
                   <div className='table-data centered'>{room.roomId}</div>
                   <div className='table-data centered'>{room.nb_player}/8</div>
                   <div className='table-data centered'>{room.status}</div>
-                  <button className='clean-btn join-button centered'>
-                    <img src={join_button} className='centered'/>
-                  </button>
+                  {room.status == 'Waiting for players' && <button className='clean-btn join-button centered'>
+                    <img src={join_button} className='centered'/> 
+                  </button>}
                 </div>
             ))):
             <div className='centered'>No ongoing games</div>}
         </div>
+        <div className='room-button-container'>
+          <div className='centered'>
+            <QuickPairingButton onClick={()=>console.log()}/>
+          </div>
+          <div className='centered'>
+            <CreateRoomButton onClick={()=>console.log()}/>
+          </div>
+        </div>
+        
       </div>
     </SpecialBG>
   );

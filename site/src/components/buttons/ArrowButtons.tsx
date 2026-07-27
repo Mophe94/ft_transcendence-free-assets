@@ -1,13 +1,13 @@
 import { useState } from "react";
 import './ArrowButtons.css';
 
-import leftArrow from "../../assets/buttons/left_arrow.png";
-import leftArrowDisabled from "../../assets/buttons/left_arrow_disabled.png";
-import leftArrowPressed from "../../assets/buttons/left_arrow_pressed.png";
+import leftArrow from "../../assets/buttons/arrow_buttons/left_arrow.png";
+import leftArrowDisabled from "../../assets/buttons/arrow_buttons/left_arrow_disabled.png";
+import leftArrowPressed from "../../assets/buttons/arrow_buttons/left_arrow_pressed.png";
 
-import rightArrow from "../../assets/buttons/right_arrow.png";
-import rightArrowDisabled from "../../assets/buttons/right_arrow_disabled.png";
-import rightArrowPressed from "../../assets/buttons/right_arrow_pressed.png";
+import rightArrow from "../../assets/buttons/arrow_buttons/right_arrow.png";
+import rightArrowDisabled from "../../assets/buttons/arrow_buttons/right_arrow_disabled.png";
+import rightArrowPressed from "../../assets/buttons/arrow_buttons/right_arrow_pressed.png";
 
 interface ArrowProps {
   onClick: () => void,

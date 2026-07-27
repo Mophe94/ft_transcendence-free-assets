@@ -3,9 +3,9 @@ import './SaveButton.css';
 import { useState } from 'react';
 
 
-import saveBtn from '../../assets/buttons/save_button.png';
-import saveBtnHover from '../../assets/buttons/save_button_hover.png';
-import saveBtnPressed from '../../assets/buttons/save_button_pressed.png';
+import saveBtn from '../../assets/buttons/save_button/save_button.png';
+import saveBtnHover from '../../assets/buttons/save_button/save_button_hover.png';
+import saveBtnPressed from '../../assets/buttons/save_button/save_button_pressed.png';
 
 interface SaveButtonProps {
   onClick: () => void | Promise<void>;
