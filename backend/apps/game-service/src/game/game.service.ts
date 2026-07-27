@@ -155,15 +155,15 @@ export class GameService implements OnModuleInit {
             case "add_item":
         result = await this.received_add_item(player); break;
       case "delete_item":
-        result = await this.received_delete_item(player, payload.data.item); break;
+        result = await this.received_delete_item(player, payload.item); break;
       case "item_request":
         result = await this.received_request_item(player); break;
       case "use_item":
-        result = await this.received_use_item(player, payload.data.item); break;
+        result = await this.received_use_item(player, payload.item); break;
       case 'new_encounter': {
         result = await this.received_new_encounter(
           player,
-          2 /* payload.data.tile */,
+          2 /* payload.tile */,
         );
         break;
       }
@@ -297,7 +297,8 @@ export class GameService implements OnModuleInit {
     for (let i = 0; i < player.inventory.length; ++i){
       if (player.inventory[i]["name"] === ""){
         player.inventory[i]["name"] = player.current_item;
-        player.inventory[i]["current"] = 1;
+        player.inventory[i]["scene"] = 'map';
+        player.inventory[i]["current"] += 1;
         //call pour scene et value et target
         break;
       }
@@ -306,6 +307,7 @@ export class GameService implements OnModuleInit {
         break;
       }
     }
+    player.current_item = "";
     return this.update_inventory(player);
   }
 
@@ -413,6 +415,7 @@ export class GameService implements OnModuleInit {
         }
         break;
       }
+      console.log(this.update_inventory(player));
     return this.update_inventory(player);
   }
 
