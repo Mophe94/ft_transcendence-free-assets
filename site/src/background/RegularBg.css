@@ -40,6 +40,7 @@
   grid-column: 1;
 }
 .regbg-middleMiddle {
+  position: relative;
   background-image: var(--img-mm);
   background-repeat: round round;
   background-size: auto auto;

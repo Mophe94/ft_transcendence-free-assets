@@ -24,7 +24,6 @@ export class wsAuthService {
     }
 
     try {
-      console.log(getSecret('jwt_secret_key'));
       return await this.jwtService.verifyAsync<AuthenticatedUser>(token, {
         secret: getSecret('jwt_secret_key'),
       });

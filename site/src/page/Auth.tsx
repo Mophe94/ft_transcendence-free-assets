@@ -25,7 +25,7 @@ export default function AuthCallback() {
     } else {
       navigate(`/login?error=no_code`);
     }
-  }, [searchParams, navigate, checkUserStatus]);
+  }, []);
   return (
     <Loading />
   );

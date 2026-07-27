@@ -8,6 +8,9 @@ import purpleFrame from '../assets/frame/picture_frame_purple.png';
 import yellowFrame from '../assets/frame/picture_frame_yellow.png';
 import blackFrame from '../assets/frame/picture_frame_black.png';
 import cacaFrame from '../assets/frame/picture_frame_caca.png';
+import spartanFrame from '../assets/frame/picture_frame_spartan.png';
+import athenianFrame from '../assets/frame/picture_frame_athenian.png';
+import trojanFrame from '../assets/frame/picture_frame_trojan.png';
 
 interface PicFrameProps {
   imgSrc: string;
@@ -39,6 +42,16 @@ export default function ImgFrame ({imgSrc, imgAlt, color='none'}: PicFrameProps)
     case 'caca':
       frame = cacaFrame;
       break;
+    case 'spartan':
+      frame = spartanFrame;
+      break;
+    case 'athenian':
+      frame = athenianFrame;
+      break;
+    case 'trojan':
+      frame = trojanFrame;
+      break;
+
     }
     return (
         <div className="pic-frame-container">

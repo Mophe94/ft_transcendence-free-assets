@@ -1,18 +1,11 @@
 
-.stats-container {
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  padding: 20px; 
+.stats-content-layout {
+  position: relative;
+}
 
-  background-image: url('background/special_paper/special_paper_MM.png');
-  background-repeat: repeat;
-  
-  overflow: hidden; 
-}
-.stats-header {
+/* .stats-title {
   margin-top: 70px;
-}
+} */
 
 .stats-table {
   display: grid;
@@ -53,4 +46,24 @@
 
 .content-table .value {
   grid-column: 4;
+}
+
+.coalLogo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+}
+
+.trojan {
+  color: rgb(53, 92, 157);
+}
+
+.athenian {
+  color: rgb(26, 98, 0);
+}
+
+.spartan {
+  color: rgb(141, 4, 2);
 }

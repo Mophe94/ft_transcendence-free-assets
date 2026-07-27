@@ -24,5 +24,7 @@ export interface User {
   created_at: Date;
   settings?: Settings;
   stats?: Stats;
+  coalition_id?: number;
+  coalition_name?: string;
   role: string;
 }

@@ -61,11 +61,9 @@ export class AuthController {
     const userWithSettings = await this.usersService.findSettingsById(
       req.user.id,
     );
-
     if (!userWithSettings) {
       throw new NotFoundException('User not found');
     }
-
     return userWithSettings;
   }
 
