@@ -77,12 +77,25 @@ export class GameService implements OnModuleInit {
     }
 
     if (room.size === FULL) {
-      //this.combatService.matchmake(room);
+      this.combatService.matchmake(room);
+      // TEST MATCHMAKING //
+      for (const userId of room) {
+        const player = this.playerService.getPlayer(userId)!;  
+        const opponentId = this.combatService.getOpponentId(userId);
+        const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
+        if (!enemy) {
+          console.log(`[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`);
+        }
+        console.log('USER ID: ', userId, ': ', this.team_setup(player, enemy ?? player));
+        console.log('OPONNENT ID: ', opponentId);
+        console.log('******************');
+      }
+      //******************************//
+
       await this.startMapPhase(roomId, room);
-      console.log('[GameService]: StartMapPhase');
     }
   }
-
+  
   onGodotDisconnected(userId: number, roomId: string): void {
     this.leaveGameRoom(roomId, userId);
   }
@@ -133,15 +146,16 @@ export class GameService implements OnModuleInit {
       const player = this.playerService.getPlayer(userId)!;
       player.timer = TeamSetupTimer;
 
-      /*       const opponentId = this.combatService.getOpponentId(userId);
+      const opponentId = this.combatService.getOpponentId(userId);
       const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
       if (!enemy) {
         console.log(`[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`);
       }
 
-      this.sendToPlayer(userId, this.team_setup(player, enemy ?? player)); */
+      console.log('USER ID: ', userId, ': ', this.team_setup(player, enemy ?? player));
+      console.log('OPUNNENT ID: ', opponentId);
 
-      this.sendToPlayer(userId, this.team_setup(player, player)); //replace by enemy
+      this.sendToPlayer(userId, this.team_setup(player, enemy ?? player));
     }
   }
 

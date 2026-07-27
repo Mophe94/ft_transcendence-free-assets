@@ -6,11 +6,11 @@ export interface GamePayload {
   };
 }
 
-export const FULL = 1;
+export const FULL = 6;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 120,
+  map: 60,
   team_setup: 10,
   choose_monster: 30,
   choose_action: 30,

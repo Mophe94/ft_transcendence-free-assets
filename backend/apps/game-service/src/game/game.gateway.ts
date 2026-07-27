@@ -53,14 +53,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       !roomId
       //|| !this.gameService.isPlayerInRoom(user.sub, roomId)
     ) {
-      console.log('Missing token to authenticate');
+      console.log('[GameGateway]: Missing token to authenticate');
       client.close();
       return;
     }
 
     this.clients.set(client, { userId, roomId, isAlive: true });
     this.clientsById.set(userId, client);
-    console.log(`Client ${userId} connected in room ${roomId}`);
+    console.log(`[GameGateway]: Client ${userId} connected in room ${roomId}`);
 
     client.on('pong', () => {
       console.log('pong received');
@@ -69,7 +69,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
 
     this.gameService.onGodotConnected(client, userId, roomId).catch((err) => {
-      console.log('handleConnection error');
+      console.log('[GameGateway]: handleConnection error');
       client.close();
     });
   }
@@ -87,7 +87,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (user.roomId) {
       this.gameService.onGodotDisconnected(user.userId, user.roomId);
     }
-    console.log(`Client ${user?.userId} disconnected`);
+    console.log(`[GameGateway]: Client ${user?.userId} disconnected`);
   }
 
   private broadcast(clients: Set<WebSocket>, message: object) {
@@ -130,7 +130,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const userId = clientData.userId;
 
-    console.log(`[GG]: payload received: ${payload.state}`);
     const response = await this.gameService.handleMessage(userId, payload);
     this.sendToClient(client, response);
   }
