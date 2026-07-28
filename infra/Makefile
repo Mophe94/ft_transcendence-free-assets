@@ -7,9 +7,9 @@ SWARM_SCRIPTS = $(LOCATION)/swarm/scripts
 CONTAINER_FILES:= "$(LOCATION)/containers"
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 #HOST_IP:= $(shell cat host_ip.txt)
-HOST_IP:= $(shell tailscape ip -4) 
-REG_PORT ?=5050
-REGISTRY ?= $(HOST_IP):$(REG_PORT)
+HOST_IP := $(shell tailscale ip -4 | tr -d '[:space:]') 
+REG_PORT?=5050
+REGISTRY?=$(HOST_IP):$(REG_PORT)
 TAG ?= latest
 BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) REGISTRY=$(REGISTRY) TAG=$(TAG)
 DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) REGISTRY_PORT=$(REG_PORT) 

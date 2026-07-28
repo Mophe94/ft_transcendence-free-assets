@@ -57,55 +57,16 @@ echo "[$SCRIPT_NAME] Changing VM hostname to: swarmnode.${NEW_USER}"
 echo "swarmnode.${NEW_USER}" > /etc/hostname
 
 #Server CA creation
-if [ ${TYPE} == "leader" ]; then
 
-    echo "[$SCRIPT_NAME] Setting up directory"
-    mkdir -p ${CERT_DIR}
-    mv /cert_info.env ${CERT_DIR}/cert_info.env 
+echo "[$SCRIPT_NAME] Setting up directory"
+mkdir -p ${CERT_DIR}
+mv /cert_info.env ${CERT_DIR}/cert_info.env 
 
-    #Server CA generation
-    echo "[$SCRIPT_NAME] Generating CA"
+#Server CA generation
+echo "[$SCRIPT_NAME] Generating CA"
 
-    chmod +x /cert_rootCA.sh
-    bash /cert_rootCA.sh ${CERT_DIR}
-
-    echo "[$SCRIPT_NAME] Setting up Docker Daemon"
-    mkdir -p "/etc/docker"
-    if [ ! -f ${CERT_DIR}/ca.crt ]; then
-	echo "[$SCRIPT_NAME] Missing CA certificate, marking registry as insecure"
-	if [ -f "/etc/docker/daemon.json" ]; then
-	    rm -f "/etc/docker/daemon.json"
-	fi
-	cat > "/etc/docker/daemon.json" << EOF
-	{
-	    "insecure-registries": [
-		"${HOST_IP}:5050"
-	    ]
-	    "log-driver": "json-file",
-	    "log-opts": {
-		"max-size": "10m",
-		"max-file": "3"
-	    }
-	}
-EOF
-    else
-	echo "[$SCRIPT_NAME] Found CA certificate, marking registry as secure"
-	mkdir -p "/etc/docker/certs.d/${HOST_IP}:5050/"
-	cp "${CERT_DIR}/ca.crt" "/etc/docker/certs.d/${HOST_IP}:5050/"
-	if [ -f "/etc/docker/daemon.json" ]; then
-	    rm -f "/etc/docker/daemon.json"
-	fi
-	cat > "/etc/docker/daemon.json" << EOF
-	{
-	    "log-driver": "json-file",
-	    "log-opts": {
-		"max-size": "10m",
-		"max-file": "3"
-	    }
-	}
-EOF
-    fi
-fi
+chmod +x /cert_rootCA.sh
+bash /cert_rootCA.sh ${CERT_DIR}
 
 echo "[$SCRIPT_NAME] Adding utils"
 apk update
@@ -125,7 +86,7 @@ mkdir -p ${HEADSCALE_DIR}/{config,data}
 
 
 cat > ${HEADSCALE_DIR}/config/config.yaml <<EOF
-server_url: http://${HOST_IP}:${HEADSCALE_PORT}
+server_url: http://${HOST_IP}:9090
 
 listen_addr: 0.0.0.0:${HEADSCALE_PORT}
 
@@ -248,6 +209,43 @@ mkdir -p /nfs-storage/{registry,monitoring,backups} \
 echo "/nfs-storage *(rw,sync,no_subtree_check,no_root_squash)" >> "/etc/exports"
 exportfs -ra
 #check with exportfs -v
+
+echo "[$SCRIPT_NAME] Setting up Docker Daemon"
+mkdir -p "/etc/docker"
+if [ ! -f ${CERT_DIR}/ca.crt ]; then
+    echo "[$SCRIPT_NAME] Missing CA certificate, marking registry as insecure"
+    if [ -f "/etc/docker/daemon.json" ]; then
+	rm -f "/etc/docker/daemon.json"
+    fi
+    cat > "/etc/docker/daemon.json" << EOF
+    {
+	"insecure-registries": [
+	    "${TAILSCALE_IP}:5050"
+	]
+	"log-driver": "json-file",
+	"log-opts": {
+	    "max-size": "10m",
+	    "max-file": "3"
+	}
+    }
+EOF
+else
+    echo "[$SCRIPT_NAME] Found CA certificate, marking registry as secure"
+    mkdir -p "/etc/docker/certs.d/${TAILSCALE_IP}:5050/"
+    cp "${CERT_DIR}/ca.crt" "/etc/docker/certs.d/${TAILSCALE_IP}:5050/"
+    if [ -f "/etc/docker/daemon.json" ]; then
+	rm -f "/etc/docker/daemon.json"
+    fi
+    cat > "/etc/docker/daemon.json" << EOF
+    {
+	"log-driver": "json-file",
+	"log-opts": {
+	    "max-size": "10m",
+	    "max-file": "3"
+	}
+    }
+EOF
+fi
 
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"
 
