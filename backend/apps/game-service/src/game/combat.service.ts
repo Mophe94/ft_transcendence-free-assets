@@ -34,8 +34,8 @@ export class CombatService {
 		const combatRoomId = this.playerCombatRoom.get(userId);
 		if (!combatRoomId) 
 			return undefined;
-	
 		const [userIdA, userIdB] = this.combatRooms.get(combatRoomId)!;
 		return userIdA === userId ? userIdB : userIdA;
+
 	}
 }
