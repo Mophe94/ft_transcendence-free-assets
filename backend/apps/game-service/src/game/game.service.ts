@@ -78,7 +78,7 @@ export class GameService implements OnModuleInit {
 
     if (room.size === FULL) {
       this.combatService.matchmake(room);
-      // TEST MATCHMAKING //
+/*       // TEST MATCHMAKING //
       for (const userId of room) {
         const player = this.playerService.getPlayer(userId)!;  
         const opponentId = this.combatService.getOpponentId(userId);
@@ -89,8 +89,7 @@ export class GameService implements OnModuleInit {
         console.log('USER ID: ', userId, ': ', this.team_setup(player, enemy ?? player));
         console.log('OPONNENT ID: ', opponentId);
         console.log('******************');
-      }
-      //******************************//
+      } */
 
       await this.startMapPhase(roomId, room);
     }
@@ -137,14 +136,16 @@ export class GameService implements OnModuleInit {
   private startTeamSetupPhase(roomId: string, room: Set<number>) {
     this.phaseTimer.start(roomId, 'team_setup', () => {
       console.log(`Room ${roomId} team_setup phase timeout`);
+      //this.startCombatPhase(roomId, room);
+
     });
-    const TeamSetupTimer =
+    const teamSetupTimer =
       this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
 
     // TODO: combat room: player/enemy
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;
-      player.timer = TeamSetupTimer;
+      player.timer = teamSetupTimer;
 
       const opponentId = this.combatService.getOpponentId(userId);
       const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
@@ -152,12 +153,25 @@ export class GameService implements OnModuleInit {
         console.log(`[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`);
       }
 
-      console.log('USER ID: ', userId, ': ', this.team_setup(player, enemy ?? player));
-      console.log('OPUNNENT ID: ', opponentId);
+		// TEST MATCHMAKING //
+		console.log('USER ID: ', userId, ': ', this.team_setup(player, enemy ?? player));
+		console.log('OPONNENT ID: ', opponentId);
+		console.log('******************');
+		//******************************//
 
       this.sendToPlayer(userId, this.team_setup(player, enemy ?? player));
     }
   }
+
+/*   private startCombatPhase(roomId: string, room: Set<number>) {
+    this.phaseTimer.start(roomId, 'choose_monster', () => {
+      console.log(`Room ${roomId} choose_monster timeout`);
+
+    });
+    const combatTimer =
+      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.choose_monster;
+
+  } */
 
   async handleMessage(
     userId: number,
@@ -255,13 +269,13 @@ export class GameService implements OnModuleInit {
     for (let i = 0; i < monsters.length; ++i) {
       if (monsters[i] != '') {
         const monster = await this.monstersService.findOneByName(
-          monsters[i] /* , { skills: true } */,
+          monsters[i] /* , { skills: true } */
         );
         if (!monster) return undefined;
         console.log(monster);
         const currentMonster: CurrentMonster = {
           name: monster.name,
-          type: String(monster.type), //add enum
+          type: String(monster.type),
           slot: i,
           life: {
             current: monster.hp_total,
@@ -286,15 +300,16 @@ export class GameService implements OnModuleInit {
           player.battle_team[count]['slot'] = count;
           ++count;
         }
-        if (count === 3) break;
+        if (count === 2) break;
       }
     } else {
       for (let i = 0; i < player.battle_team.length; ++i) {
-        player.battle_team[i]['name'] === monsters[i];
+        player.battle_team[i]['name'] = monsters[i];
         player.battle_team[count]['slot'] = i;
       }
     }
-
+/*     const combatTimer =
+    this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.choose_monster; */
     return this.combat(player);
   }
 
@@ -469,7 +484,7 @@ export class GameService implements OnModuleInit {
       event: 'game',
       data: {
         state: 'combat',
-        timer: player.timer,
+        timer: PHASE_DURATIONS.choose_monster, //player.timer,
         player: {
           battle_team: player.battle_team,
         },
