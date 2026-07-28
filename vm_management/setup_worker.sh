@@ -67,7 +67,8 @@ EOF
 #echo "[$SCRIPT_NAME] Adding utils"
 
 echo "[$SCRIPT_NAME] Setting up wireguard"
-apk add -U wireguard-tools
+apk add -U tailscale
+rc-update add tailscale default
 
 echo "[$SCRIPT_NAME] Setting up NFS"
 apk add nfs-utils

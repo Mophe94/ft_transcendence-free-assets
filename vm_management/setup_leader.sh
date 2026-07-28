@@ -109,13 +109,14 @@ fi
 
 echo "[$SCRIPT_NAME] Adding utils"
 apk update
-apk add curl
-apk add vim
+apk add curl \
+	vim \
+	jq
 
 echo "[$SCRIPT_NAME] Setting up tailscape"
-apk add tailscape
-rc-update add tailscape default
-service tailscape start
+apk add tailscale
+rc-update add tailscale default
+service tailscale start
 
 echo "[$SCRIPT_NAME] Setting up Headscale"
 
@@ -124,28 +125,39 @@ mkdir -p ${HEADSCALE_DIR}/{config,data}
 
 
 cat > ${HEADSCALE_DIR}/config/config.yaml <<EOF
-
-server_url: http://${HOST_IP}:9090
+server_url: http://${HOST_IP}:${HEADSCALE_PORT}
 
 listen_addr: 0.0.0.0:${HEADSCALE_PORT}
 
-
-ip_prefixes:
-  - 100.64.0.0/10
-
+prefixes:
+  allocation: sequential
+  v4: 100.64.0.0/10
+  v6: fd7a:115c:a1e0::/48
 
 database:
   type: sqlite
-
   sqlite:
     path: /var/lib/headscale/db.sqlite
 
-
 private_key_path: /var/lib/headscale/private.key
-
 
 noise:
   private_key_path: /var/lib/headscale/noise_private.key
+
+dns:
+  magic_dns: false
+  override_local_dns: false
+
+derp:
+  server:
+    enabled: false
+
+  urls:
+    - https://controlplane.tailscale.com/derpmap/default
+
+log:
+  format: text
+  level: info
 
 EOF
 
@@ -155,7 +167,7 @@ services:
 
   headscale:
 
-    image: headscale/headscale:latest
+    image: headscale/headscale:v0.29.2
 
     container_name: headscale
 
@@ -168,50 +180,61 @@ services:
     ports:
       - "${HEADSCALE_PORT}:${HEADSCALE_PORT}"
 
-    command: headscale serve
+    command: serve
 
 EOF
 
 cd ${HEADSCALE_DIR}
 
 docker compose up -d
+TIMEOUT=60
+ELAPSED=0
+
+until docker exec headscale headscale version >/dev/null 2>&1; do
+    sleep 2
+    ELAPSED=$((ELAPSED+2))
+
+    if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
+        echo "[$SCRIPT_NAME] Headscale failed to become ready"
+        docker logs headscale
+        exit 1
+    fi
+done
+
 echo "[$SCRIPT_NAME] Creating Headscale user"
-
-
-sleep 5
-
-
 docker exec headscale \
 headscale users create swarm || true
 
-
-
 echo "[$SCRIPT_NAME] Creating Headscale auth key"
+USER_ID=$(
+    docker exec headscale headscale users list -o json \
+    | jq -r '.[] | select(.name=="swarm") | .id'
+)
 
+echo "[$SCRIPT_NAME] USER_ID=$USER_ID"
+if [ -z "$USER_ID" ]; then
+    echo "[$SCRIPT_NAME] Failed to determine Headscale user ID"
+    docker exec headscale headscale users list
+    exit 1
+fi
 
 AUTH_KEY=$(docker exec headscale \
-headscale preauthkeys create \
---user swarm \
---reusable \
---expiration 24h)
-
+    headscale preauthkeys create \
+    --user "$USER_ID" \
+    --reusable \
+    --expiration 24h)
 
 echo "${AUTH_KEY}" > /etc/headscale_authkey
-
 chmod 600 /etc/headscale_authkey
+
 echo "[$SCRIPT_NAME] Registering leader in Tailscale"
-
-
 tailscale up \
  --login-server=http://${HOST_IP}:9090 \
  --authkey=${AUTH_KEY} \
  --hostname=swarmnode.${NEW_USER}
 
 TAILSCALE_IP=$(tailscale ip -4)
-
 echo "${TAILSCALE_IP}" > ${TAILSCALE_IP_FILE}
-
-
 echo "[$SCRIPT_NAME] Tailscale IP: ${TAILSCALE_IP}"
 
 echo "[$SCRIPT_NAME] Setting up NFS"

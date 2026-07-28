@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/07/19 17:48:29 by stempels         ###   ########.fr        #
+#    Updated: 2026/07/28 15:59:26 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -72,6 +72,7 @@ if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
     ssh-keygen -f $HOME/.ssh/${SSH_KEY_NAME} -N "$SSH_KEY_PASSPHRASE"
 fi
 
+LEADER_TAILSCALE_IP=$(tailscale ip -4)
 for user in "${NODE_USERS[@]}"; do
     if [ "$user" = "$USER" ]; then
 	continue
@@ -111,9 +112,12 @@ for user in "${NODE_USERS[@]}"; do
 		/home/${USER}/certs/worker.crt \
 		/home/${USER}/certs/worker.key \
 		"${user}"@"${HOST_IP}":"$VM_TARGET_DIR"
+	    doas scp -i $HOME/.ssh/${SSH_KEY_NAME} -r -P "$SSH_PORT" -o StrictHostKeyChecking=no \
+		/etc/headscale_authkey
+		"${user}"@"${HOST_IP}":"$VM_TARGET_DIR/headscale_authkey"
 	    ssh -i $HOME/.ssh/${SSH_KEY_NAME} -p "$SSH_PORT" "$user"@"$HOST_IP" \
 		"doas chmod +x /setup_for_swarm.sh; \
-		doas nohup /setup_for_swarm.sh ${LEADER_IP} ${HOST_IP} "${JOIN_CMD}" 2049 \
+		doas nohup /setup_for_swarm.sh ${LEADER_IP} ${LEADER_TAILSCALE_IP} "${JOIN_CMD}" 2049 \
 		>/tmp/setup_for_swarm.log 2>&1 < /dev/null &"
 	    CONNECTED_NODES+=("$user")
 	    ADDED_NODES=$((ADDED_NODES + 1))

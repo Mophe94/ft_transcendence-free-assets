@@ -14,7 +14,7 @@ fi
 
 # Setup
 LEADER_IP="$1"
-NODE_IP="$2"
+LEADER_TAILSCALE_IP="$2"
 JOIN_CMD="$3"
 NFS_PORT="$4"
 
@@ -62,7 +62,21 @@ while ! docker info >/dev/null 2>&1; do
     echo -n "."
 done
 
-docker swarm join --advertise-addr ${NODE_IP} --data-path-addr ${NODE_IP} --token ${JOIN_CMD} ${LEADER_IP}:2377
+echo "[${SCRIPT_NAME}] Connecting to Headscale"
+
+AUTH_KEY=$(cat /tmp/headscale_authkey)
+
+tailscale up \
+    --login-server=http://${LEADER_IP}:9090 \
+    --authkey="${AUTH_KEY}" \
+    --hostname="swarmnode.${USER}"
+
+TAILSCALE_IP=$(tailscale ip -4)
+
+docker swarm join \
+	--advertise-addr ${TAILSCALE_IP} \
+	--data-path-addr ${TAILSCALE_IP} \
+	--token ${JOIN_CMD} "${LEADER_TAILSCALE_IP}:2377"
 echo "[INFO][$SCRIPT_NAME] Worker successfully configured."
 
 #echo "[$SCRIPT_NAME] Setting up leader SSH login"
