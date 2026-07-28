@@ -1,7 +1,4 @@
 import type { Player } from "../../Player";
-import { received_update_current_monster } from "./combat/received_change_current_monster";
-import { received_use_item_combat } from "./combat/received_use_item_combat";
-import { received_try_attack } from "./combat/received_try_attack";
 
 import { received_team_choice } from "./temSetup/received_team_choice";
 
@@ -12,6 +9,16 @@ import { received_new_encounter } from "./map/received_new_encounter";
 import { received_request_item } from "./map/received_request_item";
 import { received_try_catch } from "./map/received_try_catch";
 import { received_use_item } from "./map/received_use_item";
+import { resolving_battle_round } from "./new_combat/resolving_battle_round";
+
+export interface PlayerActions {
+    [playerId: number]: {
+        actionType: "try_attack" | "use_item" | "change_monster" | "pass";
+        data: any;
+    }
+}
+
+export let currentActions: PlayerActions = {};
 
 export function handle_message(player: Player, enemy: Player, msg: any){
 	let result: object
@@ -33,31 +40,38 @@ export function handle_message(player: Player, enemy: Player, msg: any){
 			result = received_new_encounter(player, msg.data?.tile)
 			break;
 		case "try_catch":
-			received_try_catch(player)
+			result = received_try_catch(player)
 			break;
 		case "delete_monster":
-			received_delete_monster(player, msg.data?.monster)
+			result = received_delete_monster(player, msg.data?.monster)
 			break;
 
-			
+
 		case "team_choice":
-			received_team_choice(player, msg.data?.battle_team)
+			result = received_team_choice(player, msg.data?.battle_team)
 			break;
+		
 
-
-		case "change_current_monster":
-			received_update_current_monster(player, msg.data?.slot)
-			break;
-		case "use_item_combat":
-			received_use_item_combat(player, enemy, msg.data?.item)
-			break;
-		case "try_attack":
-			received_try_attack(player, enemy, msg.data?.skill)
+        case "change_current_monster":
+        case "use_item_combat":
+        case "try_attack":
+		case "pass":
+			currentActions[player.id] = {
+                actionType: state,
+                data: msg.data
+            };
+			if (currentActions[player.id] && currentActions[enemy.id]) {
+                result = resolving_battle_round(player, enemy, currentActions);
+                // result contient les message de retour + voir si current monster mort chez l'un des deux
+				delete currentActions[player.id];
+                delete currentActions[enemy.id];
+            }
+//			else
+//				player.send({ status: "waiting_for_opponent" });
 			break;
 		
 		default:
 			console.log("Unknow state:", msg.data.state)
 			return
 	}
-	//send result
 }

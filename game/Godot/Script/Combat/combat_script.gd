@@ -104,13 +104,13 @@ func generate_banner():
 	combatBanner.modulate.a = 0.0
 	await get_tree().create_timer(0.5).timeout
 	var tween = create_tween()
-	tween.tween_property(combatBanner, "modulate:a", 0.6, 1.5)
+	tween.tween_property(combatBanner, "modulate:a", 0.6, 1.0)
 	await tween.finished
-	await get_tree().create_timer(1.5).timeout
-	var tween2 = create_tween()
-	tween2.tween_property(combatBanner, "modulate:a", 0.0, 1.5)
-	await tween2.finished
 	await get_tree().create_timer(0.5).timeout
+	var tween2 = create_tween()
+	tween2.tween_property(combatBanner, "modulate:a", 0.0, 1.0)
+	await tween2.finished
+	await get_tree().create_timer(0.3).timeout
 	combatBanner.process_mode = Node.PROCESS_MODE_DISABLED
 	
 func start_intro():
@@ -181,7 +181,7 @@ func _ready() -> void:
 	show_UI()
 
 func _time_finish():
-	print("signal received combat")
+	print("timer signal received combat: go to new turn")
 	$Timer.send = true
 	await Received.new_turn
 	$Timer.send = false

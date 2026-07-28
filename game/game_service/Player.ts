@@ -1,7 +1,5 @@
 import type { Inventory, Skill, Life, CurrentMonster } from "./type/interfaces";
 
-import { finish } from "./methods/send/finish";
-
 export class Player {
 	readonly id: number = -1;
 	readonly name: string = "";
@@ -20,30 +18,51 @@ export class Player {
 		defense_spe: 0,
 		speed: 0,
 		status: [],
+		dodge: false,
 		skill: [
 			{
 				name: "",
 				current: 0,
 				max: 0,
-				type: ""
+				type: "",
+				effect: "",
+				repetition: 0,
+				precision: 0,
+				data: "",
+				value: 0
 			},
 			{
 				name: "",
 				current: 0,
 				max: 0,
-				type: ""
+				type: "",
+				effect: "",
+				repetition: 0,
+				precision: 0,
+				data: "",
+				value: 0
 			},
 			{
 				name: "",
 				current: 0,
 				max: 0,
-				type: ""
+				type: "",
+				effect: "",
+				repetition: 0,
+				precision: 0,
+				data: "",
+				value: 0
 			},
 			{
 				name: "",
 				current: 0,
 				max: 0,
-				type: ""
+				type: "",
+				effect: "",
+				repetition: 0,
+				precision: 0,
+				data: "",
+				value: 0
 			},
 		],
 	};
@@ -62,30 +81,113 @@ export class Player {
 			defense_spe: 0,
 			speed: 0,
 			status: [],
+			dodge: false,
 			skill: [
 				{
 					name: "",
 					current: 0,
 					max: 0,
-					type: ""
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
 				},
 				{
 					name: "",
 					current: 0,
 					max: 0,
-					type: ""
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
 				},
 				{
 					name: "",
 					current: 0,
 					max: 0,
-					type: ""
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
 				},
 				{
 					name: "",
 					current: 0,
 					max: 0,
-					type: ""
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+			],
+		},
+		{
+			name: "",
+			slot: -1,
+			life: {
+				"current": 0,
+				"max": 0
+			},
+			type: "",
+			attack: 0,
+			attack_spe: 0,
+			defense: 0,
+			defense_spe: 0,
+			speed: 0,
+			status: [],	
+			dodge: false,
+			skill: [
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
 				},
 			],
 		},
@@ -103,71 +205,51 @@ export class Player {
 			defense_spe: 0,
 			speed: 0,
 			status: [],
+			dodge: false,
 			skill: [
 				{
 					name: "",
 					current: 0,
 					max: 0,
-					type: ""
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
 				},
 				{
 					name: "",
 					current: 0,
 					max: 0,
-					type: ""
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
 				},
 				{
 					name: "",
 					current: 0,
 					max: 0,
-					type: ""
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
 				},
 				{
 					name: "",
 					current: 0,
 					max: 0,
-					type: ""
-				},
-			],
-		},
-		{
-			name: "",
-			slot: -1,
-			life: {
-				"current": 0,
-				"max": 0
-			},
-			type: "",
-			attack: 0,
-			attack_spe: 0,
-			defense: 0,
-			defense_spe: 0,
-			speed: 0,
-			status: [],
-			skill: [
-				{
-					name: "",
-					current: 0,
-					max: 0,
-					type: ""
-				},
-				{
-					name: "",
-					current: 0,
-					max: 0,
-					type: ""
-				},
-				{
-					name: "",
-					current: 0,
-					max: 0,
-					type: ""
-				},
-				{
-					name: "",
-					current: 0,
-					max: 0,
-					type: ""
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
 				},
 			],
 		},

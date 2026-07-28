@@ -10,7 +10,6 @@ signal update_inventory
 signal update_team
 
 signal combat_scene
-signal battle_start
 
 signal new_turn
 signal lose
@@ -52,8 +51,6 @@ func handle_message_receive(msg):
 				_update_inventory(data)
 			"combat":
 				_combat(data)
-			"battle_start":
-				_battle_start(data)
 			"action_battle":
 				_action_battle(data)
 			"new_turn":
@@ -142,55 +139,6 @@ func _action_battle(data):
 	
 	if data.has("text"):
 		GeneralData.text = data["text"]
-
-
-func _battle_start(data):
-	if data.has("timer"):
-		GeneralData.timer = data["timer"]
-	
-	if data.has("player"):
-		var player = data["player"]
-
-		if player.has("currentMonster"):
-			var cMonsterPlayer = player["currentMonster"]
-			GeneralData.player["currentMonster"]["name"] = cMonsterPlayer["name"]
-			GeneralData.player["currentMonster"]["index"] = cMonsterPlayer["index"]
-
-			if cMonsterPlayer.has("life"):
-				GeneralData.player["currentMonster"]["life"]["current"] = cMonsterPlayer["life"]["current"]
-				GeneralData.player["currentMonster"]["life"]["max"] = cMonsterPlayer["life"]
-
-			if cMonsterPlayer.has("skill"):
-				for i in range(cMonsterPlayer["skill"].size()):
-					var monsterSkill = cMonsterPlayer["skill"][i]
-					GeneralData.player["currentMonster"]["skill"][i]["name"] = monsterSkill["name"]
-					GeneralData.player["currentMonster"]["skill"][i]["current"] = monsterSkill["current"]
-					GeneralData.player["currentMonster"]["skill"][i]["max"] = monsterSkill["max"]
-
-			if cMonsterPlayer.has("status"):
-				var status = cMonsterPlayer["status"]
-				for i in range(status.size()):
-					GeneralData.player["currentMonster"]["skill"][i] = status[i]
-
-	if data.has("enemy"):
-		var enemy = data["enemy"]
-	
-		if enemy.has("currentMonster"):
-			var cMonsterEnemy = enemy["currentMonster"]
-			GeneralData.enemy["currentMonster"]["name"] = cMonsterEnemy["name"]
-
-			if cMonsterEnemy.has("life"):
-				GeneralData.enemy["currentMonster"]["life"]["current"] = cMonsterEnemy["life"]["current"]
-				GeneralData.enemy["currentMonster"]["life"]["max"] = cMonsterEnemy["life"]
-	
-			if cMonsterEnemy.has("status"):
-				var status = cMonsterEnemy["status"]
-				for i in range(status.size()):
-					GeneralData.player["currentMonster"]["skill"][i] = status[i]
-	
-	if data.has("text"):
-		GeneralData.text = data["text"]
-	emit_signal("battle_start")
 
 
 func _combat(data):

@@ -11,7 +11,12 @@ export interface Skill {
 	name: string;
 	current: number;
 	max: number,
-	type: string
+	type: string,
+	effect: string,
+	repetition: number,
+	precision: number,
+	data: string
+	value: number
 }
 
 export interface Life {
@@ -30,5 +35,6 @@ export interface CurrentMonster {
 	speed: number,
 	slot: number;
 	status: string[];
-	skill: Skill[]
+	skill: Skill[];
+	dodge: boolean;
 }
