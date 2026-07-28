@@ -1,7 +1,7 @@
 res://Scene/Capture/CaptureBanner/capture_banner.tscn::7ab4f76376d9de079738e245e2305086::1785135771::res://.godot/exported/133200997/export-bbd7223aa8c9168c5db01bc137d78561-capture_banner.scn
 res://Scene/Capture/CaptureMenus/capture_menus.tscn::86bbb65dd8b38f334d03cebb30d79d75::1785135771::res://.godot/exported/133200997/export-d508935c107ac05c4cef31f3bc085d4b-capture_menus.scn
 res://Scene/Capture/CapturePortal/capture_portal.tscn::268ce0094b618062461e555330ccb3da::1785135771::res://.godot/exported/133200997/export-27777a9ac384bda06ec722cc3df18829-capture_portal.scn
-res://Scene/Capture/capture.tscn::e9a8701078a87f746d45840179fcee30::1785241070::res://.godot/exported/133200997/export-becfdda67a820b98bffc0bc780dc1a9c-capture.scn
+res://Scene/Capture/capture.tscn::e9a8701078a87f746d45840179fcee30::1785251612::res://.godot/exported/133200997/export-becfdda67a820b98bffc0bc780dc1a9c-capture.scn
 res://Scene/Combat/CombatBanner/combat_banner.tscn::b8b587314d60575fc73424114507651d::1785135771::res://.godot/exported/133200997/export-cbb3690965fc0983963958875bc1501d-combat_banner.scn
 res://Scene/Combat/CombatMenus/combat_menus.tscn::c27232825c6b7b2e4cf899d42d62bcd3::1785135771::res://.godot/exported/133200997/export-3eedcb7e57232a07e739087066494ae7-combat_menus.scn
 res://Scene/Combat/CombatResult/lose.tscn::d60777316ed26c08a7f901108465eb51::1785135771::res://.godot/exported/133200997/export-8fa933da19bf071088bd115ccf92e223-lose.scn

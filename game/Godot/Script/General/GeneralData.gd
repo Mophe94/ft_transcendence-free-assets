@@ -116,7 +116,7 @@ const player_enemy_scene = preload("res://Scene/PlayerCharacter/enemy_character.
 var player: Dictionary = {
 	"id": 0,
 	"name": "",
-	"asset": "dinoRed",
+	"asset": "",
 	"currentMonster": {
 		"name": "",
 		"slot": -1,
@@ -223,7 +223,7 @@ var timer = 0
 
 var current_item = ""
 var current_map = ""
-var monster_encounter = "burpy"
+var monster_encounter = ""
 var text = []
 
 var tile = ""

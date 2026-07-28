@@ -70,15 +70,17 @@ func _new_current_monster():
 	show_UI()
 	style_progress_bar()
 
-#func _new_enemy_monster():
-#	for child in enemy.get_node("EnemyMonster").get_children():
-#		child.queue_free()
-#	await get_tree().process_frame
-#	var monsterEnemy = GeneralData.enemy["currentMonster"]["name"]
-#	var monster_enemy_scene = monsterTab[monsterEnemy].instantiate()
-#	enemy.get_node("EnemyMonster").add_child(monster_enemy_scene)
-#	show_UI()
-#	style_progress_bar()
+func _new_enemy_monster():
+	for child in enemy.get_node("EnemyMonster").get_children():
+		child.queue_free()
+	await get_tree().process_frame
+	var monsterEnemy = GeneralData.enemy["currentMonster"]["name"]
+	var monster_enemy_scene = monsterTab[monsterEnemy].instantiate()
+	enemy.get_node("EnemyMonster").add_child(monster_enemy_scene)
+	monster_enemy_scene.scale.x = -1
+	show_UI()
+	style_progress_bar()
+
 
 func generate_charactere():
 	var player_scene = assetPlayer.instantiate()
@@ -88,17 +90,11 @@ func generate_charactere():
 	enemy.get_node("EnemyAsset").add_child(enemy_scene)
 	enemy_scene.scale.x = -1
 
-	var monsterEnemy = GeneralData.enemy["currentMonster"]["name"]
-	if monsterEnemy == "":
-		print("monsterEnemy missing, remplace by burpy")
-		monsterEnemy = "burpy"
-	var monster_enemy_scene = monsterTab[monsterEnemy].instantiate()
-	monster_enemy_scene.scale.x = -1
-	enemy.get_node("EnemyMonster").add_child(monster_enemy_scene)
 
 func generate_asset():
 	generate_charactere()
 	backGround.texture = GeneralData.background_database[nameBackGround]
+
 
 func generate_banner():
 	combatBanner.modulate.a = 0.0
@@ -114,7 +110,6 @@ func generate_banner():
 	combatBanner.process_mode = Node.PROCESS_MODE_DISABLED
 	
 func start_intro():
-	$CombatMenus.change_monster.connect(_new_current_monster)
 	$CombatMenus.hide()
 	$PlayerMonsterUI.hide()
 	$EnemyMonsterUI.hide()
@@ -172,6 +167,8 @@ func transi_open():
 	transi_scene.queue_free()
 
 func _ready() -> void:
+	$CombatMenus.change_current_monster.connect(_new_current_monster)
+	$CombatMenus.change_enemy_monster.connect(_new_enemy_monster)
 	$Timer.time_finish.connect(_time_finish)
 	_capture_battle_ratios()
 	_update_battle_positions()

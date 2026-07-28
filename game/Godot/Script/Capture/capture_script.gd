@@ -132,6 +132,6 @@ func _signal_timer():
 	await transi_close()
 	$Timer.send = false
 	if success:
-		get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
+		get_tree().change_scene_to_packed(GeneralData.team_setup_scene)
 	else:
 		get_tree().change_scene_to_packed(GeneralData.wait)

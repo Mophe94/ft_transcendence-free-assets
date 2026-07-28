@@ -15,7 +15,8 @@ var SPEED_TEXT = GeneralData.SPEED_TEXT
 @onready var back_button = $Button5
 
 
-signal change_monster()
+signal change_current_monster
+signal change_enemy_monster
 
 func text_show(new_text):
 	$Text.show()
@@ -55,15 +56,19 @@ func set_menus_back():
 	button[2].text = "CHANGE"
 	button[2].action = "change"
 	button[3].show()
-	button[3].text = "GIVE UP"
-	button[3].action = "give up"
+	for i in range(GeneralData.player["currentMonster"]["skill"].size()):
+		if GeneralData.player["currentMonster"]["skill"][i]["current"] > 0:
+			break
+			
+	button[3].text = "PASS"
+	button[3].action = "pass"
 	
-func set_menus_give_up():
+func set_menus_pass():
 	unlock_button()
 	hide_selection("all")
 	$Text.show()
 	$Text.visible_characters = 0
-	$Text.text = "Are you sure you want to give up the fight ?"
+	$Text.text = "Are you sure you want pass ?"
 	for i in range($Text.text.length() + 1):
 		$Text.visible_characters = i
 		await get_tree().create_timer(SPEED_TEXT).timeout
@@ -95,7 +100,7 @@ func set_menus_monster(object):
 		GeneralData.player["battle_team"][index]["life"] = temp["life"].duplicate(true)
 		await text_show( GeneralData.player["battle_team"][index]["name"] + " has been replaced by " + GeneralData.player["currentMonster"]["name"])
 	back_button.show()
-	change_monster.emit()
+	emit_signal("change_current_monster")
 	
 func set_menus_select_monster():
 	unlock_button()
@@ -220,8 +225,8 @@ func _attack(object):
 	set_menus_attack(object)
 	await get_tree().create_timer(1.0).timeout
 
-func _give_up():
-	set_menus_give_up()
+func _pass():
+	set_menus_pass()
 	await get_tree().create_timer(1.0).timeout
 	
 func _choice(object):
@@ -249,7 +254,7 @@ func _on_button_action(action, object):
 			_monster(object)
 		"change":
 			_change()
-		"choice":
+		"choice_pass":
 			_choice(object)
 		"items":
 			_items()
@@ -257,8 +262,8 @@ func _on_button_action(action, object):
 			_back()
 		"use":
 			_use(object)
-		"give up":
-			_give_up()
+		"pass":
+			_pass()
 		"skill":
 			_skill()
 		"attack":

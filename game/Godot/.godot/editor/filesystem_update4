@@ -21,3 +21,6 @@ res://Scene/World01/Tree/tree.tres
 res://Scene/World01/Tree/tree3.tres
 res://Script/General/Received.gd
 res://Script/Combat/combat_script.gd
+res://Script/Combat/Menus/combat_menus_script.gd
+res://Script/Capture/Menus/capture_menus.gd
+res://Scene/Combat/combat.tscn
