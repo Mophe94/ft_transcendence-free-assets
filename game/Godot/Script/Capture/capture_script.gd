@@ -33,6 +33,7 @@ func _catch_fail():
 	for child in monster.get_children():
 		child.queue_free()
 	var monster_scene = monsterTab[nameMonster].instantiate()
+	monster_scene.scale.x = -1
 	monster.add_child(monster_scene)
 
 func _catch_ok():

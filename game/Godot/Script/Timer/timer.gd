@@ -5,15 +5,14 @@ signal time_finish
 @onready var nine_patch = $NinePatchRect
 @onready var send = false
 
-var total_time: float = GeneralData.timer - float(Time.get_unix_time_from_system())
-var time_remaining: float = total_time
+var time_remaining: float = GeneralData.timer - float(Time.get_unix_time_from_system())
 var last_minute: int = -1
 var flashing: bool = false
 var flash_timer: float = 0.0
 var flash_duration: float = 1.0
 
 func _ready():
-	time_remaining = 420.0
+#	time_remaining = 120
 	_apply_scene_style()
 	_update_scale()
 	get_viewport().size_changed.connect(_update_scale)
@@ -44,12 +43,13 @@ func _update_scale():
 	nine_patch.position.x = (screen_size.x - nine_patch.size.x * ratio) / 2
 	nine_patch.position.y = 10
 
-func _process(delta):
+func _process(_delta):
 	if time_remaining > 0:
-		time_remaining -= delta
+#		time_remaining -= _delta
+		time_remaining = GeneralData.timer - float(Time.get_unix_time_from_system())
 		time_remaining = max(time_remaining, 0)
 		_check_minute_change()
-		_update_flash(delta)
+		_update_flash(_delta)
 		_update_scale()
 	else:
 		if !send:

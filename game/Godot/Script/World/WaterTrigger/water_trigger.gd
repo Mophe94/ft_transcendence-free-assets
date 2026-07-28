@@ -21,7 +21,7 @@ func transi_close():
 func _new_encounter():
 	print("signal timer received new encounter")
 	GeneralData.tile = "water"
-	GeneralData.background_capture = "water"
+	GeneralData.background_capture = "beach"
 	var send_func = func():
 		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.NEW_ENCOUNTER])
 	var success = await GeneralProcess.wait_signal(send_func, Received.monster_encounter_received)

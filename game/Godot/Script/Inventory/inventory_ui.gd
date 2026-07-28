@@ -21,20 +21,20 @@ func transi_close():
 	await transi_scene.get_node("CanvasLayer/ColorRect").close()
 	transi_scene.queue_free()
 
-func _delete_monster():
+func _delete_monster(monster):
 	print("delete monster send")
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.DELETE_MONSTER])
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.DELETE_MONSTER], monster)
 	var success = await GeneralProcess.wait_signal(send_func, Received.update_team)
 
 	if ! success:
 		await transi_close()
 		get_tree().change_scene_to_packed(GeneralData.wait)
 		
-func _delete_item():
+func _delete_item(object):
 	print("delete item send")
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.DELETE_ITEM])
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.DELETE_ITEM], object)
 	var success = await GeneralProcess.wait_signal(send_func, Received.update_inventory)
 
 	if ! success:
@@ -44,6 +44,9 @@ func _delete_item():
 
 
 func _ready():
+	for node in get_tree().get_nodes_in_group("trigger_zone"):
+		if node.has_signal("update_slots"):
+			node.update_slots.connect(update_slots)
 	update_slots()
 	buttonQuit.pressed.connect(_on_quit_pressed)
 	buttonYes.pressed.connect(_on_yes_pressed)
@@ -70,17 +73,14 @@ func _on_yes_pressed():
 		"quit":
 			get_tree().quit()
 		"delete_monster":
-			GeneralData.player["team"][pending_index] = ""
 			emit_signal("stop_inventory")
-			await _delete_monster()
+			await _delete_monster(GeneralData.player["team"][pending_index])
 			emit_signal("run_inventory")
-			update_slots()
 		"delete_object":
-			GeneralData.player["inventory"][pending_index] = {"name": "", "scene": "", "current": 0}
 			emit_signal("stop_inventory")
-			await _delete_item()
+			await _delete_item(GeneralData.player["inventory"][pending_index]["name"])
 			emit_signal("run_inventory")
-			update_slots()
+	update_slots()
 	pending_action = ""
 	pending_index = -1
 

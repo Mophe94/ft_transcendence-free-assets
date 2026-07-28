@@ -2990,7 +2990,6 @@ animations = [{
 }]
 
 [node name="world1" type="Node2D" unique_id=1653227762]
-position = Vector2(-1, 0)
 script = ExtResource("1_xrrma")
 trees_to_activate = 40
 fishing_spots_to_activate = 29
@@ -3788,7 +3787,7 @@ tile_set = SubResource("TileSet_277l5")
 
 [node name="Player" parent="." unique_id=622233450 instance=ExtResource("72_benk5")]
 z_index = 4
-position = Vector2(4929, 1064)
+position = Vector2(4946, 1076)
 
 [node name="Collision" type="StaticBody2D" parent="." unique_id=828704952]
 

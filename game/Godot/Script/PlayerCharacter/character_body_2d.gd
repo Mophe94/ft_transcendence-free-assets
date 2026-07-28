@@ -102,9 +102,9 @@ func _physics_process(_delta: float) -> void:
 		sprite.play("idle")
 		return
 
-	if Input.is_action_just_pressed("ui_selec"):
-		GeneralData.current_item = "rage"
-		_on_item_received()
+#	if Input.is_action_just_pressed("ui_selec"):
+#		GeneralData.current_item = "rage"
+#		_on_item_received()
 
 	if Input.is_action_just_pressed("action"):
 		var spot = get_current_interactable()

@@ -1,21 +1,2 @@
-res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Particle FX/
-res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Bars/
-res://Scene/World01/Water_trigger/
-res://Script/World/Map_01/
-res://Script/World/Tree/
-res://
-res://Scene/Wait/
-res://Script/PlayerCharacter/
-res://Script/General/
-res://Scene/Capture/
-res://Assets/Font/
-res://Assets/Monster/spritesheet/Pisciner/
-res://Script/Combat/Win/
-res://Script/Inventory/
-res://Script/TeamSetup/ButtonTeamSetup/
-res://Script/Combat/Lose/
-res://Script/Combat/UIPrgressBar/
-res://Script/Combat/
-res://Script/Combat/Banners/
-res://Script/TeamSetup/Effect/
-res://Script/TeamSetup/Asset/
+/media/bertrmar/SSD_1T/transcendance/game/Export/
+res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Terrain/Resources/Wood/Trees/

@@ -61,6 +61,7 @@ func hide_button(my_str):
 		back_button.hide()
 
 func set_menus_action():
+	$Text.text = ""
 	button[0].text = "CAPTURE"
 	button[0].action = "capture"
 	button[1].text = "ITEMS"
@@ -132,27 +133,26 @@ func set_menus_capture():
 func set_menus_catch(object):
 	if object == "yes":
 		hide_button("all")
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TRY_CATCH])
 		emit_signal("try_catch")
 		await text_show("You try to catch " + GeneralData.monster_encounter)
 		var success = await _result_catch()
 		
-		if success > 0:
-			emit_signal("catch_ok")
-			await text_show("You success to capture " + GeneralData.monster_encounter + " !")
-			await transi_close()
-			get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
-		else:
-			emit_signal("catch_fail")
-			await text_show("You fail to capture " + GeneralData.monster_encounter)
-			_back()
+		if success:
+			if success > 0:
+				emit_signal("catch_ok")
+				await text_show("You success to capture " + GeneralData.monster_encounter + " !")
+				await transi_close()
+				get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
+			else:
+				emit_signal("catch_fail")
+				await text_show("You fail to capture " + GeneralData.monster_encounter)
+				_back()
 	else:
 		_back()
 
 func set_menus_use(object):
 	hide_button("all")
 	await text_show("You use " + object)
-	Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.USE_ITEM], object)
 	emit_signal("try_catch")
 	var success = await _result_catch()
 		
@@ -181,6 +181,7 @@ func set_menus_items():
 	back_button.show()
 
 func _action():
+	$Text.text = ""
 	set_menus_action()
 	await get_tree().create_timer(1.0).timeout
 

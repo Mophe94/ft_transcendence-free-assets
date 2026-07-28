@@ -8,6 +8,7 @@ var collected: bool = false
 
 signal stop_inventory
 signal run_inventory
+signal update_slots
 
 #############################
 func transi_close()  :
@@ -57,6 +58,7 @@ func interact(_player: Node2D) -> void:
 	emit_signal("stop_inventory")
 	await _request_item()
 	await _add_item()
+	emit_signal("update_slots")
 	emit_signal("run_inventory")
 	sprite.stop()
 	collected = true

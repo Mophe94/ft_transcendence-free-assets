@@ -7,12 +7,10 @@ func _stop_player():
 	$CanvasLayer/Inventory_UI.hide()
 
 func _stop_inventory():
-	print("coucou")
 	$Player/CharacterBody2D.process_mode = Node.PROCESS_MODE_DISABLED
 	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED
 
 func _run_inventory():
-	print("aurevoir")
 	$Player/CharacterBody2D.process_mode = Node.PROCESS_MODE_ALWAYS
 	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_ALWAYS
 
@@ -41,7 +39,6 @@ func _signal_timer():
 	var send_func = func():
 		null
 	var success = await GeneralProcess.wait_signal(send_func, Received.team_setup_scene)
-	print("Message team set up received ===> scene : world\nResult messsage : ", success)
 
 	await transi_close()
 	$Timer.send = false

@@ -74,13 +74,14 @@ func _ready() -> void:
 			emit_signal("fail_connection")
 			return
 		connect_server()
+		ws.inbound_buffer_size = 1024 * 1024	# 64 Ko -> 1Mo
+		ws.max_queued_packets = 16384		# 4096 -> 16384
 	else:
 		print("Export not in HTML5")
 		emit_signal("fail_connection")
 		return
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	ws.poll()
 	wsSate = ws.get_ready_state()
