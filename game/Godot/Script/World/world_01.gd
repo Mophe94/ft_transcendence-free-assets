@@ -22,7 +22,7 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _team_set_up_received():
-	print("signal team set up received ===> scene : worl 01")
+	print("signal timer received ===> scene map_01 : go to team setup")
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED
 	$CanvasLayer/Inventory_UI.hide()
 	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED  
@@ -30,7 +30,7 @@ func _team_set_up_received():
 	get_tree().change_scene_to_packed(GeneralData.team_setup_scene)
 
 func _signal_timer():
-	print("signal timer received ===> scene : worl 01")
+	print("signal timer received ===> scene map_01 : go to team setup")
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED
 	$CanvasLayer/Inventory_UI.hide()
 	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED      

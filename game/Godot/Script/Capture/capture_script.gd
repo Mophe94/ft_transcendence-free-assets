@@ -63,13 +63,13 @@ func generate_banner():
 	monsterAppearsBanner.show()
 	monsterAppearsBanner.modulate.a = 0.0
 	var tween = create_tween()
-	tween.tween_property(monsterAppearsBanner, "modulate:a", 0.6, 1.5)
+	tween.tween_property(monsterAppearsBanner, "modulate:a", 0.6, 1.0)
 	await tween.finished
-	await get_tree().create_timer(1.5).timeout
-	var tween2 = create_tween()
-	tween2.tween_property(monsterAppearsBanner, "modulate:a", 0.0, 1.5)
-	await tween2.finished
 	await get_tree().create_timer(0.5).timeout
+	var tween2 = create_tween()
+	tween2.tween_property(monsterAppearsBanner, "modulate:a", 0.0, 1.0)
+	await tween2.finished
+	await get_tree().create_timer(0.3).timeout
 	monsterAppearsBanner.process_mode = Node.PROCESS_MODE_DISABLED
 
 func transi_open():

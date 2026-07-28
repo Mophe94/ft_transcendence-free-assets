@@ -69,7 +69,7 @@ func _ready() -> void:
 	await instanciate_monster_enemy()
 
 func _signal_timer():
-	print("signal timer received ===> scene : team_setup")
+	print("signal timer received ===> scene team_setup : go to combat")
 	$Timer.send = true
 	$CurrentTeam.process_mode = Node.PROCESS_MODE_DISABLED
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED
@@ -78,10 +78,8 @@ func _signal_timer():
 		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TEAM_CHOICE])
 	var success = await GeneralProcess.wait_signal(send_func, Received.combat_scene)
 
-	print("Result fonction send/received : ", success)
 	$Timer.send = false
 	if success:
-		print("Message transition combat received ===> scene : team_setup")
 		get_tree().change_scene_to_packed(GeneralData.combat_scene)
 	else:
 		get_tree().change_scene_to_packed(GeneralData.wait)

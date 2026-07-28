@@ -2,7 +2,7 @@ extends ColorRect
 
 @onready var mat: ShaderMaterial = material
 
-@export var duration := 2.5
+@export var duration := 1.0
 
 func open():
 	var tween = create_tween()

@@ -24,17 +24,15 @@ func handle_message_receive(msg):
 	#VERIF GOOD MESSAGE
 	print("-------- MSG RECEIVED -------- :\n", msg)
 	if not msg.has("event"):
-		print("func handle_message_receive EVENT missing")
 		return
 	if msg["event"] != "game":
-		print("func handle_message_receive EVENT isn't GAME")
 		return
 	if not msg.has("data"):
-		print("func handle_message_receive DATA missing")
 		return
 	
 	#SEARCH STATE OF MESSAGE
 	var data = msg["data"]
+	print("je suis arriver jusque data")
 	if data.has("state"):
 		var state = data["state"]
 		match state:
@@ -205,11 +203,14 @@ func _combat(data):
 		if player.has("battle_team"):
 			for i in range(player["battle_team"].size()):
 				var team = player["battle_team"][i]
+				print("voila le pq numero " + str(i) + " :")
+				print(team)
 				GeneralData.player["battle_team"][i]["name"] = team["name"]
 				GeneralData.player["battle_team"][i]["slot"] = team["slot"]
-				GeneralData.player["battle_team"][i]["life"]["current"] = team[i]["life"]["current"]
-				GeneralData.player["battle_team"][i]["life"]["max"] = team[i]["life"]["max"]
-
+				GeneralData.player["battle_team"][i]["life"]["current"] = team["life"]["current"]
+				GeneralData.player["battle_team"][i]["life"]["max"] = team["life"]["max"]
+	print("message ok est passer !!!!!!!!!!!!!!!!!!!!!")
+	print(GeneralData.player["battle_team"])
 	emit_signal("combat_scene")
 
 

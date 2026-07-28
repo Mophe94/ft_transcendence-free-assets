@@ -177,9 +177,9 @@ var player: Dictionary = {
 	"team": ["", "", "", "", "", ""],
 	"inventory": [
 		{
-			"name": "golden ticket",
-			"scene": "map",
-			"current": 1
+			"name": "",
+			"scene": "",
+			"current": 0
 		},
 		{
 			"name": "",
@@ -219,13 +219,13 @@ const WAIT_TEXT = 0.3
 
 var position_player = Vector2(4929.0, 1064.0)
 var player_speed = 0.0
-var timer = 1785228800
+var timer = 0
 
 var current_item = ""
 var current_map = ""
-var monster_encounter = "monkel"
+var monster_encounter = "burpy"
 var text = []
 
 var tile = ""
-var background_capture = "three"
+var background_capture = "beach"
 var background_battle = "plains_night"
