@@ -7,7 +7,7 @@ SWARM_SCRIPTS = $(LOCATION)/swarm/scripts
 CONTAINER_FILES:= "$(LOCATION)/containers"
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 #HOST_IP:= $(shell cat host_ip.txt)
-HOST_IP := $(shell tailscale ip -4 | tr -d '[:space:]') 
+HOST_IP := $(shell tailscale ip -4)
 REG_PORT?=5050
 REGISTRY?=$(HOST_IP):$(REG_PORT)
 TAG ?= latest
