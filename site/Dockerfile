@@ -1,19 +1,11 @@
-FROM base-image as build
+FROM alpine:3.22.4
 
 WORKDIR /app
 
-COPY package*.json /app/
-
-RUN npm ci
+RUN apk upgrade && apk add npm
 
 COPY . /app
 
-RUN npm run build
+RUN npm install
 
-FROM nginx:alpine
-
-COPY --from=build /app/dist /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "dev", "--", "--host"]

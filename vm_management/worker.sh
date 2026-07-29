@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/bash
 
 SCRIPT_NAME="${0##*/}"
 SCRIPT_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -18,9 +18,9 @@ SSH_KEY_PASSPHRASE=
 DEFAULT_VM_DIR="$HOME/goinfre/"
 
 # Vm config
-RAM_MB=4096
-VRAM_MB=32
-CPUS=4
+RAM_MB=2048
+VRAM_MB=16
+CPUS=2
 DISK_SIZE_MB=10240
 
 SSH_PORT="2222"
@@ -42,10 +42,10 @@ wait_for_ssh() {
     ELAPSED=0
     echo -n "[$SCRIPT_NAME] Waiting for VM to boot."
     while :; do
-	status=$(ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=10 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} "exit 0" 2>&1)
+	status=$(ssh -v -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=10 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} 2>&1)
 	RESULT=$?
 	if [ $RESULT -eq 0 ]; then
-	    echo " connected"
+	    echo " Connected"
 	    break
 	fi
 	if [ $RESULT -eq 255 ]; then
@@ -56,7 +56,7 @@ wait_for_ssh() {
 	fi
 	TIMEOUT=$((TIMEOUT - 1))
 	if [ $TIMEOUT -eq 0 ]; then
-	    echo " timed out"
+	    echo "Time out"
 	    exit 1
 	fi
 	sleep 2
@@ -65,18 +65,22 @@ wait_for_ssh() {
     set -e
 }
 
+ssh_finish_session() {
+    ssh -O exit -o ControlPath="$CONTROL_PATH" "$VM_USER"@"SSH_HOST"
+}
+
 BASE_DIR=""
 VM_DIR=""
 
 # Define role of VM
 if [ $# -eq 2 ]; then
-    if [ "$1" == "leader" ] || [ "$1" == "worker" ]; then
+    if [ "$1" == "manager" ] || [ "$1" == "worker" ]; then
 	TYPE="${1,,}"
     else
 	echo "[$SCRIPT_NAME] invalid argument $1"
 	exit 1
     fi
-    HOST_IP="$2"
+    IP="$2"
 else
     echo "[$SCRIPT_NAME] invalid argument."
     exit 1
@@ -163,7 +167,10 @@ else
 	    --natpf1 "http,tcp,,8080,,80" \
 	    --natpf1 "https,tcp,,8443,,443" \
 	    --natpf1 "ssh,tcp,,2222,,22" \
-	    --natpf1 "headscale,tcp,,9090,,8080" \
+	    --natpf1 "swarm_management,tcp,,2377,,2377" \
+	    --natpf1 "node_communication-TCP,tcp,,7946,,7946" \
+	    --natpf1 "node_communication-UDP,udp,,7946,,7946" \
+	    --natpf1 "overlay_networks,udp,,4789,,4789" \
 	    --paravirtprovider default \
 	    --nictype1 virtio \
 	    --natdnshostresolver1 on \
@@ -209,43 +216,41 @@ else
     echo "[$SCRIPT_NAME] Starting VM..."
     VBoxManage startvm "$VM_NAME" --type headless
 
-    # Generating ssh key
+    #Waiting for VM ssh to be ready
     if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
 	ssh-keygen -f $HOME/.ssh/${SSH_KEY_NAME} -N "$SSH_KEY_PASSPHRASE"
     fi
+    PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
     wait_for_ssh
+#    echo "[$SCRIPT_NAME] SSH is fully ready"
+    echo "[$SCRIPT_NAME] Setting up worker"
+    echo "$IP" > "infra/host_ip.txt"
+
+    VM_TARGET_DIR="/home/$USER"
 
     echo "[$SCRIPT_NAME] Setting up node"
-    echo "$HOST_IP" > "infra/host_ip.txt"
-    PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
-
-    echo "[$SCRIPT_NAME] Adding needed file"
-    declare -A BUNDLE
-    BUNDLE[leader]="vm_management/setup_leader.sh vm_management/cert_rootCA.sh vm_management/cert_info.env"
-    BUNDLE[worker]="vm_management/setup_worker.sh vm_management/setup_for_swarm.sh"
-    read -r -a files <<< "${BUNDLE[$TYPE]}"
-    #echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
-    VM_TARGET_DIR="/"
     set +e
-    scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_${TYPE}.sh; bash /setup_${TYPE}.sh ${USER} ${HOST_IP}; exit 0"
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
+    scp -P "$SSH_PORT" -o StrictHostKeyChecking=no "vm_management/setup_node.sh" "$VM_USER"@"$SSH_HOST":"/setup_node.sh"
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_node.sh; bash /setup_node.sh $TYPE $USER; exit 0"
     set -e
 
-    while ssh -p $SSH_PORT -o ConnectTimeout=2 -o BatchMode=yes "$VM_USER"@"$SSH_HOST" true >/dev/null 2>&1; do
-	sleep 2
-    done
     echo "[$SCRIPT_NAME] Switching user"
     VM_USER=$USER
     VM_TARGET_DIR="/home/$USER"
     echo "[$SCRIPT_NAME] Current user: $VM_USER"
     wait_for_ssh
     declare -A PACK
-    PACK[leader]="infra site backend database game_test"
+    PACK[manager]="infra site backend database game_test"
     PACK[worker]="infra/Makefile"
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     set +e
+    PUB_KEY="$HOME/.ssh/*.pub"
+    ssh -vvv -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; doas mkdir -p $VM_TARGET_DIR; exit 0"
     scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
     set -e
 fi
+set +e
+ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "make -C $VM_TARGET_DIR/infra/ node_launch TYPE=$TYPE HOST_IP=$IP USER_NAME=$VM_USER; exit 0"
+set -e

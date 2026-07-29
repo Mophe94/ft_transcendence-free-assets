@@ -32,20 +32,24 @@ vm :
 	@bash $(VM_SCRIPTS)/vm.sh
 
 setup_worker:
-	@ssh-keygen -f "/home/$(USER)/.ssh/known_hosts" -R "[localhost]:2222"
-	@if [ ! -f $(VM_SCRIPTS)/node.sh ]; then \
-		echo "node.sh file missing"; \
+	@if [ ! -f $(VM_SCRIPTS)/worker.sh ]; then \
+		echo "worker.sh file missing"; \
 		exit 1; \
 	fi
+<<<<<<< HEAD
 	@chmod +x $(VM_SCRIPTS)/node.sh;
 	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4);
 	ssh -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$${USER}/infra && make TYPE=$(TYPE);"
+=======
+	@chmod +x $(VM_SCRIPTS)/worker.sh;
+	@bash $(VM_SCRIPTS)/worker.sh $(TYPE) $(IP4);
+>>>>>>> parent of 75876d9f (Merge branch 'infra' into merge-backend)
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"
 
-leader:
-	@$(MAKE) setup_worker TYPE="leader"
+manager:
+	@$(MAKE) setup_worker TYPE="manager"
 
 iso_test/image/*.iso:
 	mkdir -p iso_test/image

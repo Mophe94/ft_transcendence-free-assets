@@ -1,9 +1,9 @@
-FROM base-image
+FROM alpine:3.22.4
 
 WORKDIR /app
 
-COPY package*.json /app/
-
-RUN npm ci --omit=dev
+RUN apk upgrade && apk add npm
 
 COPY . /app/
+
+RUN npm install

@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
 
   prometheus:
@@ -7,7 +9,7 @@ services:
         target: /etc/prometheus/prometheus.yml
 
     deploy:
-      replicas: 0
+      replicas: 1
       placement:
         constraints:
           - node.role == manager
@@ -33,11 +35,11 @@ services:
           - node.role == manager
 
     environment:
-        - GF_SERVER_ROOT_URL=https://grafana.localhost/
-        - GF_SERVER_SERVE_FROM_SUB_PATH=false
-        - GF_SECURITY_ALLOW_EMBEDDING=true
-        - GF_SECURITY_ADMIN_USER=admin
-        - GF_SECURITY_ADMIN_PASSWORD=admin123
+        GF_SERVER_ROOT_URL: http://localhost/grafana/
+        GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+        GF_SECURITY_ALLOW_EMBEDDING: "true"
+        GF_SECURITY_ADMIN_USER: "admin"
+        GF_SECURITY_ADMIN_PASSWORD: "admin123"
 
     volumes:
         - grafana_data:/var/lib/grafana
@@ -56,18 +58,17 @@ services:
     networks:
       - obsrv_net
     deploy:
-      #mode: global
-      replicas: 0
+      mode: global
       
   loki:
     image: grafana/loki:3.5.2
     command:
       -config.file=/etc/loki/config.yml
     volumes:
-      - loki_data:/loki
+      - loki-data:/loki
     configs:
       - source: loki_config
-        target: /etc/loki/config.yml
+        target: /etc/loki/loki-config.yml
     networks:
       - obsrv_net
     deploy:
@@ -78,74 +79,28 @@ services:
       restart_policy:
         condition: on-failure
 
-#  fluent-bit:
-#    image: fluent/fluent-bit:3.0
-#    volumes:
-#      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-#      - /var/run/docker.sock:/var/run/docker.sock:ro
-#      - fluent-bit_data:/fluent-bit/storage
-#
-#    configs:
-#      - source: fluent-bit_config
-#        target: /fluent-bit/etc/fluent-bit.conf
-#      - source: parsers_config
-#        target: /fluent-bit/etc/parsers.conf
-#      - source: lua_http_level
-#        target: /fluent-bit/scripts/http_level.lua
-#    
-#    command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
-#    
-#    networks:
-#      - obsrv_net
-#    
-#    deploy:
-#      mode: global
-#      restart_policy:
-#        condition: any
-
-  alloy:
-    image: grafana/alloy:latest
-
-    command:
-      - run
-      - /etc/alloy/config.alloy
-
-    configs:
-      - source: alloy_config
-        target: /etc/alloy/config.alloy
-
+  fluent-bit:
+    image: ${IP}:80/fluent-bit:latest
     volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - fluent-bit-config:/fluent-bit/etc
 
-    environment:
-      - NODE_HOSTNAME="{{.Node.Hostname}}"
-      - NODE_ID="{{.Node.ID}}"
-
-    deploy:
-      mode: global
-
+    command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
+    
     networks:
       - obsrv_net
+    
+    deploy:
+      mode: global
+      restart_policy:
+        condition: any
 
 volumes:
-    loki_data:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: "addr=${IP},nfsvers=4,rw,soft"
-        device: ":/nfs-storage/loki"
+    loki-data:
     prom_data:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: "addr=${IP},nfsvers=4,rw,soft"
-        device: ":/nfs-storage/prometheus"
     grafana_data:
-      driver: local
-      driver_opts:
-        type: nfs
-        o: "addr=${IP},nfsvers=4,rw,soft"
-        device: ":/nfs-storage/grafana"
+    fluent-bit-config:
 
 configs:
     prometheus_config:
@@ -156,8 +111,6 @@ configs:
         file: ../containers/grafana/provisioning/dashboards/dashboards.yml
     loki_config:
         file: ../containers/loki/loki_config.yml
-    alloy_config:
-        file: ../containers/alloy/alloy.conf
 
 networks:
     obsrv_net:
