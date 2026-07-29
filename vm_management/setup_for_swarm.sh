@@ -31,6 +31,22 @@ else
     echo "[WARNING][$SCRIPT_NAME]: CA certificate not found: $CA_CERT"
 fi
 
+echo "[${SCRIPT_NAME}] Connecting to Headscale"
+
+AUTH_KEY=$(cat /tmp/headscale_authkey)
+
+doas tailscale up \
+    --login-server=http://${LEADER_IP}:9090 \
+    --authkey="${AUTH_KEY}" \
+    --hostname="swarmnode.${USER}"
+
+TAILSCALE_IP=$(tailscale ip -4)
+
+docker swarm join \
+	--advertise-addr ${TAILSCALE_IP} \
+	--data-path-addr ${TAILSCALE_IP} \
+	--token ${JOIN_CMD} "${LEADER_TAILSCALE_IP}:2377"
+
 # Check install of NFS client
 if ! command -v mount.nfs >/dev/null 2>&1; then
     doas apk add --no-cache nfs-utils
@@ -62,21 +78,6 @@ while ! docker info >/dev/null 2>&1; do
     echo -n "."
 done
 
-echo "[${SCRIPT_NAME}] Connecting to Headscale"
-
-AUTH_KEY=$(cat /tmp/headscale_authkey)
-
-tailscale up \
-    --login-server=http://${LEADER_IP}:9090 \
-    --authkey="${AUTH_KEY}" \
-    --hostname="swarmnode.${USER}"
-
-TAILSCALE_IP=$(tailscale ip -4)
-
-docker swarm join \
-	--advertise-addr ${TAILSCALE_IP} \
-	--data-path-addr ${TAILSCALE_IP} \
-	--token ${JOIN_CMD} "${LEADER_TAILSCALE_IP}:2377"
 echo "[INFO][$SCRIPT_NAME] Worker successfully configured."
 
 #echo "[$SCRIPT_NAME] Setting up leader SSH login"
@@ -86,4 +87,3 @@ echo "[INFO][$SCRIPT_NAME] Worker successfully configured."
 #cat "${SSH_KEY}" > "/home/${USER}/.ssh/authorized_keys" 
 #chmod 600 "/home/${USER}/.ssh/authorized_keys"
 #chown -R ${USER}:${USER} "/home/${USER}/.ssh"
-

@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/07/28 15:59:26 by stempels         ###   ########.fr        #
+#    Updated: 2026/07/28 17:35:27 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -113,7 +113,7 @@ for user in "${NODE_USERS[@]}"; do
 		/home/${USER}/certs/worker.key \
 		"${user}"@"${HOST_IP}":"$VM_TARGET_DIR"
 	    doas scp -i $HOME/.ssh/${SSH_KEY_NAME} -r -P "$SSH_PORT" -o StrictHostKeyChecking=no \
-		/etc/headscale_authkey
+		/etc/headscale_authkey \
 		"${user}"@"${HOST_IP}":"$VM_TARGET_DIR/headscale_authkey"
 	    ssh -i $HOME/.ssh/${SSH_KEY_NAME} -p "$SSH_PORT" "$user"@"$HOST_IP" \
 		"doas chmod +x /setup_for_swarm.sh; \

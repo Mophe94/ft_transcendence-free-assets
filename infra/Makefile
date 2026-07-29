@@ -6,10 +6,10 @@ DEPLOY_FILES = $(LOCATION)/swarm
 SWARM_SCRIPTS = $(LOCATION)/swarm/scripts
 CONTAINER_FILES:= "$(LOCATION)/containers"
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
-#HOST_IP:= $(shell cat host_ip.txt)
-HOST_IP := $(shell tailscale ip -4)
+HOST_IP:= $(shell cat host_ip.txt)
+HOST_TAILSCALE_IP := $(shell tailscale ip -4)
 REG_PORT?=5050
-REGISTRY?=$(HOST_IP):$(REG_PORT)
+REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
 TAG ?= latest
 BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) REGISTRY=$(REGISTRY) TAG=$(TAG)
 DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) REGISTRY_PORT=$(REG_PORT) 
@@ -104,7 +104,7 @@ image:
 	MISSING=0; \
 	MISSING_TARGETS=""; \
 	for img in $$IMAGES; do \
-	    if docker manifest inspect $(REGISTRY)/$$img:$(TAG) >/dev/null 2>&1; then \
+	    if doas docker manifest inspect $(REGISTRY)/$$img:$(TAG) >/dev/null 2>&1; then \
 		echo "Image $(REGISTRY)/$$img:$(TAG) exists, skip build"; \
 	    else \
 		echo "Image $(REGISTRY)/$$img:$(TAG) not found, building"; \

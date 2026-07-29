@@ -1,6 +1,18 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    game_deploy.yml                                    :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
+#    Updated: 2026/07/29 11:23:45 by stempels         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 services:
     game_service:
-        image: ${HOST_IP}:${REGISTRY_PORT}/backend:latest
+        image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/backend:latest
 #        env_file:
 #          - "site/BackEnd/.env"
 
@@ -34,7 +46,7 @@ services:
             replicas: 1
 
     game:
-        image: ${HOST_IP}:${REGISTRY_PORT}/game:latest
+        image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/game:latest
 
         networks:
             - games_net
@@ -47,7 +59,7 @@ services:
             replicas: 1
 
     game_db:
-        image: ${HOST_IP}:${REGISTRY_PORT}/game_db:latest
+        image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/game_db:latest
 #        env_file:
 #          - "site/databases/game_db/.env"
 
