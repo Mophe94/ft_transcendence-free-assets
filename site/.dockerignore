@@ -5,3 +5,6 @@ eslintcongig.js
 README.md
 theme-example.png
 Dockerfile
+.git
+.gitignore
+.*

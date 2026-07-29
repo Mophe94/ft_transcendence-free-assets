@@ -31,18 +31,19 @@ vm :
 	@bash $(VM_SCRIPTS)/vm.sh
 
 setup_worker:
-	@if [ ! -f $(VM_SCRIPTS)/worker.sh ]; then \
-		echo "worker.sh file missing"; \
+	@ssh-keygen -f "/home/$(USER)/.ssh/known_hosts" -R "[localhost]:2222"
+	@if [ ! -f $(VM_SCRIPTS)/node.sh ]; then \
+		echo "node.sh file missing"; \
 		exit 1; \
 	fi
-	@chmod +x $(VM_SCRIPTS)/worker.sh;
-	@bash $(VM_SCRIPTS)/worker.sh $(TYPE) $(IP4);
+	@chmod +x $(VM_SCRIPTS)/node.sh;
+	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4);
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"
 
-manager:
-	@$(MAKE) setup_worker TYPE="manager"
+leader:
+	@$(MAKE) setup_worker TYPE="leader"
 
 iso_test/image/*.iso:
 	mkdir -p iso_test/image
