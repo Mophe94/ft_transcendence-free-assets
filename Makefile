@@ -5,6 +5,7 @@ VM_SCRIPTS = $(LOCATION)/vm_management
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 USER_NAME="$(USER)"
 TYPE=""
+SSH_PORT=2222
 
 all:
 	@$(MAKE) --no-print-directory swarm-status
@@ -38,6 +39,7 @@ setup_worker:
 	fi
 	@chmod +x $(VM_SCRIPTS)/node.sh;
 	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4);
+	ssh -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$${USER}/infra && make TYPE=$(TYPE);"
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"

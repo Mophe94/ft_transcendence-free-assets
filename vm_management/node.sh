@@ -249,6 +249,3 @@ else
     scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
     set -e
 fi
-set +e
-ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "cd ${VM_TARGET_DIR}/infra"
-set -e
