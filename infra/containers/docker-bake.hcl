@@ -1,14 +1,13 @@
-variable "LOCAL" { default = false }
-variable "REGISTRY" { default = "127.0.0.1:5050" }
-variable "TAG" { default = "latest" }
+variable "IP" { default = "127.0.0.1"}
+variable "REGISTRY" { default = "${IP}:5050" }
 variable "BAKE_ROOT" { default = "." }
 
-group "base" {
-    targets = ["node-base", "postgress-base"]
+group "default" {
+    targets = ["alpine_base"]
 }
 
 group "databases" {
-    targets = ["users_db", "game_db"]
+    targets = ["database_users", "database_game"]
 }
 
 group "observ" {
@@ -23,75 +22,50 @@ group "game" {
     targets = ["game"]
 }
 
-target "alpine-base" {
+target "alpine_base" {
     context	= "${BAKE_ROOT}/base/"
-    dockerfile	= "Dockerfile_alpine_base"
-    tags	= ["${REGISTRY}/alpine-base:${TAG}"]
-}
-
-target "node-base" {
-    context	= "${BAKE_ROOT}/base/"
-    dockerfile	= "Dockerfile_node_base"
-    tags	= ["${REGISTRY}/node-base:${TAG}"]
-}
-
-target "postgress-base" {
-    context	= "${BAKE_ROOT}/base/"
-    dockerfile	= "Dockerfile_postgress_base"
-    tags	= ["${REGISTRY}/postgress-base:${TAG}"]
+    dockerfile	= "Dockerfile_base"
+    tags	= ["${REGISTRY}/alpine-base:latest"]
 }
 
 target "frontend" {
     context     = "${BAKE_ROOT}/../../site/"
     dockerfile  = "Dockerfile"
-    contexts = {
-	base-image = (LOCAL
-	    ? "target:node-base"
-	    : "docker-image://${REGISTRY}/node-base:${TAG}")
-    }
-    tags        = ["${REGISTRY}/frontend:${TAG}"]
+    tags        = ["${REGISTRY}/frontend:latest"]
 }
 
 target "backend" {
     context     = "${BAKE_ROOT}/../../backend"
     dockerfile  = "Dockerfile"
-    contexts = {
-	base-image = (LOCAL
-	    ? "target:node-base"
-	    : "docker-image://${REGISTRY}/node-base:${TAG}")
-    }
-    tags        = ["${REGISTRY}/backend:${TAG}"]
+    tags        = ["${REGISTRY}/backend:latest"]
 }
 
 target "game" {
     context     = "${BAKE_ROOT}/../../game_test"
     dockerfile  = "Dockerfile"
-    contexts = {
-	base-image = (LOCAL
-	    ? "target:node-base"
-	    : "docker-image://${REGISTRY}/node-base:${TAG}")
-    }
-    tags        = ["${REGISTRY}/game:${TAG}"]
+    tags        = ["${REGISTRY}/game:latest"]
 }
 
-target "users_db" {
+target "database_users" {
     context     = "${BAKE_ROOT}/../../database/users_db"
     dockerfile  = "Dockerfile"
-    contexts = {
-	base-image = (LOCAL
-	    ? "target:postgress-base"
-	    : "docker-image://${REGISTRY}/postgress-base:${TAG}")
-    }
-    tags        = ["${REGISTRY}/users_db:${TAG}"]
+    tags        = ["${REGISTRY}/users_db:latest"]
 }
 
-target "game_db" {
+target "database_game" {
     context     = "${BAKE_ROOT}/../../database/game_db"
     dockerfile  = "Dockerfile"
-    contexts = {
-	base-image = (LOCAL
-	    ? "target:postgress-base"
-	    : "docker-image://${REGISTRY}/postgress-base:${TAG}")
-    }
-    tags        = ["${REGISTRY}/game_db:${TAG}"]
+    tags        = ["${REGISTRY}/game_db:latest"]
+}
+
+target "fluent-bit" {
+    context     = "${BAKE_ROOT}/fluent-bit"
+    dockerfile  = "Dockerfile"
+    tags        = ["${REGISTRY}/fluent-bit:latest"]
+}
+
+target "mynginx" {
+    context	= "${BAKE_ROOT}/nginx/"
+    dockerfile	= "Dockerfile_nginx"
+    tags	= ["${REGISTRY}/mynginx:latest"]
 }

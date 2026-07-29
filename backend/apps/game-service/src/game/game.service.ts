@@ -273,52 +273,56 @@ export class GameService implements OnModuleInit {
     player: Player,
     monsters: string[],
   ): Promise<object | undefined> {
-    //retrieve monsters stat from db
-    for (let i = 0; i < monsters.length; ++i) {
-      if (monsters[i] != '') {
-        const monster = await this.monstersService.findOneByName(
-          monsters[i] /* , { skills: true } */
-        );
-        if (!monster) return undefined;
-        console.log(monster);
-        const currentMonster: CurrentMonster = {
-          name: monster.name,
-          type: String(monster.type),
-          slot: i,
-          life: {
-            current: monster.hp_total,
-            max: monster.hp_total,
-          },
-          status: [],
-          skill: [], // 4 slots
-        };
+    const monstersToLoad: {name: string; slot: number}[] = []; //arr objects
+    let count = 0;
 
-        player.battle_team[i] = currentMonster;
+    for (let i = 0; i < monsters.length; i++) {
+      if (monsters[i] !== "") {
+        count ++;
       }
     }
 
-    let count: number = 0;
-    for (let i = 0; i < monsters.length; ++i) {
-      if (monsters[i] !== '') count++;
-    }
     if (count === 0) {
-      for (let i = 0; i < player.team.length; ++i) {
-        if (player.team[i] !== '') {
-          player.battle_team[count]['name'] = player.team[i];
-          player.battle_team[count]['slot'] = count;
-          ++count;
+      for (let i = 0; i < player.team.length && count <= 2; i++) {
+        if (player.team[i] !== "") {
+          monstersToLoad.push({
+            name: player.team[i],
+            slot: count,
+          });
+          count++;
         }
-        if (count === 2) break;
       }
-    } else {
-      for (let i = 0; i < player.battle_team.length; ++i) {
-        player.battle_team[i]['name'] = monsters[i];
-        player.battle_team[i]['slot'] = i;
+    }
+    else {
+      for (let i = 0; i < monsters.length; i++) {
+        if (monsters[i] !== "") {
+          monstersToLoad.push({
+            name: player.team[i],
+            slot: i,
+          })
+        }
       }
+    }
+
+    for (const {name, slot} of monstersToLoad) {
+      const monster = await this.monstersService.findOneByName(name);
+    if (!monster) return undefined;
+      player.battle_team[slot] = {
+        name: monster.name,
+        type: String(monster.type),
+        slot: slot,
+        life: {
+          current: monster.hp_total,
+          max: monster.hp_total,
+        },
+        status: [],
+        skill: [], // 4 slots
+      };
     }
     await new Promise(resolve => setTimeout(resolve, 500)); // ! temp fix to synchronizeke with startCombatTimer
     return this.combat(player);
   }
+
 
   // RECEIVED REQUEST FOR ITEM, CALL DB GAME + CHOICE ONE RANDOM ITEM AND RETURN THIS
   private received_request_item(player: Player){
