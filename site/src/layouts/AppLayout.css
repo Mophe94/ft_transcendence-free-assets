@@ -7,13 +7,13 @@
 }
 
 .side-padding-left {
-  background-image: url('src/assets/side_banner.png');
+  background-image: var(--bg-image);
   background-repeat: no-repeat;
   background-size: cover;
 }
 
 .side-padding-right {
-  background-image: url('src/assets/side_banner.png');
+  background-image: var(--bg-image);
   background-repeat: no-repeat;
   background-size: cover;
   transform: scaleX(-1);

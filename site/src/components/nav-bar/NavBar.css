@@ -1,7 +1,9 @@
 .pub-nav-bar {
   height: 15ch;
 }
+
 .priv-nav-bar {
+  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -29,7 +31,7 @@
 
   white-space: nowrap;
 
-  background-image: url('navbar/sword_mid.png');
+  background-image: var(--sword-mid);
   background-repeat: round no-repeat;
   background-size: auto 100%;
 
@@ -50,10 +52,12 @@
 .nav-link {
   font-family: 'New Rocker', system-ui;
   color: rgb(121, 121, 121);
+  -webkit-text-stroke: 1px rgb(100, 100, 100);
   font-size: 48px;
   text-decoration: none;
 }
 
 .nav-link:hover {
   color: rgb(90, 90, 90);
+  -webkit-text-stroke: 1px rgb(70, 70, 70);
 }

@@ -2,6 +2,8 @@ export interface FortyTwoProfile {
   id: number;
   login: string;
   email: string;
+  coalition_id?: number;
+  coalition_name?: string;
   image?: {
     link: string;
     versions: {
@@ -20,4 +22,9 @@ export interface FortyTwoTokenResponse {
   refresh_token?: string;
   scope: string;
   created_at: number;
+}
+
+export interface FortyTwoCoal {
+  id: number;
+  name: string;
 }

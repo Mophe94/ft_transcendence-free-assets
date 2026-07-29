@@ -1,0 +1,45 @@
+.table-col-templ {
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  width: 100%;
+}
+
+.table-games-header {
+  background: rgba(143, 84, 7, 0.726);
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+
+.table-games-content {
+  max-height: 400px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+
+.table-head {
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 600;
+  padding: 10px 10px 10px 10px;
+}
+
+.table-data {
+  padding: 10px 20px 10px 20px;
+}
+
+.join-button {
+  border: none;
+  background-color: none;
+  height: 26px;
+
+}
+.join-button img {
+  height: 100%
+}
+
+.room-button-container {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: space-around;
+}

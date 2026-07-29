@@ -1,0 +1,23 @@
+.quick-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: inherit;
+  width: 192px;
+  height: 64px;
+  margin-left: 10px;
+  margin-right: 10px;
+
+  background-image: var(--img-quick);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.quick-button:hover {
+  background-image: var(--img-quick-hover);
+}
+.quick-button.pressed {
+  background-image: var(--img-quick-pressed);
+}

@@ -8,6 +8,10 @@ import { GameModule } from './game/game.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { getSecret } from 'libs/shared/src/utils/secret.utils';
+import { RedisModule } from './redis/redis.module';
+import { RedisService } from './redis/redis.service';
+import { LobbyController } from './lobby/lobby.controller';
+import { AuthModule } from 'apps/account-service/src/auth/auth.module';
 
 @Module({
   imports: [
@@ -23,7 +27,7 @@ import { getSecret } from 'libs/shared/src/utils/secret.utils';
         username: getSecret('db_game_username'),
         password: getSecret('db_game_password'),
         database: getSecret('db_game_db_name'),
-        synchronize: false, // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Only for dev, remove for prod.
+        synchronize: false,
         autoLoadEntities: true,
       }),
     }), // switch for GAME DB
@@ -31,8 +35,9 @@ import { getSecret } from 'libs/shared/src/utils/secret.utils';
     GameModule,
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
+    RedisModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, LobbyController],
+  providers: [AppService, RedisService],
 })
 export class AppModule {}

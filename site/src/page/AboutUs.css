@@ -1,0 +1,38 @@
+.section-left {
+    display: grid;
+    grid-template-columns: 2fr 9fr;
+    gap: 30px;
+    margin-bottom: 70px;
+}
+
+.section-right {
+    display: grid;
+    grid-template-columns: 9fr 2fr;
+    gap: 30px;
+    margin-bottom: 70px;
+}
+
+.description {
+    font-family: 'Ubuntu';
+    font-size: 26px;
+
+    align-content: center;
+}
+.text-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    font-size: 24px;
+}
+.text-container.right{
+    align-items: flex-end;
+}
+.text-container.left{
+    align-items: flex-start;
+}
+
+.signature {
+    padding-top: 20px;
+    font-size: 28px;
+    font-weight: 500;
+}

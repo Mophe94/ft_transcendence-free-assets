@@ -1,11 +1,11 @@
 import { Outlet } from 'react-router-dom';
-import { PrivNavBar } from '../components/nav-bar/PrivNavBar';
-import './PublicLayout.css';
+import { NavBar } from '../components/nav-bar/NavBar';
+import './AppLayout.css';
 
 export default function AppLayout() {
   return (
     <>
-      <PrivNavBar />
+      <NavBar />
       <div className="body-layout">
         <div className="side-padding-left"></div>
         <div className="public-content">

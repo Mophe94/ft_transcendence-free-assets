@@ -6,9 +6,10 @@ import {
   clientsMap,
   ClientData,
 } from 'apps/game-service/src/shared/clients.map';
-import { FULL_LOBBY } from 'apps/game-service/src/game/game.type';
+import { FULL } from 'apps/game-service/src/game/game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class LobbyService {
@@ -16,16 +17,20 @@ export class LobbyService {
     private roomService: RoomService,
     private eventEmitter: EventEmitter2,
     private phaseTimer: PhaseTimerService,
+    private redisService: RedisService,
   ) {}
 
   private rooms = new Map<string, Set<WebSocket>>();
 
   // JOIN LOBBY
-  joinLobby(client: WebSocket, userSub: number): void {
+  async joinLobby(client: WebSocket, userSub: number): Promise<void> {
     const roomId =
-      this.roomService.findAvailableRoom() ?? this.roomService.createRoom();
+      this.roomService.findAvailableRoom() ?? await this.roomService.createRoom();
 
     this.roomService.joinRoom(client, roomId);
+    console.log('room id: ', roomId);
+
+    await this.redisService.addPlayerToRoom(userSub.toString(), roomId);
 
     const clients = this.roomService.getClients(roomId)!;
 
@@ -33,7 +38,7 @@ export class LobbyService {
     if (clientData) clientData.roomId = roomId; */
 
     console.log(
-      `[LobbyService] User ${userSub} joined room ${roomId} (${clients.size}/${FULL_LOBBY})`,
+      `[LobbyService] User ${userSub} joined room ${roomId} (${clients.size}/${FULL})`,
     );
 
     this.eventEmitter.emit('lobby.player_joined', {
@@ -42,7 +47,7 @@ export class LobbyService {
       playerCount: clients.size,
     });
 
-    if (clients.size === FULL_LOBBY) {
+    if (clients.size === FULL) {
       this.phaseTimer.clear(roomId);
       this.eventEmitter.emit('lobby.start', { roomId, clients });
     } else if (clients.size === 1) {

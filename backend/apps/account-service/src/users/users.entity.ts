@@ -27,6 +27,12 @@ export class User {
   @Column()
   avatarUrl!: string;
 
+  @Column()
+  coalition_id!: number;
+
+  @Column()
+  coalition_name!: string;
+
   @Column({
     type: 'enum',
     enum: UserRole,

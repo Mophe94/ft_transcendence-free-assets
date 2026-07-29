@@ -23,6 +23,7 @@ services:
       - site/.env
     volumes:
       - ./site:/app
+      - /app/node_modules
 
   game_service:
     build:
@@ -35,6 +36,7 @@ services:
       - db_game_db_name
       - db_game_username
       - db_game_password
+      - redis_password
     depends_on:
       users_db:
         condition: service_healthy
@@ -49,6 +51,8 @@ services:
     command: npm run start:dev chat-service
     env_file:
       - backend/.env.docker
+    secrets:
+      - jwt_secret_key
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -78,12 +82,15 @@ services:
       start_period: 5s
     volumes:
       - ./backend:/app
+      - /app/node_modules
+
   game:
     build:
       context: game_test
     container_name: game
     volumes:
       - ./game_test:/app
+      - /app/node_modules
 
   users_db:
     build:
@@ -98,10 +105,10 @@ services:
       - db_users_postgres_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 3s   # Teste toutes les 3 secondes
-      timeout: 5s    # Temps max accordé au test
-      retries: 5     # Nombre d'essais avant de considérer la DB comme en panne
-      start_period: 5s # Laisse 5 secondes au démarrage avant de commencer à tester
+      interval: 3s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
   game_db:
     build:
       context: database/game_db/
@@ -113,6 +120,13 @@ services:
       - db_game_username
       - db_game_password
       - db_game_postgres_password
+
+  redis:
+    build:
+      context: redis/
+    container_name: redis
+    secrets:
+      - redis_password
 
 volumes:
   nginx_ssl:
@@ -140,3 +154,5 @@ secrets:
     file: ./.secrets/fortytwo_client_secret.txt
   jwt_secret_key:
     file: ./.secrets/jwt_secret_key.txt
+  redis_password:
+    file: ./.secrets/redis_password.txt

@@ -2,51 +2,52 @@
   display: grid;
   gap: 0px;
 
-  grid-template-columns: 55px 1fr 55px;
+  grid-template-columns: 52px 1fr 52px;
   grid-template-rows: 44px 1fr 43px;
 }
+
 .profile-upperLeft img,
 .profile-upperRight img,
-.profile-bottomLeft img,
+.profil-bottomLeft img,
 .profile-bottomRight img {
   display: block;
 }
 .profile-upperLeft {
-  background-image: url('background/special_paper/special_paper_UL.png');
+  background-image: var(--img-ul);
   background-repeat: no-repeat no-repeat;
   grid-row: 1;
   grid-column: 1;
 }
 .profile-upperMiddle {
-  background-image: url('background/special_paper/special_paper_UM.png');
-  background-repeat: repeat-x;
+  background-image: var(--img-um);
+  background-repeat: round no-repeat;
   background-size: auto 100%;
   grid-row: 1;
   grid-column: 2;
 }
 .profile-upperRight {
-  background-image: url('background/special_paper/special_paper_UR.png');
+  background-image: var(--img-ur);
   background-repeat: no-repeat no-repeat;
   grid-row: 1;
   grid-column: 3;
 }
 
 .profile-middleLeft {
-  background-image: url('background/special_paper/special_paper_ML.png');
-  background-repeat: repeat-y;
+  background-image: var(--img-ml);
+  background-repeat: no-repeat round;
   background-size: 100% auto;
   grid-row: 2;
   grid-column: 1;
 }
 .profile-middleMiddle {
-  background-image: url('background/special_paper/special_paper_MM.png');
+  background-image: var(--img-mm);
   background-repeat: round round;
   background-size: auto auto;
   grid-row: 2;
   grid-column: 2;
 }
 .profile-middleRight {
-  background-image: url('background/special_paper/special_paper_MR.png');
+  background-image: var(--img-mr);
   background-repeat: repeat-y;
   background-size: 100% auto;
   grid-row: 2;
@@ -54,53 +55,21 @@
 }
 
 .profile-bottomLeft {
-  background-image: url('background/special_paper/special_paper_DL.png');
+  background-image: var(--img-dl);
   background-repeat: no-repeat no-repeat;
   grid-row: 3;
   grid-column: 1;
 }
 .profile-bottomMiddle {
-  background-image: url('background/special_paper/special_paper_DM.png');
-  background-repeat: repeat-x;
+  background-image: var(--img-dm);
+  background-repeat: round no-repeat;
   background-size: auto 100%;
   grid-row: 3;
   grid-column: 2;
 }
 .profile-bottomRight {
-  background-image: url('background/special_paper/special_paper_DR.png');
+  background-image: var(--img-dr);
   background-repeat: no-repeat no-repeat;
   grid-row: 3;
   grid-column: 3;
-}
-.profile-table {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-.top-left {
-  grid-column: 1;
-  justify-self: center;
-}
-.user-info {
-  grid-column: 2;
-
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-
-  align-self: center;
-}
-.stats-table {
-  grid-column: 1 / span 2;
-  justify-self: center;
-  border: solid 1 red;
-
-  display: grid;
-  grid-template-columns: 1fr 3fr 1fr 3fr 1fr;
-}
-.stats-table .key {
-  grid-column: 2;
-  padding-bottom: 10px;
-}
-.stats-table .value {
-  grid-column: 4;
 }

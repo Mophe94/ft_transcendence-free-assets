@@ -11,4 +11,7 @@ export class UpdateSettingsDto {
 
   @IsNumber()
   starter!: number;
+
+  @IsString()
+  avatar!: string;
 }

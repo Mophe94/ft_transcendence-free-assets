@@ -7,12 +7,14 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { UsersService } from 'apps/account-service/src/users/users.service';
 import {
+  FortyTwoCoal,
   FortyTwoProfile,
   FortyTwoTokenResponse,
 } from './types/fortytwo-profile.interface';
 import { JwtService } from '@nestjs/jwt';
 import { getSecret } from 'app/shared/utils/secret.utils';
 import { UserRole } from '../users/types/userRole.enum';
+import { CoalitionEnum } from './types/coalition.enum';
 
 @Injectable()
 export class AuthService {
@@ -25,8 +27,10 @@ export class AuthService {
   async handleFortyTwoAuth(code: string) {
     const accessToken = await this.exchangeCodeForToken(code);
     const profile = await this.getFortyTwoProfile(accessToken);
+    const coal = await this.getFortyTwoCoal(accessToken, profile.id);
 
     let user = await this.usersService.findOneByFortyTwoId(profile.id);
+
     if (!user) {
       user = await this.usersService.create({
         fortyTwoId: profile.id,
@@ -34,6 +38,8 @@ export class AuthService {
         email: profile.email,
         avatarUrl: profile.image?.link ?? '',
         role: UserRole.USER,
+        coalition_id: coal?.id ?? 0,
+        coalition_name: coal?.name ?? '',
       });
     }
     const payload = {
@@ -88,6 +94,32 @@ export class AuthService {
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException("Couldn't fetch users profile.");
+    }
+  }
+  private async getFortyTwoCoal(
+    accessToken: string,
+    userId: number,
+  ): Promise<FortyTwoCoal | undefined> {
+    try {
+      const response = await axios.get<Array<FortyTwoCoal>>(
+        `${
+          this.configService.get('FORTYTWO_API_GETCOAL') ??
+          'https://api.intra.42.fr/v2'
+        }/users/${userId}/coalitions`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      );
+      const coalitions = response.data;
+      const current_coal = coalitions.find((coal) =>
+        (Object.values(CoalitionEnum) as number[]).includes(coal.id),
+      );
+      return current_coal;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(
+        "Couldn't fetch users coalitions.",
+      );
     }
   }
 }

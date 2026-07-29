@@ -1,8 +1,8 @@
 import { Banner } from '../components/Banner';
-import { EnterButton } from '../components/EnterButton';
+import { EnterButton } from '../components/buttons/EnterButton';
 import './Welcome.css';
 
-export function Landing() {
+export default function Landing() {
   return (
     <div className="home-layout">
       <div className="game_banner">

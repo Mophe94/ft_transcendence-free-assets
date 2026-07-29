@@ -6,6 +6,8 @@ USERS_DB_USER=$(cat /run/secrets/db_users_username)
 USERS_DB_PASSWORD=$(cat /run/secrets/db_users_password)
 POSTGRES_PASSWORD=$(cat /run/secrets/db_users_postgres_password)
 
+echo "hello";
+
 psql -v ON_ERROR_STOP=1 \
     --username="postgres" \
     --no-password << EOF
@@ -30,6 +32,7 @@ psql -v ON_ERROR_STOP=1 \
     GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO ${USERS_DB_USER};
     ALTER TABLE "user" OWNER TO ${USERS_DB_USER};
     ALTER TABLE user_stats OWNER TO ${USERS_DB_USER};
+    ALTER TABLE settings OWNER TO ${USERS_DB_USER};
     ALTER TYPE user_role OWNER TO ${USERS_DB_USER};
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO ${USERS_DB_USER};
     ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO ${USERS_DB_USER};

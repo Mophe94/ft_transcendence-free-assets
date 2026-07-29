@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './Play.css';
 
-export function Play() {
+export default function Play() {
   const [gameStart, setGameStart] = useState<boolean>(false);
   const [userToken, setUserToken] = useState<string | null>(null);
   const [roomToken, setRoomToken] = useState<string | null>(null);

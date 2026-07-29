@@ -1,17 +1,25 @@
 import type React from 'react';
 import { ChatContext, type Chat, type Message } from './ChatContext';
 import { useEffect, useState } from 'react';
+import { Color, type ColorType } from '../constants/Colors';
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const [userColors, setUserColors] = useState<Map<string, ColorType>>(new Map());
+
+  function getRandomColor(): ColorType {
+    const colorArray = Object.values(Color);
+    const randomIndex = Math.floor(Math.random() * colorArray.length);
+    return colorArray[randomIndex];
+  }
+
 
   useEffect(() => {
     const socket = new WebSocket(`${import.meta.env.VITE_CHAT_SERVICE}`);
 
     socket.onopen = () => {
       setWs(socket);
-      console.log('Connected');
     };
 
     socket.onmessage = (event) => {
@@ -23,16 +31,28 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            hour12: false, // Force le format 24h
+            hour12: false,
           });
           return time;
         }
         return value;
-      });
+      }) as Message;
       console.log(data);
-      setMessages((prev) => [...prev, data]);
+      if (data.username && userColors.get(data.username)) {
+        data.color = userColors.get(data.username);
+      }
+      else 
+      {
+        setUserColors((prev) => (prev.set(data.username, getRandomColor())))
+        userColors.set(data.username, getRandomColor());
+        data.color = userColors.get(data.username);
+      }
+      console.log(data)
+      setMessages((prev) => {
+        const lastMessages = prev.slice(-99);
+        return [...lastMessages, data]});
     };
-  }, []);
+  }, [userColors]);
 
   const sendMessage = async (content: string) => {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -41,6 +61,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Socket not connected.');
     }
   };
-  const chat: Chat = { user: 'kprist', messages, sendMessage };
+  const chat: Chat = { messages, sendMessage };
   return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;
 };

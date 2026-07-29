@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const checkUserStatus = async () => {
-    fetch(`${import.meta.env.VITE_USERS_SERVICE}/auth/me`, {
+    return fetch(`${import.meta.env.VITE_USERS_SERVICE}/auth/me`, {
       method: 'GET',
       credentials: 'include',
     })
@@ -37,9 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
   return (
-    <AuthContext.Provider
-      value={{ user, isLoading, handleSignout, checkUserStatus }}
-    >
+    <AuthContext.Provider value={{ user, isLoading, handleSignout, checkUserStatus }}>
       {children}
     </AuthContext.Provider>
   );

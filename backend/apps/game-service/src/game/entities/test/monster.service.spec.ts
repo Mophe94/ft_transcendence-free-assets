@@ -41,7 +41,7 @@ describe('MonstersService - Integration', () => {
   it('devrait retourner les monstres de la tuile 3', async () => {
     // Si on regarde ton dump, la tuile 3 contient les monstres 10, 9 et 8
     const monsters = await service.findMonstersByTile(3);
-    
+
     console.log('Monstres trouvés :', monsters);
     expect(monsters).toBeDefined();
     expect(monsters.length).toBeGreaterThan(0);

@@ -1,0 +1,26 @@
+.pic-frame-container {
+  position: relative;
+  display: inline-block;
+  width: 300px;
+}
+
+.pic-frame {
+  display: block;
+  width: 100%;
+  height: auto;
+  position: relative;
+  z-index: 5;
+}
+
+.pic-frame-content {
+position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  height: 85%; 
+  pointer-events: none;
+  z-index: 2;
+  object-fit: cover;
+  clip-path: inset(0% 15% 0% 15%);
+}

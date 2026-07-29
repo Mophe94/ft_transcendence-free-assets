@@ -1,13 +1,14 @@
 import { createContext } from 'react';
+import type { ColorType } from '../constants/Colors';
 
 export interface Message {
   time: string;
   username: string;
   content: string;
+  color?: ColorType;
 }
 
 export interface Chat {
-  user: string;
   messages: Array<Message>;
   sendMessage: (text: string) => Promise<void>;
 }

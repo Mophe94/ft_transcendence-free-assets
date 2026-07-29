@@ -1,97 +1,64 @@
-import React, { useEffect, useState } from 'react';
-import './Profile.css';
-import type { User } from '../types/user';
-import { useAuth } from '../context/AuthContext';
+import { useEffect, useState } from 'react';
+import './Profile.css'
+import Stats from '../content/Stats';
+import Preferences from '../content/Preferences';
+import ErrorDisplay from '../content/Error';
 import { useParams } from 'react-router-dom';
-import { HexMediaWindow } from '../components/HexMediaWindow';
+import { useAuth } from '../context/AuthContext';
+import { Loading } from '../content/Loading';
+import type { User } from '../types/user';
+import RegularBG from '../background/RegularBg';
+
 
 export default function Profile() {
-  let { username } = useParams<{ username?: string }>();
+  const { username } = useParams();
   const { user } = useAuth();
-  if (!user) {
-    return null;
-  }
-  if (!username) {
-    username = user?.username;
-  }
+  const [profileUser, setProfileUser] = useState<User | null>(null);
+  const [error, setError] = useState<{msg: string; code: number} | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  return <ProfileBody username={username} />;
-}
+  const targetUsername = username || user?.username;
 
-interface ProfileBodyProps {
-  username: string;
-}
-
-export function ProfileBody({ username }: ProfileBodyProps) {
-  const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_USERS_SERVICE}/profile/${username}`, {
-      method: 'Get',
+    if (!targetUsername) return;
+    fetch(`${import.meta.env.VITE_USERS_SERVICE}/profile/${targetUsername}`, {
+      method: 'GET',
       credentials: 'include',
     })
-      .then((res) => res.json())
+      .then((res) => {
+        // if (!res.ok) {
+        //   throw new Error("Utilisateur introuvable");
+        // }
+        return res.json();
+      })
       .then((data) => {
-        setUser(data.user);
+        if (data && data.user) {
+          setProfileUser(data.user);
+        } else {
+          setError({ msg: "User not found", code: 404 });
+        }
       })
       .catch(() => {
-        return null;
+        setError({ msg: "User not found", code: 404 });
+      })
+      .finally(() => {
+        setLoading(false);
       });
-  }, [username]);
+  }, [targetUsername]);
 
-  if (!user || !user.stats) return null;
+  if (!targetUsername) {
+    return <ErrorDisplay msg="User not found" code={404} />;
+  }
+  if (loading) return <Loading />;
 
-  const stats = {
-    Stats: '',
-    'Number of games played': user.stats.nb_fights,
-    'Number of games won': user.stats.nb_victories,
-    'Number of games lost': user.stats.nb_defeats,
-    'Total Damage': user.stats.total_damage_given,
-    'Discovered monsters': `${user.stats.nb_monsters_discovered} / ??`,
-    'Discovered objects': `${user.stats.nb_objects_discovered} / ??`,
-    Achievements: `${user.stats.nb_achievements} / ??`,
-  };
+  if (error) {
+    return <ErrorDisplay msg={error.msg} code={error.code} />;
+  }
 
   return (
-    <div className="profile-content-layout">
-      <div className="profile-upperLeft" />
-      <div className="profile-upperMiddle" />
-      <div className="profile-upperRight" />
-
-      <div className="profile-middleLeft" />
-      <div className="profile-middleMiddle">
-        <div className="profile-table">
-          <div className="top-left">
-            <HexMediaWindow
-              type="img"
-              src={user?.avatarUrl}
-              mediaId="avatar-pic"
-            />
-          </div>
-
-          <div className="user-info">
-            <div className="text-medium bold">Username:</div>
-            <div className="text-medium">{user?.username}</div>
-            <div className="text-medium bold">Email:</div>
-            <div className="text-medium">{user?.email}</div>
-            <div className="text-medium bold">Title:</div>
-            <div className="text-medium">MonsterMaster</div>
-          </div>
-
-          <div className="stats-table">
-            {Object.entries(stats).map(([key, value]) => (
-              <React.Fragment key={key}>
-                <div className="text-medium key">{key}:</div>
-                <div className="text-medium value">{value}</div>
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="profile-middleRight" />
-
-      <div className="profile-bottomLeft" />
-      <div className="profile-bottomMiddle" />
-      <div className="profile-bottomRight" />
-    </div>
+    <RegularBG>
+      <Stats user={profileUser}/>
+      <Preferences />
+    </RegularBG>
   );
 }

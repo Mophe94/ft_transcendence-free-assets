@@ -12,7 +12,7 @@ export default function Dashboard() {
   }, [context.user, navigate]);
 
   return (
-    // HTTML TO IMPLEMENT
+    // HTML TO IMPLEMENT
     <div>Admin Page</div>
   );
 }

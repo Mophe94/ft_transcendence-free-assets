@@ -11,12 +11,13 @@ import { WebSocket, Server } from 'ws';
 import { OnEvent } from '@nestjs/event-emitter';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import {
-  FULL_LOBBY,
+  FULL,
   PHASE_DURATIONS,
   createMockUser,
 } from 'apps/game-service/src/game/game.type';
 import { LobbyService } from 'apps/game-service/src/lobby/lobby.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
+import { RedisService } from '../redis/redis.service';
 
 @WebSocketGateway(8081, { cors: { origin: true }, path: '/lobby' })
 export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -26,6 +27,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private lobbyService: LobbyService,
     private roomService: RoomService,
+    private redisService: RedisService,
   ) {}
 
   handleConnection(client: WebSocket): void {
@@ -58,7 +60,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.close();
       return;
     }
-    this.lobbyService.joinLobby(client, clientData.userId);
+    void this.lobbyService.joinLobby(client, clientData.userId);
   }
 
   @OnEvent('lobby.player_joined')
@@ -74,7 +76,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.broadcast(clients, {
       event: 'lobby',
       state: 'player_joigned',
-      data: { roomId, playerCount, maxPlayers: FULL_LOBBY },
+      data: { roomId, playerCount, maxPlayers: FULL },
     });
   }
 

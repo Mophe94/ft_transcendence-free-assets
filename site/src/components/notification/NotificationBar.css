@@ -1,0 +1,45 @@
+.notification-bar {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 6px;
+  color: #ffffff;
+  font-weight: 600;
+  font-family: sans-serif;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  
+  animation: slideInNotif 0.3s ease-out forwards;
+}
+
+.notification-bar.fade-out {
+  animation: slideOutNotif 0.3s ease-in forwards;
+}
+
+.notification-bar.success { background-color: #2ecc71; border: 1px solid #27ae60; }
+.notification-bar.error { background-color: #e74c3c; border: 1px solid #c0392b; }
+.notification-bar.warning { background-color: #f39c12; border: 1px solid #d35400; }
+
+@keyframes slideInNotif {
+  from {
+    transform: translate(-50%, -40px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutNotif {
+  from {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -40px);
+    opacity: 0;
+  }
+}
