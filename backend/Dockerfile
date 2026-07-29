@@ -2,6 +2,8 @@ FROM base-image
 
 WORKDIR /app
 
-COPY . /app/
+COPY package*.json /app/
 
-RUN npm install
+RUN npm ci --omit=dev
+
+COPY . /app/
