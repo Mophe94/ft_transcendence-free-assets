@@ -156,7 +156,7 @@ export class Player {
       ],
     },
   ];
-  team: string[] = ['pisciner', 'sharky', 'fishet', 'monkel', 'gigantomakia', 'burpy'];
+  team: string[] = ['pisciner', 'sharky', 'fishet', 'monkel', 'burpy', ''];
   inventory: Inventory[] = [
     {
       name: '',

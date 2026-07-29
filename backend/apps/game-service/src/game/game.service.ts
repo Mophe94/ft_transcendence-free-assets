@@ -78,7 +78,7 @@ export class GameService implements OnModuleInit {
 
     if (room.size === FULL) {
       this.combatService.matchmake(room);
-/*       // TEST MATCHMAKING //
+      // TEST MATCHMAKING //
       for (const userId of room) {
         const player = this.playerService.getPlayer(userId)!;  
         const opponentId = this.combatService.getOpponentId(userId);
@@ -86,10 +86,10 @@ export class GameService implements OnModuleInit {
         if (!enemy) {
           console.log(`[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`);
         }
-        console.log('USER ID: ', userId, ': ', this.team_setup(player, enemy ?? player));
+        console.log('USER ID: ', userId);
         console.log('OPONNENT ID: ', opponentId);
         console.log('******************');
-      } */
+      }
 
       await this.startMapPhase(roomId, room);
     }
@@ -136,13 +136,13 @@ export class GameService implements OnModuleInit {
   private startTeamSetupPhase(roomId: string, room: Set<number>) {
     this.phaseTimer.start(roomId, 'team_setup', () => {
       console.log(`Room ${roomId} team_setup phase timeout`);
-      //this.startCombatPhase(roomId, room);
+      //await new Promise(resolve => setTimeout(resolve, 3000));
+      this.startCombatPhase(roomId, room);
 
     });
     const teamSetupTimer =
       this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
 
-    // TODO: combat room: player/enemy
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;
       player.timer = teamSetupTimer;
@@ -160,18 +160,26 @@ export class GameService implements OnModuleInit {
 		//******************************//
 
       this.sendToPlayer(userId, this.team_setup(player, enemy ?? player));
+      
     }
   }
 
-/*   private startCombatPhase(roomId: string, room: Set<number>) {
+  private startCombatPhase(roomId: string, room: Set<number>) {
     this.phaseTimer.start(roomId, 'choose_monster', () => {
       console.log(`Room ${roomId} choose_monster timeout`);
 
     });
+
     const combatTimer =
       this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.choose_monster;
 
-  } */
+    for (const userId of room) {
+      const player = this.playerService.getPlayer(userId)!;
+      player.timer = combatTimer;
+      }
+
+    console.log('Combat timer started');
+  }
 
   async handleMessage(
     userId: number,
@@ -305,11 +313,10 @@ export class GameService implements OnModuleInit {
     } else {
       for (let i = 0; i < player.battle_team.length; ++i) {
         player.battle_team[i]['name'] = monsters[i];
-        player.battle_team[count]['slot'] = i;
+        player.battle_team[i]['slot'] = i;
       }
     }
-/*     const combatTimer =
-    this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.choose_monster; */
+    await new Promise(resolve => setTimeout(resolve, 500)); // ! temp fix to synchronizeke with startCombatTimer
     return this.combat(player);
   }
 
@@ -484,7 +491,7 @@ export class GameService implements OnModuleInit {
       event: 'game',
       data: {
         state: 'combat',
-        timer: PHASE_DURATIONS.choose_monster, //player.timer,
+        timer: player.timer,
         player: {
           battle_team: player.battle_team,
         },
