@@ -146,11 +146,9 @@ services:
 EOF
 
 cd ${HEADSCALE_DIR}
-
 docker compose up -d
 TIMEOUT=60
 ELAPSED=0
-
 until docker exec headscale headscale version >/dev/null 2>&1; do
     sleep 2
     ELAPSED=$((ELAPSED+2))

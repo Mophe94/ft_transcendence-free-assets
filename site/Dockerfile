@@ -1,4 +1,4 @@
-FROM base-image as build
+FROM base-image AS build
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ RUN npm ci
 
 COPY . /app
 
-RUN npm run build
+RUN npm run dev -- --host
 
 FROM nginx:alpine
 

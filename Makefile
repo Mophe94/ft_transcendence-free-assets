@@ -39,7 +39,7 @@ setup_worker:
 	fi
 	@chmod +x $(VM_SCRIPTS)/node.sh;
 	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4);
-	ssh -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$${USER}/infra && make TYPE=$(TYPE);"
+	ssh -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make TYPE=$(TYPE);"
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"

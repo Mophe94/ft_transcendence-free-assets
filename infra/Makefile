@@ -1,4 +1,5 @@
 #SWARM_STATUS := $(shell docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null)
+SCRIPT_NAME:=Infra-Makefile
 STACK_NAME = transcendence
 LOCATION := $(shell pwd)
 BUILD_FILE = $(LOCATION)/docker-compose-build.yml
@@ -7,7 +8,7 @@ SWARM_SCRIPTS = $(LOCATION)/swarm/scripts
 CONTAINER_FILES:= "$(LOCATION)/containers"
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 HOST_IP:= $(shell cat host_ip.txt)
-HOST_TAILSCALE_IP := $(shell tailscale ip -4)
+HOST_TAILSCALE_IP = $(shell tailscale ip -4)
 REG_PORT?=5050
 REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
 TAG ?= latest
@@ -19,7 +20,7 @@ TARGET=""
 
 all: node_launch
 
-node_launch:
+node_launch: wait_tailscale
 	@if [ "$(TYPE)" == "leader" ]; then \
 	    $(MAKE) swarm_setup && \
 	    $(MAKE) core && \
@@ -28,7 +29,7 @@ node_launch:
 
 swarm_setup:
 	@chmod +x $(SWARM_SCRIPTS)/launch_swarm.sh
-	@$(SWARM_SCRIPTS)/launch_swarm.sh "$(SWARM_SCRIPTS)" "$(HOST_TAILSCALE_IP)"
+	@$(SWARM_SCRIPTS)/launch_swarm.sh "$(SWARM_SCRIPTS)" "$(HOST_IP)" "$(HOST_TAILSCALE_IP)"
 	@BUILDX_BAKE_ENTITLEMENTS_FS=0 IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
 push:
@@ -119,4 +120,18 @@ image:
 	    echo "All images for $(TARGET) already exist"; \
 	fi
 
-PHONY: all node_launch swarm_setup push test core website game observ up down swarm-status image
+wait_tailscale:
+	TIMEOUT=60; \
+	INTERVAL=1; \
+	ELAPSED=0; \
+	until IP=$$(tailscale ip -4 2>/dev/null) && [ -n "$$IP" ]; do \
+	    sleep $$INTERVAL; \
+	    ELAPSED=$$((ELAPSED+INTERVAL)); \
+	    if [ "$$ELAPSED" -ge "$$TIMEOUT" ]; then \
+		echo "[$(SCRIPT_NAME)] Headscale failed to become ready"; \
+		docker logs headscale; \
+		exit 1; \
+	    fi; \
+	done
+
+PHONY: all node_launch swarm_setup push test core website game observ up down swarm-status image wait_tailscale

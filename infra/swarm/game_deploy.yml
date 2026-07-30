@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/07/29 11:23:45 by stempels         ###   ########.fr        #
+#    Updated: 2026/07/29 12:56:03 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,6 +44,9 @@ services:
 
         deploy:
             replicas: 1
+
+    redis:
+        image:
 
     game:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/game:latest

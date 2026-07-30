@@ -3,14 +3,15 @@
 #SAFEGUARDING#
 set -euo pipefail
 SCRIPT_NAME="${0##*/}"
-if [ ! $# -eq 2 ]; then
-	echo "Usage: $SCRIPT_NAME <dir> <ip>"
+if [ ! $# -eq 3 ]; then
+	echo "Usage: $SCRIPT_NAME <dir> <ip> <tailscale ip>"
 	exit 1
 fi
 
 #ARGUMENTS ASSIGNATION#
 DIR="$1"
 HOST_IP="$2"
+HOST_TAILSCALE_IP="$3"
 IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
 
 # Creating certificates
@@ -19,23 +20,23 @@ if [ ! -f $HOME/infra/cert_creation.sh ]; then
 else
     chmod +x $HOME/infra/cert_creation.sh
     if [ ! -f "$HOME/certs/nginx.crt" ]; then
-	bash $HOME/infra/cert_creation.sh "/etc/certs" "${HOST_IP}" nginx
+	bash $HOME/infra/cert_creation.sh "/etc/certs" "${HOST_TAILSCALE_IP}" nginx
     else
 	echo "[$SCRIPT_NAME] Nginx certificate already exist"
     fi
     if [ ! -f "$HOME/certs/registry.crt" ]; then
-	bash $HOME/infra/cert_creation.sh "/etc/certs" "${HOST_IP}" registry
+	bash $HOME/infra/cert_creation.sh "/etc/certs" "${HOST_TAILSCALE_IP}" registry
     else
 	echo "[$SCRIPT_NAME] Registry certificate already exist"
     fi
     if [ ! -f "$HOME/certs/worker.crt" ]; then
-	bash $HOME/infra/cert_creation.sh "/etc/certs" "${HOST_IP}" worker
+	bash $HOME/infra/cert_creation.sh "/etc/certs" "${HOST_TAILSCALE_IP}" worker
 
 	# Adding certificates to docker
-	doas mkdir -p /etc/docker/certs.d/${HOST_IP}:5050
-	doas rm -rf "/etc/docker/certs.d/${HOST_IP}:5050/worker.*"
-	doas cp "$HOME/certs/worker.crt" "/etc/docker/certs.d/${HOST_IP}:5050/client.cert" 
-	doas cp "$HOME/certs/worker.key" "/etc/docker/certs.d/${HOST_IP}:5050/client.key" 
+	doas mkdir -p /etc/docker/certs.d/${HOST_TAILSCALE_IP}:5050
+	doas rm -rf "/etc/docker/certs.d/${HOST_TAILSCALE_IP}:5050/worker.*"
+	doas cp "$HOME/certs/worker.crt" "/etc/docker/certs.d/${HOST_TAILSCALE_IP}:5050/client.cert" 
+	doas cp "$HOME/certs/worker.key" "/etc/docker/certs.d/${HOST_TAILSCALE_IP}:5050/client.key" 
 	doas rc-service docker restart
 	COUNTER=0
 	TIMEOUT=30
@@ -56,7 +57,7 @@ fi
 
 #INIT THE SWARM AND PUBLISH IS IP OF CONTACT(HOST_IP)#
 if [ ! "$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then
-    docker swarm init --advertise-addr ${HOST_IP} --data-path-addr ${HOST_IP}
+    docker swarm init --advertise-addr ${HOST_TAILSCALE_IP} --data-path-addr ${HOST_TAILSCALE_IP}
 fi
 
 docker node update --label-add leader=true $(docker node ls --format '{{.ID}} {{.ManagerStatus}}' | awk '/Leader/ {print $1}')
