@@ -108,7 +108,7 @@ export class GameService implements OnModuleInit {
     roomId: string,
     room: Set<number>,
   ): Promise<void> {
-    this.phaseTimer.start(roomId, 'map', () => {
+    this.phaseTimer.start(`game: ${roomId}`, 'map', () => {
       console.log(`Room ${roomId} map phase timeout`);
       this.startTeamSetupPhase(roomId, room);
     });
@@ -134,9 +134,8 @@ export class GameService implements OnModuleInit {
   }
 
   private startTeamSetupPhase(roomId: string, room: Set<number>) {
-    this.phaseTimer.start(roomId, 'team_setup', () => {
+    this.phaseTimer.start(`game: ${roomId}`, 'team_setup', () => {
       console.log(`Room ${roomId} team_setup phase timeout`);
-      //await new Promise(resolve => setTimeout(resolve, 3000));
       this.startCombatPhase(roomId, room);
 
     });
@@ -154,7 +153,7 @@ export class GameService implements OnModuleInit {
       }
 
 		// TEST MATCHMAKING //
-		console.log('USER ID: ', userId, ': ', this.team_setup(player, enemy ?? player));
+		console.log('USER ID: ', userId, /* ': ', this.team_setup(player, enemy ?? player) */);
 		console.log('OPONNENT ID: ', opponentId);
 		console.log('******************');
 		//******************************//
@@ -165,7 +164,7 @@ export class GameService implements OnModuleInit {
   }
 
   private startCombatPhase(roomId: string, room: Set<number>) {
-    this.phaseTimer.start(roomId, 'choose_monster', () => {
+    this.phaseTimer.start(`game: ${roomId}`, 'choose_monster', () => {
       console.log(`Room ${roomId} choose_monster timeout`);
 
     });
@@ -540,7 +539,6 @@ export class GameService implements OnModuleInit {
     // // DELETE ITEM + SEND UPDATE_ITEM
   private received_delete_item(player: Player, item: string){
     for (let i = 0; i < player.inventory.length; ++i){
-      console.log('Inventory: ', player.inventory[i], 'i:', i);
       if (player.inventory[i]["name"] === item){
         if (player.inventory[i].current === 1) {
           player.inventory[i]["name"] = "";

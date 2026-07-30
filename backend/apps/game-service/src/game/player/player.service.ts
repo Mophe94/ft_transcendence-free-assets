@@ -22,13 +22,14 @@ export class PlayerService {
     return this.players.get(userId);
   }
 
-  // To complete (add remove, etc)
   getUserId(player: Player): number | undefined{
     const id = this.idsByPlayers.get(player);
     return id;
   }
 
   removePlayer(userId: number): void {
+    const player =this.players.get(userId);
     this.players.delete(userId);
+    this.idsByPlayers.delete(player!);
   }
 }
