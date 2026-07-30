@@ -361,17 +361,11 @@ export class GameService implements OnModuleInit {
       for (let i = 0; i < monsters.length; i++) {
         for (let j = 0; j < player.team.length; j++) {
           if (monsters[i] !== "" && monsters[i] === player.team[j]) {
-            console.log("***************************")
-            console.log("selected monster: ", monsters[i]);
-            console.log("player monster: ", player.team[i]);
-            console.log("i: ", i);
-            console.log("j: ", j);
-            console.log("Monsters to Load: ", monstersToLoad);
-            console.log("***************************")
             monstersToLoad.push({
               name: player.team[j],
               slot: monstersToLoad.length,
             })
+            break;
           }
         }
       }
@@ -382,13 +376,19 @@ export class GameService implements OnModuleInit {
     if (!monster) return undefined;
       player.battle_team[slot] = {
         name: monster.name,
-        type: String(monster.type),
         slot: slot,
         life: {
           current: monster.hp_total,
           max: monster.hp_total,
         },
+        type: String(monster.type),
+        attack: 0,
+        attack_spe: 0,
+        defense: 0,
+        defense_spe: 0,
+        speed: 0,
         status: [],
+        dodge: false,
         skill: [], // 4 slots
       };
     }
