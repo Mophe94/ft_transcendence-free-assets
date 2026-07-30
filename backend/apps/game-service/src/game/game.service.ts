@@ -226,20 +226,69 @@ export class GameService implements OnModuleInit {
         };
     }
     if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
-    console.log('Result payload: ', result);
+    //console.log('Result payload: ', result);
     return result;
   }
 
   // HANDLERS
 
-  // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
-  private async received_new_encounter(
+/*   private async received_new_encounter(
     player: Player,
     tile: number,
   ): Promise<object | undefined> {
     const monsters = await this.monstersService.findMonstersByTile(tile);
     player.current_monster = monsters[1].name; //
     //console.log('Monsters by tile', monsters[1]);
+    return this.new_encounter(player);
+  } */
+  
+  // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
+  private received_new_encounter(player: Player, tile: string){
+    const table_encounter = {
+      commun: 60,
+      uncommun: 30,
+      rare: 10
+    }
+    // Retrieve list monsters by tile
+    let result = Math.floor(Math.random() * 100);
+    // call monster from db
+    if (result <= table_encounter.rare){ /* && monster.rarity == rare exist*/
+      result = Math.floor(Math.random() * 100);
+      let table_monster: string[] = [ "leafs", "pigeonne", "squirel" ]
+      // remplir table monster avec les nom des pq en rare
+      let gap = Math.floor(100 / table_monster.length)
+      let step = gap
+      let i = 0
+      for (i; result > gap && i < table_monster.length - 1; ++i)
+        gap += step
+      player.current_monster = table_monster[i]
+      player.current_monster_rarity = "rare"
+    }
+    else if (result <= table_encounter.uncommun){ /* && monster.rarity == uncommun exist*/
+      result = Math.floor(Math.random() * 100);
+      let table_monster: string[] = [ "leafs", "pigeonne", "squirel" ]
+      // remplir table monster avec les nom des pq en uncommun
+      let gap = Math.floor(100 / table_monster.length)
+      let step = gap
+      let i = 0
+      for (i; result > gap && i < table_monster.length - 1; ++i)
+        gap += step
+      player.current_monster = table_monster[i]
+      player.current_monster_rarity = "uncommun"
+    }
+    else {
+      result = Math.floor(Math.random() * 100);
+      let table_monster: string[] = [ "leafs", "pigeonne", "squirel" ]
+      // remplir table monster avec les nom des pq en commun
+      let gap = Math.floor(100 / table_monster.length)
+      let step = gap
+      let i = 0
+      for (i; result > gap && i < table_monster.length - 1; ++i)
+        gap += step
+      player.current_monster = table_monster[i]
+      player.current_monster_rarity = "commmun"
+    }
+    
     return this.new_encounter(player);
   }
 
@@ -252,19 +301,35 @@ export class GameService implements OnModuleInit {
     }
     return this.update_team(player);
   }
-
-  private received_try_catch(player: Player) {
-    let result = Math.floor(Math.random() * 101);
-
-    if (result <= 50) {
-      for (let i = 0; i < player.team.length; ++i) {
-        if (player.team[i] === '') {
-          player.team[i] = player.current_monster;
-          break;
-        }
+  
+  // CHECK MATCH OF MONSTER WITH RANDOM VALUE AND RETURN TRUE IF OK OR FALSE
+  private received_try_catch(player: Player, item?: string){
+    const table_encounter = {
+      common: 70,
+      uncommon: 50,
+      rare: 20
+    }
+    let result: number = 0
+  
+    if (item !== undefined)
+      result = Math.floor(Math.random() * 101);
+  
+    let monsterCatch: number = 0
+    monsterCatch = table_encounter[player.current_monster_rarity as keyof typeof table_encounter]
+    if (monsterCatch !== undefined) {
+      if (result <= monsterCatch) {
+          for (let i = 0; i < player.team.length; ++i) {
+              if (player.team[i] === '') {
+                player.team[i] = player.current_monster;
+                return this.result_catch(player, 1);
+              }
+          }
       }
-      return this.result_catch(player, 1);
-    } else return this.result_catch(player, 0);
+      else
+        return this.result_catch(player, 0);
+    }
+    else
+      return this.result_catch(player, 0);
   }
 
   // CHECK TEAM SENDED AND IF IT'S EMPTY, ELSE AUTO FULLY BATTLE_TEAM IF IT'S POSSIBLE
@@ -295,11 +360,20 @@ export class GameService implements OnModuleInit {
     }
     else {
       for (let i = 0; i < monsters.length; i++) {
-        if (monsters[i] !== "") {
-          monstersToLoad.push({
-            name: player.team[i],
-            slot: i,
-          })
+        for (let j = 0; j < player.team.length; j++) {
+          if (monsters[i] === player.team[j]) {
+            console.log("***************************")
+            console.log("selected monster: ", monsters[i]);
+            console.log("player monster: ", player.team[i]);
+            console.log("i: ", i);
+            console.log("j: ", j);
+            console.log("Monsters to Load: ", monstersToLoad);
+            console.log("***************************")
+            monstersToLoad.push({
+              name: player.team[i],
+              slot: i,
+            })
+          }
         }
       }
     }
@@ -319,6 +393,8 @@ export class GameService implements OnModuleInit {
         skill: [], // 4 slots
       };
     }
+    console.log("Monsters choice: ", monsters);
+    console.log("Monsters to load: ", monstersToLoad);
     await new Promise(resolve => setTimeout(resolve, 500)); // ! temp fix to synchronizeke with startCombatTimer
     return this.combat(player);
   }
@@ -354,12 +430,16 @@ export class GameService implements OnModuleInit {
 
   // CALL REMOVE ITEM + ADD MONSTER IN TEAM + SEND RESULT_CATCH WITH UPDATE_TEAM
   private received_use_item(player: Player, item: string){
-    this.received_delete_item(player, item);
+    const userId = this.playerService.getUserId(player);
+    if (!userId)
+      return undefined;
+    this.sendToPlayer(userId, this.received_delete_item(player, item));
 
     for (let i = 0; i < player.team.length; ++i){
-      if (player.team[i] === "")
+      if (player.team[i] === "") {
       player.team[i] = player.current_monster;
       break;
+      }
     }
     return this.result_catch(player, 1);
   }
@@ -408,17 +488,31 @@ export class GameService implements OnModuleInit {
     };
   }
 
-  private result_catch(player: Player, result: number) {
-    return {
-      event: 'game',
-      data: {
-        state: 'result_catch',
-        success: result !== 0 ? 'ok' : 'fail',
-        player: {
-          team: result !== 0 ? player.team : undefined,
+  private result_catch(player: Player, result: number, monsterFlee?: number) {
+    let success: number = 0
+    let msg = {
+          event: "game",
+          data: {
+              state: "result_catch",
+              success: "",
+              player: {
+          team: result !== 0 ? player.team : undefined
         },
-      },
-    };
+          }
+      };
+
+    if (result == 1){
+      msg.data.success = "ok"
+      return msg
+    }
+    else{
+      let flee = Math.floor(Math.random() * 101);
+      if (flee < 50)
+        msg.data.success = "flee"
+      else
+        msg.data.success = "fail"
+      return msg
+    }
   }
 
   private update_inventory(player: Player) {
@@ -446,16 +540,22 @@ export class GameService implements OnModuleInit {
     // // DELETE ITEM + SEND UPDATE_ITEM
   private received_delete_item(player: Player, item: string){
     for (let i = 0; i < player.inventory.length; ++i){
+      console.log('Inventory: ', player.inventory[i], 'i:', i);
       if (player.inventory[i]["name"] === item){
+        if (player.inventory[i].current === 1) {
           player.inventory[i]["name"] = "";
           player.inventory[i]["scene"] = "";
           player.inventory[i]["type"] = "";
           player.inventory[i]["target"] = "";
           player.inventory[i]["value"] = 0;
+          player.inventory[i]["current"] = 0;
+        }
+        else 
+          player.inventory[i].current -= 1;
+
         }
         break;
       }
-      console.log(this.update_inventory(player));
     return this.update_inventory(player);
   }
 
