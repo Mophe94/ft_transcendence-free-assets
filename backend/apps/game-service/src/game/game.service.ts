@@ -114,7 +114,7 @@ export class GameService implements OnModuleInit {
     });
 
     const mapTimer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.map;
 
     const payloads = await Promise.all(
       [...room].map(async (userId) => {
@@ -140,7 +140,7 @@ export class GameService implements OnModuleInit {
 
     });
     const teamSetupTimer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.team_setup;
 
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;
@@ -170,7 +170,7 @@ export class GameService implements OnModuleInit {
     });
 
     const combatTimer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.choose_monster;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.choose_monster;
 
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;
@@ -360,7 +360,7 @@ export class GameService implements OnModuleInit {
     else {
       for (let i = 0; i < monsters.length; i++) {
         for (let j = 0; j < player.team.length; j++) {
-          if (monsters[i] === player.team[j]) {
+          if (monsters[i] !== "" && monsters[i] === player.team[j]) {
             console.log("***************************")
             console.log("selected monster: ", monsters[i]);
             console.log("player monster: ", player.team[i]);
@@ -369,8 +369,8 @@ export class GameService implements OnModuleInit {
             console.log("Monsters to Load: ", monstersToLoad);
             console.log("***************************")
             monstersToLoad.push({
-              name: player.team[i],
-              slot: i,
+              name: player.team[j],
+              slot: monstersToLoad.length,
             })
           }
         }

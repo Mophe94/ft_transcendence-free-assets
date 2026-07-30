@@ -1,5 +1,4 @@
 import {
-  Team,
   Inventory,
   Skill,
   Life,
