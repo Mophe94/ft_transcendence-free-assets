@@ -222,6 +222,7 @@ func _items():
 	await get_tree().create_timer(1.0).timeout
 	
 func _back():
+	$Text.text = ""
 	set_menus_back()
 	await get_tree().create_timer(1.0).timeout
 
