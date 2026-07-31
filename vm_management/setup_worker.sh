@@ -66,9 +66,20 @@ EOF
 
 #echo "[$SCRIPT_NAME] Adding utils"
 
-echo "[$SCRIPT_NAME] Setting up wireguard"
+echo "[$SCRIPT_NAME] Setting up tailscale"
 apk add -U tailscale
 rc-update add tailscale default
+service tailscale start
+
+echo "[${SCRIPT_NAME}] Configuring Docker startup dependency on Tailscale"
+mkdir -p /etc/conf.d
+if [ -f /etc/conf.d/docker ]; then
+    if ! grep -q 'rc_need="tailscale"' /etc/conf.d/docker; then
+        echo 'rc_need="tailscale"' | doas tee -a /etc/conf.d/docker >/dev/null
+    fi
+else
+    echo 'rc_need="tailscale"' | doas tee /etc/conf.d/docker >/dev/null
+fi
 
 echo "[$SCRIPT_NAME] Setting up NFS"
 apk add nfs-utils

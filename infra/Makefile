@@ -86,7 +86,7 @@ addnode:
 	case "${answer,,}" in
 		[y]|[yes])
 		    answer=""
-		    echo -n "[$SCRIPT_NAME] Node(s) user(s): " 
+		    echo -n "[$(SCRIPT_NAME)] Node(s) user(s): " 
 		    read -t 15 answer || true
 		    if [ ! -z "$answer" ]; then
 			chmod +x "${DIR}/add_node.sh"

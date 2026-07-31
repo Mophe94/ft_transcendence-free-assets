@@ -79,9 +79,17 @@ apk add tailscale
 rc-update add tailscale default
 service tailscale start
 
+echo "[${SCRIPT_NAME}] Configuring Docker startup dependency on Tailscale"
+mkdir -p /etc/conf.d
+if [ -f /etc/conf.d/docker ]; then
+    if ! grep -q 'rc_need="tailscale"' /etc/conf.d/docker; then
+        echo 'rc_need="tailscale"' | doas tee -a /etc/conf.d/docker >/dev/null
+    fi
+else
+    echo 'rc_need="tailscale"' | doas tee /etc/conf.d/docker >/dev/null
+fi
+
 echo "[$SCRIPT_NAME] Setting up Headscale"
-
-
 mkdir -p ${HEADSCALE_DIR}/{config,data}
 
 

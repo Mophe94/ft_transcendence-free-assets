@@ -42,14 +42,14 @@ doas tailscale up \
 
 TAILSCALE_IP=$(tailscale ip -4)
 
-docker swarm join \
-	--advertise-addr ${TAILSCALE_IP} \
-	--data-path-addr ${TAILSCALE_IP} \
-	--token ${JOIN_CMD} "${LEADER_TAILSCALE_IP}:2377"
-
-# Check install of NFS client
-if ! command -v mount.nfs >/dev/null 2>&1; then
-    doas apk add --no-cache nfs-utils
+if ! docker info 2>/dev/null | grep -q "Swarm: active"; then
+    docker swarm join \
+        --advertise-addr "${TAILSCALE_IP}" \
+        --data-path-addr "${TAILSCALE_IP}" \
+        --token "${JOIN_CMD}" \
+        "${LEADER_TAILSCALE_IP}:2377"
+else
+    echo "[INFO][$SCRIPT_NAME] Node already joined to swarm"
 fi
 
 # Check NFS connectivity
@@ -60,9 +60,9 @@ else
 fi
 
 # Adding certificates to docker
-doas mkdir -p /etc/docker/certs.d/${LEADER_IP}:5050
-doas cp /tmp/worker.crt /etc/docker/certs.d/${LEADER_IP}:5050/client.cert
-doas cp /tmp/worker.key /etc/docker/certs.d/${LEADER_IP}:5050/client.key
+doas mkdir -p /etc/docker/certs.d/${LEADER_TAILSCALE_IP}:5050
+doas cp /tmp/worker.crt /etc/docker/certs.d/${LEADER_TAILSCALE_IP}:5050/client.cert
+doas cp /tmp/worker.key /etc/docker/certs.d/${LEADER_TAILSCALE_IP}:5050/client.key
 
 doas rc-service docker restart
 COUNTER=0
@@ -79,11 +79,3 @@ while ! docker info >/dev/null 2>&1; do
 done
 
 echo "[INFO][$SCRIPT_NAME] Worker successfully configured."
-
-#echo "[$SCRIPT_NAME] Setting up leader SSH login"
-#SSH_KEY="/tmp/host_ssh_key"
-#mkdir -p "$USER/.ssh"
-#chmod 700 "/home/${USER}/.ssh"
-#cat "${SSH_KEY}" > "/home/${USER}/.ssh/authorized_keys" 
-#chmod 600 "/home/${USER}/.ssh/authorized_keys"
-#chown -R ${USER}:${USER} "/home/${USER}/.ssh"
