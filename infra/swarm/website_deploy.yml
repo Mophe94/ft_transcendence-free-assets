@@ -8,6 +8,7 @@ services:
           - VITE_USERS_SERVICE=https://${HOST_IP}:8443/users
           - VITE_CHAT_SERVICE=wss://${HOST_IP}:8443/chat
           - VITE_GAME_SERVICE=wss://${HOST_IP}:8443/game
+          - VITE_ROOM_SERVICE=https://${HOST_IP}:8443/rooms
           - VITE_LOBBY_SERVICE=wss://${HOST_IP}:8443/lobby
           - VITE_42_OAUTH_CLIENT_ID=u-s4t2ud-e487562dd07b366dee9b3b29a8fd298cbcc4c96048e03e72a17e2de8e5211d57
           - VITE_42_OAUTH_REDIRECT_URI=https://${HOST_IP}:8443/auth/callback
@@ -21,19 +22,6 @@ services:
         networks:
             - site_net
 
-#        configs:
-#          - source: load_secrets
-#            target: /load_secrets.sh
-#            mode: 0555
-
-#        entrypoint:
-#          - /load_secrets.sh
-
-        command:
-          - npm
-          - run
-          - dev
-
         deploy:
             replicas: 1
 #            placement:
@@ -42,23 +30,18 @@ services:
 
     chat_service:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/backend:latest
-#        env_file:
-#          - "site/BackEnd/.env"
-
         networks:
             - site_net
-
         secrets:
-          - db_game_db_name
-          - db_game_username
-          - db_game_password
-
+          - jwt_secret_key
+        volumes:
+          - ./backend:/app
+          - /app/node_modules
         command:
           - npm
           - run
           - start:dev
-          - game-service
-
+          - chat-service
         deploy:
             replicas: 1
  #           placement:
@@ -67,18 +50,14 @@ services:
 
     users_service:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/backend:latest
-#        env_file:
-#          - "site/BackEnd/.env"
-
         environment:
           - DB_USERS_HOST=users_db
           - FORTYTWO_API_TOKENEXCHANGE=http://nginx:420/fortytwoapi/oauth/token
-          - FORTYTWO_API_GETUSER=http://nginx:420/fortytwoapi/v2/me
+          - FORTYTWO_API=http://nginx:420/fortytwoapi/v2
           - FORTYTWO_REDIRECT_URI=https://${HOST_IP}:8443/auth/callback
 
         networks:
             - site_net
-
         secrets:
           - db_users_db_name
           - db_users_username
@@ -86,13 +65,11 @@ services:
           - fortytwo_client_id
           - fortytwo_client_secret
           - jwt_secret_key
-
         command:
           - npm
           - run
           - start:dev
           - account-service
-
         deploy:
             replicas: 1
 #            placement:

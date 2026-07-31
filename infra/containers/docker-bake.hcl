@@ -20,7 +20,7 @@ group "website" {
 }
 
 group "game" {
-    targets = ["game"]
+    targets = ["game", "redis"]
 }
 
 target "alpine-base" {
@@ -72,6 +72,12 @@ target "game" {
 	    : "docker-image://${REGISTRY}/node-base:${TAG}")
     }
     tags        = ["${REGISTRY}/game:${TAG}"]
+}
+
+target "redis" {
+    context     = "${BAKE_ROOT}/../../redis"
+    dockerfile  = "Dockerfile"
+    tags        = ["${REGISTRY}/redis:${TAG}"]
 }
 
 target "users_db" {

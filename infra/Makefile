@@ -13,7 +13,7 @@ REG_PORT?=5050
 REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
 TAG ?= latest
 BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) REGISTRY=$(REGISTRY) TAG=$(TAG)
-DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) REGISTRY_PORT=$(REG_PORT) 
+DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) 
 USER_NAME="$(USER)"
 TYPE:=""
 TARGET=""
@@ -80,7 +80,7 @@ swarm-status:
 	    echo "Swarm status: inactive"; \
 	fi
 
-addnote:
+addnode:
 	echo -n "[$SCRIPT_NAME] Do you want to add more node (y/N): " 
 	read -t 15 answer || true
 	case "${answer,,}" in
@@ -99,7 +99,7 @@ image:
 	@case "$(TARGET)" in \
 	    website) IMAGES="frontend backend ";; \
 	    databases) IMAGES="users_db game_db";; \
-	    game) IMAGES="game";; \
+	    game) IMAGES="game redis";; \
 	    *) echo "Unknown target $(TARGET)"; exit 1;; \
 	esac; \
 	MISSING=0; \
@@ -134,4 +134,4 @@ wait_tailscale:
 	    fi; \
 	done
 
-PHONY: all node_launch swarm_setup push test core website game observ up down swarm-status image wait_tailscale
+PHONY: all node_launch swarm_setup swarm_status push test core website game observ up down swarm-status image wait_tailscale

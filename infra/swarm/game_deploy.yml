@@ -6,35 +6,24 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/07/29 12:56:03 by stempels         ###   ########.fr        #
+#    Updated: 2026/07/31 10:29:51 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 services:
     game_service:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/backend:latest
-#        env_file:
-#          - "site/BackEnd/.env"
 
         networks:
             - games_net
 
-#        configs:
-#          - source: load_secrets
-#            target: /load_secrets.sh
-#            mode: 0555
-
         environment:
           - DB_GAME_HOST=game_db
-#          - FRONT_END_URL=http://localhost:5173/
 
         secrets:
           - db_game_db_name
           - db_game_username
           - db_game_password
-
-#        entrypoint:
-#          - /load_secrets.sh
 
         command:
           - npm
@@ -46,7 +35,12 @@ services:
             replicas: 1
 
     redis:
-        image:
+        image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/redis:latest
+        secrets:
+         - redis_password 
+        networks:
+            - games_net
+
 
     game:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/game:latest
@@ -112,4 +106,6 @@ secrets:
   db_game_password:
     external: true
   db_game_postgres_password:
+    external: true
+  redis_password:
     external: true
