@@ -1,4 +1,8 @@
-res://Scene/Capture/capture.tscn
+res://Script/World/Collectible/CollectibleSpot.gd
+res://Script/World/world_01.gd
+res://Script/Timer/timer.gd
+res://Script/PlayerCharacter/character_body_2d.gd
+res://Scene/World01/world_01.tscn
 res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueSpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/DinoYellow/dinoYellowSpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/DinoGreen/dinoGreenSpriteSheet.tres
@@ -9,4 +13,7 @@ res://Scene/PlayerCharacter/Skin/Ghost03/ghost03SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr01/satyr01SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr02/satyr02SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr03/satyr03SpriteSheet.tres
-res://Script/Capture/Menus/capture_menus.gd
+res://Scene/World01/Tree/tree.tres
+res://Scene/World01/Tree/tree3.tres
+res://Scene/Wait/wait.tscn
+res://Script/Combat/Menus/combat_menus_script.gd

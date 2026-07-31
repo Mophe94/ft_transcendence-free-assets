@@ -23,12 +23,12 @@ func _ready():
 	item_popup.visible = false
 	detection.area_entered.connect(_on_area_entered)
 	detection.area_exited.connect(_on_area_exited)
-#	Received.item_received.connect(_on_item_received)
+	Received.item_received.connect(_on_item_received)
 
 
 func apply_skin(skin: SkinData) -> void:
 	if skin == null:
-		push_warning("Aucune skin valide à appliquer.")
+#		push_warning("Aucune skin valide à appliquer.")
 		return
 	sprite.sprite_frames = skin.sprite_frames
 	sprite.scale = skin.scale
@@ -45,7 +45,7 @@ func _on_area_entered(area: Area2D) -> void:
 
 	var spot = _resolve_interactable(area)
 	if spot == null:
-		push_warning("%s est dans le groupe trigger_zone mais n'a pas de méthode interact() (ni lui, ni son parent)" % area.name)
+#		push_warning("%s est dans le groupe trigger_zone mais n'a pas de méthode interact() (ni lui, ni son parent)" % area.name)
 		return
 
 	active_zones.append(area)
@@ -102,9 +102,9 @@ func _physics_process(_delta: float) -> void:
 		sprite.play("idle")
 		return
 
-#	if Input.is_action_just_pressed("ui_selec"):
+	if Input.is_action_just_pressed("ui_selec"):
 #		GeneralData.current_item = "rage"
-#		_on_item_received()
+		_on_item_received()
 
 	if Input.is_action_just_pressed("action"):
 		var spot = get_current_interactable()
@@ -143,13 +143,13 @@ func teleport_to(target_position: Vector2) -> void:
 # Popup d'item
 # ---------------------------------------------------------------------------
 
-#func _on_item_received():
-#	var item_name = GeneralData.current_item
-#	if not GeneralData.object_database.has(item_name):
+func _on_item_received():
+	var item_name = GeneralData.current_item
+	if not GeneralData.object_database.has(item_name):
 #		print("Objet inconnu reçu : " + item_name)
-#		return
-#	item_icon.texture = GeneralData.object_database[item_name]
-#	_play_item_popup_animation()
+		return
+	item_icon.texture = GeneralData.object_database[item_name]
+	_play_item_popup_animation()
 
 
 func _play_item_popup_animation() -> void:

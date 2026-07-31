@@ -22,7 +22,7 @@ func transi_close():
 #	transi_scene.queue_free()
 
 func _team_set_up_received():
-	_stop_player()  
+	_stop_player()
 	await transi_close()
 	get_tree().change_scene_to_packed(GeneralData.team_setup_scene)
 
