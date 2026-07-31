@@ -273,7 +273,7 @@ export class GameService implements OnModuleInit {
       for (i; result > gap && i < table_monster.length - 1; ++i)
         gap += step
       player.current_monster = table_monster[i]
-      player.current_monster_rarity = "uncommun"
+      player.current_monster_rarity = "uncommon"
     }
     else {
       result = Math.floor(Math.random() * 100);
@@ -285,7 +285,7 @@ export class GameService implements OnModuleInit {
       for (i; result > gap && i < table_monster.length - 1; ++i)
         gap += step
       player.current_monster = table_monster[i]
-      player.current_monster_rarity = "commmun"
+      player.current_monster_rarity = "common"
     }
     
     return this.new_encounter(player);
@@ -314,8 +314,12 @@ export class GameService implements OnModuleInit {
       result = Math.floor(Math.random() * 101);
   
     let monsterCatch: number = 0
+    console.log("MonsterCatch1: ", monsterCatch);
+    console.log("Monster Rarity:", player.current_monster_rarity);
     monsterCatch = table_encounter[player.current_monster_rarity as keyof typeof table_encounter]
+    console.log("MonsterCatch2: ", monsterCatch);
     if (monsterCatch !== undefined) {
+      console.log("MonsterCatch3: ", monsterCatch);
       if (result <= monsterCatch) {
           for (let i = 0; i < player.team.length; ++i) {
               if (player.team[i] === '') {
@@ -374,7 +378,6 @@ export class GameService implements OnModuleInit {
 
     for (const {name, slot} of monstersToLoad) {
       const monster = await this.monstersService.findOneByName(name, { skills: true });
-      console.log("Monsters choice: ", monsters);
       if (!monster) return {
         event: 'game',
         data: { state: 'team_choice', reason: 'invalid_monster', monster: name },
@@ -407,36 +410,50 @@ export class GameService implements OnModuleInit {
         }))
       };
     }
-    console.log("Monsters choice: ", monsters);
-    console.log("Monsters to load: ", monstersToLoad);
     await new Promise(resolve => setTimeout(resolve, 500)); // ! temp fix to synchronizeke with startCombatTimer
     return this.combat(player);
   }
 
 
   // RECEIVED REQUEST FOR ITEM, CALL DB GAME + CHOICE ONE RANDOM ITEM AND RETURN THIS
-  private received_request_item(player: Player){
-    let item = 'golden ticket';
-    //demande object existant +++++ item = name of item select
-    player.current_item = item
+   private async received_request_item(player: Player){
+    let items = await this.itemsService.findAll();
+    if (!items) {
+      console.log('[ERROR]: items is undefined')
+      return undefined
+    }
+
+    let result = Math.floor(Math.random() * 100);
+    let gap = Math.floor(100 / items.length)
+    let step = gap
+    let i = 0
+    for (i; result > gap && i < items.length - 1; ++i)
+      gap += step
+    player.current_item = items[i].name;
+    let add = false;
+    for (let i = 0; i < player.inventory.length; ++i){
+      if (player.inventory[i]["name"] === player.current_item) {
+        player.inventory[i]["current"] += 1;
+        add = true;
+      }
+    }
+    if (add === false) {
+      for (let i = 0; i < player.inventory.length; i++) {
+        if (player.inventory[i]["name"] === ""){
+          player.inventory[i]["name"] = player.current_item;
+          player.inventory[i]["scene"] = items[i].scene;
+          player.inventory[i]["current"] += 1;
+          player.inventory[i]["value"] = items[i].value;
+          player.inventory[i]["target"] = items[i].target;
+          break;
+        }
+     }
+    }
     return this.new_current_item(player);
   }
 
   // ADD ITEM + RETURN UPDATE_ITEM
   private received_add_item(player: Player){
-    for (let i = 0; i < player.inventory.length; ++i){
-      if (player.inventory[i]["name"] === ""){
-        player.inventory[i]["name"] = player.current_item;
-        player.inventory[i]["scene"] = 'map';
-        player.inventory[i]["current"] += 1;
-        //call pour scene et value et target
-        break;
-      }
-      else if (player.inventory[i]["name"] === player.current_item){
-        player.inventory[i]["current"] += 1;
-        break;
-      }
-    }
     player.current_item = "";
     return this.update_inventory(player);
   }

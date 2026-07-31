@@ -18,5 +18,9 @@ export class Item {
     name: 'target',
     nullable: true,
   })
+
+  @Column()
+  scene!: string;
+
   target!: MonsterStat;
 }

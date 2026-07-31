@@ -10,7 +10,7 @@ export const FULL = 2;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 50,
+  map: 120,
   team_setup: 20,
   choose_monster: 30, // happend only if a monster die -> before choose action phase
   choose_action: 30,

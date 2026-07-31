@@ -150,7 +150,8 @@ CREATE TABLE public.items (
     name character varying(30) CONSTRAINT items_name_not_null NOT NULL,
     type public.object_type_enum CONSTRAINT items_type_not_null NOT NULL,
     value integer CONSTRAINT items_value_not_null NOT NULL,
-    target public.monster_stat_enum
+    target public.monster_stat_enum,
+    scene character varying(30) CONSTRAINT items_scene_not_null NOT NULL
 );
 
 
@@ -358,11 +359,11 @@ ALTER TABLE public.tiles_monsters OWNER TO postgres;
 -- Data for Name: items; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.items (id, name, type, value, target) FROM stdin;
-1	potion	heal	50	\N
-2	bomb	damage	50	\N
-3	lucky clover	capture	100	\N
-4	rage	stat_up	20	attack
+COPY public.items (id, name, type, value, target, scene) FROM stdin;
+1	potion	heal	50	\N	combat
+2	bomb	damage	50	\N	combat
+3	golden ticket	capture	100	\N	map
+4	rage	stat_up	20	attack	combat
 \.
 
 
