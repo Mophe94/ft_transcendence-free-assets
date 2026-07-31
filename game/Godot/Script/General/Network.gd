@@ -17,7 +17,6 @@ var sceneLaunch = false
 
 func connect_server():
 	#CONNECT AND SEND TOKEN
-	print("Try to connect server")
 	var url = "wss://" + domain + "/game?token=" + user + "&room=" + room
 	print("url : " + url)
 	var err = ws.connect_to_url(url)

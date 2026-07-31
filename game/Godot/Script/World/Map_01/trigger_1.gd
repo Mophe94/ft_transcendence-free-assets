@@ -25,7 +25,6 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _new_encounter():
-	print("new encounter function call")
 	GeneralData.tile = "grass"
 	GeneralData.background_capture = "plains_day"
 	var send_func = func():

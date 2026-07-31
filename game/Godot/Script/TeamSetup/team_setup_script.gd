@@ -59,7 +59,7 @@ func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
 	await transi_scene.get_node("CanvasLayer/ColorRect").close()
-	transi_scene.queue_free()
+#	transi_scene.queue_free()
 
 func _ready() -> void:
 	$Timer.time_finish.connect(_signal_timer)
@@ -69,7 +69,6 @@ func _ready() -> void:
 	await instanciate_monster_enemy()
 
 func _signal_timer():
-	print("signal timer received ===> scene team_setup : go to combat")
 	$Timer.send = true
 	$CurrentTeam.process_mode = Node.PROCESS_MODE_DISABLED
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED
@@ -79,6 +78,7 @@ func _signal_timer():
 	var success = await GeneralProcess.wait_signal(send_func, Received.combat_scene)
 
 	$Timer.send = false
+	transi_close()
 	if success:
 		get_tree().change_scene_to_packed(GeneralData.combat_scene)
 	else:

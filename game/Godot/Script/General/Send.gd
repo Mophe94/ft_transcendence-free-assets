@@ -59,7 +59,7 @@ func send_mesage(event, value = null):
 		print("-------- MSG SEND --------  :\n", JSON.stringify(packet))
 		Network.ws.send_text(JSON.stringify(packet))
 	else:
-		print("-------- WEBSOCKET CLOSE--------  ")
+		print("-------- WEBSOCKET CLOSE--------  :\n", JSON.stringify(packet))
 
 
 func _use_item_combat(packet, item):

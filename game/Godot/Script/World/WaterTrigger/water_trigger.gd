@@ -19,7 +19,6 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _new_encounter():
-	print("signal timer received new encounter")
 	GeneralData.tile = "water"
 	GeneralData.background_capture = "beach"
 	var send_func = func():
@@ -68,7 +67,6 @@ func _on_fishing_completed() -> void:
 
 func _on_fishing_failed() -> void:
 	fishing_started = false
-	print("pêche ratée")
 	await disappear()
 
 

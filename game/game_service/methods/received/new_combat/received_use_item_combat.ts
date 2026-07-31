@@ -57,7 +57,7 @@ export function received_use_item_combat(player: Player, enemy: Player, item: st
 					break;
 				default:
 					player.text = player.name + " pass for this turn."
-					return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+					return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 			}
 			player.text = player.name + " use " + item + " on " + enemy.currentMonster.name + ", " + current_item.target + " stat down."
 			break;
@@ -81,7 +81,7 @@ export function received_use_item_combat(player: Player, enemy: Player, item: st
 					break;
 				default:
 					player.text = player.name + " pass for this turn."
-					return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+					return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 			}
 			player.text = player.name + " use " + item + " on " + player.currentMonster.name + ", " + current_item.target + " stat up."
 			break;
@@ -98,5 +98,5 @@ export function received_use_item_combat(player: Player, enemy: Player, item: st
 			current_item["type"] = ""
 			current_item["value"] = 0
 		}
-		return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+		return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 }

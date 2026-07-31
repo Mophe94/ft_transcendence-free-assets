@@ -32,12 +32,12 @@ function resolve_first(player1: Player, player2: Player, actionPlayer1: PlayerAc
         return actionPlayer1.actionType === "pass" ? player1 : player2
     }
 
-    if (actionPlayer1.actionType === "change_monster" || actionPlayer2.actionType === "change_monster"){
-        return actionPlayer1.actionType === "change_monster" ? player1 : player2
+    if (actionPlayer1.actionType === "change_current_monster" || actionPlayer2.actionType === "change_current_monster"){
+        return actionPlayer1.actionType === "change_current_monster" ? player1 : player2
     }
 
-    if (actionPlayer1.actionType === "use_item" || actionPlayer2.actionType === "use_item"){
-        return actionPlayer1.actionType === "use_item" ? player1 : player2
+    if (actionPlayer1.actionType === "use_item_combat" || actionPlayer2.actionType === "use_item_combat"){
+        return actionPlayer1.actionType === "use_item_combat" ? player1 : player2
     }
 
     return player1
@@ -48,9 +48,9 @@ function handle_action(player: Player, enemy: Player, actionPlayer: PlayerAction
     switch (actionPlayer.actionType) {
         case "try_attack":
             return received_try_attack(player, enemy, actionPlayer.data?.skill, order)
-        case "use_item":
+        case "use_item_combat":
             return received_use_item_combat(player, enemy, actionPlayer.data?.item, order)
-        case "change_monster":
+        case "change_current_monster":
             return received_change_current_monster(player, actionPlayer.data?.slot, order)
         case "pass":
             return received_pass(player, order)
@@ -64,7 +64,7 @@ export function resolving_battle_round(player1: Player, player2: Player, action:
     const actionPlayer2 = action[player2.id];
 
     let first: Player = resolve_first(player1, player2, actionPlayer1, actionPlayer2)
-    let second: Player = player1 ? player2 : player1
+    let second: Player = first ? player2 : player1
 
     let first_action = handle_action(first, second, action[first.id], 1)
     if (second.currentMonster.life.current <= 0) {

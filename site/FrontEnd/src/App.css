@@ -1,6 +1,0 @@
-.app-layout {
-	display: flex;
-	flex-direction: column;
-	width: 1fr;
-	min-height: 100vh;
-}

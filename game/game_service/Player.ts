@@ -292,7 +292,7 @@ export class Player {
 	timer: number = 0
 	current_map: string = ""
 	current_monster: string = ""
-	current_monster_catch: number = 0
+	current_monster_rarity: string = ""
 	current_item: string  = ""
 	text: string = ""
 

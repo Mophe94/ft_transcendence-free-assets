@@ -27,6 +27,7 @@ var enemy_monster_base_scale: Vector2
 
 @onready var assetEnemy = GeneralData.player_enemy_scene
 @onready var assetPlayer = GeneralData.player_charactere_scene
+@onready var skip_intro = false
 
 @onready var combatBanner = $CombatBanner
 @onready var playerUI = $PlayerMonsterUI/CenterContainer/HBoxContainer
@@ -97,6 +98,7 @@ func generate_asset():
 
 
 func generate_banner():
+	$CombatBanner.show()
 	combatBanner.modulate.a = 0.0
 	await get_tree().create_timer(0.5).timeout
 	var tween = create_tween()
@@ -114,7 +116,9 @@ func start_intro():
 	$PlayerMonsterUI.hide()
 	$EnemyMonsterUI.hide()
 	await generate_asset()
-	await generate_banner()
+	if skip_intro == false:
+		transi_open()
+		await generate_banner()
 	
 func show_UI_player():
 	if GeneralData.player["currentMonster"]["name"] == "":
@@ -167,18 +171,18 @@ func transi_open():
 	transi_scene.queue_free()
 
 func _ready() -> void:
+	$CombatBanner.hide()
 	$CombatMenus.change_current_monster.connect(_new_current_monster)
 	$CombatMenus.change_enemy_monster.connect(_new_enemy_monster)
 	$Timer.time_finish.connect(_time_finish)
 	_capture_battle_ratios()
 	_update_battle_positions()
 	get_viewport().size_changed.connect(_update_battle_positions)
-	transi_open()
 	await start_intro()
 	show_UI()
 
 func _time_finish():
-	print("timer signal received combat: go to new turn")
 	$Timer.send = true
+	skip_intro = true
 	await Received.new_turn
 	$Timer.send = false

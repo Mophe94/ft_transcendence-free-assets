@@ -19,5 +19,5 @@ export function received_change_current_monster(player: Player, slot: number, or
 	else
 		player.text = player.name + " fail to change " + temp
 
-	return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+	return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 }

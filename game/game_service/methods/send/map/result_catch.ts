@@ -1,19 +1,28 @@
 import type { Player } from "../../../Player";
-import { update_team } from "./update_team";
 
-export function result_catch(player: Player, result: number) {
-    return {
+export function result_catch(player: Player, result: number, monsterFlee?: number) {
+    let success: number = 0
+	let msg = {
         event: "game",
         data: {
             state: "result_catch",
-            success: result !== 0
-                ? "ok"
-                : "fail",
+            success: "",
             player: {
-				team: result !== 0
-                	? player.team
-                	: undefined
-			}
+				team: result !== 0 ? player.team : undefined
+			},
         }
     };
+
+	if (result == 1){
+		msg.data.success = "ok"
+		return msg
+	}
+	else{
+		let flee = Math.floor(Math.random() * 101);
+		if (flee < 50)
+			msg.data.success = "flee"
+		else
+			msg.data.success = "fail"
+		return msg
+	}
 }

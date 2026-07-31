@@ -1,7 +1,6 @@
 import { Player } from "../../../Player";
 import { CurrentMonster, Skill } from "../../../type/interfaces";
 import { action_battle } from "../../send/new_combat/action_battle";
-import { received_pass } from "./received_pass";
 
 const typeChart: Record<string, Record<string, number>> = {
 	"fire":  { "plant": 2, "water": 0.5, "neutral": 1, "earth": 1 },
@@ -17,11 +16,11 @@ export function	received_try_attack(player: Player, enemy: Player, skillName: st
 	if (enemy == null || enemy.currentMonster == null || skill == null || skill.current <= 0){
 		if (skill == null){
 			player.text = player.name + " pass for this turn."
-			return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+			return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 		}
 		else{
 			player.text = player.currentMonster.name + " fail to use " + skillName
-			return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+			return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 		}
 	}
 
@@ -45,7 +44,7 @@ export function	received_try_attack(player: Player, enemy: Player, skillName: st
 					if (attackSuccess === false){
 						if (skill.repetition === 1){
 							player.text = enemy.currentMonster.name + " dodge " + skillName + "."
-							return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+							return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 						}
 						else
 							continue
@@ -90,7 +89,7 @@ export function	received_try_attack(player: Player, enemy: Player, skillName: st
 				
 				default:
 					player.text = player.name + " pass for this turn."
-					return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+					return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 			}
 			player.text = player.currentMonster.name + " use " + skillName + " and up his " + target_up;
 			break;
@@ -140,7 +139,7 @@ export function	received_try_attack(player: Player, enemy: Player, skillName: st
 
 				default:
 					player.text = player.name + " pass for this turn."
-					return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+					return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 			}
 			break;
 		
@@ -151,9 +150,9 @@ export function	received_try_attack(player: Player, enemy: Player, skillName: st
 
 		default:
 			player.text = player.name + " pass for this turn."
-			return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+			return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 	}
-	return order === 1 ? action_battle(player, 1) : action_battle(player, 2)
+	return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 }
 
 

@@ -2,16 +2,16 @@ extends Node2D
 
 func _stop_player():
 	GeneralData.position_player = $Player/CharacterBody2D.global_position
-	$Player/CharacterBody2D.process_mode = Node.PROCESS_MODE_DISABLED
+	$Player/CharacterBody2D.control = false
 	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED
 	$CanvasLayer/Inventory_UI.hide()
 
 func _stop_inventory():
-	$Player/CharacterBody2D.process_mode = Node.PROCESS_MODE_DISABLED
+	$Player/CharacterBody2D.control = false
 	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED
 
 func _run_inventory():
-	$Player/CharacterBody2D.process_mode = Node.PROCESS_MODE_ALWAYS
+	$Player/CharacterBody2D.control = true
 	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_ALWAYS
 
 #####################################
@@ -19,21 +19,15 @@ func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
 	await transi_scene.get_node("CanvasLayer/ColorRect").close()
-	transi_scene.queue_free()
+#	transi_scene.queue_free()
 
 func _team_set_up_received():
-	print("signal timer received ===> scene map_01 : go to team setup")
-	$Player.process_mode = Node.PROCESS_MODE_DISABLED
-	$CanvasLayer/Inventory_UI.hide()
-	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED  
+	_stop_player()  
 	await transi_close()
 	get_tree().change_scene_to_packed(GeneralData.team_setup_scene)
 
 func _signal_timer():
-	print("signal timer received ===> scene map_01 : go to team setup")
-	$Player.process_mode = Node.PROCESS_MODE_DISABLED
-	$CanvasLayer/Inventory_UI.hide()
-	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED      
+	_stop_player()     
 	$Timer.send = true
 	
 	var send_func = func():
@@ -76,7 +70,7 @@ func _close_game():
 func activate_random_collectibles() -> void:
 	var collectibles = get_tree().get_nodes_in_group("collectible")
 	collectibles.shuffle()
-	var half = collectibles.size() / 2
+	var half = int(collectibles.size() / 2)
 	for i in range(half):
 		collectibles[i].set_interactable(true)
 	
@@ -114,15 +108,15 @@ func activate_random_fishing_spots() -> void:
 		spots[i].set_interactable(true)
 		
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed:
-		var space_state = get_world_2d().direct_space_state
-		var query = PhysicsPointQueryParameters2D.new()
-		query.position = get_global_mouse_position()
-		query.collide_with_areas = true
-		query.collide_with_bodies = true
-		var result = space_state.intersect_point(query)
-		if result.is_empty():
-			print("Rien détecté à cet endroit")
-		for r in result:
-			print("Trouvé : ", r.collider.name, " -> chemin : ", r.collider.get_path())
+#func _unhandled_input(event: InputEvent) -> void:
+#	if event is InputEventMouseButton and event.pressed:
+#		var space_state = get_world_2d().direct_space_state
+#		var query = PhysicsPointQueryParameters2D.new()
+#		query.position = get_global_mouse_position()
+#		query.collide_with_areas = true
+#		query.collide_with_bodies = true
+#		var result = space_state.intersect_point(query)
+#		if result.is_empty():
+#			print("Rien détecté à cet endroit")
+#		for r in result:
+#			print("Trouvé : ", r.collider.name, " -> chemin : ", r.collider.get_path())

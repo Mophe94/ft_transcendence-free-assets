@@ -22,7 +22,6 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _delete_monster(monster):
-	print("delete monster send")
 	var send_func = func():
 		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.DELETE_MONSTER], monster)
 	var success = await GeneralProcess.wait_signal(send_func, Received.update_team)
@@ -32,7 +31,6 @@ func _delete_monster(monster):
 		get_tree().change_scene_to_packed(GeneralData.wait)
 		
 func _delete_item(object):
-	print("delete item send")
 	var send_func = func():
 		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.DELETE_ITEM], object)
 	var success = await GeneralProcess.wait_signal(send_func, Received.update_inventory)

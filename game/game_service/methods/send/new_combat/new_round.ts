@@ -1,11 +1,11 @@
 import { Player } from "../../../Player";
 
-export function new_round(){
+export function new_round(player: Player){
         return {
         event: "game",
         data: {
             state: "new_round",
-            timer: 0
+            timer: player.timer
         }
     }
 }

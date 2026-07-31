@@ -31,7 +31,6 @@ func handle_message_receive(msg):
 	
 	#SEARCH STATE OF MESSAGE
 	var data = msg["data"]
-	print("je suis arriver jusque data")
 	if data.has("state"):
 		var state = data["state"]
 		match state:
@@ -77,31 +76,30 @@ func _next_map(data):
 
 
 func _new_turn(data):
-	if not data.has("timer"):
-		return
-	GeneralData.timer = data["timer"]
-	emit_signal("new_turn")
+	if data.has("timer"):
+		GeneralData.timer = data["timer"]
+		emit_signal("new_turn")
 
 func _action_battle(data):
 	var player = null
-	if not data.has("player"):
+	if data.has("player"):
 		player = data["player"]
 
 	if player.has("currentMonster"):
 		var cMonsterPlayer = player["currentMonster"]
 		GeneralData.player["currentMonster"]["name"] = cMonsterPlayer["name"]
-		GeneralData.player["currentMonster"]["slot"] = cMonsterPlayer["slot"]
+		GeneralData.player["currentMonster"]["slot"] = int(cMonsterPlayer["slot"])
 
 		if cMonsterPlayer.has("life"):
-			GeneralData.player["currentMonster"]["life"]["current"] = cMonsterPlayer["life"]["current"]
-			GeneralData.player["currentMonster"]["life"]["max"] = cMonsterPlayer["life"]
+			GeneralData.player["currentMonster"]["life"]["current"] = int(cMonsterPlayer["life"]["current"])
+			GeneralData.player["currentMonster"]["life"]["max"] = int(cMonsterPlayer["life"]["max"])
 
 		if cMonsterPlayer.has("skill"):
 			for i in range(cMonsterPlayer["skill"].size()):
 				var monsterSkill = cMonsterPlayer["skill"][i]
-				GeneralData.player["currentMonster"]["skill"][i]["name"] = monsterSkill["name"]
-				GeneralData.player["currentMonster"]["skill"][i]["current"] = monsterSkill["current"]
-				GeneralData.player["currentMonster"]["skill"][i]["max"] = monsterSkill["max"]
+				GeneralData.player["currentMonster"]["skill"][i]["name"] = int(monsterSkill["name"])
+				GeneralData.player["currentMonster"]["skill"][i]["current"] = int(monsterSkill["current"])
+				GeneralData.player["currentMonster"]["skill"][i]["max"] = int(monsterSkill["max"])
 
 		if cMonsterPlayer.has("status"):
 			var status = cMonsterPlayer["status"]
@@ -113,15 +111,15 @@ func _action_battle(data):
 		for i in range(team.size()):
 			var monster = player["battle_team"][i]
 			GeneralData.monster["name"] = team["name"]
-			GeneralData.monster["slot"] = team["slot"]
-			GeneralData.monster["life"]["current"] = monster["life"]["current"]
-			GeneralData.monster["life"]["max"] = team[i]["life"]["max"]
+			GeneralData.monster["slot"] = int(team["slot"])
+			GeneralData.monster["life"]["current"] = int(monster["life"]["current"])
+			GeneralData.monster["life"]["max"] = int(team[i]["life"]["max"])
 	
 	if player.has("inventory"):
 		for i in range(player["inventory"].size()):
 			GeneralData.player["inventory"][i]["name"] = player["inventory"][i]["name"]
 			GeneralData.player["inventory"][i]["scene"] = player["inventory"][i]["scene"]
-			GeneralData.player["inventory"][i]["current"] = player["inventory"][i]["current"]
+			GeneralData.player["inventory"][i]["current"] = int(player["inventory"][i]["current"])
 	
 	var enemy = data["enemy"]
 	if enemy.has("currentMonster"):
@@ -129,8 +127,8 @@ func _action_battle(data):
 		GeneralData.enemy["currentMonster"]["name"] = cMonster["name"]
 
 		if cMonster.has("life"):
-			GeneralData.enemy["currentMonster"]["life"]["current"] = cMonster["life"]["current"]
-			GeneralData.enemy["currentMonster"]["life"]["max"] = cMonster["life"]
+			GeneralData.enemy["currentMonster"]["life"]["current"] = int(cMonster["life"]["current"])
+			GeneralData.enemy["currentMonster"]["life"]["max"] = int(cMonster["life"])
 	
 		if cMonster.has("status"):
 			var status = cMonster["status"]
@@ -154,11 +152,9 @@ func _combat(data):
 				print("voila le pq numero " + str(i) + " :")
 				print(team)
 				GeneralData.player["battle_team"][i]["name"] = team["name"]
-				GeneralData.player["battle_team"][i]["slot"] = team["slot"]
-				GeneralData.player["battle_team"][i]["life"]["current"] = team["life"]["current"]
-				GeneralData.player["battle_team"][i]["life"]["max"] = team["life"]["max"]
-	print("message ok est passer !!!!!!!!!!!!!!!!!!!!!")
-	print(GeneralData.player["battle_team"])
+				GeneralData.player["battle_team"][i]["slot"] = int(team["slot"])
+				GeneralData.player["battle_team"][i]["life"]["current"] = int(team["life"]["current"])
+				GeneralData.player["battle_team"][i]["life"]["max"] = int(team["life"]["max"])
 	emit_signal("combat_scene")
 
 
@@ -210,7 +206,7 @@ func _update_inventory(data):
 		for i in range(player["inventory"].size()):
 			GeneralData.player["inventory"][i]["name"] = player["inventory"][i]["name"]
 			GeneralData.player["inventory"][i]["scene"] = player["inventory"][i]["scene"]
-			GeneralData.player["inventory"][i]["current"] = player["inventory"][i]["current"]
+			GeneralData.player["inventory"][i]["current"] = int(player["inventory"][i]["current"])
 		emit_signal("update_inventory")
 
 
@@ -219,11 +215,13 @@ func _result_catch(data):
 		match data["success"]:
 			"ok":
 				_update_team(data)
-				emit_signal("catch_result", 1)
+				emit_signal("catch_result", 0)
 			"fail":
-				emit_signal("catch_result", 0)
+				emit_signal("catch_result", 1)
+			"flee":
+				emit_signal("catch_result", 2)
 			_:
-				emit_signal("catch_result", 0)
+				emit_signal("catch_result", 1)
 
 
 func _new_encounter(data):

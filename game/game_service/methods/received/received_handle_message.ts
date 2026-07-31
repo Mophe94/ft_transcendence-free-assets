@@ -10,10 +10,11 @@ import { received_request_item } from "./map/received_request_item";
 import { received_try_catch } from "./map/received_try_catch";
 import { received_use_item } from "./map/received_use_item";
 import { resolving_battle_round } from "./new_combat/resolving_battle_round";
+import { action_battle } from "../send/new_combat/action_battle";
 
 export interface PlayerActions {
     [playerId: number]: {
-        actionType: "try_attack" | "use_item" | "change_monster" | "pass";
+        actionType: "try_attack" | "use_item_combat" | "change_current_monster" | "pass";
         data: any;
     }
 }
@@ -21,7 +22,7 @@ export interface PlayerActions {
 export let currentActions: PlayerActions = {};
 
 export function handle_message(player: Player, enemy: Player, msg: any){
-	let result: object
+	let result: object | undefined
 	const state = msg?.data?.state
 	switch (state) {
 		case "add_item":
@@ -62,16 +63,14 @@ export function handle_message(player: Player, enemy: Player, msg: any){
             };
 			if (currentActions[player.id] && currentActions[enemy.id]) {
                 result = resolving_battle_round(player, enemy, currentActions);
-                // result contient les message de retour + voir si current monster mort chez l'un des deux
 				delete currentActions[player.id];
                 delete currentActions[enemy.id];
             }
-//			else
-//				player.send({ status: "waiting_for_opponent" });
 			break;
 		
 		default:
 			console.log("Unknow state:", msg.data.state)
 			return
 	}
+	return result
 }

@@ -88,7 +88,6 @@ func get_equipped_skin() -> SkinData:
 	for skin in available_skins:
 		if skin.skin_id == player["asset"]:
 			return skin
-	print("Skin introuvable, fallback on first skin disponible.")
 	return available_skins[0] if available_skins.size() > 0 else null
 
 func set_equipped_skin(skin_id: String) -> void:
@@ -98,7 +97,6 @@ func get_equipped_skin_enemy() -> SkinData:
 	for skin in available_skins:
 		if skin.skin_id == enemy["asset"]:
 			return skin
-	print("Skin introuvable, fallback sur le premier skin disponible.")
 	return available_skins[0] if available_skins.size() > 0 else null
 
 func get_item_current(item_name: String) -> int:
@@ -214,8 +212,8 @@ var enemy: Dictionary = {
 	"team": ["", "", "", "", "", ""],
 }
 
-const SPEED_TEXT = 0.03
-const WAIT_TEXT = 0.3
+const SPEED_TEXT = 0.02
+const WAIT_TEXT = 0.2
 
 var position_player = Vector2(4929.0, 1064.0)
 var player_speed = 0.0

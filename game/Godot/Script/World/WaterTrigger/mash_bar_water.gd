@@ -55,8 +55,6 @@ func start() -> void:
 	zone_start = randf_range(0.0, 1.0 - zone_width)
 	zone_end = zone_start + zone_width
 
-	print("ZONE :", zone_start, " -> ", zone_end)
-
 	cursor_pos = 0.0
 	direction = 1
 	time_left = time_limit
@@ -99,7 +97,6 @@ func _process(delta: float) -> void:
 
 
 	if can_validate and Input.is_action_just_pressed(action_name):
-		print("STOP CURSOR :", cursor_pos)
 
 		if cursor_pos >= zone_start and cursor_pos <= zone_end:
 			_on_success()

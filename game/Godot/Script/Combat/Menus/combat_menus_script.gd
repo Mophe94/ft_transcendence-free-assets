@@ -14,7 +14,6 @@ var SPEED_TEXT = GeneralData.SPEED_TEXT
 @onready var button = [$Button, $Button2, $Button3, $Button4]
 @onready var back_button = $Button5
 
-
 signal change_current_monster
 signal change_enemy_monster
 
@@ -248,7 +247,6 @@ func _back():
 func _on_button_action(action, object):
 	$Text.text = ""
 	$Text.hide()
-	print(action)
 	match action:
 		"monster":
 			_monster(object)

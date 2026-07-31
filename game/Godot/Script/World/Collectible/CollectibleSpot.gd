@@ -18,7 +18,6 @@ func transi_close()  :
 	transi_scene.queue_free()
 	
 func _request_item():
-	print("request item send")
 	var send_func = func():
 		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.REQUEST_ITEM])
 	var success = await GeneralProcess.wait_signal(send_func, Received.item_received)
@@ -28,7 +27,6 @@ func _request_item():
 		get_tree().change_scene_to_packed(GeneralData.wait)
 
 func _add_item():
-	print("add item send")
 	var send_func = func():
 		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.ADD_ITEM])
 	var success = await GeneralProcess.wait_signal(send_func, Received.update_inventory)

@@ -12,16 +12,16 @@ var AWAIT_TEXT = GeneralData.WAIT_TEXT
 signal try_catch
 signal catch_fail
 signal catch_ok
+signal monster_flee
 
 #############################
 func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
 	await transi_scene.get_node("CanvasLayer/ColorRect").close()
-	transi_scene.queue_free()
+#	transi_scene.queue_free()
 
 func _result_catch():
-	print("result catch send")
 	var send_func = func():
 		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TRY_CATCH])
 	var success = await GeneralProcess.wait_signal_return(send_func, Received.catch_result)
@@ -32,10 +32,9 @@ func _result_catch():
 		await transi_close()
 		get_tree().change_scene_to_packed(GeneralData.wait)
 
-func _result_item():
-	print("result use item")
+func _result_item(object):
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.USE_ITEM])
+		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.USE_ITEM], object)
 	var success = await GeneralProcess.wait_signal_return(send_func, Received.catch_result)
 
 	if success >= 0:
@@ -54,10 +53,9 @@ func text_show(new_text):
 		await get_tree().create_timer(SPEED_TEXT).timeout
 	await get_tree().create_timer(AWAIT_TEXT).timeout
 
-func hide_button(my_str):
+func hide_button():
 	for i in range(button.size()):
 		button[i].hide()
-	if my_str == "all":
 		back_button.hide()
 
 func set_menus_action():
@@ -85,7 +83,7 @@ func set_menus_back():
 	button[3].hide()
 
 func set_menus_flee_choice(object):
-	hide_button("all")
+	hide_button()
 	if object == "yes":
 		await text_show("you flee")
 		var tween = create_tween()
@@ -98,7 +96,7 @@ func set_menus_flee_choice(object):
 		_back()
 	
 func set_menus_flee():
-	hide_button("all")
+	hide_button()
 	await text_show("Are you sure you want to run away ?")
 	button[2].text = "YES"
 	button[2].action = "flee choice"
@@ -112,7 +110,7 @@ func set_menus_flee():
 	
 	
 func set_menus_capture():
-	hide_button("all")
+	hide_button()
 	var team = GeneralData.player["team"]
 	for i in range(team.size()):
 		if team[i] == "":
@@ -131,29 +129,44 @@ func set_menus_capture():
 	back_button.show()
 	
 func set_menus_catch(object):
+	hide_button()
 	if object == "yes":
-		hide_button("all")
 		emit_signal("try_catch")
 		await text_show("You try to catch " + GeneralData.monster_encounter)
 		var success = await _result_catch()
 		
-		if success:
-			if success > 0:
+		# Fonction work
+		if success >= 0:
+			# Catch success
+			if success == 0:
 				emit_signal("catch_ok")
 				await text_show("You success to capture " + GeneralData.monster_encounter + " !")
 				await transi_close()
 				get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
-			else:
+			# Cacth fail
+			elif success == 1:
 				emit_signal("catch_fail")
+				await text_show("You fail to capture " + GeneralData.monster_encounter)
 				_back()
+			# Catch fail + monster flee
+			else:
+				await text_show("You fail to capture " + GeneralData.monster_encounter)
+				emit_signal("monster_flee")
+				await text_show(GeneralData.monster_encounter + " flee")
+				await transi_close()
+				get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
+				
+		else:
+			await transi_close()
+			get_tree().change_scene_to_packed(GeneralData.wait)
 	else:
 		_back()
 
 func set_menus_use(object):
-	hide_button("all")
+	hide_button()
 	await text_show("You use " + object)
 	emit_signal("try_catch")
-	var success = await _result_catch()
+	var success = await _result_item(object)
 		
 	if success >= 0:
 		emit_signal("catch_ok")
@@ -166,7 +179,7 @@ func set_menus_use(object):
 		_back()
 
 func set_menus_items():
-	hide_button("all")
+	hide_button()
 	var j = 0
 	for i in range(4):
 		if inventory[i]["name"] != "" && inventory[i]["scene"] == "map" && inventory[i]["current"] != 0:

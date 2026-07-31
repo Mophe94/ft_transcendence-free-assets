@@ -21,7 +21,7 @@ GeneralData="*uid://diqen0fl03d16"
 Network="*uid://ce6nfhimh5tq7"
 Received="*uid://demuhc0cll03l"
 Send="*uid://2uq5lxxmapte"
-GeneralProcess="*uid://rkkyrchdk1cb"
+GeneralProcess="*res://Script/General/GeneralProcess.gd"
 
 [display]
 

@@ -14,6 +14,7 @@ extends Control
 @onready var assetPlayer = GeneralData.player["asset"]
 
 @onready var monsterAppearsBanner = $MonsterAppearsBanner
+@onready var skip_intro = false
 
 const REFERENCE_SIZE := Vector2(960, 640)
 @onready var player_ref: Node2D = $Player
@@ -27,7 +28,7 @@ func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
 	await transi_scene.get_node("CanvasLayer/ColorRect").close()
-	transi_scene.queue_free()
+#	transi_scene.queue_free()
 
 func _catch_fail():
 	for child in monster.get_children():
@@ -37,12 +38,19 @@ func _catch_fail():
 	monster.add_child(monster_scene)
 
 func _catch_ok():
-	capture_menus.hide_button("all")
+	capture_menus.hide_button()
 	for child in monster.get_children():
 		child.queue_free()
+		
+func _monster_flee():
+	capture_menus.hide_button()
+	for child in monster.get_children():
+		child.queue_free()
+	var monster_scene = monsterTab[nameMonster].instantiate()
+	monster.add_child(monster_scene)
 
 func _wait_catch_result():
-	capture_menus.hide_button("all")
+	capture_menus.hide_button()
 	for child in monster.get_children():
 		child.queue_free()
 	var portal_scene = portal.instantiate()
@@ -82,9 +90,11 @@ func start_intro():
 	$CaptureMenus.try_catch.connect(_wait_catch_result)
 	$CaptureMenus.catch_fail.connect(_catch_fail)
 	$CaptureMenus.catch_ok.connect(_catch_ok)
+	$CaptureMenus.monster_flee.connect(_monster_flee)
 	generate_asset()
-	transi_open()
-	await generate_banner()
+	if skip_intro == true:
+		transi_open()
+		await generate_banner()
 
 func _update_battle_positions() -> void:
 	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
@@ -110,24 +120,22 @@ func _ready() -> void:
 
 
 func _team_set_up_received():
-	print("signal team set up received ===> scene : capture")
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED
 	$CanvasLayer/Inventory_UI.hide()
-	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED  
+	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED 
 	await transi_close()
 	get_tree().change_scene_to_packed(GeneralData.team_setup_scene)
 
 
 func _signal_timer():
-	print("signal timer received ===> scene : capture")
 	$CaptureMenus.hide()
 	$CaptureMenus.process_mode = Node.PROCESS_MODE_DISABLED
 	$Timer.send = true
+	skip_intro = true
 	
 	var send_func = func():
 		null
 	var success = await GeneralProcess.wait_signal(send_func, Received.team_setup_scene)
-	print("Message transi team set up received ===> scene : world\nResult messsage : ", success)
 
 	await transi_close()
 	$Timer.send = false

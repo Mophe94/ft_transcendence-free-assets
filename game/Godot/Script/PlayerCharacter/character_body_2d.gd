@@ -23,7 +23,7 @@ func _ready():
 	item_popup.visible = false
 	detection.area_entered.connect(_on_area_entered)
 	detection.area_exited.connect(_on_area_exited)
-	Received.item_received.connect(_on_item_received)
+#	Received.item_received.connect(_on_item_received)
 
 
 func apply_skin(skin: SkinData) -> void:
@@ -143,13 +143,13 @@ func teleport_to(target_position: Vector2) -> void:
 # Popup d'item
 # ---------------------------------------------------------------------------
 
-func _on_item_received():
-	var item_name = GeneralData.current_item
-	if not GeneralData.object_database.has(item_name):
-		print("Objet inconnu reçu : " + item_name)
-		return
-	item_icon.texture = GeneralData.object_database[item_name]
-	_play_item_popup_animation()
+#func _on_item_received():
+#	var item_name = GeneralData.current_item
+#	if not GeneralData.object_database.has(item_name):
+#		print("Objet inconnu reçu : " + item_name)
+#		return
+#	item_icon.texture = GeneralData.object_database[item_name]
+#	_play_item_popup_animation()
 
 
 func _play_item_popup_animation() -> void:
