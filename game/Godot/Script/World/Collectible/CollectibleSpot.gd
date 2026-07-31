@@ -54,9 +54,9 @@ func can_interact() -> bool:
 
 func interact(_player: Node2D) -> void:
 	emit_signal("stop_inventory")
+	sprite.stop()
+	collected = true
 	await _request_item()
 	await _add_item()
 	emit_signal("update_slots")
 	emit_signal("run_inventory")
-	sprite.stop()
-	collected = true

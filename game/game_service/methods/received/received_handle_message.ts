@@ -62,9 +62,14 @@ export function handle_message(player: Player, enemy: Player, msg: any){
                 data: msg.data
             };
 			if (currentActions[player.id] && currentActions[enemy.id]) {
-                result = resolving_battle_round(player, enemy, currentActions);
+                const arrResult = resolving_battle_round(player, enemy, currentActions);
 				delete currentActions[player.id];
                 delete currentActions[enemy.id];
+				if (arrResult && Array.isArray(arrResult)){
+					for (let i = 0; i < arrResult.length; ++i){
+						send(arrResult[i])
+					}
+				}
             }
 			break;
 		
