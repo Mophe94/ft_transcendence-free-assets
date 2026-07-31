@@ -358,7 +358,7 @@ export class GameService implements OnModuleInit {
       }
     }
     else {
-      for (let i = 0; i < monsters.length; i++) {
+      for (let i = 0; i < monsters.length && monstersToLoad.length < 3; i++) {
         for (let j = 0; j < player.team.length; j++) {
           if (monsters[i] !== "" && monsters[i] === player.team[j]) {
             monstersToLoad.push({
@@ -371,9 +371,14 @@ export class GameService implements OnModuleInit {
       }
     }
 
+
     for (const {name, slot} of monstersToLoad) {
-      const monster = await this.monstersService.findOneByName(name);
-    if (!monster) return undefined;
+      const monster = await this.monstersService.findOneByName(name, { skills: true });
+      console.log("Monsters choice: ", monsters);
+      if (!monster) return {
+        event: 'game',
+        data: { state: 'team_choice', reason: 'invalid_monster', monster: name },
+      }
       player.battle_team[slot] = {
         name: monster.name,
         slot: slot,
@@ -382,14 +387,24 @@ export class GameService implements OnModuleInit {
           max: monster.hp_total,
         },
         type: String(monster.type),
-        attack: 0,
-        attack_spe: 0,
-        defense: 0,
-        defense_spe: 0,
-        speed: 0,
+        attack: monster.attack,
+        attack_spe: monster.attack_spe,
+        defense: monster.defense,
+        defense_spe: monster.defense_spe,
+        speed: monster.speed,
         status: [],
-        dodge: false,
-        skill: [], // 4 slots
+        dodge: false, // missing in DB
+        skill: monster.skills.slice(0, 4).map((skill): PlayerSkill => ({
+          name: skill.name,
+          current: skill.power_point,
+          max: skill.power_point,
+          type: skill.type,
+          effect: skill.effect,
+          repetition: skill.repetition,
+          precision: skill.precision,
+          data: skill.data,
+          value: skill.value,
+        }))
       };
     }
     console.log("Monsters choice: ", monsters);

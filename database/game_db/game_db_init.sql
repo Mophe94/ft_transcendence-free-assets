@@ -401,12 +401,12 @@ COPY public.monsters (id, name, hp_total, attack, attack_spe, defense, defense_s
 2	fishet	120	10	15	5	15	100	water	common
 3	burpy	100	20	30	0	20	80	water	uncommon
 4	sharky	150	20	30	0	20	150	water	rare
-5	squirrel	100	20	20	5	10	110	neutral	common
+5	squirel	100	20	20	5	10	110	neutral	common
 6	papate	180	10	15	5	10	80	earth	uncommon
 7	gigantomakia	200	20	30	15	25	50	earth	rare
 9	monkel	130	15	15	10	20	100	neutral	uncommon
 10	pigeonne	120	25	25	10	10	160	fly	rare
-8	leaves	80	35	45	0	10	100	plant	common
+8	leafs	80	35	45	0	10	100	plant	common
 \.
 
 
