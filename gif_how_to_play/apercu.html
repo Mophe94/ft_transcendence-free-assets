@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Play</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #0a0b1e;
+    --navy-deep: #060714;
+    --parchment: #ecdfc0;
+    --parchment-edge: #d9c9a0;
+    --ink: #2b2410;
+    --ink-soft: #5a4f30;
+    --red: #8b1a1a;
+    --red-dark: #4a0d0d;
+    --teal: #4a9b9b;
+    --teal-dark: #2c6666;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  body{
+    background: var(--navy);
+    min-height: 100vh;
+    font-family: 'VT323', monospace;
+    color: var(--ink);
+    position: relative;
+    overflow-x: hidden;
+    padding: 40px 20px 80px;
+  }
+
+  /* ---------- Decorative Pixel Clouds ---------- */
+  .cloud{
+    position: absolute;
+    image-rendering: pixelated;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .cloud svg{ display:block; width: 100%; height: 100%; }
+
+  .cloud--1{ top: 8%;  left: 3%;  width: 130px; }
+  .cloud--2{ top: 28%; left: 1%;  width: 90px; }
+  .cloud--3{ top: 60%; left: 5%;  width: 150px; }
+  .cloud--4{ top: 10%; right: 3%; width: 120px; }
+  .cloud--5{ top: 32%; right: 1%; width: 100px; }
+  .cloud--6{ top: 62%; right: 4%; width: 140px; }
+
+  @media (max-width: 900px){
+    .cloud{ display:none; }
+  }
+
+  /* ---------- Header ---------- */
+  .topbar{
+    max-width: 1100px;
+    margin: 0 auto 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+  }
+
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .logo svg{ width:40px; height:40px; image-rendering:pixelated; }
+
+  .logo span{
+    font-family: 'Pirata One', serif;
+    font-size: 28px;
+    color: var(--parchment);
+    letter-spacing: 1px;
+  }
+
+  .back-link{
+    font-size: 20px;
+    color: var(--teal);
+    text-decoration: none;
+    border: 2px solid var(--teal-dark);
+    padding: 8px 16px;
+    background: rgba(74,155,155,0.08);
+    transition: background .15s ease, transform .1s ease;
+  }
+  .back-link:hover{ background: rgba(74,155,155,0.2); transform: translateY(-1px); }
+
+  /* ---------- Parchment Panel ---------- */
+  .parchment{
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    background: var(--parchment);
+    padding: 56px clamp(20px, 4vw, 50px) 64px;
+    clip-path: polygon(
+      0% 2%, 2% 0%, 6% 1%, 11% 0%, 16% 1%, 22% 0%, 28% 1%, 34% 0%, 40% 1%, 46% 0%,
+      52% 1%, 58% 0%, 64% 1%, 70% 0%, 76% 1%, 82% 0%, 88% 1%, 94% 0%, 98% 1%, 100% 2%,
+      99% 8%, 100% 14%, 99% 20%, 100% 26%, 99% 32%, 100% 38%, 99% 44%, 100% 50%,
+      99% 56%, 100% 62%, 99% 68%, 100% 74%, 99% 80%, 100% 86%, 99% 92%, 100% 98%,
+      94% 100%, 88% 99%, 82% 100%, 76% 99%, 70% 100%, 64% 99%, 58% 100%, 52% 99%,
+      46% 100%, 40% 99%, 34% 100%, 28% 99%, 22% 100%, 16% 99%, 11% 100%, 6% 99%, 2% 100%, 0% 98%,
+      1% 92%, 0% 86%, 1% 80%, 0% 74%, 1% 68%, 0% 62%, 1% 56%, 0% 50%,
+      1% 44%, 0% 38%, 1% 32%, 0% 26%, 1% 20%, 0% 14%, 1% 8%
+    );
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+  }
+
+  .parchment::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.025) 0 2px, transparent 2px 4px);
+    clip-path: inherit;
+    pointer-events:none;
+  }
+
+  /* ---------- Title Header ---------- */
+  .hero{
+    text-align:center;
+    margin-bottom: 48px;
+  }
+
+  .hero h1{
+    font-family: 'Pirata One', serif;
+    font-size: clamp(40px, 6vw, 68px);
+    color: var(--red);
+    text-shadow: 1.5px 1.5px 0 var(--red-dark);
+    letter-spacing: 2px;
+  }
+
+  .hero p{
+    font-size: 22px;
+    color: var(--ink-soft);
+    margin-top: 10px;
+  }
+
+  /* ---------- Controls Grid ---------- */
+  .controls{
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .control{
+    display: grid;
+    gap: 28px;
+    align-items: center;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--parchment-edge);
+  }
+
+  .control:last-child{ 
+    border-bottom: none; 
+    padding-bottom: 0;
+  }
+
+  /* --- ODD ROWS (1, 3, 5, 7) : [Keys:140px] -> [Text:1fr] -> [GIF:320px] --- */
+  .control:nth-child(odd){
+    grid-template-columns: 140px 1fr 320px;
+  }
+  .control:nth-child(odd) .keys { 
+    order: 1; 
+    justify-content: center; 
+  }
+  .control:nth-child(odd) .control-desc { 
+    order: 2; 
+    text-align: left; 
+  }
+  .control:nth-child(odd) .gif-frame { 
+    order: 3; 
+  }
+
+  /* --- EVEN ROWS (2, 4, 6) : [GIF:320px] -> [Text:1fr] -> [Keys:140px] --- */
+  .control:nth-child(even){
+    grid-template-columns: 320px 1fr 140px;
+  }
+  .control:nth-child(even) .gif-frame { 
+    order: 1; 
+  }
+  .control:nth-child(even) .control-desc { 
+    order: 2; 
+    text-align: left; 
+  }
+  .control:nth-child(even) .keys { 
+    order: 3; 
+    justify-content: center; 
+  }
+
+  /* Mobile / Tablet Responsive */
+  @media (max-width: 860px){
+    .control, .control:nth-child(odd), .control:nth-child(even){
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: 16px;
+    }
+
+    .control .keys, .control:nth-child(even) .keys { 
+      order: 1 !important; 
+      justify-content: center; 
+    }
+    .control .gif-frame, .control:nth-child(even) .gif-frame { 
+      order: 2 !important; 
+      width: 100%;
+      max-width: 320px;
+    }
+    .control .control-desc, .control:nth-child(even) .control-desc { 
+      order: 3 !important; 
+      text-align: center !important; 
+    }
+  }
+
+  /* --- Keys styling --- */
+  .keys{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  /* 2x2 Grid for WASD */
+  .keys--grid{
+    display: grid;
+    grid-template-columns: repeat(2, 36px);
+    gap: 6px;
+  }
+
+  .key{
+    min-width: 36px;
+    height: 36px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.5);
+    border: 1.5px solid var(--ink-soft);
+    font-family: 'VT323', monospace;
+    font-size: 19px;
+    color: var(--ink);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.15);
+  }
+
+  .key--wide{ min-width: 80px; }
+  .key--auto{ min-width: auto; padding: 0 10px; }
+
+  /* Fixed GIF Container */
+  .gif-frame{
+    width: 320px;
+    height: 220px;
+    overflow: hidden;
+    border: 2px solid var(--teal-dark);
+    background: rgba(74,155,155,0.08);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  }
+
+  .gif-frame img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .control-desc h3{
+    font-family: 'Pirata One', serif;
+    font-size: 28px;
+    color: var(--red);
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+
+  .control-desc p{
+    font-size: 20px;
+    color: var(--ink-soft);
+    line-height: 1.25;
+  }
+
+  .dev-note{
+    max-width: 1100px;
+    margin: 32px auto 0;
+    background: rgba(236,223,192,0.08);
+    border: 2px dashed var(--teal);
+    color: var(--teal);
+    font-size: 17px;
+    padding: 16px 20px;
+    position: relative;
+    z-index: 2;
+    line-height: 1.5;
+  }
+  .dev-note strong{ color:#eaf6f6; }
+</style>
+</head>
+<body>
+
+  <!-- Background Clouds -->
+  <div class="cloud cloud--1"><svg viewBox="0 0 40 20"><g fill="#2a2c4a"><rect x="4" y="10" width="4" height="4"/><rect x="8" y="6" width="4" height="8"/><rect x="12" y="4" width="8" height="10"/><rect x="20" y="8" width="6" height="6"/><rect x="26" y="10" width="6" height="4"/><rect x="0" y="12" width="4" height="4"/></g></svg></div>
+  <div class="cloud cloud--2"><svg viewBox="0 0 40 20"><g fill="#2a2c4a"><rect x="2" y="10" width="6" height="6"/><rect x="8" y="6" width="10" height="10"/><rect x="18" y="10" width="8" height="6"/></g></svg></div>
+  <div class="cloud cloud--3"><svg viewBox="0 0 40 20"><g fill="#2a2c4a"><rect x="4" y="10" width="4" height="4"/><rect x="8" y="6" width="6" height="8"/><rect x="14" y="4" width="10" height="10"/><rect x="24" y="8" width="8" height="6"/><rect x="32" y="10" width="4" height="4"/></g></svg></div>
+  <div class="cloud cloud--4"><svg viewBox="0 0 40 20"><g fill="#2a2c4a"><rect x="4" y="10" width="4" height="4"/><rect x="8" y="6" width="4" height="8"/><rect x="12" y="4" width="8" height="10"/><rect x="20" y="8" width="6" height="6"/><rect x="26" y="10" width="6" height="4"/></g></svg></div>
+  <div class="cloud cloud--5"><svg viewBox="0 0 40 20"><g fill="#2a2c4a"><rect x="2" y="10" width="6" height="6"/><rect x="8" y="6" width="10" height="10"/><rect x="18" y="10" width="8" height="6"/></g></svg></div>
+  <div class="cloud cloud--6"><svg viewBox="0 0 40 20"><g fill="#2a2c4a"><rect x="4" y="10" width="4" height="4"/><rect x="8" y="6" width="6" height="8"/><rect x="14" y="4" width="10" height="10"/><rect x="24" y="8" width="8" height="6"/><rect x="32" y="10" width="4" height="4"/></g></svg></div>
+
+  <div class="topbar">
+    <div class="logo">
+      <svg viewBox="0 0 20 20"><g fill="none" stroke="#4a9b9b" stroke-width="1.5"><rect x="2" y="2" width="16" height="16" fill="#0a0b1e"/></g><g fill="#ecdfc0"><rect x="8" y="4" width="8" height="3"/><rect x="6" y="8" width="10" height="3"/></g></svg>
+      <span>GAME_TITLE</span>
+    </div>
+    <a href="#" class="back-link">&larr; Back to Game</a>
+  </div>
+
+  <main class="parchment">
+    <div class="hero">
+      <h1>How to Play</h1>
+      <p>Essential controls & features before starting your adventure.</p>
+    </div>
+
+    <div class="controls">
+
+      <!-- Row 1: [ Keys ] -> [ Text ] -> [ GIF ] -->
+      <div class="control">
+        <div class="keys keys--grid">
+          <div class="key">W</div>
+          <div class="key">A</div>
+          <div class="key">S</div>
+          <div class="key">D</div>
+        </div>
+        <div class="control-desc">
+          <h3>Movement</h3>
+          <p>Use WASD to walk around, explore the world, and navigate through the map.</p>
+        </div>
+        <div class="gif-frame">
+          <img src="/gif_how_to_play/deplacer.gif" alt="Demonstration: Moving around">
+        </div>
+      </div>
+
+      <!-- Row 2: [ GIF ] -> [ Text ] -> [ Keys ] -->
+      <div class="control">
+        <div class="gif-frame">
+          <img src="/gif_how_to_play/interragir.gif" alt="Demonstration: Interacting">
+        </div>
+        <div class="control-desc">
+          <h3>Interact</h3>
+          <p>Press E to trigger world elements, activate teleporters, and pick up items found in the world.</p>
+        </div>
+        <div class="keys">
+          <div class="key">E</div>
+        </div>
+      </div>
+
+      <!-- Row 3: [ Keys ] -> [ Text ] -> [ GIF ] -->
+      <div class="control">
+        <div class="keys">
+          <div class="key">E</div>
+        </div>
+        <div class="control-desc">
+          <h3>Capture</h3>
+          <p>Interact with wild creatures to capture them and assemble a party of up to 6 monsters! Beware though: monsters can escape during capture!</p>
+        </div>
+        <div class="gif-frame">
+          <img src="/gif_how_to_play/phase_capture.gif" alt="Demonstration: Monster Encounter">
+        </div>
+      </div>
+
+      <!-- Row 4: [ GIF ] -> [ Text ] -> [ Keys ] -->
+      <div class="control">
+        <div class="gif-frame">
+          <img src="/gif_how_to_play/inventaire.gif" alt="Demonstration: Opening inventory">
+        </div>
+        <div class="control-desc">
+          <h3>Inventory</h3>
+          <p>Press Spacebar anytime to open your inventory and manage your collected items.</p>
+        </div>
+        <div class="keys">
+          <div class="key key--wide">Space</div>
+        </div>
+      </div>
+
+      <!-- Row 5: [ Keys ] -> [ Text ] -> [ GIF ] -->
+      <div class="control">
+        <div class="keys">
+          <div class="key key--wide">Left Click</div>
+        </div>
+        <div class="control-desc">
+          <h3>Discard Item</h3>
+          <p>Left-click on any item inside your inventory to throw it away and free up space.</p>
+        </div>
+        <div class="gif-frame">
+          <img src="/gif_how_to_play/delete_item.gif" alt="Demonstration: Discarding an item">
+        </div>
+      </div>
+
+      <!-- Row 6: [ GIF ] -> [ Text ] -> [ Keys ] -->
+      <div class="control">
+        <div class="gif-frame">
+          <img src="/gif_how_to_play/phase_combat_team_setup.gif" alt="Demonstration: Battle preparation">
+        </div>
+        <div class="control-desc">
+          <h3>Battle Preparation</h3>
+          <p>Prepare your lineup before the timer runs out. Out of your 6 captured monsters, carefully select the 3 fighters that will enter the arena!</p>
+        </div>
+        <div class="keys">
+          <div class="key key--auto">Left Click</div>
+        </div>
+      </div>
+
+      <!-- Row 7: [ Keys ] -> [ Text ] -> [ GIF ] -->
+      <div class="control">
+        <div class="keys">
+          <div class="key key--auto">Left Click</div>
+        </div>
+        <div class="control-desc">
+          <h3>Engage in Battle</h3>
+          <p>Once the timer ends, battle begins! Combine skills and items to knock out all 3 enemy monsters. Win to return to exploration and power up your team for the next duel—lose, and it's Game Over!</p>
+        </div>
+        <div class="gif-frame">
+          <img src="/gif_how_to_play/phase_combat_selection.gif" alt="Demonstration: Battle phase">
+        </div>
+      </div>
+
+    </div>
+  </main>
+</body>
+</html>
