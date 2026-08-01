@@ -3,16 +3,14 @@ import { WebSocket } from 'ws';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { PlayerService } from './player/player.service';
 import { MonstersService } from './entities/monsters.service';
+import { TilesService } from './entities/tiles.service';
 import { ItemsService } from './entities/items.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { GamePayload } from './game.type';
-import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
-import { max } from 'node_modules/class-validator/types';
-import { MonsterType } from './entities/types/monster_type.enum';
 import { Skill } from './entities/skills.entity';
 import {
   CurrentMonster,
@@ -28,6 +26,7 @@ export class GameService implements OnModuleInit {
     private playerService: PlayerService,
     private combatService: CombatService,
     private monstersService: MonstersService,
+    private tilesService: TilesService,
     private itemsService: ItemsService,
   ) {}
 
@@ -196,10 +195,7 @@ export class GameService implements OnModuleInit {
       case "use_item":
         result = await this.received_use_item(player, payload.item); break;
       case 'new_encounter': {
-        result = await this.received_new_encounter(
-          player,
-          2 /* payload.tile */,
-        );
+        result = await this.received_new_encounter(player, payload.tile);
         break;
       }
       case 'try_catch':
@@ -230,61 +226,60 @@ export class GameService implements OnModuleInit {
   }
 
   // HANDLERS
-
-/*   private async received_new_encounter(
-    player: Player,
-    tile: number,
-  ): Promise<object | undefined> {
-    const monsters = await this.monstersService.findMonstersByTile(tile);
-    player.current_monster = monsters[1].name; //
-    //console.log('Monsters by tile', monsters[1]);
-    return this.new_encounter(player);
-  } */
   
   // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
-  private received_new_encounter(player: Player, tile: string){
+  private async received_new_encounter(player: Player, tile: string){
     const table_encounter = {
       commun: 60,
       uncommun: 30,
       rare: 10
     }
     // Retrieve list monsters by tile
+    const tileObject = await this.tilesService.findOneByType(tile);
+    if (!tileObject) {
+      console.log("tileObject is undefined");
+      return undefined;
+    }
+    const tileId = tileObject.id;
+
+    let table_monster = await this.monstersService.findMonstersByTile(tileId);
+    if (!table_monster) {
+      console.log("table_monster is undefined");
+      return undefined;
+    }
+    console.log("Monster list by tiles: ", table_monster);
+
     let result = Math.floor(Math.random() * 100);
     // call monster from db
-    if (result <= table_encounter.rare){ /* && monster.rarity == rare exist*/
+    if (result <= table_encounter.rare){
       result = Math.floor(Math.random() * 100);
-      let table_monster: string[] = [ "leafs", "pigeonne", "squirel" ]
-      // remplir table monster avec les nom des pq en rare
-      let gap = Math.floor(100 / table_monster.length)
-      let step = gap
-      let i = 0
+      let gap = Math.floor(100 / table_monster.length);
+      let step = gap;
+      let i = 0;
       for (i; result > gap && i < table_monster.length - 1; ++i)
-        gap += step
-      player.current_monster = table_monster[i]
+        gap += step;
+      player.current_monster = table_monster[i].name;
       player.current_monster_rarity = "rare"
     }
-    else if (result <= table_encounter.uncommun){ /* && monster.rarity == uncommun exist*/
+    else if (result <= table_encounter.uncommun){ /* && monster.rarity === uncommun exist*/
       result = Math.floor(Math.random() * 100);
-      let table_monster: string[] = [ "leafs", "pigeonne", "squirel" ]
-      // remplir table monster avec les nom des pq en uncommun
-      let gap = Math.floor(100 / table_monster.length)
-      let step = gap
-      let i = 0
+      let gap = Math.floor(100 / table_monster.length);
+      let step = gap;
+      let i = 0;
       for (i; result > gap && i < table_monster.length - 1; ++i)
-        gap += step
-      player.current_monster = table_monster[i]
+        gap += step;
+      player.current_monster = table_monster[i].name;
       player.current_monster_rarity = "uncommon"
     }
     else {
       result = Math.floor(Math.random() * 100);
-      let table_monster: string[] = [ "leafs", "pigeonne", "squirel" ]
       // remplir table monster avec les nom des pq en commun
-      let gap = Math.floor(100 / table_monster.length)
-      let step = gap
-      let i = 0
+      let gap = Math.floor(100 / table_monster.length);
+      let step = gap;
+      let i = 0;
       for (i; result > gap && i < table_monster.length - 1; ++i)
-        gap += step
-      player.current_monster = table_monster[i]
+        gap += step;
+      player.current_monster = table_monster[i].name;
       player.current_monster_rarity = "common"
     }
     
@@ -314,12 +309,9 @@ export class GameService implements OnModuleInit {
       result = Math.floor(Math.random() * 101);
   
     let monsterCatch: number = 0
-    console.log("MonsterCatch1: ", monsterCatch);
     console.log("Monster Rarity:", player.current_monster_rarity);
     monsterCatch = table_encounter[player.current_monster_rarity as keyof typeof table_encounter]
-    console.log("MonsterCatch2: ", monsterCatch);
     if (monsterCatch !== undefined) {
-      console.log("MonsterCatch3: ", monsterCatch);
       if (result <= monsterCatch) {
           for (let i = 0; i < player.team.length; ++i) {
               if (player.team[i] === '') {
