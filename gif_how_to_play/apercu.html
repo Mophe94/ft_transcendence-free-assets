@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>How to Play</title>
+<title>Comment jouer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=VT323&display=swap" rel="stylesheet">
 <style>
@@ -18,6 +18,8 @@
     --red-dark: #4a0d0d;
     --teal: #4a9b9b;
     --teal-dark: #2c6666;
+    --cloud: #2a2c4a;
+    --cloud-dark: #1c1e38;
   }
 
   *{ box-sizing: border-box; margin:0; padding:0; }
@@ -32,7 +34,7 @@
     padding: 40px 20px 80px;
   }
 
-  /* ---------- Decorative Pixel Clouds ---------- */
+  /* ---------- Nuages pixel décoratifs ---------- */
   .cloud{
     position: absolute;
     image-rendering: pixelated;
@@ -89,15 +91,16 @@
     transition: background .15s ease, transform .1s ease;
   }
   .back-link:hover{ background: rgba(74,155,155,0.2); transform: translateY(-1px); }
+  .back-link:focus-visible{ outline: 3px solid var(--teal); outline-offset: 2px; }
 
-  /* ---------- Parchment Panel ---------- */
+  /* ---------- Panneau parchemin (bord déchiré) ---------- */
   .parchment{
     max-width: 1100px;
     margin: 0 auto;
     position: relative;
     z-index: 2;
     background: var(--parchment);
-    padding: 56px clamp(20px, 4vw, 50px) 64px;
+    padding: 56px clamp(24px, 6vw, 72px) 64px;
     clip-path: polygon(
       0% 2%, 2% 0%, 6% 1%, 11% 0%, 16% 1%, 22% 0%, 28% 1%, 34% 0%, 40% 1%, 46% 0%,
       52% 1%, 58% 0%, 64% 1%, 70% 0%, 76% 1%, 82% 0%, 88% 1%, 94% 0%, 98% 1%, 100% 2%,
@@ -115,12 +118,13 @@
     content:"";
     position:absolute;
     inset:0;
-    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.025) 0 2px, transparent 2px 4px);
+    background:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.025) 0 2px, transparent 2px 4px);
     clip-path: inherit;
     pointer-events:none;
   }
 
-  /* ---------- Title Header ---------- */
+  /* ---------- Titre ---------- */
   .hero{
     text-align:center;
     margin-bottom: 48px;
@@ -140,122 +144,92 @@
     margin-top: 10px;
   }
 
-  /* ---------- Controls Grid ---------- */
+  /* ---------- Liste des contrôles ---------- */
   .controls{
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 28px;
   }
 
   .control{
     display: grid;
-    gap: 28px;
+    grid-template-columns: 120px 380px 1fr;
+    gap: 24px;
     align-items: center;
-    padding-bottom: 40px;
+    padding: 14px 4px;
     border-bottom: 1px solid var(--parchment-edge);
   }
 
-  .control:last-child{ 
-    border-bottom: none; 
-    padding-bottom: 0;
-  }
+  .control:last-child{ border-bottom: none; }
 
-  /* --- ODD ROWS (1, 3, 5, 7) : [Keys:140px] -> [Text:1fr] -> [GIF:320px] --- */
-  .control:nth-child(odd){
-    grid-template-columns: 140px 1fr 320px;
-  }
-  .control:nth-child(odd) .keys { 
-    order: 1; 
-    justify-content: center; 
-  }
-  .control:nth-child(odd) .control-desc { 
-    order: 2; 
-    text-align: left; 
-  }
-  .control:nth-child(odd) .gif-frame { 
-    order: 3; 
-  }
-
-  /* --- EVEN ROWS (2, 4, 6) : [GIF:320px] -> [Text:1fr] -> [Keys:140px] --- */
+  /* une ligne sur deux : on inverse le sens (gif à gauche, touches à droite) */
   .control:nth-child(even){
-    grid-template-columns: 320px 1fr 140px;
+    grid-template-columns: 1fr 380px 120px;
   }
-  .control:nth-child(even) .gif-frame { 
-    order: 1; 
-  }
-  .control:nth-child(even) .control-desc { 
-    order: 2; 
-    text-align: left; 
-  }
-  .control:nth-child(even) .keys { 
-    order: 3; 
-    justify-content: center; 
-  }
+  .control:nth-child(even) .keys{ order: 3; }
+  .control:nth-child(even) .gif-slot{ order: 2; }
+  .control:nth-child(even) .control-desc{ order: 1; text-align: right; }
+  .control:nth-child(even) .control-desc h3,
+  .control:nth-child(even) .control-desc p{ text-align: right; }
 
-  /* Mobile / Tablet Responsive */
-  @media (max-width: 860px){
-    .control, .control:nth-child(odd), .control:nth-child(even){
+  @media (max-width: 760px){
+    .control,
+    .control:nth-child(even){
       grid-template-columns: 1fr;
-      justify-items: center;
-      gap: 16px;
+      text-align: center;
     }
-
-    .control .keys, .control:nth-child(even) .keys { 
-      order: 1 !important; 
-      justify-content: center; 
-    }
-    .control .gif-frame, .control:nth-child(even) .gif-frame { 
-      order: 2 !important; 
-      width: 100%;
-      max-width: 320px;
-    }
-    .control .control-desc, .control:nth-child(even) .control-desc { 
-      order: 3 !important; 
-      text-align: center !important; 
-    }
+    .control:nth-child(even) .keys{ order: 1; }
+    .control:nth-child(even) .gif-slot{ order: 2; }
+    .control:nth-child(even) .control-desc{ order: 3; text-align: center; }
+    .control:nth-child(even) .control-desc h3,
+    .control:nth-child(even) .control-desc p{ text-align: center; }
   }
 
-  /* --- Keys styling --- */
+  /* Touche façon pixel keycap, en plus léger */
   .keys{
-    display: flex;
+    display:flex;
+    justify-content:center;
     flex-wrap: wrap;
-    gap: 6px;
-    align-items: center;
-  }
-
-  /* 2x2 Grid for WASD */
-  .keys--grid{
-    display: grid;
-    grid-template-columns: repeat(2, 36px);
     gap: 6px;
   }
 
   .key{
-    min-width: 36px;
-    height: 36px;
-    padding: 0 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,255,255,0.5);
+    min-width: 40px;
+    height: 38px;
+    padding: 0 8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: rgba(255,255,255,0.35);
     border: 1.5px solid var(--ink-soft);
     font-family: 'VT323', monospace;
     font-size: 19px;
     color: var(--ink);
-    box-shadow: 0 2px 0 rgba(0,0,0,0.15);
   }
 
-  .key--wide{ min-width: 80px; }
-  .key--auto{ min-width: auto; padding: 0 10px; }
+  .key--wide{ min-width: 90px; }
 
-  /* Fixed GIF Container */
+  /* Zone GIF (placeholder pour le dev) */
+  .gif-slot{
+    width: 100%;
+    aspect-ratio: 16 / 12;
+    background: rgba(74,155,155,0.06);
+    border: 1.5px dashed var(--teal);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color: var(--teal-dark);
+    font-size: 16px;
+    text-align:center;
+    padding: 8px;
+  }
+
   .gif-frame{
-    width: 320px;
-    height: 220px;
+    width: 100%;
+    aspect-ratio: 16 / 12;
     overflow: hidden;
-    border: 2px solid var(--teal-dark);
-    background: rgba(74,155,155,0.08);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    border: 1.5px solid var(--teal-dark);
   }
 
   .gif-frame img{
@@ -265,20 +239,34 @@
     display: block;
   }
 
+  .gif-slot strong{
+    font-size: 17px;
+    color: var(--teal-dark);
+    font-weight: normal;
+  }
+
+  .gif-slot span{
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--teal);
+    word-break: break-all;
+  }
+
+  /* Description */
   .control-desc h3{
     font-family: 'Pirata One', serif;
-    font-size: 28px;
+    font-size: 26px;
     color: var(--red);
-    margin-bottom: 4px;
-    line-height: 1.1;
+    margin-bottom: 6px;
   }
 
   .control-desc p{
     font-size: 20px;
     color: var(--ink-soft);
-    line-height: 1.25;
+    line-height: 1.3;
   }
 
+  /* ---------- Note technique pour le dev (visible seulement en dev, à retirer en prod) ---------- */
   .dev-note{
     max-width: 1100px;
     margin: 32px auto 0;
@@ -296,7 +284,7 @@
 </head>
 <body>
 
-  <!-- Background Clouds -->
+  <!-- Nuages décoratifs (pixel art, identiques au style du site) -->
   <div class="cloud cloud--1"><svg viewBox="0 0 40 20"><g fill="#2a2c4a"><rect x="4" y="10" width="4" height="4"/><rect x="8" y="6" width="4" height="8"/><rect x="12" y="4" width="8" height="10"/><rect x="20" y="8" width="6" height="6"/><rect x="26" y="10" width="6" height="4"/><rect x="0" y="12" width="4" height="4"/></g></svg></div>
   <div class="cloud cloud--2"><svg viewBox="0 0 40 20"><g fill="#2a2c4a"><rect x="2" y="10" width="6" height="6"/><rect x="8" y="6" width="10" height="10"/><rect x="18" y="10" width="8" height="6"/></g></svg></div>
   <div class="cloud cloud--3"><svg viewBox="0 0 40 20"><g fill="#2a2c4a"><rect x="4" y="10" width="4" height="4"/><rect x="8" y="6" width="6" height="8"/><rect x="14" y="4" width="10" height="10"/><rect x="24" y="8" width="8" height="6"/><rect x="32" y="10" width="4" height="4"/></g></svg></div>
@@ -307,121 +295,24 @@
   <div class="topbar">
     <div class="logo">
       <svg viewBox="0 0 20 20"><g fill="none" stroke="#4a9b9b" stroke-width="1.5"><rect x="2" y="2" width="16" height="16" fill="#0a0b1e"/></g><g fill="#ecdfc0"><rect x="8" y="4" width="8" height="3"/><rect x="6" y="8" width="10" height="3"/></g></svg>
-      <span>GAME_TITLE</span>
+      <span>NOM_DU_JEU</span>
     </div>
-    <a href="#" class="back-link">&larr; Back to Game</a>
+    <a href="#" class="back-link">&larr; Retour au jeu</a>
   </div>
 
   <main class="parchment">
     <div class="hero">
-      <h1>How to Play</h1>
-      <p>Essential controls & features before starting your adventure.</p>
+      <h1>Comment jouer</h1>
+      <p>Les commandes essentielles avant de partir à l'aventure.</p>
     </div>
 
-    <div class="controls">
+    
 
-      <!-- Row 1: [ Keys ] -> [ Text ] -> [ GIF ] -->
-      <div class="control">
-        <div class="keys keys--grid">
-          <div class="key">W</div>
-          <div class="key">A</div>
-          <div class="key">S</div>
-          <div class="key">D</div>
-        </div>
-        <div class="control-desc">
-          <h3>Movement</h3>
-          <p>Use WASD to walk around, explore the world, and navigate through the map.</p>
-        </div>
-        <div class="gif-frame">
-          <img src="/gif_how_to_play/deplacer.gif" alt="Demonstration: Moving around">
-        </div>
-      </div>
+  <!-- Note pour le développeur : à retirer avant mise en prod -->
+  <div class="dev-note">
+    <strong>⚠️ Ceci est une version APERÇU</strong> — les GIFs sont intégrés directement dans le code (base64) pour que tu puisses voir le rendu tout de suite.
+    Pour ton dev, utilise plutôt le fichier <code>comment-jouer.html</code> avec le dossier <code>assets/gif/</code> à côté (chemins classiques, plus propre à maintenir).
+  </div>
 
-      <!-- Row 2: [ GIF ] -> [ Text ] -> [ Keys ] -->
-      <div class="control">
-        <div class="gif-frame">
-          <img src="/gif_how_to_play/interragir.gif" alt="Demonstration: Interacting">
-        </div>
-        <div class="control-desc">
-          <h3>Interact</h3>
-          <p>Press E to trigger world elements, activate teleporters, and pick up items found in the world.</p>
-        </div>
-        <div class="keys">
-          <div class="key">E</div>
-        </div>
-      </div>
-
-      <!-- Row 3: [ Keys ] -> [ Text ] -> [ GIF ] -->
-      <div class="control">
-        <div class="keys">
-          <div class="key">E</div>
-        </div>
-        <div class="control-desc">
-          <h3>Capture</h3>
-          <p>Interact with wild creatures to capture them and assemble a party of up to 6 monsters! Beware though: monsters can escape during capture!</p>
-        </div>
-        <div class="gif-frame">
-          <img src="/gif_how_to_play/phase_capture.gif" alt="Demonstration: Monster Encounter">
-        </div>
-      </div>
-
-      <!-- Row 4: [ GIF ] -> [ Text ] -> [ Keys ] -->
-      <div class="control">
-        <div class="gif-frame">
-          <img src="/gif_how_to_play/inventaire.gif" alt="Demonstration: Opening inventory">
-        </div>
-        <div class="control-desc">
-          <h3>Inventory</h3>
-          <p>Press Spacebar anytime to open your inventory and manage your collected items.</p>
-        </div>
-        <div class="keys">
-          <div class="key key--wide">Space</div>
-        </div>
-      </div>
-
-      <!-- Row 5: [ Keys ] -> [ Text ] -> [ GIF ] -->
-      <div class="control">
-        <div class="keys">
-          <div class="key key--wide">Left Click</div>
-        </div>
-        <div class="control-desc">
-          <h3>Discard Item</h3>
-          <p>Left-click on any item inside your inventory to throw it away and free up space.</p>
-        </div>
-        <div class="gif-frame">
-          <img src="/gif_how_to_play/delete_item.gif" alt="Demonstration: Discarding an item">
-        </div>
-      </div>
-
-      <!-- Row 6: [ GIF ] -> [ Text ] -> [ Keys ] -->
-      <div class="control">
-        <div class="gif-frame">
-          <img src="/gif_how_to_play/phase_combat_team_setup.gif" alt="Demonstration: Battle preparation">
-        </div>
-        <div class="control-desc">
-          <h3>Battle Preparation</h3>
-          <p>Prepare your lineup before the timer runs out. Out of your 6 captured monsters, carefully select the 3 fighters that will enter the arena!</p>
-        </div>
-        <div class="keys">
-          <div class="key key--auto">Left Click</div>
-        </div>
-      </div>
-
-      <!-- Row 7: [ Keys ] -> [ Text ] -> [ GIF ] -->
-      <div class="control">
-        <div class="keys">
-          <div class="key key--auto">Left Click</div>
-        </div>
-        <div class="control-desc">
-          <h3>Engage in Battle</h3>
-          <p>Once the timer ends, battle begins! Combine skills and items to knock out all 3 enemy monsters. Win to return to exploration and power up your team for the next duel—lose, and it's Game Over!</p>
-        </div>
-        <div class="gif-frame">
-          <img src="/gif_how_to_play/phase_combat_selection.gif" alt="Demonstration: Battle phase">
-        </div>
-      </div>
-
-    </div>
-  </main>
 </body>
 </html>
