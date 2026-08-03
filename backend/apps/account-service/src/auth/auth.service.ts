@@ -84,9 +84,9 @@ export class AuthService {
   ): Promise<FortyTwoProfile> {
     try {
       const response = await axios.get<FortyTwoProfile>(
-      `${
+        `${
         this.configService.get<string>('FORTYTWO_API') ??
-          'https://api.intra.42.fr/v2/me'
+          'https://api.intra.42.fr/v2'
         }/me`,
         {
           headers: { Authorization: `Bearer ${accessToken}` },

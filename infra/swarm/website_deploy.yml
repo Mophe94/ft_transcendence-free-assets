@@ -54,7 +54,7 @@ services:
           - DB_USERS_HOST=users_db
           - FORTYTWO_API_TOKENEXCHANGE=http://nginx:420/fortytwoapi/oauth/token
           - FORTYTWO_REDIRECT_URI=https://${HOST_IP}:8443/auth/callback
-          - FORTYTWO_API=https://nginx:420/fortytwoapi/v2
+          - FORTYTWO_API=http://nginx:420/fortytwoapi/v2
 
         networks:
             - site_net
