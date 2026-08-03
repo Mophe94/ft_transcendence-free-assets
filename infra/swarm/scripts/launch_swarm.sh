@@ -50,6 +50,7 @@ else
 	    sleep 2
 	    echo -n "."
 	done
+	echo ""
     else
 	echo "[$SCRIPT_NAME] Worker certificate already exist"
     fi
@@ -102,7 +103,7 @@ done
 #Adding preconfigured nodes
 read -t 15 -p "[$SCRIPT_NAME] Do you want to add preconfigured node (y/N): " answer || true
 case "${answer,,}" in
-	[y]|[yes])
+	y|yes)
 	    chmod +x "${DIR}/add_node.sh"
 	   bash "${DIR}/add_node.sh" "${HOST_IP}" "${HOST_TAILSCALE_IP}" agaland bertrmar dbajeux kprist stempels;;
 	*) echo "[$SCRIPT_NAME] No node added"
