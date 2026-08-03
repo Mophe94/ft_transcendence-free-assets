@@ -14,8 +14,58 @@ var SPEED_TEXT = GeneralData.SPEED_TEXT
 @onready var button = [$Button, $Button2, $Button3, $Button4]
 @onready var back_button = $Button5
 
-signal change_current_monster
-signal change_enemy_monster
+signal action_combat
+signal change_monster
+signal enemy_change_monster
+
+##############################################################
+func _lose():
+	await text_show("You lose the fight")
+	var lose_scene = battle_result["lose"].instantiate()
+	get_tree().current_scene.add_child(lose_scene)
+
+func _win():
+	await text_show("You lose the fight")
+	var victory_scene = battle_result["win"].instantiate()
+	get_tree().current_scene.add_child(victory_scene)
+
+func _change_monster():
+	if GeneralData.text != "":
+		text_show(GeneralData.text)
+	set_menus_select_monster()
+
+func _new_current_monster():
+	if GeneralData.text != "":
+		text_show(GeneralData.text)
+	emit_signal("change_monster")
+
+func _enemy_change_monster():
+	hide_selection()
+	if GeneralData.text != "":
+		text_show(GeneralData.text)
+		
+func _new_enemy_monster():
+	if GeneralData.text != "":
+		text_show(GeneralData.text)
+	emit_signal("enemy_change_monster")
+
+func waiting_player(send_func: Callable):
+	hide_selection()
+	lock_button()
+	send_func.call()
+	text_show("Waiting action enemy.")
+
+func _received_action():
+	emit_signal("action_combat")
+	if GeneralData.text != "":
+		text_show(GeneralData.text)
+	Received.action_finished.emit()
+	
+func _new_turn():
+	if GeneralData.text != "":
+		text_show(GeneralData.text)
+	_back()
+##############################################################
 
 func text_show(new_text):
 	$Text.show()
@@ -24,6 +74,7 @@ func text_show(new_text):
 	for i in range($Text.text.length() + 1):
 		$Text.visible_characters = i
 		await get_tree().create_timer(SPEED_TEXT).timeout
+	await get_tree().create_timer(0.5).timeout
 
 func lock_button():
 	for i in range(4):
@@ -35,16 +86,15 @@ func unlock_button():
 		button[i].disabled = false
 	back_button.disabled = false
 	
-func hide_selection(my_str):
+func hide_selection():
 	for i in range(button.size()):
 		button[i].hide()
-	if my_str == "all":
 		back_button.hide()
 	
 	
 func set_menus_back():
 	unlock_button()
-	hide_selection("all")
+	hide_selection()
 	button[0].show()
 	button[0].text = "SKILL"
 	button[0].action = "skill"
@@ -55,55 +105,42 @@ func set_menus_back():
 	button[2].text = "CHANGE"
 	button[2].action = "change"
 	button[3].show()
-	for i in range(GeneralData.player["currentMonster"]["skill"].size()):
-		if GeneralData.player["currentMonster"]["skill"][i]["current"] > 0:
-			break
-			
 	button[3].text = "PASS"
 	button[3].action = "pass"
-	
+
+func set_menus_choice_pass(object):
+	unlock_button()
+	hide_selection()
+	if object == "no":
+		_back()
+	elif object == "yes":
+		var send_func = func():
+			Send.send_message(Send.SEND_TAB[Send.SEND_NAME.PASS])
+		waiting_player(send_func)
+
 func set_menus_pass():
 	unlock_button()
-	hide_selection("all")
-	$Text.show()
-	$Text.visible_characters = 0
-	$Text.text = "Are you sure you want pass ?"
-	for i in range($Text.text.length() + 1):
-		$Text.visible_characters = i
-		await get_tree().create_timer(SPEED_TEXT).timeout
+	hide_selection()
+	text_show("Are you sure you want pass ?")
 	button[2].show()
 	button[2].text = "YES"
-	button[2].action = "choice"
+	button[2].action = "choice_pass"
 	button[2].object = "yes"
 	button[3].show()
 	button[3].text = "NO"
-	button[3].action = "choice"
+	button[3].action = "choice_pass"
 	button[3].object = "no"
 	back_button.show()
-	
-func set_menus_monster(object):
-	hide_selection("all")
-	var index = int(object)
-	var name_stock =  GeneralData.player["currentMonster"]["name"]
-	if name_stock == "":
-		GeneralData.player["currentMonster"]["name"] = GeneralData.player["battle_team"][index]["name"]
-		GeneralData.player["currentMonster"]["life"] = GeneralData.player["battle_team"][index]["life"]
-		GeneralData.player["currentMonster"]["index"] = object
-		await text_show(GeneralData.player["currentMonster"]["name"] + " appeared")
-	else:
-		var temp = GeneralData.player["currentMonster"].duplicate(true)
-		GeneralData.player["currentMonster"]["name"] = GeneralData.player["battle_team"][index]["name"]
-		GeneralData.player["currentMonster"]["life"] = GeneralData.player["battle_team"][index]["life"].duplicate(true)
-		GeneralData.player["currentMonster"]["index"] = object
-		GeneralData.player["battle_team"][index]["name"] = temp["name"]
-		GeneralData.player["battle_team"][index]["life"] = temp["life"].duplicate(true)
-		await text_show( GeneralData.player["battle_team"][index]["name"] + " has been replaced by " + GeneralData.player["currentMonster"]["name"])
-	back_button.show()
-	emit_signal("change_current_monster")
+
+func set_monster_choice(object):
+	hide_selection()
+	var send_func = func():
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.CHANGE_CURRENT_MONSTER], object)
+	waiting_player(send_func)
 	
 func set_menus_select_monster():
 	unlock_button()
-	hide_selection("all")
+	hide_selection()
 	for i in range(3):
 		if GeneralData.player["battle_team"][i]["name"] != "":
 			button[i].show()
@@ -113,17 +150,17 @@ func set_menus_select_monster():
 			else:
 				button[i].text = GeneralData.player["battle_team"][i]["name"] + " : " + str(GeneralData.player["battle_team"][i]["life"]["current"]) + "/" + str(GeneralData.player["battle_team"][i]["life"]["max"])
 				button[i].action = "monster"
-				button[i].object = str(i)
+				button[i].object = GeneralData.player["battle_team"][i]["slot"]
 	if GeneralData.player["currentMonster"]["name"] != "":
 		back_button.show()
 
 func set_menus_change():
 	unlock_button()
-	hide_selection("all")
+	hide_selection()
 	await text_show("Which monster you want to switch to ?")
 	var current_button = 2
 	for i in range(3):
-		if i == int(GeneralData.player["currentMonster"]["index"]):
+		if i == int(GeneralData.player["currentMonster"]["slot"]):
 			continue
 		if GeneralData.player["battle_team"][i]["name"] != "":
 			button[current_button].show()
@@ -137,42 +174,15 @@ func set_menus_change():
 			current_button +=1
 	back_button.show()
 	
-func set_menus_choice(object):
-	unlock_button()
-	if object == "no":
-		hide_selection("all")
-		await text_show("You win")
-		var victory_scene = battle_result["win"].instantiate()
-		get_tree().current_scene.add_child(victory_scene)
-	elif object == "yes":
-		hide_selection("all")
-		await text_show("You lose the fight")
-		var lose_scene = battle_result["lose"].instantiate()
-		get_tree().current_scene.add_child(lose_scene)
-	
 func set_menus_use(object):
-	unlock_button()
-	hide_selection("all")
-	await text_show("You use " + object)
-	for i in range(4):
-		if inventory[i]["name"] == object:
-			inventory[i]["current"] -= 1
-			if inventory[i]["current"] == 0:
-				inventory[i]["name"] = ""
-	back_button.show()
-	
-func set_menus_attack(object):
-	unlock_button()
-	hide_selection("all")
-	await text_show("You try to use " + object)
-	for i in range(4):
-		if skill[i]["name"] == object:
-			skill[i]["current"] -= 1
-	back_button.show()
+	hide_selection()
+	var send_func = func():
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.USE_ITEM], object)
+	waiting_player(send_func)
 
 func set_menus_items():
 	unlock_button()
-	hide_selection("all")
+	hide_selection()
 	var j = 0
 	for i in range(4):
 		if inventory[i]["name"] != "" and inventory[i]["scene"] == "combat":
@@ -184,10 +194,16 @@ func set_menus_items():
 		else:
 			button[i].object = ""
 	back_button.show()
+
+func set_menus_attack(object):
+	hide_selection()
+	var send_func = func():
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.TRY_ATTACK], object)
+	waiting_player(send_func)
 	
 func set_menus_skill():
 	unlock_button()
-	hide_selection("all")
+	hide_selection()
 	for i in range(4):
 		if skill[i]["name"] != "":
 			button[i].show()
@@ -200,8 +216,8 @@ func set_menus_skill():
 			button[i].object = ""
 	back_button.show()
 
-func _monster(object):
-	set_menus_monster(object)
+func _monster_choice(object):
+	set_monster_choice(object)
 	await get_tree().create_timer(1.0).timeout
 
 func _select_monster():
@@ -228,8 +244,8 @@ func _pass():
 	set_menus_pass()
 	await get_tree().create_timer(1.0).timeout
 	
-func _choice(object):
-	set_menus_choice(object)
+func _choice_pass(object):
+	set_menus_choice_pass(object)
 	await get_tree().create_timer(1.0).timeout
 
 func _use(object):
@@ -250,11 +266,11 @@ func _on_button_action(action, object):
 	$Text.hide()
 	match action:
 		"monster":
-			_monster(object)
+			_monster_choice(object)
 		"change":
 			_change()
 		"choice_pass":
-			_choice(object)
+			_choice_pass(object)
 		"items":
 			_items()
 		"back":
@@ -272,13 +288,15 @@ func _on_button_action(action, object):
 		
 
 func _ready() -> void:
+	Received.new_current_monster.connect(_new_current_monster)
+	Received.new_enemy_monster.connect(_new_enemy_monster)
+	Received.action.connect(_received_action)
+	Received.change_monster.connect(_change_monster)
+	Received.enemy_change_monster.connect(_enemy_change_monster)
+	Received.new_turn.connect(_new_turn)
+	Received.win.connect(_win)
+	Received.lose.connect(_lose)
 	set_menus_select_monster()
 	for i in range(button.size()):
 		button[i].action_pressed.connect(_on_button_action)
 	back_button.action_pressed.connect(_on_button_action)
-	
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass

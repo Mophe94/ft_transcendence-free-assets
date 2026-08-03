@@ -8,6 +8,8 @@ var ws = WebSocketPeer.new()
 var wsSate = WebSocketPeer.STATE_CLOSED
 var sceneLaunch = false
 
+var processing_messages = false
+
 @onready var user = ""
 @onready var room = ""
 @onready var domain = ""
@@ -93,12 +95,18 @@ func _process(_delta: float) -> void:
 	if wsSate == WebSocketPeer.STATE_CONNECTING:
 		pass
 
-
 func process_network_messages():
-	while messageQueue.size() > 0:
+	if processing_messages:
+		return
+#	processing_messages = true
+	if messageQueue.size() > 0:
+		processing_messages = true
+		
 		var msg = messageQueue.pop_front()
-		Received.handle_message_receive(msg)
-
+		await Received.handle_message_receive(msg)
+		await get_tree().create_timer(0.2).timeout 
+		
+		processing_messages = false
 
 func receive_messages():
 	if ws.get_ready_state() != WebSocketPeer.STATE_OPEN:

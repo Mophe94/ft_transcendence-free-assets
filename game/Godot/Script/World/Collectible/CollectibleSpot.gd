@@ -19,7 +19,7 @@ func transi_close()  :
 	
 func _request_item():
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.REQUEST_ITEM])
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.REQUEST_ITEM])
 	var success = await GeneralProcess.wait_signal(send_func, Received.item_received)
 
 	if ! success:
@@ -28,7 +28,7 @@ func _request_item():
 
 func _add_item():
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.ADD_ITEM])
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.ADD_ITEM])
 	var success = await GeneralProcess.wait_signal(send_func, Received.update_inventory)
 
 	if ! success:

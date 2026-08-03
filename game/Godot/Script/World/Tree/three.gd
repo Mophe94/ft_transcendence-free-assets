@@ -29,10 +29,10 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _new_encounter():
-	GeneralData.tile = "three"
-	GeneralData.background_capture = "three"
+	GeneralData.tile = "tree"
+	GeneralData.background_capture = "tree"
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.NEW_ENCOUNTER])
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.NEW_ENCOUNTER])
 	var success = await GeneralProcess.wait_signal(send_func, Received.monster_encounter_received)
 
 	await transi_close()

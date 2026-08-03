@@ -4,8 +4,7 @@ export function result_battle(player: Player, win_id: number){
     let result = {
         event: "game",
         data: {
-            state: "",
-            player: player
+            state: ""
         }
     }
     if (player.id === win_id)

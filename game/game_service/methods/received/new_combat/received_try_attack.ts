@@ -1,6 +1,6 @@
 import { Player } from "../../../Player";
 import { CurrentMonster, Skill } from "../../../type/interfaces";
-import { action_battle } from "../../send/new_combat/action_battle";
+import { received_pass } from "./received_pass";
 
 const typeChart: Record<string, Record<string, number>> = {
 	"fire":  { "plant": 2, "water": 0.5, "neutral": 1, "earth": 1 },
@@ -11,23 +11,23 @@ const typeChart: Record<string, Record<string, number>> = {
  }
 
 
-export function	received_try_attack(player: Player, enemy: Player, skillName: string, order: number) {
+export function	received_try_attack(player: Player, enemy: Player, skillName: string) {
 	const skill = player.currentMonster.skill.find(s => s.name === skillName);
 	if (enemy == null || enemy.currentMonster == null || skill == null || skill.current <= 0){
 		if (skill == null){
-			player.text = player.name + " pass for this turn."
-			return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
+			received_pass(player)
+			return
 		}
 		else{
 			player.text = player.currentMonster.name + " fail to use " + skillName
-			return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
+			return
 		}
 	}
 
 	let i: number = 0
 	let touch: number = 0
 	let resultDamage: number = 0
-	let effectiveness: string = ""
+	let effectiveness: string = "."
 	switch (skill.effect) {
 		case "damage":
 			if (enemy.currentMonster.dodge === true){
@@ -43,8 +43,8 @@ export function	received_try_attack(player: Player, enemy: Player, skillName: st
 					const attackSuccess: boolean = successAttackCalculation(skill, enemy.currentMonster)
 					if (attackSuccess === false){
 						if (skill.repetition === 1){
-							player.text = enemy.currentMonster.name + " dodge " + skillName + "."
-							return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
+							player.text = enemy.currentMonster.name + " dodge " + skillName + "."							
+							return
 						}
 						else
 							continue
@@ -68,7 +68,7 @@ export function	received_try_attack(player: Player, enemy: Player, skillName: st
 				else
 					player.text += " for " + resultDamage + " damage"
 			}
-			player.text += effectiveness
+			player.text += effectiveness		
 			break;
 
 		case "up_stat":
@@ -85,13 +85,11 @@ export function	received_try_attack(player: Player, enemy: Player, skillName: st
 					break;
 				case "attack_spe":
 					player.currentMonster.attack_spe += skill.value
-					break;
-				
+					break;				
 				default:
-					player.text = player.name + " pass for this turn."
-					return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
+					received_pass(player)
 			}
-			player.text = player.currentMonster.name + " use " + skillName + " and up his " + target_up;
+			player.text = player.currentMonster.name + " use " + skillName + " and up his " + target_up;			
 			break;
 
 		case "down_stat":
@@ -136,23 +134,20 @@ export function	received_try_attack(player: Player, enemy: Player, skillName: st
 						enemy.currentMonster.attack_spe -= skill.value
 					}
 					break;
-
 				default:
-					player.text = player.name + " pass for this turn."
-					return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
-			}
+					received_pass(player)					
+					return
+			}		
 			break;
 		
 		case "dodge":
 			player.currentMonster.dodge = true
 			player.text = player.currentMonster.name + " use " + skillName + " and are ready to dodge next attack."
 			break;
-
 		default:
-			player.text = player.name + " pass for this turn."
-			return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
+			received_pass(player)			
+			return
 	}
-	return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 }
 
 

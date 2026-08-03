@@ -23,7 +23,7 @@ func transi_close():
 
 func _delete_monster(monster):
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.DELETE_MONSTER], monster)
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.DELETE_MONSTER], monster)
 	var success = await GeneralProcess.wait_signal(send_func, Received.update_team)
 
 	if ! success:
@@ -32,7 +32,7 @@ func _delete_monster(monster):
 		
 func _delete_item(object):
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.DELETE_ITEM], object)
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.DELETE_ITEM], object)
 	var success = await GeneralProcess.wait_signal(send_func, Received.update_inventory)
 
 	if ! success:

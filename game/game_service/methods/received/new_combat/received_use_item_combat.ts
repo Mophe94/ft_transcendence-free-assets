@@ -2,7 +2,7 @@ import type { Player } from "../../../Player";
 import { action_battle } from "../../send/new_combat/action_battle";
 import { received_pass } from "./received_pass";
 
-export function received_use_item_combat(player: Player, enemy: Player, item: string, order: number){
+export function received_use_item_combat(player: Player, enemy: Player, item: string){
 	let i: number = 0
 	for (i; i < player.inventory.length; ++i){
 		if (player.inventory[i]["name"] === item){
@@ -10,7 +10,8 @@ export function received_use_item_combat(player: Player, enemy: Player, item: st
 		}
 	}
 	if (i >= player.inventory.length || player.inventory[i]["current"] <= 0){
-		received_pass(player, order)
+		received_pass(player)
+		return
 	}
 
 	let current_item = player.inventory[i]
@@ -56,8 +57,8 @@ export function received_use_item_combat(player: Player, enemy: Player, item: st
 					enemy.currentMonster.speed -= current_item.value
 					break;
 				default:
-					player.text = player.name + " pass for this turn."
-					return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
+					received_pass(player)
+					return
 			}
 			player.text = player.name + " use " + item + " on " + enemy.currentMonster.name + ", " + current_item.target + " stat down."
 			break;
@@ -80,14 +81,15 @@ export function received_use_item_combat(player: Player, enemy: Player, item: st
 					player.currentMonster.speed += current_item.value
 					break;
 				default:
-					player.text = player.name + " pass for this turn."
-					return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
+					received_pass(player)
+					return
 			}
 			player.text = player.name + " use " + item + " on " + player.currentMonster.name + ", " + current_item.target + " stat up."
 			break;
 
 		default:
-			return received_pass(player, order)
+			received_pass(player)
+			return
 	}
 
 	current_item["current"] -= 1
@@ -98,5 +100,4 @@ export function received_use_item_combat(player: Player, enemy: Player, item: st
 			current_item["type"] = ""
 			current_item["value"] = 0
 		}
-		return order === 1 ? action_battle(player, 1, 1) : action_battle(player, 2, 1)
 }

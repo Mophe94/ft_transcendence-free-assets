@@ -11,11 +11,17 @@ signal update_team
 
 signal combat_scene
 
+signal action
 signal new_turn
 signal lose
 signal win
 signal next_map_scene
+signal change_monster
+signal enemy_change_monster
+signal new_current_monster
+signal new_enemy_monster
 
+signal action_finished
 signal finish
 
 
@@ -55,9 +61,15 @@ func handle_message_receive(msg):
 			"new_turn":
 				_new_turn(data)
 			"lose":
+				_lose(data)
 				emit_signal("lose")
 			"win":
+				_win(data)
 				emit_signal("win")
+			"change_monster":
+				_change_monster(data)
+			"enemy_change_monster":
+				_enemy_change_monster(data)
 			"next_map":
 				_next_map(data)
 			"finish":
@@ -78,9 +90,70 @@ func _next_map(data):
 func _new_turn(data):
 	if data.has("timer"):
 		GeneralData.timer = data["timer"]
-		emit_signal("new_turn")
+	if data.has("player"):
+		var player = data["player"]
+		if player.has("text"):
+			GeneralData.text = player["text"]
+	emit_signal("new_turn")
+
+
+func _win(data):
+	var player = null
+	if data.has("player"):
+		player = data["player"]
+
+	if player.has("text"):
+		GeneralData.text = player["text"]
+	win.emit()
+
+
+func _lose(data):
+	var player = null
+	if data.has("player"):
+		player = data["player"]
+
+	if player.has("text"):
+		GeneralData.text = player["text"]
+	lose.emit()
+
+
+func _change_monster(data):
+	if data.has("timer"):
+		GeneralData.timer = data["timer"]
+
+	var player = null
+	if data.has("player"):
+		player = data["player"]
+
+	if player.has("text"):
+		GeneralData.text = player["text"]
+	change_monster.emit()
+
+
+func _enemy_change_monster(data):
+	if data.has("timer"):
+		GeneralData.timer = data["timer"]
+
+	var player = null
+	if data.has("player"):
+		player = data["player"]
+
+	if player.has("text"):
+		GeneralData.text = player["text"]
+	enemy_change_monster.emit()
+
 
 func _action_battle(data):
+	var signal_to_send = ""
+	if data.has("change_monster"):
+		var change = data["change_monster"]
+		if change == GeneralData.player["id"]:
+			signal_to_send = "new_current_monster"
+		elif change >= 0:
+			signal_to_send = "new_enemy_monster"
+		else:
+			signal_to_send = "action"
+	
 	var player = null
 	if data.has("player"):
 		player = data["player"]
@@ -135,9 +208,11 @@ func _action_battle(data):
 			for i in range(status.size()):
 				GeneralData.player["currentMonster"]["skill"][i] = status[i]
 	
-	if data.has("text"):
-		GeneralData.text = data["text"]
+	if player.has("text"):
+		GeneralData.text = player["text"]
 
+	emit_signal(signal_to_send)
+	await action_finished
 
 func _combat(data):
 	if data.has("timer"):

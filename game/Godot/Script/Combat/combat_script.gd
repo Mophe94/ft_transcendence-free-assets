@@ -33,6 +33,7 @@ var enemy_monster_base_scale: Vector2
 @onready var playerUI = $PlayerMonsterUI/CenterContainer/HBoxContainer
 @onready var enemyUI = $EnemyMonsterUI/CenterContainer/HBoxContainer
 
+
 func _capture_battle_ratios() -> void:
 	player_asset_ratio = player_asset_ref.position / REFERENCE_SIZE
 	player_monster_ratio = player_monster_ref.position / REFERENCE_SIZE
@@ -60,7 +61,7 @@ func _update_battle_positions() -> void:
 	enemy_monster_ref.position = viewport_size * enemy_monster_ratio
 	enemy_monster_ref.scale = enemy_monster_base_scale * scale_ratio
 
-
+###################################################################
 func _new_current_monster():
 	for child in player.get_node("PlayerMonster").get_children():
 		child.queue_free()
@@ -81,6 +82,7 @@ func _new_enemy_monster():
 	monster_enemy_scene.scale.x = -1
 	show_UI()
 	style_progress_bar()
+###################################################################
 
 
 func generate_charactere():
@@ -171,9 +173,10 @@ func transi_open():
 	transi_scene.queue_free()
 
 func _ready() -> void:
+	$CombatMenus.action_combat.connect(show_UI)
+	$CombatMenus.change_monster.connect(_new_current_monster)
+	$CombatMenus.enemy_change_monster.connect(_new_enemy_monster)
 	$CombatBanner.hide()
-	$CombatMenus.change_current_monster.connect(_new_current_monster)
-	$CombatMenus.change_enemy_monster.connect(_new_enemy_monster)
 	$Timer.time_finish.connect(_time_finish)
 	_capture_battle_ratios()
 	_update_battle_positions()
@@ -182,7 +185,14 @@ func _ready() -> void:
 	show_UI()
 
 func _time_finish():
+	skip_intro = true
+	$CombatMenus.hide()
+	$CombatMenus.process_mode = Node.PROCESS_MODE_DISABLED
 	$Timer.send = true
 	skip_intro = true
-	await Received.new_turn
+	var send_func = func():
+		null
+	var success = await GeneralProcess.wait_signal(send_func, Received.action)
 	$Timer.send = false
+	if !success:
+		get_tree().change_scene_to_packed(GeneralData.wait)

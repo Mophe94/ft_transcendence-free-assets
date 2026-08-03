@@ -22,7 +22,7 @@ func _new_encounter():
 	GeneralData.tile = "water"
 	GeneralData.background_capture = "beach"
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.NEW_ENCOUNTER])
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.NEW_ENCOUNTER])
 	var success = await GeneralProcess.wait_signal(send_func, Received.monster_encounter_received)
 
 	await transi_close()

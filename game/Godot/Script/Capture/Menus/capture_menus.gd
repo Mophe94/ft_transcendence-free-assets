@@ -23,7 +23,7 @@ func transi_close():
 
 func _result_catch():
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TRY_CATCH])
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.TRY_CATCH])
 	var success = await GeneralProcess.wait_signal_return(send_func, Received.catch_result)
 
 	if success >= 0:
@@ -34,7 +34,7 @@ func _result_catch():
 
 func _result_item(object):
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.USE_ITEM], object)
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.USE_ITEM], object)
 	var success = await GeneralProcess.wait_signal_return(send_func, Received.catch_result)
 
 	if success >= 0:

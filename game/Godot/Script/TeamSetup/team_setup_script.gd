@@ -74,7 +74,7 @@ func _signal_timer():
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED
 	
 	var send_func = func():
-		Send.send_mesage(Send.SEND_TAB[Send.SEND_NAME.TEAM_CHOICE])
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.TEAM_CHOICE])
 	var success = await GeneralProcess.wait_signal(send_func, Received.combat_scene)
 
 	$Timer.send = false

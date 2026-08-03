@@ -10,7 +10,8 @@ enum SEND_NAME {
 	USE_ITEM,
 	TEAM_CHOICE,
 	CHANGE_CURRENT_MONSTER,
-	TRY_ATTACK
+	TRY_ATTACK,
+	PASS
 }
 
 const SEND_TAB = {
@@ -23,15 +24,17 @@ const SEND_TAB = {
 	SEND_NAME.USE_ITEM: "use_item",
 	SEND_NAME.TEAM_CHOICE: "team_choice",
 	SEND_NAME.CHANGE_CURRENT_MONSTER: "change_current_monster",
-	SEND_NAME.TRY_ATTACK: "try_attack"
+	SEND_NAME.TRY_ATTACK: "try_attack",
+	SEND_NAME.PASS: "pass"
 }
 
-func send_mesage(event, value = null):
+func send_message(event, value = null):
 	#PROTO MESSAGE
 	var packet = {
 		"event": "game",
 		"data": {}
 	}
+	print(event)
 	match event:
 		"request_item":
 			_item_request(packet)
@@ -50,16 +53,25 @@ func send_mesage(event, value = null):
 		"team_choice":
 			_team_choice(packet)
 		"change_current_monster":
+			print("coucoucocuocu")
 			_change_current_monster(packet, value)
 		"try_attack":
 			_try_attack(packet, value)
 		"use_item_combat":
 			_use_item_combat(packet, value)
+		"pass":
+			_pass(packet)
 	if Network.wsSate != WebSocketPeer.STATE_CLOSED:
 		print("-------- MSG SEND --------  :\n", JSON.stringify(packet))
 		Network.ws.send_text(JSON.stringify(packet))
 	else:
 		print("-------- WEBSOCKET CLOSE--------  :\n", JSON.stringify(packet))
+
+
+func _pass(packet):
+	packet["data"] = {
+		"state": "pass"
+	}
 
 
 func _use_item_combat(packet, item):

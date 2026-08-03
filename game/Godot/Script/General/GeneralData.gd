@@ -15,7 +15,7 @@ const background_database: Dictionary = {
 	"plains_night": preload("res://Assets/Capture/plains_night.png"),
 	"plains_day": preload("res://Assets/Capture/plains_day.png"),
 	"beach": preload("res://Assets/Capture/beach.png"),
-	"three": preload("res://Assets/Capture/three.png")
+	"tree": preload("res://Assets/Capture/three.png")
 }
 
 const monster_database: Dictionary = {
@@ -149,7 +149,7 @@ var player: Dictionary = {
 	"battle_team": [
 		{
 			"name": "",
-			"slot": -1,
+			"slot": 1,
 			"life": {
 				"current": 0,
 				"max": 0
@@ -222,8 +222,8 @@ var timer = 0
 var current_item = ""
 var current_map = ""
 var monster_encounter = ""
-var text = []
+var text = ""
 
 var tile = ""
-var background_capture = "beach"
+var background_capture = ""
 var background_battle = "plains_night"

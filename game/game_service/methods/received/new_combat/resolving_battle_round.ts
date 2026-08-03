@@ -1,21 +1,12 @@
 import { Player } from "../../../Player";
 import { action_battle } from "../../send/new_combat/action_battle";
 import { result_battle } from "../../send/new_combat/result_battle";
+import { change_monster } from "../../send/new_combat/change_monster";
 import { PlayerActions } from "../received_handle_message";
 import { received_change_current_monster } from "./received_change_current_monster";
 import { received_pass } from "./received_pass";
 import { received_try_attack } from "./received_try_attack";
 import { received_use_item_combat } from "./received_use_item_combat";
-
-
-function has_valid_monsters(player: Player): boolean {
-    for (const monster of player.battle_team) {
-        if (monster.name !== "" && monster.life.current > 0) {
-            return true;
-        }
-    }
-    return false;
-}
 
 
 function resolve_first(player1: Player, player2: Player, actionPlayer1: PlayerActions[number], actionPlayer2: PlayerActions[number]): Player {
@@ -48,15 +39,19 @@ function resolve_first(player1: Player, player2: Player, actionPlayer1: PlayerAc
 function handle_action(player: Player, enemy: Player, actionPlayer: PlayerActions[number], order: number){
     switch (actionPlayer.actionType) {
         case "try_attack":
-            return received_try_attack(player, enemy, actionPlayer.data?.skill, order)
+            received_try_attack(player, enemy, actionPlayer.data?.skill)
+            break
         case "use_item_combat":
-            return received_use_item_combat(player, enemy, actionPlayer.data?.item, order)
+            received_use_item_combat(player, enemy, actionPlayer.data?.item)
+            break
         case "change_current_monster":
-            return received_change_current_monster(player, actionPlayer.data?.slot, order)
+            received_change_current_monster(player, actionPlayer.data?.slot)
+            break
         case "pass":
-            return received_pass(player, order)
+            received_pass(player)
+            break
         default:
-           return received_pass(player, order)
+           received_pass(player)
     }
 }
 
@@ -66,87 +61,26 @@ export function resolving_battle_round(player1: Player, player2: Player, action:
 
     let first: Player = resolve_first(player1, player2, actionPlayer1, actionPlayer2)
     let second: Player = first === player1 ? player2 : player1
+    let changeMonsterFirst: number | undefined = undefined;
+    let changeMonsterSecond: number | undefined = undefined;
+
+    if (action[first.id].actionType == "change_current_monster")
+        changeMonsterFirst = first.id 
 
     handle_action(first, second, action[first.id], 1)
     if (second.currentMonster.life.current <= 0) {
         second.currentMonster.life.current = 0
-        if (!has_valid_monsters(second)) {
-            return [ action_battle(first, 1, 1),
-				result_battle(first, first.id)
-			]
-		}
-		else 
-			return [ action_battle(first, 1, 1),
-				change_monster(first, second)
-			]
-		}
+		return [ action_battle(first, second,  1, 1, changeMonsterFirst)
+		]
+	}
+
+    if (action[second.id].actionType == "change_current_monster")
+        changeMonsterSecond = second.id 
 
     handle_action(second, first, action[second.id], 2)
-    if (first.currentMonster.life.current <= 0) {
-        first.currentMonster.life.current = 0
-        if (!has_valid_monsters(first)) {
-            return { action_battle(first, 1, 3),
-				action_battle(second, 2, 3),
-				result_battle(first, second.id) }
-            }
-		else {
-			return { action_battle(first, 1, 3),
-				action_battle(second, 2, 3),
-				change_monster(first, second)
-			}
-    	}
-	}
+
     // si change monster envoyer 
-    return { action_battle(first, 1, 2),
-		action_battle(second, 2, 2)
-	 }
-}
-
-export function resolving_battle_round(player1: Player, player2: Player, action: PlayerActions){
-    const actionPlayer1 = action[player1.id];
-    const actionPlayer2 = action[player2.id];
-
-    let first: Player = resolve_first(player1, player2, actionPlayer1, actionPlayer2)
-    let second: Player = first === player1 ? player2 : player1 // Correction de la condition ternaire
-
-    let first_action = handle_action(first, second, action[first.id], 1)
-    if (second.currentMonster.life.current <= 0) {
-        second.currentMonster.life.current = 0;
-        if (!has_valid_monsters(second)) {
-            // Utilisation d'un tableau []
-            return [
-                action_battle(first, 1, 1),
-                result_battle(first, first.id)
-            ];
-        } else {
-            return [
-                action_battle(first, 1, 1),
-                change_monster(first, second)
-            ];
-        }
-    }
-
-    let second_action = handle_action(second, first, action[second.id], 2)
-    if (first.currentMonster.life.current <= 0) {
-        first.currentMonster.life.current = 0;
-        if (!has_valid_monsters(first)) {
-            return [
-                action_battle(first, 1, 3),
-                action_battle(second, 2, 3),
-                result_battle(first, second.id)
-            ];
-        } else {
-            return [
-                action_battle(first, 1, 3),
-                action_battle(second, 2, 3),
-                change_monster(first, second)
-            ];
-        }
-    }
-
-    // Retourne un tableau d'actions par défaut
-    return [
-        action_battle(first, 1, 2),
-        action_battle(second, 2, 2)
-    ];
+    return [ action_battle(first, second, 1, 2, changeMonsterFirst),
+        action_battle(second, first, 2, 2, changeMonsterSecond)
+    ]
 }
