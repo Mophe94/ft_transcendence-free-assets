@@ -27,7 +27,7 @@ export class MonstersService {
   findMonstersByTile(
     tileId: number,
     relations: FindOptionsRelations<Monster> = {},
-  ): Promise<Monster[]> {
+  ): Promise<Monster[] | undefined> {
     return this.repo.find({
       where: {
         tiles: {

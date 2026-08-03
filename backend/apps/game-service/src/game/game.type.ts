@@ -2,7 +2,7 @@ export interface GamePayload {
   state: string;
   data: {
     state: string;
-    [key: string]: any;
+    [key: string]: any;q
   };
 }
 
@@ -18,7 +18,6 @@ export const PHASE_DURATIONS = {
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;
 
-// DELETE when Guard is implemented
 let mockUserCounter = 0;
 export const createMockUser = () => {
   mockUserCounter++;

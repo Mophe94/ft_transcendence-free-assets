@@ -4,7 +4,7 @@ import { SkillType } from './types/skill_type.entity';
 import { MonsterStat } from './types/monster_stat.enum';
 import { Monster } from './monsters.entity';
 
-@Entity()
+@Entity('skills')
 export class Skill {
   @PrimaryGeneratedColumn()
   id!: number;

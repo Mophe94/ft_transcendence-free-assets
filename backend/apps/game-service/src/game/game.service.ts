@@ -3,16 +3,14 @@ import { WebSocket } from 'ws';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { PlayerService } from './player/player.service';
 import { MonstersService } from './entities/monsters.service';
+import { TilesService } from './entities/tiles.service';
 import { ItemsService } from './entities/items.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { GamePayload } from './game.type';
-import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
-import { max } from 'node_modules/class-validator/types';
-import { MonsterType } from './entities/types/monster_type.enum';
 import { Skill } from './entities/skills.entity';
 import {
   CurrentMonster,
@@ -28,6 +26,7 @@ export class GameService implements OnModuleInit {
     private playerService: PlayerService,
     private combatService: CombatService,
     private monstersService: MonstersService,
+    private tilesService: TilesService,
     private itemsService: ItemsService,
   ) {}
 
@@ -108,13 +107,13 @@ export class GameService implements OnModuleInit {
     roomId: string,
     room: Set<number>,
   ): Promise<void> {
-    this.phaseTimer.start(roomId, 'map', () => {
+    this.phaseTimer.start(`game: ${roomId}`, 'map', () => {
       console.log(`Room ${roomId} map phase timeout`);
       this.startTeamSetupPhase(roomId, room);
     });
 
     const mapTimer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.map;
 
     const payloads = await Promise.all(
       [...room].map(async (userId) => {
@@ -134,14 +133,13 @@ export class GameService implements OnModuleInit {
   }
 
   private startTeamSetupPhase(roomId: string, room: Set<number>) {
-    this.phaseTimer.start(roomId, 'team_setup', () => {
+    this.phaseTimer.start(`game: ${roomId}`, 'team_setup', () => {
       console.log(`Room ${roomId} team_setup phase timeout`);
-      //await new Promise(resolve => setTimeout(resolve, 3000));
       this.startCombatPhase(roomId, room);
 
     });
     const teamSetupTimer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.team_setup;
 
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;
@@ -154,7 +152,7 @@ export class GameService implements OnModuleInit {
       }
 
 		// TEST MATCHMAKING //
-		console.log('USER ID: ', userId, ': ', this.team_setup(player, enemy ?? player));
+		console.log('USER ID: ', userId, /* ': ', this.team_setup(player, enemy ?? player) */);
 		console.log('OPONNENT ID: ', opponentId);
 		console.log('******************');
 		//******************************//
@@ -165,13 +163,13 @@ export class GameService implements OnModuleInit {
   }
 
   private startCombatPhase(roomId: string, room: Set<number>) {
-    this.phaseTimer.start(roomId, 'choose_monster', () => {
+    this.phaseTimer.start(`game: ${roomId}`, 'choose_monster', () => {
       console.log(`Room ${roomId} choose_monster timeout`);
 
     });
 
     const combatTimer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.choose_monster;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.choose_monster;
 
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;
@@ -197,10 +195,7 @@ export class GameService implements OnModuleInit {
       case "use_item":
         result = await this.received_use_item(player, payload.item); break;
       case 'new_encounter': {
-        result = await this.received_new_encounter(
-          player,
-          2 /* payload.tile */,
-        );
+        result = await this.received_new_encounter(player, payload.tile);
         break;
       }
       case 'try_catch':
@@ -226,20 +221,68 @@ export class GameService implements OnModuleInit {
         };
     }
     if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
-    console.log('Result payload: ', result);
+    //console.log('Result payload: ', result);
     return result;
   }
 
   // HANDLERS
-
+  
   // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
-  private async received_new_encounter(
-    player: Player,
-    tile: number,
-  ): Promise<object | undefined> {
-    const monsters = await this.monstersService.findMonstersByTile(tile);
-    player.current_monster = monsters[1].name; //
-    //console.log('Monsters by tile', monsters[1]);
+  private async received_new_encounter(player: Player, tile: string){
+    const table_encounter = {
+      commun: 60,
+      uncommun: 30,
+      rare: 10
+    }
+    // Retrieve list monsters by tile
+    const tileObject = await this.tilesService.findOneByType(tile);
+    if (!tileObject) {
+      console.log("tileObject is undefined");
+      return undefined;
+    }
+    const tileId = tileObject.id;
+
+    let table_monster = await this.monstersService.findMonstersByTile(tileId);
+    if (!table_monster) {
+      console.log("table_monster is undefined");
+      return undefined;
+    }
+    console.log("Monster list by tiles: ", table_monster);
+
+    let result = Math.floor(Math.random() * 100);
+    // call monster from db
+    if (result <= table_encounter.rare){
+      result = Math.floor(Math.random() * 100);
+      let gap = Math.floor(100 / table_monster.length);
+      let step = gap;
+      let i = 0;
+      for (i; result > gap && i < table_monster.length - 1; ++i)
+        gap += step;
+      player.current_monster = table_monster[i].name;
+      player.current_monster_rarity = "rare"
+    }
+    else if (result <= table_encounter.uncommun){ /* && monster.rarity === uncommun exist*/
+      result = Math.floor(Math.random() * 100);
+      let gap = Math.floor(100 / table_monster.length);
+      let step = gap;
+      let i = 0;
+      for (i; result > gap && i < table_monster.length - 1; ++i)
+        gap += step;
+      player.current_monster = table_monster[i].name;
+      player.current_monster_rarity = "uncommon"
+    }
+    else {
+      result = Math.floor(Math.random() * 100);
+      // remplir table monster avec les nom des pq en commun
+      let gap = Math.floor(100 / table_monster.length);
+      let step = gap;
+      let i = 0;
+      for (i; result > gap && i < table_monster.length - 1; ++i)
+        gap += step;
+      player.current_monster = table_monster[i].name;
+      player.current_monster_rarity = "common"
+    }
+    
     return this.new_encounter(player);
   }
 
@@ -252,19 +295,36 @@ export class GameService implements OnModuleInit {
     }
     return this.update_team(player);
   }
-
-  private received_try_catch(player: Player) {
-    let result = Math.floor(Math.random() * 101);
-
-    if (result <= 50) {
-      for (let i = 0; i < player.team.length; ++i) {
-        if (player.team[i] === '') {
-          player.team[i] = player.current_monster;
-          break;
-        }
+  
+  // CHECK MATCH OF MONSTER WITH RANDOM VALUE AND RETURN TRUE IF OK OR FALSE
+  private received_try_catch(player: Player, item?: string){
+    const table_encounter = {
+      common: 70,
+      uncommon: 50,
+      rare: 20
+    }
+    let result: number = 0
+  
+    if (item !== undefined)
+      result = Math.floor(Math.random() * 101);
+  
+    let monsterCatch: number = 0
+    console.log("Monster Rarity:", player.current_monster_rarity);
+    monsterCatch = table_encounter[player.current_monster_rarity as keyof typeof table_encounter]
+    if (monsterCatch !== undefined) {
+      if (result <= monsterCatch) {
+          for (let i = 0; i < player.team.length; ++i) {
+              if (player.team[i] === '') {
+                player.team[i] = player.current_monster;
+                return this.result_catch(player, 1);
+              }
+          }
       }
-      return this.result_catch(player, 1);
-    } else return this.result_catch(player, 0);
+      else
+        return this.result_catch(player, 0);
+    }
+    else
+      return this.result_catch(player, 0);
   }
 
   // CHECK TEAM SENDED AND IF IT'S EMPTY, ELSE AUTO FULLY BATTLE_TEAM IF IT'S POSSIBLE
@@ -294,29 +354,52 @@ export class GameService implements OnModuleInit {
       }
     }
     else {
-      for (let i = 0; i < monsters.length; i++) {
-        if (monsters[i] !== "") {
-          monstersToLoad.push({
-            name: player.team[i],
-            slot: i,
-          })
+      for (let i = 0; i < monsters.length && monstersToLoad.length < 3; i++) {
+        for (let j = 0; j < player.team.length; j++) {
+          if (monsters[i] !== "" && monsters[i] === player.team[j]) {
+            monstersToLoad.push({
+              name: player.team[j],
+              slot: monstersToLoad.length,
+            })
+            break;
+          }
         }
       }
     }
 
+
     for (const {name, slot} of monstersToLoad) {
-      const monster = await this.monstersService.findOneByName(name);
-    if (!monster) return undefined;
+      const monster = await this.monstersService.findOneByName(name, { skills: true });
+      if (!monster) return {
+        event: 'game',
+        data: { state: 'team_choice', reason: 'invalid_monster', monster: name },
+      }
       player.battle_team[slot] = {
         name: monster.name,
-        type: String(monster.type),
         slot: slot,
         life: {
           current: monster.hp_total,
           max: monster.hp_total,
         },
+        type: String(monster.type),
+        attack: monster.attack,
+        attack_spe: monster.attack_spe,
+        defense: monster.defense,
+        defense_spe: monster.defense_spe,
+        speed: monster.speed,
         status: [],
-        skill: [], // 4 slots
+        dodge: false, // missing in DB
+        skill: monster.skills.slice(0, 4).map((skill): PlayerSkill => ({
+          name: skill.name,
+          current: skill.power_point,
+          max: skill.power_point,
+          type: skill.type,
+          effect: skill.effect,
+          repetition: skill.repetition,
+          precision: skill.precision,
+          data: skill.data,
+          value: skill.value,
+        }))
       };
     }
     await new Promise(resolve => setTimeout(resolve, 500)); // ! temp fix to synchronizeke with startCombatTimer
@@ -325,28 +408,44 @@ export class GameService implements OnModuleInit {
 
 
   // RECEIVED REQUEST FOR ITEM, CALL DB GAME + CHOICE ONE RANDOM ITEM AND RETURN THIS
-  private received_request_item(player: Player){
-    let item = 'golden ticket';
-    //demande object existant +++++ item = name of item select
-    player.current_item = item
+   private async received_request_item(player: Player){
+    let items = await this.itemsService.findAll();
+    if (!items) {
+      console.log('[ERROR]: items is undefined')
+      return undefined
+    }
+
+    let result = Math.floor(Math.random() * 100);
+    let gap = Math.floor(100 / items.length)
+    let step = gap
+    let i = 0
+    for (i; result > gap && i < items.length - 1; ++i)
+      gap += step
+    player.current_item = items[i].name;
+    let add = false;
+    for (let i = 0; i < player.inventory.length; ++i){
+      if (player.inventory[i]["name"] === player.current_item) {
+        player.inventory[i]["current"] += 1;
+        add = true;
+      }
+    }
+    if (add === false) {
+      for (let i = 0; i < player.inventory.length; i++) {
+        if (player.inventory[i]["name"] === ""){
+          player.inventory[i]["name"] = player.current_item;
+          player.inventory[i]["scene"] = items[i].scene;
+          player.inventory[i]["current"] += 1;
+          player.inventory[i]["value"] = items[i].value;
+          player.inventory[i]["target"] = items[i].target;
+          break;
+        }
+     }
+    }
     return this.new_current_item(player);
   }
 
   // ADD ITEM + RETURN UPDATE_ITEM
   private received_add_item(player: Player){
-    for (let i = 0; i < player.inventory.length; ++i){
-      if (player.inventory[i]["name"] === ""){
-        player.inventory[i]["name"] = player.current_item;
-        player.inventory[i]["scene"] = 'map';
-        player.inventory[i]["current"] += 1;
-        //call pour scene et value et target
-        break;
-      }
-      else if (player.inventory[i]["name"] === player.current_item){
-        player.inventory[i]["current"] += 1;
-        break;
-      }
-    }
     player.current_item = "";
     return this.update_inventory(player);
   }
@@ -354,12 +453,16 @@ export class GameService implements OnModuleInit {
 
   // CALL REMOVE ITEM + ADD MONSTER IN TEAM + SEND RESULT_CATCH WITH UPDATE_TEAM
   private received_use_item(player: Player, item: string){
-    this.received_delete_item(player, item);
+    const userId = this.playerService.getUserId(player);
+    if (!userId)
+      return undefined;
+    this.sendToPlayer(userId, this.received_delete_item(player, item));
 
     for (let i = 0; i < player.team.length; ++i){
-      if (player.team[i] === "")
+      if (player.team[i] === "") {
       player.team[i] = player.current_monster;
       break;
+      }
     }
     return this.result_catch(player, 1);
   }
@@ -408,17 +511,31 @@ export class GameService implements OnModuleInit {
     };
   }
 
-  private result_catch(player: Player, result: number) {
-    return {
-      event: 'game',
-      data: {
-        state: 'result_catch',
-        success: result !== 0 ? 'ok' : 'fail',
-        player: {
-          team: result !== 0 ? player.team : undefined,
+  private result_catch(player: Player, result: number, monsterFlee?: number) {
+    let success: number = 0
+    let msg = {
+          event: "game",
+          data: {
+              state: "result_catch",
+              success: "",
+              player: {
+          team: result !== 0 ? player.team : undefined
         },
-      },
-    };
+          }
+      };
+
+    if (result == 1){
+      msg.data.success = "ok"
+      return msg
+    }
+    else{
+      let flee = Math.floor(Math.random() * 101);
+      if (flee < 50)
+        msg.data.success = "flee"
+      else
+        msg.data.success = "fail"
+      return msg
+    }
   }
 
   private update_inventory(player: Player) {
@@ -447,15 +564,20 @@ export class GameService implements OnModuleInit {
   private received_delete_item(player: Player, item: string){
     for (let i = 0; i < player.inventory.length; ++i){
       if (player.inventory[i]["name"] === item){
+        if (player.inventory[i].current === 1) {
           player.inventory[i]["name"] = "";
           player.inventory[i]["scene"] = "";
           player.inventory[i]["type"] = "";
           player.inventory[i]["target"] = "";
           player.inventory[i]["value"] = 0;
+          player.inventory[i]["current"] = 0;
+        }
+        else 
+          player.inventory[i].current -= 1;
+
         }
         break;
       }
-      console.log(this.update_inventory(player));
     return this.update_inventory(player);
   }
 

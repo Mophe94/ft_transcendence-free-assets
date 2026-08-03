@@ -1,5 +1,4 @@
 import {
-  Team,
   Inventory,
   Skill,
   Life,
@@ -7,191 +6,305 @@ import {
 } from 'apps/game-service/src/game/player/player.interfaces';
 
 export class Player {
-  readonly id: number = -1;
-  readonly name: string = '';
-  readonly asset: string = '';
-  currentMonster: CurrentMonster = {
-    name: '',
-    slot: -1,
-    life: {
-      current: 0,
-      max: 0,
-    },
-    type: '',
-    status: [],
-    skill: [
-      {
-        name: '',
-        current: 0,
-        max: 0,
-        type: '',
-      },
-      {
-        name: '',
-        current: 0,
-        max: 0,
-        type: '',
-      },
-      {
-        name: '',
-        current: 0,
-        max: 0,
-        type: '',
-      },
-      {
-        name: '',
-        current: 0,
-        max: 0,
-        type: '',
-      },
-    ],
-  };
-  battle_team: CurrentMonster[] = [
-    {
-      name: '',
-      slot: -1,
-      life: {
-        current: 0,
-        max: 0,
-      },
-      type: '',
-      status: [],
-      skill: [
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-      ],
-    },
-    {
-      name: '',
-      slot: -1,
-      life: {
-        current: 0,
-        max: 0,
-      },
-      type: '',
-      status: [],
-      skill: [
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-      ],
-    },
-    {
-      name: '',
-      slot: -1,
-      life: {
-        current: 0,
-        max: 0,
-      },
-      type: '',
-      status: [],
-      skill: [
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-        {
-          name: '',
-          current: 0,
-          max: 0,
-          type: '',
-        },
-      ],
-    },
-  ];
-  team: string[] = ['pisciner', 'sharky', 'fishet', 'monkel', 'burpy', ''];
-  inventory: Inventory[] = [
-    {
-      name: '',
-      scene: '',
-      current: 0,
-      value: 0,
-    },
-    {
-      name: '',
-      scene: '',
-      current: 0,
-      value: 0,
-    },
-    {
-      name: '',
-      scene: '',
-      current: 0,
-      value: 0,
-    },
-    {
-      name: '',
-      scene: '',
-      current: 0,
-      value: 0,
-    },
-  ];
-  timer: number = 0;
-  current_map: string = '';
-  current_monster: string = '';
-  current_item: string = '';
-  text: string = '';
+	readonly id: number = -1;
+	readonly name: string = "";
+	readonly asset: string = "";
+	currentMonster: CurrentMonster = {
+		name: "",
+		slot: -1,
+		life: {
+			current: 0,
+			max: 0
+		},
+		type: "",
+		attack: 0,
+		attack_spe: 0,
+		defense: 0,
+		defense_spe: 0,
+		speed: 0,
+		status: [],
+		dodge: false,
+		skill: [
+			{
+				name: "",
+				current: 0,
+				max: 0,
+				type: "",
+				effect: "",
+				repetition: 0,
+				precision: 0,
+				data: "",
+				value: 0
+			},
+			{
+				name: "",
+				current: 0,
+				max: 0,
+				type: "",
+				effect: "",
+				repetition: 0,
+				precision: 0,
+				data: "",
+				value: 0
+			},
+			{
+				name: "",
+				current: 0,
+				max: 0,
+				type: "",
+				effect: "",
+				repetition: 0,
+				precision: 0,
+				data: "",
+				value: 0
+			},
+			{
+				name: "",
+				current: 0,
+				max: 0,
+				type: "",
+				effect: "",
+				repetition: 0,
+				precision: 0,
+				data: "",
+				value: 0
+			},
+		],
+	};
+	battle_team: CurrentMonster[] = [
+		{
+			name: "",
+			slot: -1,
+			life: {
+				"current": 0,
+				"max": 0
+			},
+			type: "",
+			attack: 0,
+			attack_spe: 0,
+			defense: 0,
+			defense_spe: 0,
+			speed: 0,
+			status: [],
+			dodge: false,
+			skill: [
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+			],
+		},
+		{
+			name: "",
+			slot: -1,
+			life: {
+				"current": 0,
+				"max": 0
+			},
+			type: "",
+			attack: 0,
+			attack_spe: 0,
+			defense: 0,
+			defense_spe: 0,
+			speed: 0,
+			status: [],	
+			dodge: false,
+			skill: [
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+			],
+		},
+		{
+			name: "",
+			slot: -1,
+			life: {
+				"current": 0,
+				"max": 0
+			},
+			type: "",
+			attack: 0,
+			attack_spe: 0,
+			defense: 0,
+			defense_spe: 0,
+			speed: 0,
+			status: [],
+			dodge: false,
+			skill: [
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+				{
+					name: "",
+					current: 0,
+					max: 0,
+					type: "",
+					effect: "",
+					repetition: 0,
+					precision: 0,
+					data: "",
+					value: 0
+				},
+			],
+		},
+	];
+  team: string[] = ['pisciner', 'burpy', 'fishet', '', '', ''];
+	inventory: Inventory[] = [
+		{
+			name: "",
+			scene: "",
+			current: 0,
+			value: 0,
+			type: "",
+			target: ""
+		},
+		{
+			name: "",
+			scene: "",
+			current: 0,
+			value: 0,
+			type: "",
+			target: ""
+		},
+		{
+			name: "",
+			scene: "",
+			current: 0,
+			value: 0,
+			type: "",
+			target: ""
+		},
+		{
+			name: "",
+			scene: "",
+			current: 0,
+			value: 0,
+			type: "",
+			target: ""
+		},
+	];
+	timer: number = 0
+	current_map: string = ""
+	current_monster: string = ""
+	current_monster_rarity: string = ""
+	current_item: string  = ""
+	text: string = ""
 
-  constructor(new_id: number, name: string, asset: string) {
-    this.id = new_id;
-    this.name = name;
-    this.asset = asset;
-  }
+	constructor(new_id: number, name: string, asset: string){
+		this.id = new_id;
+		this.name = name;
+		this.asset = asset
+		this.team[0] = "pisciner"
+	}
 }
