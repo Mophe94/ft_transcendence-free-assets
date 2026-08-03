@@ -87,7 +87,7 @@ export class AuthService {
       `${
         this.configService.get<string>('FORTYTWO_API') ??
           'https://api.intra.42.fr/v2/me'
-        }/v2/me`,
+        }/me`,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         },
