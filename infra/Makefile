@@ -42,7 +42,7 @@ test:
 core:
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 	chmod +x $(SWARM_SCRIPTS)/registry_check.sh
-	if ! bash $(SWARM_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \
+	@if ! bash $(SWARM_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \
           exit 1; \
         fi
 

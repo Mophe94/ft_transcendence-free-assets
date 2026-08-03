@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/03 10:35:59 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/03 10:50:46 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -39,7 +39,7 @@ is_ip() {
     return 0
 }
 
-if [ ! is_ip "$1" ] || [ ! is_ip "$2" ]; then
+if ! is_ip "$1" || ! is_ip "$2"; then
     addnote_help
     exit 1
 else
@@ -70,7 +70,7 @@ PROMOTE_TIMEOUT=120
 
 # Generating ssh key
 if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
-    ssh-keygen -f $HOME/.ssh/${SSH_KEY_NAME} -N "$SSH_KEY_PASSPHRASE"
+    ssh-keygen -f "$HOME/.ssh/${SSH_KEY_NAME}" -N "$SSH_KEY_PASSPHRASE"
 fi
 
 for user in "${NODE_USERS[@]}"; do
@@ -101,13 +101,13 @@ for user in "${NODE_USERS[@]}"; do
     try=0
     while [ "$try" -lt 3 ]; do
 	ssh -i $HOME/.ssh/${SSH_KEY_NAME} -p "$SSH_PORT" -o StrictHostKeyChecking=no "${user}"@"${HOST_IP}" \
-		    "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || \
-		    echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
+		    "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat "$PUB_KEY")\" ~/.ssh/authorized_keys 2>/dev/null || \
+		    echo \"$(cat "$PUB_KEY")\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
 	if [ "$?" != 0 ]; then
 	    echo -e "[ERROR][$SCRIPT_NAME] Could not connect to $user node\n"
 	    try=$((try + 1))
 	else
-            ssh -p"$SSH_PORT" "${user}"@"${HOST_IP}" "doas rm -rf ${VM_TARGET_DIR}"
+            ssh -p"$SSH_PORT" "${user}"@"${HOST_IP}" "doas rm -rf ${VM_TARGET_DIR}/worker.* ca.crt"
 	    doas scp -i $HOME/.ssh/${SSH_KEY_NAME} -r -P "$SSH_PORT" -o StrictHostKeyChecking=no \
 		/etc/certs/ca.crt \
 		/home/${USER}/certs/worker.crt \
@@ -134,7 +134,7 @@ done
 # Wait for node to join
 start_time=$(date +%s)
 
-for user in "${NODE_CONNECTED[@]}"; do
+for user in "${CONNECTED_NODES[@]}"; do
     [ "$user" = "$USER" ] && continue
 
     while ! docker node ls --format '{{.Hostname}}' | grep -Fxq swarmnode."$user"; do

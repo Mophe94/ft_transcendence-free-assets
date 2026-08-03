@@ -28,8 +28,8 @@ is_ip() {
 if [ ! $# -eq 4 ]; then
     addnote_help
     exit 1
-elif [ ! is_ip "$1" ] \
-  || [ ! is_ip "$2" ] \
+elif ! is_ip "$1" \
+  || ! is_ip "$2" \
   || [ -z "$3" ] \
   || [ -z "$4" ]; then
     addnote_help
