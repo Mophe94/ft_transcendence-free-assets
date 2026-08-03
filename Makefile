@@ -5,18 +5,10 @@ VM_SCRIPTS = $(LOCATION)/vm_management
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 USER_NAME="$(USER)"
 TYPE=""
+SSH_PORT=2222
 
 all:
-	@$(MAKE) --no-print-directory swarm-status
-
-swarm-status:
-	@if ! docker info >/dev/null 2>&1; then \
-	    echo "Docker daemon unavailable"; \
-	elif [ "$$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then \
-	    echo "Swarm status: active"; \
-	else \
-	    echo "Swarm status: inactive"; \
-	fi
+	@$(MAKE) setup_worker TYPE="leader"
 
 vm : 
 	@if [ "$(USER)" != "stempels" ]; then \
@@ -31,30 +23,20 @@ vm :
 	@bash $(VM_SCRIPTS)/vm.sh
 
 setup_worker:
-	@if [ ! -f $(VM_SCRIPTS)/worker.sh ]; then \
-		echo "worker.sh file missing"; \
+	@ssh-keygen -f "/home/$(USER)/.ssh/known_hosts" -R "[localhost]:2222"
+	@if [ ! -f $(VM_SCRIPTS)/node.sh ]; then \
+		echo "node.sh file missing"; \
 		exit 1; \
 	fi
-	@chmod +x $(VM_SCRIPTS)/worker.sh;
-	@bash $(VM_SCRIPTS)/worker.sh $(TYPE) $(IP4);
+	@chmod +x $(VM_SCRIPTS)/node.sh;
+	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4);
+	ssh -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make TYPE=$(TYPE);"
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"
 
-manager:
-	@$(MAKE) setup_worker TYPE="manager"
-
-iso_test/image/*.iso:
-	mkdir -p iso_test/image
-	chmod 777 iso_test/image
-	@if ! ls iso_test/image/*.iso >/dev/null 2>&1; then \
-		docker build iso_test/ -t swarm_test; \
-	fi
-	@if docker ps -a --filter "name=test"; then \
-		docker rm -f test; \
-	fi
-	@docker run -it --privileged --rm -v"$(LOCATION)/iso_test/image:/build/image" --name test swarm_test sh;
-	chmod 755 iso_test/image
+leader:
+	@$(MAKE) setup_worker TYPE="leader"
 
 vm_erase:
 	

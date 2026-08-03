@@ -38,9 +38,6 @@ export class LobbyService implements OnApplicationBootstrap {
 
     const clients = this.roomService.getClients(roomId)!;
 
-    /*     const clientData = clientsMap.get(client);
-    if (clientData) clientData.roomId = roomId; */
-
     console.log(
       `[LobbyService] User ${userSub} joined room ${roomId} (${clients.size}/${FULL})`,
     );
@@ -52,14 +49,7 @@ export class LobbyService implements OnApplicationBootstrap {
     });
 
     if (clients.size === FULL) {
-      this.phaseTimer.clear(roomId);
       this.eventEmitter.emit('lobby.start', { roomId, clients });
-    } else if (clients.size === 1) {
-      this.phaseTimer.start(roomId, 'lobby', () => {
-        console.log(`[LobbyService] Room ${roomId} lobby timeout`);
-        //ADD bots ??
-        this.eventEmitter.emit('lobby.start', { roomId, clients });
-      });
     }
   }
 }
