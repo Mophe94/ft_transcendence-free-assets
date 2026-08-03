@@ -1,49 +1,88 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Redis from 'ioredis/built';
-import { REDIS_CLIENT, REDIS_KEYS } from './redis.const';
+import { REDIS_CLIENT } from './redis.const';
+import { LOBBY_KEYS, DEFAULT } from '../lobby/lobby.const';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class RedisService {
   constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
 
   async addInactiveRoom(roomId: string): Promise<void> {
-    await this.redis.sadd(REDIS_KEYS.GAME_INACTIVE_ROOMS, roomId);
+    await this.redis.sadd(LOBBY_KEYS.INACTIVE_ROOMS, roomId);
   }
 
   async removeInactiveRoom(roomId: string): Promise<void> {
-    await this.redis.srem(REDIS_KEYS.GAME_INACTIVE_ROOMS, roomId);
+    await this.redis.srem(LOBBY_KEYS.INACTIVE_ROOMS, roomId);
   }
 
   async getInactiveRooms(): Promise<Array<string>> {
-    const members = await this.redis.smembers(REDIS_KEYS.GAME_INACTIVE_ROOMS);
+    const members = await this.redis.smembers(LOBBY_KEYS.INACTIVE_ROOMS);
     return members;
   }
 
+  async setRoomTimer(
+    roomId: string,
+    countdown: number = DEFAULT.COUNTDOWN,
+  ): Promise<void> {
+    const endTime = Date.now() + 1000 * countdown;
+    await this.redis.set(`room:${roomId}:timer`, endTime);
+  }
+
+  async getRoomTimer(roomId: string): Promise<number> {
+    const timestamp = await this.redis.get(`room:${roomId}:timer`);
+    if (timestamp === null) return 0;
+    return parseInt(timestamp, 10);
+  }
+
+  async setRoomCapacity(roomId: string, capacity: number): Promise<void> {
+    await this.redis.set(LOBBY_KEYS.ROOM_CAPACITY(roomId), capacity);
+  }
+
+  async getRandRoomId(): Promise<string> {
+    const id = await this.redis.spop(LOBBY_KEYS.FREE_IDS);
+    return id ? id : randomUUID();
+  }
+
+  async freeRoomId(roomId: string): Promise<void> {
+    await Promise.all([
+      this.redis.srem(LOBBY_KEYS.USED_IDS, roomId),
+      this.redis.sadd(LOBBY_KEYS.FREE_IDS, roomId),
+    ]);
+  }
+
+  async getRoomCapacity(
+    roomId: string,
+    capacity: number = DEFAULT.CAPACITY,
+  ): Promise<void> {
+    await this.redis.set(`room:${roomId}:capacity`, capacity);
+  }
+
   async addActiveRoom(roomId: string): Promise<void> {
-    await this.redis.sadd(REDIS_KEYS.GAME_ACTIVE_ROOMS, roomId);
+    await this.redis.sadd(LOBBY_KEYS.ACTIVE_ROOMS, roomId);
   }
 
   async addPlayerToRoom(playerId: string, roomId: string): Promise<void> {
-    await this.redis.sadd(REDIS_KEYS.ROOM_PLAYERS(roomId), playerId);
+    await this.redis.sadd(LOBBY_KEYS.ROOM_PLAYERS(roomId), playerId);
   }
   async removePlayerFromRoom(playerId: string, roomId: string): Promise<void> {
-    await this.redis.srem(REDIS_KEYS.ROOM_PLAYERS(roomId), playerId);
+    await this.redis.srem(LOBBY_KEYS.ROOM_PLAYERS(roomId), playerId);
   }
   async getPlayersFromRoom(roomId: string): Promise<Array<string>> {
-    const players = await this.redis.smembers(REDIS_KEYS.ROOM_PLAYERS(roomId));
+    const players = await this.redis.smembers(LOBBY_KEYS.ROOM_PLAYERS(roomId));
     return players;
   }
   async countPlayersInRoom(roomId: string): Promise<number> {
-    const nb_players = await this.redis.scard(REDIS_KEYS.ROOM_PLAYERS(roomId));
+    const nb_players = await this.redis.scard(LOBBY_KEYS.ROOM_PLAYERS(roomId));
     return nb_players;
   }
 
   async removeActiveRoom(roomId: string): Promise<void> {
-    await this.redis.srem(REDIS_KEYS.GAME_ACTIVE_ROOMS, roomId);
+    await this.redis.srem(LOBBY_KEYS.ACTIVE_ROOMS, roomId);
   }
 
   async getActiveRooms(): Promise<Array<string>> {
-    const members = await this.redis.smembers(REDIS_KEYS.GAME_ACTIVE_ROOMS);
+    const members = await this.redis.smembers(LOBBY_KEYS.ACTIVE_ROOMS);
     return members;
   }
 

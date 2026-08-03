@@ -64,6 +64,7 @@ services:
       - db_game_username
       - db_game_password
       - redis_password
+      - jwt_secret_key
     volumes:
       - ./backend:/app
       - /app/node_modules

@@ -51,12 +51,10 @@ export default function ImgFrame ({imgSrc, imgAlt, color='none'}: PicFrameProps)
     case 'trojan':
       frame = trojanFrame;
       break;
-
     }
     return (
         <div className="pic-frame-container">
-            
-            <img id='connard' className="pic-frame-content" src={imgSrc} alt={imgAlt} />
+            <img className="pic-frame-content" src={imgSrc} alt={imgAlt} />
             <img className="pic-frame" src={frame} alt="picture frame"/>
         </div>
     )

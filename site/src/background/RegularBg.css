@@ -8,7 +8,7 @@
 
 .regbg-upperLeft img,
 .regbg-upperRight img,
-.profil-bottomLeft img,
+.regbg-bottomLeft img,
 .regbg-bottomRight img {
   display: block;
 }
@@ -46,6 +46,8 @@
   background-size: auto auto;
   grid-row: 2;
   grid-column: 2;
+  min-width: 0;
+  padding: 1rem;
 }
 .regbg-middleRight {
   background-image: var(--img-mr);

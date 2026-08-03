@@ -21,6 +21,20 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     socket.onopen = () => {
       setWs(socket);
     };
+    // socket.onclose = () => {
+    //   const date = new Date();
+    //   const time = date.toLocaleTimeString('fr-FR', {
+    //     hour: '2-digit',
+    //     minute: '2-digit',
+    //     second: '2-digit',
+    //     hour12: false,
+    //   });
+    //   const disconnection =
+    //     { time: time,
+    //       msg : "Disconnected",
+    //       color: Color.RED};
+    //       setMessages([disconnection]);
+    // }
 
     socket.onmessage = (event) => {
       console.log('receiving a message');

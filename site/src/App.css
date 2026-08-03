@@ -1,24 +1,36 @@
 body,
 #root {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 1rem;
   margin: 0px;
-  height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-
+  min-height: 100vh;
+  overflow-x: hidden;
   font-family: 'Ubuntu', sans-serif;
   background-color: var(--bg-color);
-  overflow-x: hidden;
-
-  --black: rgb(84, 102, 126);
-  --blue: rgb(71, 149, 167);
-  --red: rgb(222, 84, 84);
-  --purple: rgb(163, 112, 150);
-  --yellow: rgb(220, 170, 70);
 }
 
 .main-layout {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    font-size: 1.2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .body-layout {
+    width: min(100vw, 1500px);
+
+    font-size: 1.3rem;
+  }
 }

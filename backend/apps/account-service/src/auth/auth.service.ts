@@ -103,7 +103,7 @@ export class AuthService {
     try {
       const response = await axios.get<Array<FortyTwoCoal>>(
         `${
-          this.configService.get('FORTYTWO_API_GETCOAL') ??
+          this.configService.get<string>('FORTYTWO_API_GETCOAL') ??
           'https://api.intra.42.fr/v2'
         }/users/${userId}/coalitions`,
         {

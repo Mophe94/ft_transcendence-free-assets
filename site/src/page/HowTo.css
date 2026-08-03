@@ -1,0 +1,81 @@
+.howto-content {
+  display: grid;
+  justify-items: center;
+  justify-self: center;
+}
+
+.howto-intro {
+  padding: 2rem 0 2rem 0;
+}
+.demo-container {
+  width: clamp(170px, 40vw, 550px);
+}
+.demo-container img {
+  width: 100%;
+}
+.instruction {
+  display: grid;
+  justify-items: center;
+  padding: 2rem;
+  /* border-top: solid 1px maroon; */
+  gap: 2rem
+}
+.mouse-click-container {
+  display: flex;
+  align-items: center;
+}
+.mouse-click-container img {
+  margin-right: 1.5rem;
+}
+.descript {
+  text-align: justify;
+}
+.key-action {
+  align-self: center;
+}
+
+.paragraph .heading-small {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 1024px)
+{
+  .instruction{
+    gap: 3rem;
+    align-items: center;
+  }
+  .right-instruct {
+    grid-template-columns: 2fr 5fr 3fr;
+  }
+  .right-instruct .demo-container{
+    grid-column: 3;
+  }
+  .left-instruct {
+    grid-template-columns: 3fr 5fr 2fr;
+  }
+  .left-instruct .demo-container{
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .left-instruct .key-action{
+    grid-column: 3;
+  }
+  .paragraph {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+  }
+  .paragraph .heading-small {
+    text-align:  start;
+    margin-bottom: 1rem;
+  }
+  .descript {
+    max-width: 100%;
+  }
+  .demo-container {
+    width: 100%;
+  }
+}

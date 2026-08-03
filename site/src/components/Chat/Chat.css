@@ -1,39 +1,30 @@
+#chat-icon {
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+}
+#chat-icon img {
+  width: min(10vw, 10vh);
+}
+
 .chat-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+.chat-container.visible {
+  height: 100vh;
+  width: 97vw;
   display: grid;
   gap: 0px;
 
-  grid-template-columns: 98px 400px 64px;
+  grid-template-columns: 98px 1fr 64px;
   grid-template-rows: 188px 1fr 172px;
+  visibility: visible;
 }
-
-.chat-msg {
-  margin-bottom: 15px;
-}
-
-.message-container {
-  height: 400px;
-  max-width: 400px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.3s ease;
-}
-
-.chat-heading {
-  font-family: 'New Rocker';
-  color: rgb(112, 14, 14);
-  -webkit-text-stroke: 2px black;
-  justify-self: center;
-  font-size: 64px;
-  font-weight: 400;
-  padding-top: 40px;
-}
-
-
-#send-button {
-  width: 50px;
-}
-
 .chat-upperLeft img,
 .chat-upperRight img,
 .chat-bottomLeft img,
@@ -102,4 +93,52 @@
   background-repeat: no-repeat no-repeat;
   grid-row: 3;
   grid-column: 3;
+} 
+.chat-heading {
+  font-family: 'New Rocker';
+  color: rgb(112, 14, 14);
+  -webkit-text-stroke: 2px black;
+  justify-self: center;
+  font-size: 64px;
+  font-weight: 400;
+  padding-top: 40px;
 }
+
+@media (min-width: 720px){
+  .chat-container.visible {
+    height: 45vh;
+    width: min(50vw, 800px);
+  }
+}
+
+/*
+
+.chat-msg {
+  margin-bottom: 15px;
+}
+
+.message-container {
+  height: 400px;
+  max-width: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+.chat-heading {
+  font-family: 'New Rocker';
+  color: rgb(112, 14, 14);
+  -webkit-text-stroke: 2px black;
+  justify-self: center;
+  font-size: 64px;
+  font-weight: 400;
+  padding-top: 40px;
+}
+
+
+#send-button {
+  width: 50px;
+}
+
+*/

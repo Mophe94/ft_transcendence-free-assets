@@ -10,8 +10,11 @@ export default function Readme() {
 
   return (
     <RegularBG>
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{readmeFile}</ReactMarkdown>
+      <div className="readme-content">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {readmeFile}
+        </ReactMarkdown>
+      </div>
     </RegularBG>
-    
   );
 }

@@ -7,7 +7,7 @@ import { IncomingMessage } from 'http';
 import { getSecret } from '../utils/secret.utils';
 
 @Injectable()
-export class wsAuthService {
+export class WsAuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,

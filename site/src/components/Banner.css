@@ -1,9 +1,10 @@
 .banner-container {
-  position: relative;
-  display: flex;
   justify-content: center;
-
-  width: 60vw;
+  border-radius: 20px;
+  border: solid 3px rgb(121, 121, 121);
+  box-shadow: 0 0 10px 10px rgba(255, 255, 255, 0.5);
+  box-sizing: border-box;
+  width: 100%;
 
   overflow: hidden;
   position: relative;
@@ -11,14 +12,14 @@
 
 .free_assets_banner {
   position: absolute;
-  width: 35%;
-  height: 35%;
+  width: 33%;
   right: 0;
+  top: 0;
   z-index: 99;
 }
 
 .video-banner {
-  max-width: 100%;
+  width: 100%;
   top: 0;
   position: relative;
   object-position: center top;

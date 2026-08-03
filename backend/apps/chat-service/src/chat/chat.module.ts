@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { ConfigModule } from '@nestjs/config';
-import { wsAuthService } from 'libs/shared/src/auth/ws-auth.service';
+import { WsAuthService } from 'libs/shared/src/auth/ws-auth.service';
 import { JwtService } from '@nestjs/jwt';
 
 @Module({
@@ -10,6 +10,6 @@ import { JwtService } from '@nestjs/jwt';
       isGlobal: true,
     }),
   ],
-  providers: [ChatService, wsAuthService, JwtService],
+  providers: [ChatService, WsAuthService, JwtService],
 })
 export class ChatModule {}

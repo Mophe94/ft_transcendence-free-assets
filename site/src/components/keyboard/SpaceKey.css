@@ -1,0 +1,10 @@
+.space-key {
+    border: solid 2px rgb(38, 38, 38);
+    text-align: center;
+    align-content: center;
+    height: clamp(1.5rem, 3vw, 3rem);
+    background-color: rgb(221, 220, 220);
+    border-radius: 4px;
+    box-shadow: 4px 4px 5px rgba(121, 121, 121, 0.8);
+    padding-inline: 1rem;
+}
