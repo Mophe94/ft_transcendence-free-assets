@@ -123,7 +123,7 @@ image:
 	fi
 
 wait_tailscale:
-	TIMEOUT=60; \
+	@TIMEOUT=60; \
 	INTERVAL=1; \
 	ELAPSED=0; \
 	until IP=$$(tailscale ip -4 2>/dev/null) && [ -n "$$IP" ]; do \

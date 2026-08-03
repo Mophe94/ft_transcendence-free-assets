@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/03 10:50:46 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/03 13:07:15 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -121,7 +121,6 @@ for user in "${NODE_USERS[@]}"; do
 		doas nohup /setup_for_swarm.sh ${LEADER_IP} ${LEADER_TAILSCALE_IP} "${JOIN_CMD}" 2049 \
 		>/tmp/setup_for_swarm.log 2>&1 < /dev/null &"
 	    CONNECTED_NODES+=("$user")
-	    ADDED_NODES=$((ADDED_NODES + 1))
 	    break
 	fi
     done
@@ -130,24 +129,25 @@ for user in "${NODE_USERS[@]}"; do
 	continue
     fi
 done
+echo "$CONNECTED_NODES"
 
 # Wait for node to join
 start_time=$(date +%s)
-
 for user in "${CONNECTED_NODES[@]}"; do
     [ "$user" = "$USER" ] && continue
 
-    while ! docker node ls --format '{{.Hostname}}' | grep -Fxq swarmnode."$user"; do
-        now=$(date +%s)
-        elapsed=$((now - start_time))
-
-        if [ "$elapsed" -ge "$NODE_JOIN_TIMEOUT" ]; then
-            echo "[ERROR][$SCRIPT_NAME] Timeout waiting for node $user to join swarm"
+    now=$(date +%s)
+    elapsed=$((now - start_time))
+    while [ "$elapsed" -ge "$NODE_JOIN_TIMEOUT" ]; do
+        if docker node ls --format '{{.Hostname}}' | grep -Fxq swarmnode."$user"; then
+            ADDED_NODES=$((ADDED_NODES + 1))
             break
         fi
-
         sleep 2
     done
+    if "$elapsed" -ge "$NODE_JOIN_TIMEOUT"
+        echo "[ERROR][$SCRIPT_NAME] Timeout waiting for node $user to join swarm"
+    fi
 done
 
 # Promote to reach manager target

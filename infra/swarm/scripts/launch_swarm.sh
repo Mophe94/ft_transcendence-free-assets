@@ -104,7 +104,7 @@ read -t 15 -p "[$SCRIPT_NAME] Do you want to add preconfigured node (y/N): " ans
 case "${answer,,}" in
 	[y]|[yes])
 	    chmod +x "${DIR}/add_node.sh"
-	   bash "${DIR}/add_node.sh" "${HOST_IP}" agaland bertrmar dbajeux kprist stempels;;
+	   bash "${DIR}/add_node.sh" "${HOST_IP}" "${HOST_TAILSCALE_IP}" agaland bertrmar dbajeux kprist stempels;;
 	*) echo "[$SCRIPT_NAME] No node added"
 esac
 
