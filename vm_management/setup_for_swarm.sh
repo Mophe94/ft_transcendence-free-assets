@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #Safeguard
 SCRIPT_NAME="${0##*/}"
