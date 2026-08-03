@@ -7,13 +7,12 @@ import { TilesService } from './entities/tiles.service';
 import { ItemsService } from './entities/items.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
-import { GamePayload } from './game.type';
+//import { GamePayload } from './game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
-import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
-import { Skill } from './entities/skills.entity';
+import { FULL, PHASE_DURATIONS, PlayerActions} from 'apps/game-service/src/game/game.type';
+//import { Skill } from './entities/skills.entity';
 import {
-  CurrentMonster,
   Skill as PlayerSkill,
 } from './player/player.interfaces';
 
@@ -158,7 +157,6 @@ export class GameService implements OnModuleInit {
 		//******************************//
 
       this.sendToPlayer(userId, this.team_setup(player, enemy ?? player));
-      
     }
   }
 
@@ -179,7 +177,7 @@ export class GameService implements OnModuleInit {
     console.log('Combat timer started');
   }
 
-  async handleMessage(
+/*   async handleMessage(
     userId: number,
     payload: any,
   ): Promise<object | undefined> {
@@ -208,12 +206,12 @@ export class GameService implements OnModuleInit {
         result = await this.received_team_choice(player, payload.battle_team);
         break;
       }
-      /*       case "change_current_monster":
+            case "change_current_monster":
         result = await this.received_update_current_monster(player, payload.data.slot); break;
       case "use_item_combat":
         result = await this.received_use_item_combat(player, enemy, payload.data.item); break;
       case "try_attack":
-        result = await this.received_try_attack(player, enemy, payload.data.skill); break; */
+        result = await this.received_try_attack(player, enemy, payload.data.skill); break;
       default:
         return {
           event: 'game',
@@ -223,6 +221,117 @@ export class GameService implements OnModuleInit {
     if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
     //console.log('Result payload: ', result);
     return result;
+  } */
+
+  private has_valid_monsters(player: Player): boolean {
+    for (const monster of player.battle_team) {
+        if (monster.name !== "" && monster.life.current > 0) {
+            return true;
+        }
+    }
+    return false;
+  }
+
+  async handleMessage(userId: number, payload: any) : Promise<object | undefined> {
+    let currentActions: PlayerActions = {};
+    let player = this.playerService.getPlayer(userId)!;
+    let userId2 = this.combatService.getOpponentId(userId);
+    if (!userId2) {
+      console.log(`[GameService]: userId2 for ${userId} is missing - using userId as placeholder`);
+      userId2 = userId;
+    }
+    let player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
+    if (!player2) {
+      console.log(`[GameService]: No opponent for ${userId} - using player as placeholder`);
+      player2 = player;
+    }
+    let result: object | undefined
+    const state = payload?.data?.state
+    switch (state) {
+      case "add_item":
+        result = await this.received_add_item(player)
+        break;
+      case "delete_item":
+        result = await this.received_delete_item(player, payload.item)
+        break;
+      case "item_request":
+        result = await this.received_request_item(player)
+        break;
+      case "use_item":
+        result = await this.received_use_item(player, payload.item)
+        break;
+      case "new_encounter":
+        result = await this.received_new_encounter(player, payload.tile)
+        break;
+      case "try_catch":
+        result = await this.received_try_catch(player)
+        break;
+      case "delete_monster":
+        result = await this.received_delete_monster(player, payload.monster)
+        break;
+      case "team_choice":
+        result = await this.received_team_choice(player, payload.battle_team)
+        break;
+      case "change_current_monster":
+      case "use_item_combat":
+      case "try_attack":
+      case "pass":
+        currentActions[player.id] = {
+                  actionType: state,
+                  data: payload
+              };
+        if (currentActions[player.id] && currentActions[player2.id]) {
+                  const arrResult = this.combatService.resolving_battle_round(player, player2, currentActions);
+          delete currentActions[player.id];
+                  delete currentActions[player2.id];
+          if (arrResult && Array.isArray(arrResult)){
+            for (let i = 0; i < arrResult.length; ++i){
+              let packet = arrResult[i]
+              // send packet to player1 and player2
+            }
+            if (player.currentMonster.life.current <= 0){
+              if (!this.has_valid_monsters(player)){
+                this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
+                this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
+                // wainting all combat finish
+              }
+              else{
+                this.sendToPlayer(userId, this.combatService.change_monster(player, player.id));
+                this.sendToPlayer(userId2, this.combatService.change_monster(player2, player.id));
+              }
+            }
+            else if (player2.currentMonster.life.current <= 0){
+              if (!this.has_valid_monsters(player2)){
+                this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
+                this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
+              }
+              else{
+                this.sendToPlayer(userId, this.combatService.change_monster(player, player2.id));
+                this.sendToPlayer(userId2, this.combatService.change_monster(player2, player2.id));
+              }
+            }
+  //					else if (!has_valid_monsters(player2)){
+  //						send result_battle(player, player.id)
+  //						send result_battle(player2, player.id)
+  //					}
+            else{
+              this.sendToPlayer(userId, this.combatService.new_turn(player));
+              this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+              // si un combat deja finish declenchement du roundLeft
+              // send new_turn(player, rounLeft)
+              // send new_turn(player, roundLeft)
+            }
+          }
+              }
+        break;
+      
+      default:
+        console.log("Unknow state:", state)
+        return undefined
+    }
+    if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
+    //console.log('Result payload: ', result);
+    return result
   }
 
   // HANDLERS
@@ -280,7 +389,7 @@ export class GameService implements OnModuleInit {
       for (i; result > gap && i < table_monster.length - 1; ++i)
         gap += step;
       player.current_monster = table_monster[i].name;
-      player.current_monster_rarity = "common"
+      player.current_monster_rarity = "common";
     }
     
     return this.new_encounter(player);
@@ -625,13 +734,5 @@ export class GameService implements OnModuleInit {
     };
   }
 
-  changeMonster: (new_monster: number) => object;
-  attack: (enemy: Player, attackName: string) => object;
 
-  /*   //Events
-  @OnEvent('lobby.start')
-  initGameRoom({ roomId }: { roomId: string }): void {
-    console.log('OnEvent -> createRoom()');
-    this.roomService.createRoom(roomId);
-  } */
 }

@@ -23,6 +23,9 @@ export class RoomService {
     if (clientData) clientData.roomId = roomId;
   }
 
+/*   async createRoom(roomCapacity: number): Promise<string> {
+    const id = await this.redis.getRandRoomId(); */
+  // ROOMID HARDCODEE
   async createRoom(roomCapacity: number): Promise<string> {
     const id = await this.redis.getRandRoomId();
     this.rooms.set(id, new Set());
@@ -42,7 +45,7 @@ export class RoomService {
     return null;
   }
 
-  async leaveRoom(client: WebSocket, roomId: string, userId: string): void {
+  async leaveRoom(client: WebSocket, roomId: string, userId: string): Promise<void> {
     const clients = this.rooms.get(roomId);
     if (!clients) return;
     clients.delete(client);

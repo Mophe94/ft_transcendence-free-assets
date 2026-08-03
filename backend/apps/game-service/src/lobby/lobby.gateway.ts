@@ -47,8 +47,9 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: WebSocket): void {
     const clientData = clientsMap.get(client);
-    if (clientData?.roomId) {
-      this.roomService.leaveRoom(client, clientData.roomId);
+    const userId = clientData?.userId.toString();
+    if (clientData?.roomId && userId) {
+      this.roomService.leaveRoom(client, clientData.roomId, userId);
       console.log('LEAVEROOM');
     }
     clientsMap.delete(client);

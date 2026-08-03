@@ -10,7 +10,7 @@ import { FULL } from 'apps/game-service/src/game/game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { RedisService } from '../redis/redis.service';
-import { LOBBY_KEYS, ROOM_IDS } from './lobby.const';
+import { DEFAULT, LOBBY_KEYS, ROOM_IDS } from './lobby.const';
 
 @Injectable()
 export class LobbyService implements OnApplicationBootstrap {
@@ -30,7 +30,7 @@ export class LobbyService implements OnApplicationBootstrap {
   async joinLobby(client: WebSocket, userSub: number): Promise<void> {
     const roomId =
       this.roomService.findAvailableRoom() ??
-      (await this.roomService.createRoom());
+      (await this.roomService.createRoom(DEFAULT.CAPACITY));
 
     this.roomService.joinRoom(client, roomId);
     await this.redisService.addPlayerToRoom(userSub.toString(), roomId);
