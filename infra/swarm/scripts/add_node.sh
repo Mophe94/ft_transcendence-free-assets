@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/03 13:07:15 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/03 13:28:14 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -145,7 +145,7 @@ for user in "${CONNECTED_NODES[@]}"; do
         fi
         sleep 2
     done
-    if "$elapsed" -ge "$NODE_JOIN_TIMEOUT"
+    if "$elapsed" -ge "$NODE_JOIN_TIMEOUT"; then
         echo "[ERROR][$SCRIPT_NAME] Timeout waiting for node $user to join swarm"
     fi
 done

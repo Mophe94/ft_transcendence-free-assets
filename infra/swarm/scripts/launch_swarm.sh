@@ -101,7 +101,7 @@ for network in "${networks[@]}"; do
 done
 
 #Adding preconfigured nodes
-read -t 15 -p "[$SCRIPT_NAME] Do you want to add preconfigured node (y/N): " answer || true
+read -p "[$SCRIPT_NAME] Do you want to add preconfigured node (y/N): " -t 15 answer || true
 case "${answer,,}" in
 	y|yes)
 	    chmod +x "${DIR}/add_node.sh"
