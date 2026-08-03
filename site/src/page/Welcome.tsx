@@ -5,10 +5,12 @@ import './Welcome.css';
 export default function Landing() {
   return (
     <div className="home-layout">
-      <div className="game_banner">
+      <div className="game-banner">
         <Banner />
       </div>
-      <EnterButton />
+      <div className='enter-button-container'>
+        <EnterButton />
+      </div>
     </div>
   );
 }

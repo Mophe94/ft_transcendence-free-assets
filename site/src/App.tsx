@@ -15,6 +15,7 @@ import Test from './page/Test';
 import AboutUs from './page/AboutUs';
 import ErrorDisplay from './content/Error';
 import Readme from './page/Readme';
+import HowToPlay from './page/HowTo';
 
 function App() {
   const { isLoading } = useAuth();
@@ -26,7 +27,6 @@ function App() {
   }
 
   return (
-    <div className="main-layout">
       <Routes>
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
@@ -35,6 +35,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:username" element={<Profile />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/howto" element={<HowToPlay/>} />
             <Route path='/test' element={<Test />} />
           </Route>
         </Route>
@@ -49,7 +50,6 @@ function App() {
           <Route path="*" element={<ErrorDisplay msg="Page not found" code={404} />} />
         </Route>
       </Routes>
-    </div>
   );
 }
 

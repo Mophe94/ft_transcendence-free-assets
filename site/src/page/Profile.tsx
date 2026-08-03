@@ -57,8 +57,10 @@ export default function Profile() {
 
   return (
     <RegularBG>
-      <Stats user={profileUser}/>
-      <Preferences />
+      <div id='profile-layout'>
+        <Stats user={profileUser}/>
+        <Preferences />
+      </div>
     </RegularBG>
   );
 }

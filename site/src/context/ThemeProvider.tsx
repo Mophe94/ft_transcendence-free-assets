@@ -37,7 +37,7 @@ export function ThemeProvider({ children }: PropsWithChildren) {
   }, [theme]);
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
-      <div className={`theme-${theme}`} style={themeStyles}>{children}</div>
+      <div id='main' className={`theme-${theme}`} style={themeStyles}>{children}</div>
     </ThemeContext.Provider>
   );
 }

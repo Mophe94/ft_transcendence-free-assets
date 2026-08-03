@@ -1,12 +1,14 @@
 import Chat from '../components/Chat/Chat';
-import { NewLobby } from '../components/NewLobby';
+import { Lobby } from '../components/Lobby';
 import { ChatProvider } from '../context/ChatProvider';
 import './Home.css';
 
 export default function Home() {
   return (
     <div className="home-container">
-      <NewLobby />
+      <div className='lobby-container'>
+        <Lobby />
+      </div>
       <ChatProvider>
         <Chat />
       </ChatProvider>

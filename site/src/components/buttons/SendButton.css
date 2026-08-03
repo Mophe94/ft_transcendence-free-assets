@@ -4,11 +4,8 @@
   padding: 0;
   cursor: pointer;
   outline: inherit;
-  width: 115px;
-  height: 70px;
-  margin-left: 10px;
-  margin-right: 10px;
-
+  height: 100%;
+  aspect-ratio: 105 / 64;
   background-image: var(--img-save);
   background-size: contain;
   background-repeat: no-repeat;

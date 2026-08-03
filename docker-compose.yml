@@ -37,9 +37,7 @@ services:
       - db_game_username
       - db_game_password
       - redis_password
-    depends_on:
-      users_db:
-        condition: service_healthy
+      - jwt_secret_key
     volumes:
       - ./backend:/app
       - /app/node_modules

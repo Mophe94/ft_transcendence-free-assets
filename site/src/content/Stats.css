@@ -1,11 +1,109 @@
 
+.coalLogo {
+  visibility: hidden;
+  height: 0;
+}
 .stats-content-layout {
-  position: relative;
+  display: grid;
+  justify-items: center;
 }
 
-/* .stats-title {
-  margin-top: 70px;
-} */
+.user-profile-pic {
+  width: clamp(0px, 30vw, 400px);
+  margin: 2rem 0 2rem 0;
+}
+
+.user-info{
+  display: grid;
+  gap: 0.6rem;
+  text-align: center;
+}
+.info-label {
+  margin-top: 1rem;
+  font-size: clamp(0.6rem, 3.3vw, 3rem);
+  font-weight: 500;
+}
+.info-value {
+  font-size: clamp(0.6rem, 3vw, 3rem);
+
+}
+#stats-title {
+  margin: 2rem;
+}
+.stats-info{
+  display: grid;
+  gap: 0.6rem;
+  text-align: center;
+}
+
+.stats-label {
+  margin-top: 1rem;
+  font-size: clamp(0.6rem, 3.3vw, 3rem);
+  font-weight: 500;
+}
+.stats-value {
+  font-size: clamp(0.6rem, 3vw, 3rem);
+}
+
+@media (min-width: 1280px) {
+  .coalLogo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    visibility: visible;
+    height: clamp(8rem, 9vw, 10rem);
+  }
+  .stats-content-layout {
+    align-items: center;
+  }
+  .stats-header {
+    grid-column: 1 / 3;
+  }
+  #stats-title {
+    grid-column: 1 / 3;
+  }
+  .user-profile-pic {
+    grid-column: 1;
+  }
+  .user-info {
+    height: min-content;
+    grid-column:2;
+
+    display: grid;
+    justify-items: start;
+    align-items: center;
+    gap:0;
+  }
+  .info-label {
+    font-size: 2rem;
+    margin: 1rem 0 0 3rem;
+  }
+  .info-value {
+    font-size: 1.8rem;
+    margin-left: clamp( 4rem, 5vw, 5rem)
+  }
+  .stats-info {
+    grid-column: 1 / 3;
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 2rem;
+    column-gap: 3rem;
+  }
+  .stats-label {
+    font-size: 2rem;
+    margin: 0 2rem 0 0;
+    justify-self: end;
+  }
+  .stats-value {
+    font-size: 1.8rem;
+    margin: 0 0 0 2rem;
+    justify-self: start;
+  }
+
+}
+/*
 
 .stats-table {
   display: grid;
@@ -18,13 +116,13 @@
 .top-left {
   grid-column: 1;
   justify-self: center;
-  align-self: center; /* Aligne le bouclier verticalement */
+  align-self: center;
 }
 
 .user-info {
   grid-column: 2;
   display: grid;
-  grid-template-columns: auto 1fr; /* S'adapte à la taille du texte */
+  grid-template-columns: auto 1fr;
   gap: 5px 10px;
   align-self: center;
 }
@@ -46,15 +144,14 @@
 
 .content-table .value {
   grid-column: 4;
-}
+}*/
 
-.coalLogo {
+/* .coalLogo {
   position: absolute;
   top: 0;
   right: 0;
-  width: 200px;
-  height: 200px;
-}
+  width: clamp(0.8rem, 15vw, 8rem);
+} */
 
 .trojan {
   color: rgb(53, 92, 157);

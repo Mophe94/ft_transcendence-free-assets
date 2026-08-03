@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { WebSocket } from 'ws'; //!
-import { randomUUID } from 'crypto';
 import {
   clientsMap,
   ClientData,
@@ -24,11 +23,14 @@ export class RoomService {
     if (clientData) clientData.roomId = roomId;
   }
 
-  // ROOMID HARDCODEE
-  async createRoom(roomId?: string): Promise<string> {
-    const id = roomId ?? 'test-room'; //randomUUID();
+  async createRoom(roomCapacity: number): Promise<string> {
+    const id = await this.redis.getRandRoomId();
     this.rooms.set(id, new Set());
-    await this.redis.addInactiveRoom(id);
+    void Promise.all([
+      this.redis.addInactiveRoom(id),
+      this.redis.setRoomTimer(id),
+      this.redis.setRoomCapacity(id, roomCapacity),
+    ]);
     console.log(`Room created: ${id}`);
     return id;
   }
@@ -40,10 +42,11 @@ export class RoomService {
     return null;
   }
 
-  leaveRoom(client: WebSocket, roomId: string): void {
+  async leaveRoom(client: WebSocket, roomId: string, userId: string): void {
     const clients = this.rooms.get(roomId);
     if (!clients) return;
     clients.delete(client);
+    await this.redis.removePlayerFromRoom(userId, roomId);
     console.log(`Client left ${roomId}, ${clients.size} players remaining`);
 
     if (clients.size === 0) {

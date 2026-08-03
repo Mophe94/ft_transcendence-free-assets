@@ -1,0 +1,23 @@
+.aswd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.3rem;
+    height:fit-content;
+}
+.key-up {
+    grid-column: 2 / 2;
+    grid-row: 1 / 1;
+}
+.key-left {
+    grid-column: 1 / 1;
+    grid-row: 2 / 2;
+}
+.key-down {
+    grid-column: 2 / 2;
+    grid-row: 2 / 2;
+}
+.key-right {
+    grid-column: 3 / 3;
+    grid-row: 2 / 2;
+}
+

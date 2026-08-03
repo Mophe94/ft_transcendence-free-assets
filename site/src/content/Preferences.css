@@ -1,4 +1,95 @@
+#preferences-form {
+  display: grid;
+  justify-items: center;
+  margin-top: clamp(2rem, 10vw, 5rem);
+}
+.settings-grid {
+  justify-items: center;
+}
 
+.selection {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  justify-items: center;
+}
+.selection-label {
+  grid-row: 1;
+  grid-column: 1/4;
+  margin: 2rem 0 2rem 0;
+}
+
+.pref-buttons {
+  display: flex;
+  width: 100%;
+  height: clamp(3rem, 8vw, 140px);
+  margin: 3rem 0 2rem 0;
+  flex-direction: row;
+  justify-content: center;
+}
+.arrow-button img{
+  height: 100%;
+  width: auto;
+}
+.reset-button {
+  margin-right: clamp(0px, 3vw, 50px);
+}
+.save-button {
+  margin-left: clamp(0px, 3vw, 50px);
+}
+
+.selection-img {
+  height: clamp( 2rem, 20vw, 200px);
+}
+
+
+.selection .arrow-button {
+  height: clamp( 2rem, 10vw, 200px);
+}
+
+@media (min-width: 1280px) {
+  .settings-grid {
+    grid-column: 1 / 4;;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5rem;
+  }
+  .selection-label.heading-medium {
+    font-size: clamp(4rem, 10vw, 5rem); 
+  }
+  .selection {
+    gap: 1rem;
+  }
+  .selection-img {
+    height: clamp(100px, 10vw, 200px);
+  }
+  .arrow-button img{
+    height: clamp(60px, 5vw, 100px);
+    aspect-ratio: 74/104
+  }
+  #preferences-form {
+    grid-template-columns: 1fr 3fr 1fr;
+    align-items: center;
+  }
+  .pref-header {
+    grid-column: 2 / 2;
+  }
+  .pref-buttons {
+    grid-column: 3 / 3;
+    grid-row: 1 / 1;
+    margin: 0;
+    height: clamp(2rem, 4vw, 5rem);
+    justify-content: space-around;
+  }
+  .reset-button {
+    margin: 0;
+  }
+}
+
+
+/* 
 .settings-grid {
   grid-template-columns: 1fr 1fr 1fr;
   display: grid;
@@ -30,4 +121,5 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-}
+} */
+
