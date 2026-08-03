@@ -49,12 +49,14 @@ core:
 website:
 	@doas mkdir -p "/var/lib/postgresql/data"
 	@doas mkdir -p "/var/lib/game/data"
+	@mkdir -p "/nfs-storage/users_data"
 	@make image TARGET=website
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 game:
 	@doas mkdir -p "/var/lib/postgresql/data"
 	@doas mkdir -p "/var/lib/game/data"
+	@mkdir -p "/nfs-storage/game_data"
 	@make image TARGET=game
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
