@@ -246,7 +246,7 @@ export class GameService implements OnModuleInit {
       player2 = player;
     }
     let result: object | undefined
-    const state = payload?.data?.state
+    const state = payload?.state
     switch (state) {
       case "add_item":
         result = await this.received_add_item(player)
