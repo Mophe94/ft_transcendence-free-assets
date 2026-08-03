@@ -149,7 +149,7 @@ var player: Dictionary = {
 	"battle_team": [
 		{
 			"name": "",
-			"slot": 1,
+			"slot": -1,
 			"life": {
 				"current": 0,
 				"max": 0

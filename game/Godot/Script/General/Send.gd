@@ -34,7 +34,6 @@ func send_message(event, value = null):
 		"event": "game",
 		"data": {}
 	}
-	print(event)
 	match event:
 		"request_item":
 			_item_request(packet)
@@ -53,7 +52,6 @@ func send_message(event, value = null):
 		"team_choice":
 			_team_choice(packet)
 		"change_current_monster":
-			print("coucoucocuocu")
 			_change_current_monster(packet, value)
 		"try_attack":
 			_try_attack(packet, value)

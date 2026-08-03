@@ -14,6 +14,7 @@ var SPEED_TEXT = GeneralData.SPEED_TEXT
 @onready var button = [$Button, $Button2, $Button3, $Button4]
 @onready var back_button = $Button5
 
+signal action_play
 signal action_combat
 signal change_monster
 signal enemy_change_monster
@@ -50,10 +51,12 @@ func _new_enemy_monster():
 	emit_signal("enemy_change_monster")
 
 func waiting_player(send_func: Callable):
+	action_play.emit()
 	hide_selection()
 	lock_button()
 	send_func.call()
 	text_show("Waiting action enemy.")
+	_back()
 
 func _received_action():
 	emit_signal("action_combat")
@@ -155,6 +158,7 @@ func set_menus_select_monster():
 		back_button.show()
 
 func set_menus_change():
+	print("menus change")
 	unlock_button()
 	hide_selection()
 	await text_show("Which monster you want to switch to ?")
@@ -170,7 +174,7 @@ func set_menus_change():
 			else:
 				button[current_button].text = GeneralData.player["battle_team"][i]["name"] + " : " + str(GeneralData.player["battle_team"][i]["life"]["current"]) + "/" + str(GeneralData.player["battle_team"][i]["life"]["max"])
 				button[current_button].action = "monster"
-				button[current_button].object = str(i)
+				button[current_button].object = GeneralData.player["battle_team"][i]["slot"]
 			current_button +=1
 	back_button.show()
 	
@@ -185,7 +189,7 @@ func set_menus_items():
 	hide_selection()
 	var j = 0
 	for i in range(4):
-		if inventory[i]["name"] != "" and inventory[i]["scene"] == "combat":
+		if inventory[i]["name"] != "" and inventory[i]["scene"] == "combat" and inventory[i]["current"] > 0:
 			button[j].show()
 			button[j].text = inventory[i]["name"] + " x " + str(inventory[i]["current"])
 			button[j].action = "use"

@@ -29,6 +29,8 @@ var enemy_monster_base_scale: Vector2
 @onready var assetPlayer = GeneralData.player_charactere_scene
 @onready var skip_intro = false
 
+@onready var actionPlay = false
+
 @onready var combatBanner = $CombatBanner
 @onready var playerUI = $PlayerMonsterUI/CenterContainer/HBoxContainer
 @onready var enemyUI = $EnemyMonsterUI/CenterContainer/HBoxContainer
@@ -82,6 +84,13 @@ func _new_enemy_monster():
 	monster_enemy_scene.scale.x = -1
 	show_UI()
 	style_progress_bar()
+	
+func _action_play():
+	actionPlay = true
+	
+func _new_turn():
+	actionPlay = false
+	
 ###################################################################
 
 
@@ -173,6 +182,7 @@ func transi_open():
 	transi_scene.queue_free()
 
 func _ready() -> void:
+	$CombatMenus.action_play.connect(_action_play)
 	$CombatMenus.action_combat.connect(show_UI)
 	$CombatMenus.change_monster.connect(_new_current_monster)
 	$CombatMenus.enemy_change_monster.connect(_new_enemy_monster)
