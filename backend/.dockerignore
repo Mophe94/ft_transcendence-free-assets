@@ -5,3 +5,5 @@ test
 .prettierrc
 eslintcongig.js
 README.md
+.git
+.gitignore

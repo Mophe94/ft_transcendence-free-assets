@@ -11,18 +11,16 @@ REGISTRY="$1"
 IMAGE="registry-healthcheck"
 TAG="test-$(date +%s)"
 
+#Checking registry API
 TIMEOUT=120
 INTERVAL=1
 ELAPSED=0
-echo "[$SCRIPT_NAME] Checking registry API..."
 while ! curl --cacert /etc/certs/ca.crt \
     --cert "/home/${USER}/certs/worker.crt" \
     --key "/home/${USER}/certs/worker.key" \
-    -fsS "https://${REGISTRY}/v2/" >/dev/null 2>&1
-do
+    -fsS "https://${REGISTRY}/v2/" >/dev/null 2>&1; do
     if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
-        printf "\n[%s] ERROR: Registry did not become available after %ds\n" \
-            "$SCRIPT_NAME" "$TIMEOUT"
+        printf "\n[%s] ERROR: Registry did not become available after %ds\n" "$SCRIPT_NAME" "$TIMEOUT"
         exit 1
     fi
 
@@ -32,7 +30,6 @@ do
     sleep "$INTERVAL"
     ELAPSED=$((ELAPSED + INTERVAL))
 done
-
 printf "\n[%s] Registry is ready\n" "$SCRIPT_NAME"
 
 echo "[$SCRIPT_NAME] Pulling test image..."
