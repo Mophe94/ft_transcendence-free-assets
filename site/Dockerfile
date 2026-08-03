@@ -23,6 +23,6 @@ WORKDIR /app
 
 COPY . /app/
 
-RUN npm install dev
+RUN npm install
 
 CMD ["npm","run","dev"]

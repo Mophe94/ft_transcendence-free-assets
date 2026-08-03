@@ -42,25 +42,27 @@ test:
 core:
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 	chmod +x $(SWARM_SCRIPTS)/registry_check.sh
-	bash $(SWARM_SCRIPTS)/registry_check.sh "$(REGISTRY)"
+	if ! bash $(SWARM_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \
+          exit 1; \
+        fi
 
 website:
 	@doas mkdir -p "/var/lib/postgresql/data"
 	@doas mkdir -p "/var/lib/game/data"
-	make image TARGET=website
+	@make image TARGET=website
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 game:
 	@doas mkdir -p "/var/lib/postgresql/data"
 	@doas mkdir -p "/var/lib/game/data"
-	make image TARGET=game
+	@make image TARGET=game
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 observ:
 	@mkdir -p "/nfs-storage/grafana"
 	@mkdir -p "/nfs-storage/prometheus"
 	@mkdir -p "/nfs-storage/loki"
-	make image TARGET=observ
+	@make image TARGET=observ
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 up: build

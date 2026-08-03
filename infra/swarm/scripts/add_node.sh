@@ -6,14 +6,14 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/07/28 17:35:27 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/03 10:35:59 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
 
 SCRIPT_NAME="${0##*/}"
 addnote_help() {
-    echo "[INFO] Usage ${SCRIPT_NAME}: <leader ip> <node user> <node user> <...>"
+    echo "[INFO] Usage ${SCRIPT_NAME}: <leader ip> <leader tailscale ip> <node user> <node user> <...>"
 }
 
 
@@ -39,13 +39,14 @@ is_ip() {
     return 0
 }
 
-if is_ip "$1"; then
-    LEADER_IP="$1"
-else
+if [ ! is_ip "$1" ] || [ ! is_ip "$2" ]; then
     addnote_help
     exit 1
+else
+    LEADER_IP="$1"
+    LEADER_TAILSCALE_IP="$2"
+    shift 2
 fi
-shift
 
 NODE_USERS=("$@")
 
@@ -72,7 +73,6 @@ if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
     ssh-keygen -f $HOME/.ssh/${SSH_KEY_NAME} -N "$SSH_KEY_PASSPHRASE"
 fi
 
-LEADER_TAILSCALE_IP=$(tailscale ip -4)
 for user in "${NODE_USERS[@]}"; do
     if [ "$user" = "$USER" ]; then
 	continue
@@ -107,6 +107,7 @@ for user in "${NODE_USERS[@]}"; do
 	    echo -e "[ERROR][$SCRIPT_NAME] Could not connect to $user node\n"
 	    try=$((try + 1))
 	else
+            ssh -p"$SSH_PORT" "${user}"@"${HOST_IP}" "doas rm -rf ${VM_TARGET_DIR}"
 	    doas scp -i $HOME/.ssh/${SSH_KEY_NAME} -r -P "$SSH_PORT" -o StrictHostKeyChecking=no \
 		/etc/certs/ca.crt \
 		/home/${USER}/certs/worker.crt \
@@ -157,6 +158,8 @@ current_managers() {
 
 start_time=$(date +%s)
 
+#Add security: prevent reaching a even number of manager
+
 while :; do
     managers=$(current_managers)
 
@@ -185,9 +188,5 @@ while :; do
             exit 0
         fi
     done < <(docker node ls --filter role=worker --format '{{.Hostname}}')
-#        (docker node ls --format '{{.Hostname}} {{.ManagerStatus}}' |
-#        awk 'NF == 1 {print $1}'
-#    )
-
     sleep 2
 done
