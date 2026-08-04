@@ -10,9 +10,10 @@ import { CombatService } from './combat.service';
 //import { GamePayload } from './game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
-import { FULL, PHASE_DURATIONS, PlayerActions} from 'apps/game-service/src/game/game.type';
+import { FULL, PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
 //import { Skill } from './entities/skills.entity';
 import {
+  CurrentActions,
   Skill as PlayerSkill,
 } from './player/player.interfaces';
 
@@ -177,51 +178,6 @@ export class GameService implements OnModuleInit {
     console.log('Combat timer started');
   }
 
-/*   async handleMessage(
-    userId: number,
-    payload: any,
-  ): Promise<object | undefined> {
-    const player = this.playerService.getPlayer(userId)!;
-    let result: object | undefined;
-    switch (payload.state) {
-            case "add_item":
-        result = await this.received_add_item(player); break;
-      case "delete_item":
-        result = await this.received_delete_item(player, payload.item); break;
-      case "item_request":
-        result = await this.received_request_item(player); break;
-      case "use_item":
-        result = await this.received_use_item(player, payload.item); break;
-      case 'new_encounter': {
-        result = await this.received_new_encounter(player, payload.tile);
-        break;
-      }
-      case 'try_catch':
-        result = await this.received_try_catch(player);
-        break;
-      case 'delete_monster':
-        result = await this.received_delete_monster(player, payload.monster);
-        break;
-      case 'team_choice': {
-        result = await this.received_team_choice(player, payload.battle_team);
-        break;
-      }
-            case "change_current_monster":
-        result = await this.received_update_current_monster(player, payload.data.slot); break;
-      case "use_item_combat":
-        result = await this.received_use_item_combat(player, enemy, payload.data.item); break;
-      case "try_attack":
-        result = await this.received_try_attack(player, enemy, payload.data.skill); break;
-      default:
-        return {
-          event: 'game',
-          data: { state: payload.state, reason: 'invalid_action' },
-        };
-    }
-    if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
-    //console.log('Result payload: ', result);
-    return result;
-  } */
 
   private has_valid_monsters(player: Player): boolean {
     for (const monster of player.battle_team) {
@@ -233,7 +189,6 @@ export class GameService implements OnModuleInit {
   }
 
   async handleMessage(userId: number, payload: any) : Promise<object | undefined> {
-    let currentActions: PlayerActions = {};
     let player = this.playerService.getPlayer(userId)!;
     let userId2 = this.combatService.getOpponentId(userId);
     if (!userId2) {
@@ -277,18 +232,20 @@ export class GameService implements OnModuleInit {
       case "use_item_combat":
       case "try_attack":
       case "pass":
-        currentActions[player.id] = {
-                  actionType: state,
-                  data: payload
-              };
-        if (currentActions[player.id] && currentActions[player2.id]) {
-                  const arrResult = this.combatService.resolving_battle_round(player, player2, currentActions);
-          delete currentActions[player.id];
-                  delete currentActions[player2.id];
+        player.currentActions = { 
+          actionType: state,
+          data: payload
+        }
+        console.log("Current actions", player.currentActions);
+        if (player.currentActions.actionType && player2.currentActions.actionType) {
+          const arrResult = await this.combatService.resolving_battle_round(player, player2);
+          player.currentActions.actionType = undefined;
+          player2.currentActions.actionType = undefined;
           if (arrResult && Array.isArray(arrResult)){
             for (let i = 0; i < arrResult.length; ++i){
               let packet = arrResult[i]
-              // send packet to player1 and player2
+              this.sendToPlayer(userId, packet);
+              this.sendToPlayer(userId2, packet);
             }
             if (player.currentMonster.life.current <= 0){
               if (!this.has_valid_monsters(player)){
@@ -331,9 +288,12 @@ export class GameService implements OnModuleInit {
         console.log("Unknow state:", state)
         return undefined
     }
-    if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
+    if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD 1');
     //console.log('Result payload: ', result);
-    return result
+    if (state !== "change_current_monster" && state !== "use_item_combat" && state !== "try_attack" && state !== "pass") {
+      if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD 2');
+      return result
+    }
   }
 
   // HANDLERS
@@ -358,7 +318,6 @@ export class GameService implements OnModuleInit {
       console.log("table_monster is undefined");
       return undefined;
     }
-    console.log("Monster list by tiles: ", table_monster);
 
     let result = Math.floor(Math.random() * 100);
     // call monster from db
@@ -513,7 +472,7 @@ export class GameService implements OnModuleInit {
         }))
       };
     }
-    await new Promise(resolve => setTimeout(resolve, 500)); // ! temp fix to synchronizeke with startCombatTimer
+    await new Promise(resolve => setTimeout(resolve, 1000)); // ! temp fix to synchronizeke with startCombatTimer
     return this.combat(player);
   }
 
@@ -549,7 +508,6 @@ export class GameService implements OnModuleInit {
           player.inventory[j]["current"] += 1;
           player.inventory[j]["value"] = items[i].value;
           player.inventory[j]["target"] = items[i].target;
-          console.log("ITEM: name: ", items[i].name, ", scene: ", items[i].scene);
           break;
         }
      }
@@ -560,7 +518,6 @@ export class GameService implements OnModuleInit {
   // ADD ITEM + RETURN UPDATE_ITEM
   private received_add_item(player: Player){
     player.current_item = "";
-    console.log("PLAYER INVENTORY: ", player.inventory);
     return this.update_inventory(player);
   }
 

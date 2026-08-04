@@ -10,9 +10,9 @@ export const FULL = 2;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 90,
-  team_setup: 20,
-  choose_monster: 30, // happend only if a monster die -> before choose action phase
+  map: 10,
+  team_setup: 5,
+  choose_monster: 40, // happend only if a monster die -> before choose action phase
   choose_action: 30,
 };
 
@@ -25,10 +25,3 @@ export const createMockUser = () => {
     userId: mockUserCounter,
   };
 };
-
-export interface PlayerActions {
-  [playerId: number]: {
-      actionType: "try_attack" | "use_item_combat" | "change_current_monster" | "pass";
-      data: any;
-  }
-}

@@ -3,6 +3,7 @@ import {
   Skill,
   Life,
   CurrentMonster,
+  CurrentActions,
 } from 'apps/game-service/src/game/player/player.interfaces';
 
 export class Player {
@@ -294,6 +295,10 @@ export class Player {
 			target: ""
 		},
 	];
+	currentActions: CurrentActions = {
+		actionType: undefined,
+		data: undefined
+	};
 	timer: number = 0
 	current_map: string = ""
 	current_monster: string = ""

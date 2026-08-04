@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Player } from './player/player';
-import { PlayerActions} from 'apps/game-service/src/game/game.type';
 import {
+	CurrentActions,
 	CurrentMonster,
 	Skill
   } from './player/player.interfaces';
@@ -48,34 +48,34 @@ export class CombatService {
 	/* ********************************************************************* */
 
 	/* RESOLVING BATTLE ROUND - RECEIVED */
-	private resolve_first(player1: Player, player2: Player, actionPlayer1: PlayerActions[number], actionPlayer2: PlayerActions[number]): Player {
+	private resolve_first(player1: Player, player2: Player): Player {
     const speed1 = player1.currentMonster["speed"];
     const speed2 = player2.currentMonster["speed"];
 
-    if (actionPlayer1.actionType === actionPlayer2.actionType){
+    if (player1.currentActions.actionType === player2.currentActions.actionType){
        if (speed1 === speed2) {
             return Math.random() < 0.5 ? player1 : player2;
         }
         return speed1 > speed2 ? player1 : player2;
     }
 
-    if(actionPlayer1.actionType === "pass" || actionPlayer2.actionType === "pass"){
-        return actionPlayer1.actionType === "pass" ? player1 : player2;
+    if(player1.currentActions.actionType === "pass" || player2.currentActions.actionType === "pass"){
+        return player1.currentActions.actionType === "pass" ? player1 : player2;
     }
 
-    if (actionPlayer1.actionType === "change_current_monster" || actionPlayer2.actionType === "change_current_monster"){
-        return actionPlayer1.actionType === "change_current_monster" ? player1 : player2;
+    if (player1.currentActions.actionType === "change_current_monster" || player2.currentActions.actionType === "change_current_monster"){
+        return player1.currentActions.actionType === "change_current_monster" ? player1 : player2;
     }
 
-    if (actionPlayer1.actionType === "use_item_combat" || actionPlayer2.actionType === "use_item_combat"){
-        return actionPlayer1.actionType === "use_item_combat" ? player1 : player2;
+    if (player1.currentActions.actionType === "use_item_combat" || player2.currentActions.actionType === "use_item_combat"){
+        return player1.currentActions.actionType === "use_item_combat" ? player1 : player2;
     }
 
     return player1;
 }
 
 
-	private handle_action(player: Player, enemy: Player, actionPlayer: PlayerActions[number], order: number){
+	private handle_action(player: Player, enemy: Player, actionPlayer: CurrentActions, order: number){
     switch (actionPlayer.actionType) {
         case "try_attack":
             this.received_try_attack(player, enemy, actionPlayer.data?.skill);
@@ -94,29 +94,30 @@ export class CombatService {
     }
 }
 
-	resolving_battle_round(player1: Player, player2: Player, action: PlayerActions){
-		const actionPlayer1 = action[player1.id];
-		const actionPlayer2 = action[player2.id];
-
-		let first: Player = this.resolve_first(player1, player2, actionPlayer1, actionPlayer2);
+	resolving_battle_round(player1: Player, player2: Player){
+		let first: Player = this.resolve_first(player1, player2);
 		let second: Player = first === player1 ? player2 : player1;
+		
+		const actionFirst = first.currentActions;
+		const actionSecond = second.currentActions;
+
 		let changeMonsterFirst: number | undefined = undefined;
 		let changeMonsterSecond: number | undefined = undefined;
 
-		if (action[first.id].actionType == "change_current_monster")
+		if (actionFirst.actionType == "change_current_monster")
 			changeMonsterFirst = first.id ;
 
-		this.handle_action(first, second, action[first.id], 1);
-		if (second.currentMonster.life.current <= 0) {
+		this.handle_action(first, second, actionFirst, 1);
+		if (second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) {
 			second.currentMonster.life.current = 0;
 			return [ this.action_battle(first, second,  1, 1, changeMonsterFirst)
 			];
 		}
 
-		if (action[second.id].actionType == "change_current_monster")
+		if (first.currentMonster.name !== "" && actionSecond.actionType == "change_current_monster")
 			changeMonsterSecond = second.id;
 
-		this.handle_action(second, first, action[second.id], 2);
+		this.handle_action(second, first, actionSecond, 2);
 
 		// si change monster envoyer 
 		return [ this.action_battle(first, second, 1, 2, changeMonsterFirst),
@@ -132,13 +133,13 @@ export class CombatService {
 				state: "action_battle",
 				order: order,
 				max: max,
-				changeMonster: -1,
+				change_monster: -1,
 				player: player,
 				enemy: player2
 			}
 		}
 		if (changePlayerID && changePlayerID !== undefined)
-			result.data.changeMonster = changePlayerID;
+			result.data.change_monster = changePlayerID;
 		return result;
 	}
 
@@ -489,12 +490,19 @@ export class CombatService {
 	}
 
 	private received_change_current_monster(player: Player, slot: number){
-		const temp = player.currentMonster.name;
-		if (slot >= 0 && slot <= 2 && player.battle_team[slot]["name"] != "" && player.battle_team[slot]["life"]["current"] > 0){
+		let temp = "";
+		if (player.currentMonster.name !== "")
+			temp = player.currentMonster.name;
+		if (player.currentMonster.name === "" && slot >= 0 && slot <= 2 && player.battle_team[slot]["name"] != "" && player.battle_team[slot]["life"]["current"] > 0) {
 			player.currentMonster = player.battle_team[slot];
-			player.text =  player.name + " change " + temp + " for " + player.currentMonster.name;
+			player.text =  player.name + " call " + player.currentMonster.name;
 		}
-		else if (slot === -1){
+		else if (slot >= 0 && slot <= 2 && player.battle_team[slot]["name"] != "" && player.battle_team[slot]["life"]["current"] > 0) {
+			player.currentMonster = player.battle_team[slot];
+			if (temp !== "")
+				player.text =  player.name + " change " + temp + " for " + player.currentMonster.name;
+		}
+		else {
 			for (let i = 0; i < player.battle_team.length; ++i){
 				if (player.battle_team[i]["name"] != "" && player.battle_team[i]["life"]["current"] != 0){
 					player.currentMonster = player.battle_team[i];
@@ -503,9 +511,7 @@ export class CombatService {
 				}
 			}
 		}
-		else{
-			player.text = player.name + " fail to change " + temp;
-		}
+		console.log("PLAYER text: ", player.text);
 	}
 
 	private received_pass(player: Player){

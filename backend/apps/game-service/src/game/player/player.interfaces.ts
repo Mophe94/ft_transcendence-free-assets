@@ -38,3 +38,8 @@ export interface CurrentMonster {
 	skill: Skill[];
 	dodge: boolean;
 }
+
+export interface CurrentActions {
+	actionType: "try_attack" | "use_item_combat" | "change_current_monster" | "pass" | undefined;
+	data: any;
+  }
