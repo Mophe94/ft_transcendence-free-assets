@@ -85,18 +85,15 @@ swarm-status:
 	fi
 
 addnode:
-	echo -n "[$SCRIPT_NAME] Do you want to add more node (y/N): " 
-	read -t 15 answer || true
-	case "${answer,,}" in
-		[y]|[yes])
-		    answer=""
-		    echo -n "[$(SCRIPT_NAME)] Node(s) user(s): " 
-		    read -t 15 answer || true
-		    if [ ! -z "$answer" ]; then
-			chmod +x "${DIR}/add_node.sh"
-			bash "${DIR}/add_node.sh" ${HOST_IP} ${answer}
-		    fi ;;
-		*) echo "[$SCRIPT_NAME] No node added"
+	@read -r -t 15 -p "[$(SCRIPT_NAME)] Do you want to add more nodes (y/N): " answer || true; \
+	case "$$(printf '%s' "$$answer" | tr '[:upper:]' '[:lower:]')" in \
+		y|yes) \
+			read -r -t 15 -p "[$(SCRIPT_NAME)] Node user(s): " answer || true; \
+			[ -n "$$answer" ] && \
+				chmod +x "$(SWARM_SCRIPTS)/add_node.sh" && \
+				bash "$(SWARM_SCRIPTS)/add_node.sh" "$(HOST_IP)" $$answer ;; \
+		*) \
+			echo "[$(SCRIPT_NAME)] No node added" ;; \
 	esac
 
 image:
