@@ -10,6 +10,7 @@ export const FULL = 2;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
+  godot_fill: 5,
   map: 5,
   team_setup: 20,
   choose_monster: 30,

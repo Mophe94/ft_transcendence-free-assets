@@ -13,6 +13,10 @@ export class PlayerService {
     );
     this.players.set(userId, player);
   }
+  
+  injectPlayer(userId: number, player: Player): void {
+    this.players.set(userId, player);
+  }
 
   getPlayer(userId: number): Player | undefined {
     return this.players.get(userId);

@@ -6,6 +6,7 @@ import { PlayerService } from './player/player.service';
 import { CombatService } from './combat.service';
 import { EntityModule } from './entities/entity.module';
 import { RedisService } from '../redis/redis.service';
+import { AiService } from './ai_service/ai.service';
 @Module({
   providers: [
     GameGateway,
@@ -13,6 +14,7 @@ import { RedisService } from '../redis/redis.service';
     PlayerService,
     CombatService,
     RedisService,
+    AiService,
   ],
   imports: [SharedModule, EntityModule],
 })

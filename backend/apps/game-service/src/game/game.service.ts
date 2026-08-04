@@ -14,6 +14,7 @@ import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { max } from 'node_modules/class-validator/types';
 import { MonsterType } from './entities/types/monster_type.enum';
 import { Skill } from './entities/skills.entity';
+import { AiService } from './ai_service/ai.service';
 import {
   CurrentMonster,
   Skill as PlayerSkill,
@@ -29,6 +30,7 @@ export class GameService implements OnModuleInit {
     private combatService: CombatService,
     private monstersService: MonstersService,
     private itemsService: ItemsService,
+    private aiService: AiService,
   ) {}
 
   private gameRooms = new Map<string, Set<number>>();
@@ -78,7 +80,7 @@ export class GameService implements OnModuleInit {
 
     if (room.size === FULL) {
       this.combatService.matchmake(room);
-/*       // TEST MATCHMAKING //
+      // TEST MATCHMAKING //
       for (const userId of room) {
         const player = this.playerService.getPlayer(userId)!;  
         const opponentId = this.combatService.getOpponentId(userId);
@@ -86,15 +88,35 @@ export class GameService implements OnModuleInit {
         if (!enemy) {
           console.log(`[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`);
         }
-        console.log('USER ID: ', userId, ': ', this.team_setup(player, enemy ?? player));
+        console.log('USER ID: ', userId);
         console.log('OPONNENT ID: ', opponentId);
         console.log('******************');
-      } */
+      }
 
       await this.startMapPhase(roomId, room);
+    } else if (room.size === 1) {
+    this.phaseTimer.start(roomId, 'godot_fill', () => {
+      console.log(`[GameService] Room ${roomId} pas remplie côté Godot -> ajout de bots`);
+      this.fillRoomWithBots(roomId, room);
+      });
     }
   }
   
+  private async fillRoomWithBots(roomId: string, room: Set<number>): Promise<void> {
+  const missing = FULL - room.size;
+
+  for (let i = 0; i < missing; i++) {
+    const botId = this.aiService.generateBotId();
+    const bot = this.aiService.createBotPlayer('hardcoded', botId);
+    this.playerService.injectPlayer(botId, bot);
+    room.add(botId);
+  }
+
+    console.log(`[GameService] Room ${roomId} complétée avec ${missing} bot(s), taille finale: ${room.size}`);
+
+    this.combatService.matchmake(room);
+    await this.startMapPhase(roomId, room);
+  }
   onGodotDisconnected(userId: number, roomId: string): void {
     this.leaveGameRoom(roomId, userId);
   }
