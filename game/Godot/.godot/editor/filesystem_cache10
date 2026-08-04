@@ -1,6 +1,6 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1785769973
-export_presets.cfg::TextFile::-1::1785759039::0::1::::<><><>0<>0<><>::
+::res://::1785851255
+export_presets.cfg::TextFile::-1::1785836543::0::1::::<><><>0<>0<><>::
 icon.svg::CompressedTexture2D::2212185886973996540::1785135771::1785488515::1::::<><><>0<>0<>c41cf5587972647695152ab33a85c3c7<>res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex::
 ::res://Assets/::1785135770
 ::res://Assets/Capture/::1785488502
@@ -627,8 +627,8 @@ capture_banner.tscn::PackedScene::9015389310714931830::1785135771::0::1::::<><><
 capture_menus.tscn::PackedScene::1842831533111051946::1785135771::0::1::::<><><>0<>0<><>::uid://duu1tp1at0kqb::::res://Script/Capture/Menus/capture_menus.gd<>uid://bc0a1v7x7lv30::::res://Script/Combat/Menus/Button/button1.gd<>uid://cy45tokcn3k46::::res://Script/Capture/Menus/text.gd<>uid://cr4i61qj3riij::::res://Assets/Font/Peaberry-Base.otf<>uid://c10oqrdst0hxr::::res://Script/Combat/Menus/Button/button5.gd
 ::res://Scene/Capture/CapturePortal/::1785135771
 capture_portal.tscn::PackedScene::76992043540164880::1785135771::0::1::::<><><>0<>0<><>::uid://bhekjnjspcxhl::::res://Assets/Capture/Portal/potal01.png
-::res://Scene/Combat/::1785758995
-combat.tscn::PackedScene::1564054005173634591::1785758995::0::1::::<><><>0<>0<><>::uid://8jtepesdh8yf::::res://Script/Combat/combat_script.gd<>uid://c5bq774x4p57m::::res://Script/Combat/UIPrgressBar/CharactereUI.gd<>uid://bktfivjvrdagt::::res://Scene/Combat/CombatBanner/combat_banner.tscn<>uid://cr4i61qj3riij::::res://Assets/Font/Peaberry-Base.otf<>uid://b3wokw8n0gxhc::::res://Scene/Combat/CombatMenus/combat_menus.tscn<>uid://bk48efbd6ljn2::::res://Script/Combat/Effect/particule.gd<>uid://cu0qyq3c4pgss::::res://Scene/Timer/timer.tscn
+::res://Scene/Combat/::1785836537
+combat.tscn::PackedScene::1564054005173634591::1785836537::0::1::::<><><>0<>0<><>::uid://8jtepesdh8yf::::res://Script/Combat/combat_script.gd<>uid://c5bq774x4p57m::::res://Script/Combat/UIPrgressBar/CharactereUI.gd<>uid://bktfivjvrdagt::::res://Scene/Combat/CombatBanner/combat_banner.tscn<>uid://cr4i61qj3riij::::res://Assets/Font/Peaberry-Base.otf<>uid://b3wokw8n0gxhc::::res://Scene/Combat/CombatMenus/combat_menus.tscn<>uid://bk48efbd6ljn2::::res://Script/Combat/Effect/particule.gd<>uid://cu0qyq3c4pgss::::res://Scene/Timer/timer.tscn
 ::res://Scene/Combat/CombatBanner/::1785135771
 combat_banner.tscn::PackedScene::3127851286586204647::1785135771::0::1::::<><><>0<>0<><>::uid://cllt0aj6xj1ca::::res://Assets/Combat/battle_spritesheet.png<>uid://dxx53uqbwj1l4::::res://Script/Combat/Banners/control.gd<>uid://b65i0mgyj0oo6::::res://Assets/Other/line.png<>uid://biy83erqs1cpl::::res://Script/Combat/Banners/label_battle.gd
 ::res://Scene/Combat/CombatMenus/::1785135771
@@ -655,36 +655,36 @@ squirel.tscn::PackedScene::9019392211677070355::1785135771::0::1::::<><><>0<>0<>
 character.tscn::PackedScene::8815334862976176970::1785135771::0::1::::<><><>0<>0<><>::uid://dvo2eyy83jlrn::::res://Script/PlayerCharacter/character_body_2d.gd<>uid://btvf2sflgd7e6::::res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Icons/press_e_spritesheet.png<>uid://cd3j166nqaks7::::res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Buttons/TinySquareBlueButton.png
 enemy_character.tscn::PackedScene::802535142737683628::1785135771::0::1::::<><><>0<>0<><>::res://Script/PlayerCharacter/enemy_character.gd<>uid://b5rxktktvja4x::::res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueSpriteSheet.tres
 ::res://Scene/PlayerCharacter/Skin/::1785135771
-::res://Scene/PlayerCharacter/Skin/DinoBlue/::1785756567
+::res://Scene/PlayerCharacter/Skin/DinoBlue/::1785836510
 dinoBlueRessource.tres::Resource/SkinData::7565274708586443617::1785135771::0::1::::<><><>0<>0<><>::uid://brt0iiv638g4g::::res://Script/PlayerCharacter/Skindata.gd<>uid://b5rxktktvja4x::::res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueSpriteSheet.tres
-dinoBlueSpriteSheet.tres::SpriteFrames::4528595777709154153::1785756567::0::1::::<><><>0<>0<><>::uid://crq0ig1u8jo6l::::res://Assets/Character/dinoCharactersVersion1.1/sheets/DinoSprites - doux.png
-::res://Scene/PlayerCharacter/Skin/DinoGreen/::1785756567
+dinoBlueSpriteSheet.tres::SpriteFrames::4528595777709154153::1785836510::0::1::::<><><>0<>0<><>::uid://crq0ig1u8jo6l::::res://Assets/Character/dinoCharactersVersion1.1/sheets/DinoSprites - doux.png
+::res://Scene/PlayerCharacter/Skin/DinoGreen/::1785836510
 dinoGreenRessource.tres::Resource/SkinData::3262194994412937063::1785135771::0::1::::<><><>0<>0<><>::uid://brt0iiv638g4g::::res://Script/PlayerCharacter/Skindata.gd<>uid://2s1ijd1umlyj::::res://Scene/PlayerCharacter/Skin/DinoGreen/dinoGreenSpriteSheet.tres
-dinoGreenSpriteSheet.tres::SpriteFrames::1933850984516215045::1785756567::0::1::::<><><>0<>0<><>::uid://dhylgljqurmxb::::res://Assets/Character/dinoCharactersVersion1.1/sheets/DinoSprites - vita.png
-::res://Scene/PlayerCharacter/Skin/DinoRed/::1785756567
+dinoGreenSpriteSheet.tres::SpriteFrames::1933850984516215045::1785836510::0::1::::<><><>0<>0<><>::uid://dhylgljqurmxb::::res://Assets/Character/dinoCharactersVersion1.1/sheets/DinoSprites - vita.png
+::res://Scene/PlayerCharacter/Skin/DinoRed/::1785836510
 dinoRedRessource.tres::Resource/SkinData::6845882558784467449::1785135771::0::1::::<><><>0<>0<><>::uid://brt0iiv638g4g::::res://Script/PlayerCharacter/Skindata.gd<>uid://bxlqhk2ljej61::::res://Scene/PlayerCharacter/Skin/DinoRed/dinoRedSpriteSheet.tres
-dinoRedSpriteSheet.tres::SpriteFrames::4024456782559307180::1785756567::0::1::::<><><>0<>0<><>::uid://cap51ogedacfk::::res://Assets/Character/dinoCharactersVersion1.1/sheets/DinoSprites - mort.png
-::res://Scene/PlayerCharacter/Skin/DinoYellow/::1785756567
+dinoRedSpriteSheet.tres::SpriteFrames::4024456782559307180::1785836510::0::1::::<><><>0<>0<><>::uid://cap51ogedacfk::::res://Assets/Character/dinoCharactersVersion1.1/sheets/DinoSprites - mort.png
+::res://Scene/PlayerCharacter/Skin/DinoYellow/::1785836510
 dinoYellowRessource.tres::Resource/SkinData::7692160736948311494::1785135771::0::1::::<><><>0<>0<><>::uid://brt0iiv638g4g::::res://Script/PlayerCharacter/Skindata.gd<>uid://b7ecrlb5ir074::::res://Scene/PlayerCharacter/Skin/DinoYellow/dinoYellowSpriteSheet.tres
-dinoYellowSpriteSheet.tres::SpriteFrames::4640873564284400201::1785756567::0::1::::<><><>0<>0<><>::uid://b7psf5jrtgym6::::res://Assets/Character/dinoCharactersVersion1.1/sheets/DinoSprites - tard.png
-::res://Scene/PlayerCharacter/Skin/Ghost/::1785756567
+dinoYellowSpriteSheet.tres::SpriteFrames::4640873564284400201::1785836510::0::1::::<><><>0<>0<><>::uid://b7psf5jrtgym6::::res://Assets/Character/dinoCharactersVersion1.1/sheets/DinoSprites - tard.png
+::res://Scene/PlayerCharacter/Skin/Ghost/::1785836510
 ghostRessource.tres::Resource/SkinData::7287163032569631213::1785135771::0::1::::<><><>0<>0<><>::uid://brt0iiv638g4g::::res://Script/PlayerCharacter/Skindata.gd<>uid://d0yrepw61tqbi::::res://Scene/PlayerCharacter/Skin/Ghost/ghostSpriteSheet.tres
-ghostSpriteSheet.tres::SpriteFrames::8964568363460154370::1785756567::0::1::::<><><>0<>0<><>::uid://bfjpe0tas7o0r::::res://Assets/Character/spritesheet.png<>uid://ck6fh4m7j2pq5::::res://Assets/Character/ghostRun.png
-::res://Scene/PlayerCharacter/Skin/Ghost02/::1785756567
+ghostSpriteSheet.tres::SpriteFrames::8964568363460154370::1785836510::0::1::::<><><>0<>0<><>::uid://bfjpe0tas7o0r::::res://Assets/Character/spritesheet.png<>uid://ck6fh4m7j2pq5::::res://Assets/Character/ghostRun.png
+::res://Scene/PlayerCharacter/Skin/Ghost02/::1785836510
 ghost02Ressource.tres::Resource/SkinData::99737184208636073::1785135771::0::1::::<><><>0<>0<><>::uid://brt0iiv638g4g::::res://Script/PlayerCharacter/Skindata.gd<>uid://dhl5c4fluvjp1::::res://Scene/PlayerCharacter/Skin/Ghost02/ghost02SpriteSheet.tres
-ghost02SpriteSheet.tres::SpriteFrames::7675118724639520068::1785756567::0::1::::<><><>0<>0<><>::uid://cfjitydm4ancw::::res://Assets/Character/ghost02.png
-::res://Scene/PlayerCharacter/Skin/Ghost03/::1785756567
+ghost02SpriteSheet.tres::SpriteFrames::7675118724639520068::1785836510::0::1::::<><><>0<>0<><>::uid://cfjitydm4ancw::::res://Assets/Character/ghost02.png
+::res://Scene/PlayerCharacter/Skin/Ghost03/::1785836510
 ghost03Ressource.tres::Resource/SkinData::5656766723445511668::1785135771::0::1::::<><><>0<>0<><>::uid://brt0iiv638g4g::::res://Script/PlayerCharacter/Skindata.gd<>uid://ucmg6ebqooiw::::res://Scene/PlayerCharacter/Skin/Ghost03/ghost03SpriteSheet.tres
-ghost03SpriteSheet.tres::SpriteFrames::1408646581415849838::1785756567::0::1::::<><><>0<>0<><>::uid://o6tspagspg13::::res://Assets/Character/ghost03.png
-::res://Scene/PlayerCharacter/Skin/Satyr01/::1785756567
+ghost03SpriteSheet.tres::SpriteFrames::1408646581415849838::1785836510::0::1::::<><><>0<>0<><>::uid://o6tspagspg13::::res://Assets/Character/ghost03.png
+::res://Scene/PlayerCharacter/Skin/Satyr01/::1785836510
 satyr01Ressource.tres::Resource/SkinData::5609903809839114859::1785135771::0::1::::<><><>0<>0<><>::uid://brt0iiv638g4g::::res://Script/PlayerCharacter/Skindata.gd<>uid://r281acewyq02::::res://Scene/PlayerCharacter/Skin/Satyr01/satyr01SpriteSheet.tres
-satyr01SpriteSheet.tres::SpriteFrames::1250998635910697677::1785756567::0::1::::<><><>0<>0<><>::uid://dl8dkruq1ws0k::::res://Assets/Character/satyr01.png
-::res://Scene/PlayerCharacter/Skin/Satyr02/::1785756567
+satyr01SpriteSheet.tres::SpriteFrames::1250998635910697677::1785836510::0::1::::<><><>0<>0<><>::uid://dl8dkruq1ws0k::::res://Assets/Character/satyr01.png
+::res://Scene/PlayerCharacter/Skin/Satyr02/::1785836510
 satyr02Ressource.tres::Resource/SkinData::2803089897215113452::1785135771::0::1::::<><><>0<>0<><>::uid://brt0iiv638g4g::::res://Script/PlayerCharacter/Skindata.gd<>uid://c1qjmtohkabrk::::res://Scene/PlayerCharacter/Skin/Satyr02/satyr02SpriteSheet.tres
-satyr02SpriteSheet.tres::SpriteFrames::6631350248404085072::1785756567::0::1::::<><><>0<>0<><>::uid://bu2oebaf3fiox::::res://Assets/Character/saty02.png
-::res://Scene/PlayerCharacter/Skin/Satyr03/::1785756567
+satyr02SpriteSheet.tres::SpriteFrames::6631350248404085072::1785836510::0::1::::<><><>0<>0<><>::uid://bu2oebaf3fiox::::res://Assets/Character/saty02.png
+::res://Scene/PlayerCharacter/Skin/Satyr03/::1785836510
 satyr03Ressource.tres::Resource/SkinData::8453573376929494525::1785135771::0::1::::<><><>0<>0<><>::uid://brt0iiv638g4g::::res://Script/PlayerCharacter/Skindata.gd<>uid://lapm0j1i77b8::::res://Scene/PlayerCharacter/Skin/Satyr03/satyr03SpriteSheet.tres
-satyr03SpriteSheet.tres::SpriteFrames::773010792617011779::1785756567::0::1::::<><><>0<>0<><>::uid://b7m7jb1j0vdtu::::res://Assets/Character/mino.png
+satyr03SpriteSheet.tres::SpriteFrames::773010792617011779::1785836510::0::1::::<><><>0<>0<><>::uid://b7m7jb1j0vdtu::::res://Assets/Character/mino.png
 ::res://Scene/TeamSetup/::1785487577
 team_setup.tscn::PackedScene::2510714266014104942::1785658828::0::1::::<><><>0<>0<><>::uid://chjj6vvhpmpr2::::res://Script/TeamSetup/team_setup_script.gd<>uid://diomywihvuhfv::::res://Assets/TeamSetup/mon_star_sky.png<>uid://64kusr7j27pr::::res://Script/TeamSetup/SlotSetup/player.gd<>uid://dhqgwdgfpxvpp::::res://Script/TeamSetup/SlotSetup/slot_player.gd<>uid://b0y2tyw4p7bv::::res://Script/TeamSetup/Label/Label.gd<>uid://dlj0x06vhlfx::::res://Script/TeamSetup/ButtonTeamSetup/button_slot1.gd<>uid://doc0b8w1nr3t4::::res://Script/TeamSetup/CurrentTeam/current_team.gd<>uid://cr4i61qj3riij::::res://Assets/Font/Peaberry-Base.otf<>uid://bblhf43qu0piw::::res://Script/TeamSetup/Asset/asset_player.gd<>uid://cu0qyq3c4pgss::::res://Scene/Timer/timer.tscn<>uid://3bnlilm7i22h::::res://Script/TeamSetup/SlotSetup/slot_enemy.gd<>uid://px2lq1j8nsjh::::res://Script/TeamSetup/Asset/asset_enemy.gd<>uid://c6k5aeej1ipwh::::res://Script/TeamSetup/Effect/effect.gd
 ::res://Scene/Timer/::1785135771
@@ -729,8 +729,8 @@ particule.gd::GDScript::3150187143217802337::1785135771::0::1::::<>Control<><>0<
 ::res://Script/Combat/Lose/::1785135771
 pliue_particule.gd::GDScript::5446349987022806120::1785135771::0::1::::<>GPUParticles2D<><>0<>0<><>::
 text.gd::GDScript::7446565213210805019::1785135771::0::1::::<>Label<><>0<>0<><>::
-::res://Script/Combat/Menus/::1785758973
-combat_menus_script.gd::GDScript::3612002352499594240::1785758973::0::1::::<>Panel<><>0<>0<><>::
+::res://Script/Combat/Menus/::1785834627
+combat_menus_script.gd::GDScript::3612002352499594240::1785834627::0::1::::<>Panel<><>0<>0<><>::
 text.gd::GDScript::1215588876293817101::1785135771::0::1::::<>Label<><>0<>0<><>::
 ::res://Script/Combat/Menus/Button/::1785332828
 button1.gd::GDScript::2578455398974516957::1785135771::0::1::::<>Button<><>0<>0<><>::
@@ -740,11 +740,11 @@ CharactereUI.gd::GDScript::6881601398201380012::1785135771::0::1::::<>Panel<><>0
 ::res://Script/Combat/Win/::1785135771
 particule.gd::GDScript::2460912827862188368::1785135771::0::1::::<>Control<><>0<>0<><>::
 Victory.gd::GDScript::5424993747943732167::1785135771::0::1::::<>Label<><>0<>0<><>::
-::res://Script/General/::1785758872
-GeneralData.gd::GDScript::7754070248882426799::1785758872::0::1::::<>Node<><>0<>0<><>::
+::res://Script/General/::1785836510
+GeneralData.gd::GDScript::7754070248882426799::1785834362::0::1::::<>Node<><>0<>0<><>::
 GeneralProcess.gd::GDScript::8718382613277686307::1785746942::0::1::::<>Node<><>0<>0<><>::
 Network.gd::GDScript::5118391082767340652::1785746942::0::1::::<>Node<><>0<>0<><>::
-Received.gd::GDScript::7466016942865657007::1785747769::0::1::::<>Node<><>0<>0<><>::
+Received.gd::GDScript::7466016942865657007::1785836510::0::1::::<>Node<><>0<>0<><>::
 Send.gd::GDScript::1937411993357902118::1785758546::0::1::::<>Node<><>0<>0<><>::
 ::res://Script/Inventory/::1785335142
 button.gd::GDScript::2787063295623340677::1785135771::0::1::::<>Button<><>0<>0<><>::
@@ -773,8 +773,8 @@ Label.gd::GDScript::123304747809272511::1785135771::0::1::::<>VBoxContainer<><>0
 player.gd::GDScript::2236364966601536951::1785135771::0::1::::<>Control<><>0<>0<><>::
 slot_enemy.gd::GDScript::1968161402025868553::1785135771::0::1::::<>Control<><>0<>0<><>::
 slot_player.gd::GDScript::7684017757120020649::1785135771::0::1::::<>Control<><>0<>0<><>::
-::res://Script/Timer/::1785759032
-timer.gd::GDScript::3825569180595610003::1785759032::0::1::::<>CanvasLayer<><>0<>0<><>::
+::res://Script/Timer/::1785834770
+timer.gd::GDScript::3825569180595610003::1785834770::0::1::::<>CanvasLayer<><>0<>0<><>::
 ::res://Script/Transition/::1785486613
 blur_transition_script.gd::GDScript::6994593348466547278::1785486613::0::1::::<>ColorRect<><>0<>0<><>::
 ::res://Script/Wait/::1785135771

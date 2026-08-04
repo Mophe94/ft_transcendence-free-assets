@@ -34,21 +34,25 @@ func _change_monster():
 	if GeneralData.text != "":
 		text_show(GeneralData.text)
 	set_menus_select_monster()
+	Received.action_finished.emit()
 
 func _new_current_monster():
 	if GeneralData.text != "":
 		text_show(GeneralData.text)
 	emit_signal("change_monster")
+	Received.action_finished.emit()
 
 func _enemy_change_monster():
 	hide_selection()
 	if GeneralData.text != "":
 		text_show(GeneralData.text)
+	emit_signal("enemy_change_monster")
 		
 func _new_enemy_monster():
 	if GeneralData.text != "":
 		text_show(GeneralData.text)
 	emit_signal("enemy_change_monster")
+	Received.action_finished.emit()
 
 func waiting_player(send_func: Callable):
 	action_play.emit()
@@ -56,7 +60,6 @@ func waiting_player(send_func: Callable):
 	lock_button()
 	send_func.call()
 	text_show("Waiting action enemy.")
-	_back()
 
 func _received_action():
 	emit_signal("action_combat")
@@ -67,6 +70,7 @@ func _received_action():
 func _new_turn():
 	if GeneralData.text != "":
 		text_show(GeneralData.text)
+	$Text.text = ""
 	_back()
 ##############################################################
 
@@ -158,7 +162,6 @@ func set_menus_select_monster():
 		back_button.show()
 
 func set_menus_change():
-	print("menus change")
 	unlock_button()
 	hide_selection()
 	await text_show("Which monster you want to switch to ?")
@@ -181,7 +184,7 @@ func set_menus_change():
 func set_menus_use(object):
 	hide_selection()
 	var send_func = func():
-		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.USE_ITEM], object)
+		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.USE_ITEM_COMBAT], object)
 	waiting_player(send_func)
 
 func set_menus_items():

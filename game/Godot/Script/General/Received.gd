@@ -27,7 +27,7 @@ signal finish
 
 func handle_message_receive(msg):
 	#VERIF GOOD MESSAGE
-	print("-------- MSG RECEIVED -------- :\n", msg)
+	print("-------- MSG RECEIVED -------- :\n")
 	if not msg.has("event"):
 		return
 	if msg["event"] != "game":
@@ -42,37 +42,53 @@ func handle_message_receive(msg):
 		match state:
 			"start_game": 
 				_start_game(data)
+				print(msg)
 			"team_setup":
 				_team_setup(data)
+				print(msg)
 			"new_current_item":
 				_new_current_item(data)
+				print(msg)
 			"new_encounter":
 				_new_encounter(data)
+				print(msg)
 			"result_catch":
 				_result_catch(data)
+				print(msg)
 			"update_team":
 				_update_team(data)
+				print(msg)
 			"update_inventory":
 				_update_inventory(data)
+				print(msg)
 			"combat":
 				_combat(data)
+				print(msg)
 			"action_battle":
 				_action_battle(data)
+				print("state : " + state + "\nchangemonster : " + str(data["change_monster"]) + "\ntext" + data["player"]["text"])
 			"new_turn":
+				print("state : " + state + "\ntime : " + str(data["timer"]))
 				_new_turn(data)
 			"lose":
+				print("state : " + state + "\ntext : " + data["player"]["text"])
 				_lose(data)
 				emit_signal("lose")
 			"win":
+				print("state : " + state + "\ntext : " + data["player"]["text"])
 				_win(data)
 				emit_signal("win")
 			"change_monster":
+				print("state : " + state + "\nchangemonster : " + str(data["change_monster"]) + "\ntext" + data["player"]["text"])
 				_change_monster(data)
 			"enemy_change_monster":
+				print("state : " + state + "\nchangemonster : " + str(data["change_monster"]) + "\ntext" + data["player"]["text"])
 				_enemy_change_monster(data)
 			"next_map":
+				print("state : " + state + "\ntime : " + str(data["timer"]))
 				_next_map(data)
 			"finish":
+				print("state : " + state)
 				emit_signal("finish")
 			_:
 				print("data match with nothing")
@@ -145,8 +161,9 @@ func _enemy_change_monster(data):
 
 func _action_battle(data):
 	var signal_to_send = ""
+	var change = -5
 	if data.has("change_monster"):
-		var change = data["change_monster"]
+		change = int(data["change_monster"])
 		if change == GeneralData.player["id"]:
 			signal_to_send = "new_current_monster"
 		elif change >= 0:
@@ -170,14 +187,14 @@ func _action_battle(data):
 		if cMonsterPlayer.has("skill"):
 			for i in range(cMonsterPlayer["skill"].size()):
 				var monsterSkill = cMonsterPlayer["skill"][i]
-				GeneralData.player["currentMonster"]["skill"][i]["name"] = int(monsterSkill["name"])
+				GeneralData.player["currentMonster"]["skill"][i]["name"] = monsterSkill["name"]
 				GeneralData.player["currentMonster"]["skill"][i]["current"] = int(monsterSkill["current"])
 				GeneralData.player["currentMonster"]["skill"][i]["max"] = int(monsterSkill["max"])
 
 		if cMonsterPlayer.has("status"):
 			var status = cMonsterPlayer["status"]
 			for i in range(status.size()):
-				GeneralData.player["currentMonster"]["skill"][i] = status[i]
+				GeneralData.player["currentMonster"]["status"][i] = status[i]
 	
 	if player.has("battle_team"):
 		var team = GeneralData.player["battle_team"]
@@ -211,6 +228,7 @@ func _action_battle(data):
 	if player.has("text"):
 		GeneralData.text = player["text"]
 
+	print("signal emit for change monster : " + signal_to_send)
 	emit_signal(signal_to_send)
 	await action_finished
 
@@ -224,8 +242,8 @@ func _combat(data):
 		if player.has("battle_team"):
 			for i in range(player["battle_team"].size()):
 				var team = player["battle_team"][i]
-				print("voila le pq numero " + str(i) + " :")
-				print(team)
+#				print("voila le pq numero " + str(i) + " :")
+#				print(team)
 				GeneralData.player["battle_team"][i]["name"] = team["name"]
 				GeneralData.player["battle_team"][i]["slot"] = int(team["slot"])
 				GeneralData.player["battle_team"][i]["life"]["current"] = int(team["life"]["current"])

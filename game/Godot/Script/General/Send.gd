@@ -11,7 +11,8 @@ enum SEND_NAME {
 	TEAM_CHOICE,
 	CHANGE_CURRENT_MONSTER,
 	TRY_ATTACK,
-	PASS
+	PASS,
+	USE_ITEM_COMBAT,
 }
 
 const SEND_TAB = {
@@ -25,7 +26,8 @@ const SEND_TAB = {
 	SEND_NAME.TEAM_CHOICE: "team_choice",
 	SEND_NAME.CHANGE_CURRENT_MONSTER: "change_current_monster",
 	SEND_NAME.TRY_ATTACK: "try_attack",
-	SEND_NAME.PASS: "pass"
+	SEND_NAME.PASS: "pass",
+	SEND_NAME.USE_ITEM_COMBAT: "use_item_combat"
 }
 
 func send_message(event, value = null):
