@@ -84,8 +84,10 @@ export class AuthService {
   ): Promise<FortyTwoProfile> {
     try {
       const response = await axios.get<FortyTwoProfile>(
-        this.configService.get<string>('FORTYTWO_API_GETUSER') ??
-          'https://api.intra.42.fr/v2/me',
+      `${
+        this.configService.get<string>('FORTYTWO_API') ??
+          'https://api.intra.42.fr/v2/me'
+        }/v2/me`,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         },
@@ -103,7 +105,7 @@ export class AuthService {
     try {
       const response = await axios.get<Array<FortyTwoCoal>>(
         `${
-          this.configService.get('FORTYTWO_API_GETCOAL') ??
+          this.configService.get('FORTYTWO_API') ??
           'https://api.intra.42.fr/v2'
         }/users/${userId}/coalitions`,
         {
