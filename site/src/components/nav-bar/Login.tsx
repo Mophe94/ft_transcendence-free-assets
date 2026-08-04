@@ -15,7 +15,7 @@ export function AuthSection() {
         <div className="login-container">
           <div className="username-container">{user.username}</div>
           <img id="profile-pic" src={user.avatarUrl} />
-          <ul className="dropdown-menu">
+          <ul id="dropdown-menu">
             <li>
               <Link to={'/profile'} className="auth-link">
                 Profile
@@ -29,8 +29,8 @@ export function AuthSection() {
           </ul>
         </div>
       ) : (
-        <div>
-          <a href={import.meta.env.VITE_42_OAUTH_API_LINK}>Login</a>
+        <div className='login-container'>
+          <a className="login-link" href={import.meta.env.VITE_42_OAUTH_API_LINK}>Login</a>
         </div>
       )}
     </div>

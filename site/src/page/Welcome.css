@@ -1,5 +1,11 @@
 .home-layout {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  padding-top: 2vh;
+  width: 100%;
+}
+
+.game-banner {
+  margin-bottom: 20px;
+}
+.enter-button-container {
+  margin-top: 30px;
 }

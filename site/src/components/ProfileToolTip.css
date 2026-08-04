@@ -1,0 +1,12 @@
+.player_container {
+    padding: 20px;
+}
+
+.player_data {
+
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background-color: rgb(209, 204, 204);
+    pointer-events: none;
+}

@@ -1,7 +1,10 @@
-import React, { useContext, useEffect, useRef } from 'react';
-import { ChatContext, type Message } from '../../context/ChatContext';
 import './Chat.css';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { ChatContext, type Message } from '../../context/ChatContext';
+import { InputBar } from './InputChat';
 
+import chatIcon from '../../assets/chat/chat_icon.png';
+import chatIconNew from '../../assets/chat/chat_icon_new.png';
 import parchUL from '../../assets/background/parchment/parchUL.png';
 import parchUM from '../../assets/background/parchment/parchUM.png';
 import parchUR from '../../assets/background/parchment/parchUR.png';
@@ -11,7 +14,7 @@ import parchMR from '../../assets/background/parchment/parchMR.png';
 import parchDL from '../../assets/background/parchment/parchDL.png';
 import parchDM from '../../assets/background/parchment/parchDM.png';
 import parchDR from '../../assets/background/parchment/parchDR.png';
-import { InputBar } from './InputChat';
+
 
 
 const prefStyles = {
@@ -59,23 +62,30 @@ export function MessagesWindow() {
 }
 
 export default function NewChat() {
+  const [visible, setVisible] = useState<boolean>(false);
+
   return (
-    <div className="chat-container" style={prefStyles}>
-      <div className="chat-upperLeft" />
-      <div className="chat-upperMiddle">
-        <div className='chat-heading'>Chat</div>
+    <>
+      <div className={`chat-container  ${visible ? 'visible':''}`} style={prefStyles}>
+        <div className="chat-upperLeft" />
+        <div className="chat-upperMiddle">
+          <div className='chat-heading'>Chat</div>
+        </div>
+        <div className="chat-upperRight" />
+        <div className="chat-middleLeft" />
+        <div className="chat-middleMiddle">
+          <MessagesWindow />
+        </div>
+        <div className="chat-middleRight" />
+        <div className="chat-bottomLeft" />
+        <div className="chat-bottomMiddle aligned">
+          <InputBar />
+        </div>
+        <div className="chat-bottomRight" />
       </div>
-      <div className="chat-upperRight" />
-      <div className="chat-middleLeft" />
-      <div className="chat-middleMiddle">
-        <MessagesWindow />
-      </div>
-      <div className="chat-middleRight" />
-      <div className="chat-bottomLeft" />
-      <div className="chat-bottomMiddle aligned">
-        <InputBar />
-      </div>
-      <div className="chat-bottomRight" />
-    </div>
+      <button id='chat-icon' className='clean-btn' onClick={() => setVisible(!visible)}>
+        <img src={chatIcon}/>
+      </button>
+    </>
   );
 }

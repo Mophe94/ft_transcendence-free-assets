@@ -50,30 +50,31 @@ export function InputBar() {
 
   return (
     <form onSubmit={handleSending} className="response-container">
-        <div className="input-container"
-            style={isFocused? focusedInputStyles: defaultInputStyles}>
-            <div className="input-upperLeft" />
-            <div className="input-upperMiddle"/>
-            <div className="input-upperRight" />
-            <div className="input-middleLeft" />
-            <div className="input-middleMiddle">
-                
-                <input
-                    id="chat-input"
-                    type="text"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    autoComplete="off"
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                />
-            </div>
-            <div className="input-middleRight" />
-            <div className="input-bottomLeft" />
-            <div className="input-bottomMiddle"/>
-            <div className="input-bottomRight" />
+      <div className="input-container"
+        style={isFocused? focusedInputStyles: defaultInputStyles}>
+        <div className="input-upperLeft" />
+        <div className="input-upperMiddle"/>
+        <div className="input-upperRight" />
+        <div className="input-middleLeft" />
+        <div className="input-middleMiddle">
+          <input
+            id="chat-input"
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            autoComplete="off"
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+          />
         </div>
+        <div className="input-middleRight" />
+        <div className="input-bottomLeft" />
+        <div className="input-bottomMiddle"/>
+        <div className="input-bottomRight" />
+      </div>
+      <div className='send-btn-container'>
         <SendButton />
+      </div>
     </form>
   );
 }

@@ -1,26 +1,29 @@
 .pic-frame-container {
   position: relative;
   display: inline-block;
-  width: 300px;
+  width: 100%;
+  aspect-ratio: 232 / 238;
 }
 
 .pic-frame {
   display: block;
   width: 100%;
-  height: auto;
-  position: relative;
+  height: 100%;
+  position: absolute;
+  inset: 0;
   z-index: 5;
 }
 
 .pic-frame-content {
-position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  
-  height: 85%; 
-  pointer-events: none;
-  z-index: 2;
+  position: absolute;
+
+  width: 89.6%;
+  height: 89.5%;
+
+  top: 5.5%;
+  left: 5.2%;
+
   object-fit: cover;
-  clip-path: inset(0% 15% 0% 15%);
+  z-index: 2;
+  pointer-events: none;
 }
