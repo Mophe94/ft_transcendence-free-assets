@@ -98,7 +98,7 @@ export class GameService implements OnModuleInit {
   }
 
   private sendToPlayer(userId: number, payload: object): void {
-    console.log(`Send_to_player: ${userId} -> ${payload}`);
+    console.log("Send_to_player: ", userId, "MSG: ", payload);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
@@ -247,6 +247,7 @@ export class GameService implements OnModuleInit {
     }
     let result: object | undefined
     const state = payload?.state
+    console.log("STATE", state);
     switch (state) {
       case "add_item":
         result = await this.received_add_item(player)
@@ -304,6 +305,7 @@ export class GameService implements OnModuleInit {
               if (!this.has_valid_monsters(player2)){
                 this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
                 this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
+
               }
               else{
                 this.sendToPlayer(userId, this.combatService.change_monster(player, player2.id));
@@ -531,6 +533,7 @@ export class GameService implements OnModuleInit {
     for (i; result > gap && i < items.length - 1; ++i)
       gap += step
     player.current_item = items[i].name;
+    
     let add = false;
     for (let i = 0; i < player.inventory.length; ++i){
       if (player.inventory[i]["name"] === player.current_item) {
@@ -539,13 +542,14 @@ export class GameService implements OnModuleInit {
       }
     }
     if (add === false) {
-      for (let i = 0; i < player.inventory.length; i++) {
-        if (player.inventory[i]["name"] === ""){
-          player.inventory[i]["name"] = player.current_item;
-          player.inventory[i]["scene"] = items[i].scene;
-          player.inventory[i]["current"] += 1;
-          player.inventory[i]["value"] = items[i].value;
-          player.inventory[i]["target"] = items[i].target;
+      for (let j = 0; i < player.inventory.length; j++) {
+        if (player.inventory[j]["name"] === ""){
+          player.inventory[j]["name"] = player.current_item;
+          player.inventory[j]["scene"] = items[i].scene;
+          player.inventory[j]["current"] += 1;
+          player.inventory[j]["value"] = items[i].value;
+          player.inventory[j]["target"] = items[i].target;
+          console.log("ITEM: name: ", items[i].name, ", scene: ", items[i].scene);
           break;
         }
      }
@@ -556,6 +560,7 @@ export class GameService implements OnModuleInit {
   // ADD ITEM + RETURN UPDATE_ITEM
   private received_add_item(player: Player){
     player.current_item = "";
+    console.log("PLAYER INVENTORY: ", player.inventory);
     return this.update_inventory(player);
   }
 
