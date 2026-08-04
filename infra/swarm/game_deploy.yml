@@ -6,33 +6,34 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/08/03 15:24:42 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/04 08:19:02 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 services:
     game_service:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/backend:latest
-
-        networks:
-            - games_net
-
         environment:
           - DB_GAME_HOST=game_db
-
         secrets:
           - db_game_db_name
           - db_game_username
           - db_game_password
-
         command:
           - npm
           - run
           - start:dev
           - game-service
-
+        networks:
+            - games_net
         deploy:
             replicas: 1
+        healthcheck:
+          test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://game_db:3000/health"]
+          interval: 5s
+          timeout: 3s
+          retries: 3
+          start_period: 5s
 
     redis:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/redis:latest
@@ -44,14 +45,11 @@ services:
 
     game:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/game:latest
-
-        networks:
-            - games_net
-
         command:
           - node
           - server.js
-
+        networks:
+            - games_net
         deploy:
             replicas: 1
 
@@ -59,36 +57,34 @@ services:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/game_db:latest
 #        env_file:
 #          - "site/databases/game_db/.env"
-
-        volumes:
-          - game_data:/var/lib/postgresql/
-
-        networks:
-            - games_net
-
 #        configs:
 #          - source: load_secrets
 #            target: /load_secrets.sh
 #            mode: 0555
-
         environment:
           - POSTGRES_PASSWORD=$$(cat "/run/secrets/db_users_postgres_password")
-
         secrets:
           - db_game_db_name
           - db_game_username
           - db_game_password
           - db_game_postgres_password
-
 #        entrypoint:
 #          - /load_secrets.sh
-
 #        command:
 #          - /usr/local/bin/docker-entrypoint.sh 
 #          - postgres
-
+        volumes:
+          - game_data:/var/lib/postgresql/
+        networks:
+            - games_net
         deploy:
             replicas: 1
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U postgres"]
+          interval: 3s
+          timeout: 5s
+          retries: 5
+          start_period: 5s
 
 networks:
   games_net:
