@@ -1,0 +1,23 @@
+name: Update Architecture Diagram
+
+on:
+  push:
+    paths:
+      - 'architecture_diagram.mmd'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    container:
+      image: minlag/mermaid-cli
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Generate SVG
+      run: /usr/local/bin/mmdc -i architecture_diagram.mmd -o architecture_diagram.svg

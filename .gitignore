@@ -9,6 +9,6 @@ misc/*
 !misc/README
 vm_management/worker_config.txt
 host_ip.txt
-!**/template.*.*
+!infra/template.secrets.env
 .secrets/
 .vite/

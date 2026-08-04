@@ -8,7 +8,16 @@ TYPE=""
 SSH_PORT=2222
 
 all:
-	@$(MAKE) setup_worker TYPE="leader"
+	@$(MAKE) --no-print-directory swarm-status
+
+swarm-status:
+	@if ! docker info >/dev/null 2>&1; then \
+	    echo "Docker daemon unavailable"; \
+	elif [ "$$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then \
+	    echo "Swarm status: active"; \
+	else \
+	    echo "Swarm status: inactive"; \
+	fi
 
 vm : 
 	@if [ "$(USER)" != "stempels" ]; then \
@@ -23,20 +32,36 @@ vm :
 	@bash $(VM_SCRIPTS)/vm.sh
 
 setup_worker:
-	@ssh-keygen -f "/home/$(USER)/.ssh/known_hosts" -R "[localhost]:2222"
-	@if [ ! -f $(VM_SCRIPTS)/node.sh ]; then \
-		echo "node.sh file missing"; \
+	@if [ ! -f $(VM_SCRIPTS)/worker.sh ]; then \
+		echo "worker.sh file missing"; \
 		exit 1; \
 	fi
+<<<<<<< HEAD
 	@chmod +x $(VM_SCRIPTS)/node.sh;
 	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4);
-	ssh -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make TYPE=$(TYPE);"
+	ssh -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$${USER}/infra && make TYPE=$(TYPE);"
+=======
+	@chmod +x $(VM_SCRIPTS)/worker.sh;
+	@bash $(VM_SCRIPTS)/worker.sh $(TYPE) $(IP4);
+>>>>>>> parent of 75876d9f (Merge branch 'infra' into merge-backend)
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"
 
-leader:
-	@$(MAKE) setup_worker TYPE="leader"
+manager:
+	@$(MAKE) setup_worker TYPE="manager"
+
+iso_test/image/*.iso:
+	mkdir -p iso_test/image
+	chmod 777 iso_test/image
+	@if ! ls iso_test/image/*.iso >/dev/null 2>&1; then \
+		docker build iso_test/ -t swarm_test; \
+	fi
+	@if docker ps -a --filter "name=test"; then \
+		docker rm -f test; \
+	fi
+	@docker run -it --privileged --rm -v"$(LOCATION)/iso_test/image:/build/image" --name test swarm_test sh;
+	chmod 755 iso_test/image
 
 vm_erase:
 	

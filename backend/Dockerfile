@@ -1,15 +1,11 @@
-FROM base-image
+FROM alpine:3.22.4
 
 WORKDIR /app
 
-COPY package*.json /app/
-
-RUN npm ci
+RUN apk upgrade && apk add npm
 
 COPY . /app/
-<<<<<<< HEAD
+
 RUN chmod +x /app/healthcheck.sh
 
 RUN npm install
-=======
->>>>>>> 035da4fe342f3134e2b1f565751310de14d58362

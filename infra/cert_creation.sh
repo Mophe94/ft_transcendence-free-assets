@@ -57,7 +57,7 @@ else
     echo "[$SCRIPT_NAME] ${CERT_NAME} CSR already exist"
 fi
 
-#Sign certification
+#Sig certification
 if [ ! -f ${CERT_NAME}.crt ]; then
     echo "[$SCRIPT_NAME] signing ${CERT_NAME} certificate"
     doas openssl x509 -req \
