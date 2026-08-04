@@ -134,6 +134,10 @@ networks:
 volumes:
   users_data:
     driver: local
+    driver_opts:
+        type: none
+        o: bind
+        device: /var/lib/postgresql/data
 
 configs:
   load_secrets:

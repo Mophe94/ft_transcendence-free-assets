@@ -101,12 +101,15 @@ for network in "${networks[@]}"; do
 done
 
 #Adding preconfigured nodes
-read -p "[$SCRIPT_NAME] Do you want to add preconfigured node (y/N): " -t 15 answer || true
+read -p "[$SCRIPT_NAME] Do you want to add preconfigured node (y/N): " -t 15 answer || {
+        echo
+        answer=""
+}
 case "${answer,,}" in
 	y|yes)
 	    chmod +x "${DIR}/add_node.sh"
 	   bash "${DIR}/add_node.sh" "${HOST_IP}" "${HOST_TAILSCALE_IP}" agaland bertrmar dbajeux kprist stempels;;
-	*) echo "[$SCRIPT_NAME] No node added"
+	*) echo "[$SCRIPT_NAME] No node added";;
 esac
 
 #Create secret

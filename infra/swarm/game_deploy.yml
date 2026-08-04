@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/08/04 11:23:57 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/04 12:06:39 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -107,6 +107,10 @@ networks:
 volumes:
   game_data:
     driver: local
+    driver_opts:
+        type: none
+        o: bind
+        device: /var/lib/postgresql/data
 
 #configs:
 secrets:

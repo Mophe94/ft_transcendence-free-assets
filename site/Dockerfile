@@ -25,4 +25,6 @@ COPY . /app/
 
 RUN npm install
 
+RUN chmod +x /app/healthcheck.js
+
 CMD ["npm","run","dev"]

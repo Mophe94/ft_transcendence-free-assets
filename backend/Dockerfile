@@ -8,6 +8,4 @@ RUN npm ci
 
 COPY . /app/
 
-RUN chmod +x /app/healthcheck.sh
-
 RUN npm install
