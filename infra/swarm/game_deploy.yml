@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/08/04 08:19:02 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/04 11:23:57 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,11 +29,11 @@ services:
         deploy:
             replicas: 1
         healthcheck:
-          test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://game_db:3000/health"]
-          interval: 5s
+          test: ["CMD", "/app/healthcheck.sh"]
+          interval: 15s
           timeout: 3s
           retries: 3
-          start_period: 5s
+          start_period: 15s
 
     redis:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/redis:latest
@@ -41,7 +41,12 @@ services:
          - redis_password 
         networks:
             - games_net
-
+        healthcheck:
+          test: ["CMD-SHELL", "/app/healthcheck.sh"]
+          interval: 15s
+          timeout: 3s
+          retries: 3
+          start_period: 15s
 
     game:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/game:latest
@@ -52,6 +57,12 @@ services:
             - games_net
         deploy:
             replicas: 1
+        healthcheck:
+          test: ["CMD", "node", "/app/healthcheck.js"]
+          interval: 5s
+          timeout: 3s
+          retries: 3
+          start_period: 15s
 
     game_db:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/game_db:latest
@@ -79,6 +90,9 @@ services:
             - games_net
         deploy:
             replicas: 1
+            placement:
+              constraints:
+                - node.labels.leader == true
         healthcheck:
           test: ["CMD-SHELL", "pg_isready -U postgres"]
           interval: 3s
@@ -93,10 +107,6 @@ networks:
 volumes:
   game_data:
     driver: local
-    driver_opts:
-      type: nfs
-      o: addr=${HOST_TAILSCALE_IP},rw,nfsvers=4
-      device: ":/nfs-storage/game_data"
 
 #configs:
 secrets:
