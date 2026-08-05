@@ -30,6 +30,7 @@ var enemy_monster_base_scale: Vector2
 @onready var skip_intro = false
 
 @onready var actionPlay = false
+@onready var stop_timer = false
 
 @onready var combatBanner = $CombatBanner
 @onready var playerUI = $PlayerMonsterUI/CenterContainer/HBoxContainer
@@ -64,26 +65,34 @@ func _update_battle_positions() -> void:
 	enemy_monster_ref.scale = enemy_monster_base_scale * scale_ratio
 
 ###################################################################
+func _stop_timer():
+	stop_timer = true
+	
+func _run_timer():
+	stop_timer = false
+
 func _new_current_monster():
-	for child in player.get_node("PlayerMonster").get_children():
+	for child in player_monster_ref.get_children():
 		child.queue_free()
 	await get_tree().process_frame
 	var monsterHero = GeneralData.player["currentMonster"]["name"]
 	var monster_player_scene = monsterTab[monsterHero].instantiate()
-	player.get_node("PlayerMonster").add_child(monster_player_scene)
+	player_monster_ref.add_child(monster_player_scene)
 	show_UI()
 	style_progress_bar()
+	Received.action_finished.emit()
 
 func _new_enemy_monster():
-	for child in enemy.get_node("EnemyMonster").get_children():
+	for child in enemy_monster_ref.get_children():
 		child.queue_free()
 	await get_tree().process_frame
 	var monsterEnemy = GeneralData.enemy["currentMonster"]["name"]
 	var monster_enemy_scene = monsterTab[monsterEnemy].instantiate()
-	enemy.get_node("EnemyMonster").add_child(monster_enemy_scene)
+	enemy_monster_ref.add_child(monster_enemy_scene)
 	monster_enemy_scene.scale.x = -1
 	show_UI()
 	style_progress_bar()
+	Received.action_finished.emit()
 	
 func _action_play():
 	actionPlay = true
@@ -186,6 +195,8 @@ func _ready() -> void:
 	$CombatMenus.action_combat.connect(show_UI)
 	$CombatMenus.change_monster.connect(_new_current_monster)
 	$CombatMenus.enemy_change_monster.connect(_new_enemy_monster)
+	$CombatMenus.stop_timer.connect(_stop_timer)
+	$CombatMenus.run_timer.connect(_run_timer)
 	$CombatBanner.hide()
 	$Timer.time_finish.connect(_time_finish)
 	_capture_battle_ratios()
@@ -199,10 +210,10 @@ func _time_finish():
 	$CombatMenus.hide()
 	$CombatMenus.process_mode = Node.PROCESS_MODE_DISABLED
 	$Timer.send = true
-	skip_intro = true
 	var send_func = func():
 		null
-	var success = await GeneralProcess.wait_signal(send_func, Received.action)
-	$Timer.send = false
-	if !success:
-		get_tree().change_scene_to_packed(GeneralData.wait)
+	if !stop_timer:
+		var success = await GeneralProcess.wait_signal(send_func, Received.action)
+		$Timer.send = false
+		if !success:
+			get_tree().change_scene_to_packed(GeneralData.wait)

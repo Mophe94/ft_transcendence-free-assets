@@ -83,7 +83,7 @@ func _use_item_combat(packet, item):
 
 func _try_attack(packet, skill):
 	packet["data"] = {
-		"state" = "attack",
+		"state" = "try_attack",
 		"skill" = skill
 	}
 

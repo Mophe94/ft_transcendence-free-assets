@@ -18,59 +18,65 @@ signal action_play
 signal action_combat
 signal change_monster
 signal enemy_change_monster
+signal stop_timer
+signal run_timer
 
 ##############################################################
 func _lose():
-	await text_show("You lose the fight")
+	await text_show("YOU LOSE.")
 	var lose_scene = battle_result["lose"].instantiate()
 	get_tree().current_scene.add_child(lose_scene)
-
+	stop_timer.emit()
+	Received.action_finished.emit()
+	
 func _win():
-	await text_show("You lose the fight")
+	await text_show("YOU WIN !")
 	var victory_scene = battle_result["win"].instantiate()
 	get_tree().current_scene.add_child(victory_scene)
-
-func _change_monster():
-	if GeneralData.text != "":
-		text_show(GeneralData.text)
-	set_menus_select_monster()
+	stop_timer.emit()
 	Received.action_finished.emit()
 
-func _new_current_monster():
-	if GeneralData.text != "":
-		text_show(GeneralData.text)
-	emit_signal("change_monster")
+func _change_monster():
+	await text_show(GeneralData.text)
+	$Text.text = ""
+	set_menus_select_monster()
+	run_timer.emit()
 	Received.action_finished.emit()
 
 func _enemy_change_monster():
 	hide_selection()
-	if GeneralData.text != "":
-		text_show(GeneralData.text)
-	emit_signal("enemy_change_monster")
+	await text_show(GeneralData.text)
+	$Text.text = ""
+	run_timer.emit()
+	Received.action_finished.emit()
+
+func _new_current_monster():
+	await text_show(GeneralData.text)
+	$Text.text = ""
+	emit_signal("change_monster")
 		
 func _new_enemy_monster():
-	if GeneralData.text != "":
-		text_show(GeneralData.text)
+	await text_show(GeneralData.text)
+	$Text.text = ""
 	emit_signal("enemy_change_monster")
-	Received.action_finished.emit()
 
 func waiting_player(send_func: Callable):
 	action_play.emit()
 	hide_selection()
 	lock_button()
 	send_func.call()
-	text_show("Waiting action enemy.")
+	await text_show("Waiting action enemy.")
 
 func _received_action():
 	emit_signal("action_combat")
-	if GeneralData.text != "":
-		text_show(GeneralData.text)
+	await text_show(GeneralData.text)
+	$Text.text = ""
 	Received.action_finished.emit()
 	
 func _new_turn():
-	if GeneralData.text != "":
-		text_show(GeneralData.text)
+	await text_show(GeneralData.text)
 	$Text.text = ""
+	run_timer.emit()
 	_back()
 ##############################################################
 

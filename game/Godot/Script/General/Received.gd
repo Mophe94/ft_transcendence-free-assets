@@ -1,5 +1,10 @@
 extends Node
 
+var order_action = 0
+var max_action = 0
+var pending_turn = null
+
+
 signal start_game_scene
 
 signal monster_encounter_received
@@ -27,7 +32,7 @@ signal finish
 
 func handle_message_receive(msg):
 	#VERIF GOOD MESSAGE
-	print("-------- MSG RECEIVED -------- :\n")
+	print("-------- MSG RECEIVED -------- :")
 	if not msg.has("event"):
 		return
 	if msg["event"] != "game":
@@ -73,11 +78,9 @@ func handle_message_receive(msg):
 			"lose":
 				print("state : " + state + "\ntext : " + data["player"]["text"])
 				_lose(data)
-				emit_signal("lose")
 			"win":
 				print("state : " + state + "\ntext : " + data["player"]["text"])
 				_win(data)
-				emit_signal("win")
 			"change_monster":
 				print("state : " + state + "\nchangemonster : " + str(data["change_monster"]) + "\ntext" + data["player"]["text"])
 				_change_monster(data)
@@ -96,21 +99,84 @@ func handle_message_receive(msg):
 		print("func handle_message_receive STATE missing")
 
 
+func _finish():
+	finish.emit()
+
 func _next_map(data):
-	if not data.has("current_map"):
-		return
-	GeneralData.current_map = data["current_map"]
+	if data.has("current_map"):
+		GeneralData.current_map = data["current_map"]
+		
+	var player = null
+	if data.has("player"):
+		player = data["player"]
+
+	if player.has("currentMonster"):
+		var cMonsterPlayer = player["currentMonster"]
+		GeneralData.player["currentMonster"]["name"] = cMonsterPlayer["name"]
+		GeneralData.player["currentMonster"]["slot"] = int(cMonsterPlayer["slot"])
+
+		if cMonsterPlayer.has("life"):
+			GeneralData.player["currentMonster"]["life"]["current"] = int(cMonsterPlayer["life"]["current"])
+			GeneralData.player["currentMonster"]["life"]["max"] = int(cMonsterPlayer["life"]["max"])
+
+		if cMonsterPlayer.has("skill"):
+			for i in range(cMonsterPlayer["skill"].size()):
+				var monsterSkill = cMonsterPlayer["skill"][i]
+				GeneralData.player["currentMonster"]["skill"][i]["name"] = monsterSkill["name"]
+				GeneralData.player["currentMonster"]["skill"][i]["current"] = int(monsterSkill["current"])
+				GeneralData.player["currentMonster"]["skill"][i]["max"] = int(monsterSkill["max"])
+
+		if cMonsterPlayer.has("status"):
+			var status = cMonsterPlayer["status"]
+			GeneralData.player["currentMonster"]["status"] = status.duplicate()
+	
+	if player.has("battle_team"):
+		var battle_team = player["battle_team"]
+		for i in range(battle_team.size()):
+			var monster = battle_team[i]
+			GeneralData.player["battle_team"][i]["name"] = monster["name"]
+			GeneralData.player["battle_team"][i]["slot"] = int(monster["slot"])
+			GeneralData.player["battle_team"][i]["life"]["current"] = int(monster["life"]["current"])
+			GeneralData.player["battle_team"][i]["life"]["max"] = int(monster["life"]["max"])
+	
+	if player.has("inventory"):
+		for i in range(player["inventory"].size()):
+			GeneralData.player["inventory"][i]["name"] = player["inventory"][i]["name"]
+			GeneralData.player["inventory"][i]["scene"] = player["inventory"][i]["scene"]
+			GeneralData.player["inventory"][i]["current"] = int(player["inventory"][i]["current"])
+
+	var enemy = data["enemy"]
+	if enemy.has("currentMonster"):
+		var cMonster = enemy["currentMonster"]
+		GeneralData.enemy["currentMonster"]["name"] = cMonster["name"]
+
+		if cMonster.has("life"):
+			GeneralData.enemy["currentMonster"]["life"]["current"] = int(cMonster["life"]["current"])
+			GeneralData.enemy["currentMonster"]["life"]["max"] = int(cMonster["life"]["max"])
+	
+		if cMonster.has("status"):
+			var status = cMonster["status"]
+			GeneralData.enemy["currentMonster"]["status"] = status.duplicate()
+	
+	if player.has("text"):
+		GeneralData.text = player["text"]
 	emit_signal("next_map_scene")
 
 
 func _new_turn(data):
-	if data.has("timer"):
-		GeneralData.timer = data["timer"]
-	if data.has("player"):
-		var player = data["player"]
-		if player.has("text"):
-			GeneralData.text = player["text"]
-	emit_signal("new_turn")
+	if max_action > 0 && order_action < max_action:
+		pending_turn = data
+	else:
+		if data.has("timer"):
+			GeneralData.timer = data["timer"]
+		if data.has("player"):
+			var player = data["player"]
+			if player.has("text"):
+				GeneralData.text = player["text"]
+		max_action = 0
+		order_action = 0
+		pending_turn = null
+		emit_signal("new_turn")
 
 
 func _win(data):
@@ -121,6 +187,7 @@ func _win(data):
 	if player.has("text"):
 		GeneralData.text = player["text"]
 	win.emit()
+	await action_finished
 
 
 func _lose(data):
@@ -131,6 +198,7 @@ func _lose(data):
 	if player.has("text"):
 		GeneralData.text = player["text"]
 	lose.emit()
+	await action_finished
 
 
 func _change_monster(data):
@@ -144,6 +212,7 @@ func _change_monster(data):
 	if player.has("text"):
 		GeneralData.text = player["text"]
 	change_monster.emit()
+	await action_finished
 
 
 func _enemy_change_monster(data):
@@ -157,11 +226,19 @@ func _enemy_change_monster(data):
 	if player.has("text"):
 		GeneralData.text = player["text"]
 	enemy_change_monster.emit()
+	await action_finished
 
 
 func _action_battle(data):
 	var signal_to_send = ""
 	var change = -5
+	
+	if data.has("max"):
+		max_action = int(data["max"])
+	
+	if data.has("order"):
+		order_action = int(data["order"])
+
 	if data.has("change_monster"):
 		change = int(data["change_monster"])
 		if change == GeneralData.player["id"]:
@@ -193,24 +270,23 @@ func _action_battle(data):
 
 		if cMonsterPlayer.has("status"):
 			var status = cMonsterPlayer["status"]
-			for i in range(status.size()):
-				GeneralData.player["currentMonster"]["status"][i] = status[i]
+			GeneralData.player["currentMonster"]["status"] = status.duplicate()
 	
 	if player.has("battle_team"):
-		var team = GeneralData.player["battle_team"]
-		for i in range(team.size()):
-			var monster = player["battle_team"][i]
-			GeneralData.monster["name"] = team["name"]
-			GeneralData.monster["slot"] = int(team["slot"])
-			GeneralData.monster["life"]["current"] = int(monster["life"]["current"])
-			GeneralData.monster["life"]["max"] = int(team[i]["life"]["max"])
+		var battle_team = player["battle_team"]
+		for i in range(battle_team.size()):
+			var monster = battle_team[i]
+			GeneralData.player["battle_team"][i]["name"] = monster["name"]
+			GeneralData.player["battle_team"][i]["slot"] = int(monster["slot"])
+			GeneralData.player["battle_team"][i]["life"]["current"] = int(monster["life"]["current"])
+			GeneralData.player["battle_team"][i]["life"]["max"] = int(monster["life"]["max"])
 	
 	if player.has("inventory"):
 		for i in range(player["inventory"].size()):
 			GeneralData.player["inventory"][i]["name"] = player["inventory"][i]["name"]
 			GeneralData.player["inventory"][i]["scene"] = player["inventory"][i]["scene"]
 			GeneralData.player["inventory"][i]["current"] = int(player["inventory"][i]["current"])
-	
+
 	var enemy = data["enemy"]
 	if enemy.has("currentMonster"):
 		var cMonster = enemy["currentMonster"]
@@ -218,19 +294,21 @@ func _action_battle(data):
 
 		if cMonster.has("life"):
 			GeneralData.enemy["currentMonster"]["life"]["current"] = int(cMonster["life"]["current"])
-			GeneralData.enemy["currentMonster"]["life"]["max"] = int(cMonster["life"])
+			GeneralData.enemy["currentMonster"]["life"]["max"] = int(cMonster["life"]["max"])
 	
 		if cMonster.has("status"):
 			var status = cMonster["status"]
-			for i in range(status.size()):
-				GeneralData.player["currentMonster"]["skill"][i] = status[i]
+			GeneralData.enemy["currentMonster"]["status"] = status.duplicate()
 	
 	if player.has("text"):
 		GeneralData.text = player["text"]
 
-	print("signal emit for change monster : " + signal_to_send)
+	print("signal emit for change monster end of parse :\n\n")
+	print(signal_to_send)
 	emit_signal(signal_to_send)
 	await action_finished
+	if pending_turn && order_action >= max_action:
+		_new_turn(pending_turn)
 
 func _combat(data):
 	if data.has("timer"):
