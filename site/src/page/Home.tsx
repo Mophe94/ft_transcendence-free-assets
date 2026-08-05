@@ -1,4 +1,4 @@
-import Chat from '../components/Chat/Chat';
+import Chat from '../components/chat/Chat';
 import { Lobby } from '../components/Lobby';
 import { ChatProvider } from '../context/ChatProvider';
 import './Home.css';

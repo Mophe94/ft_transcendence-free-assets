@@ -14,4 +14,14 @@ export const Color ={
   TEAL: 'teal',
 } as const;
 
-export type ColorType = typeof Color[keyof typeof Color];
+export type Color = typeof Color[keyof typeof Color];
+
+export const ButtonColor = {
+  Red: 'Red',
+  Green: 'Green',
+  Blue: 'Blue',
+  Black: 'Black',
+  Yellow: 'Yellow',
+} as const;
+
+export type ButtonColor = typeof ButtonColor[keyof typeof ButtonColor];

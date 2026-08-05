@@ -2,7 +2,8 @@ export interface GamePayload {
   state: string;
   data: {
     state: string;
-    [key: string]: any;q
+    [key: string]: any;
+    q;
   };
 }
 

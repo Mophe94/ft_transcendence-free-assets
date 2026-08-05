@@ -11,7 +11,7 @@ import { getSecret } from 'libs/shared/src/utils/secret.utils';
 import { RedisModule } from './redis/redis.module';
 import { RedisService } from './redis/redis.service';
 import { LobbyController } from './lobby/lobby.controller';
-import { AuthModule } from 'apps/account-service/src/auth/auth.module';
+import { AuthModule } from 'apps/user-service/src/auth/auth.module';
 
 @Module({
   imports: [
