@@ -444,8 +444,7 @@ export class GameService implements OnModuleInit {
               }
           }
       }
-      else
-        console.log("ELSE");
+      else 
         return this.result_catch(player, 0);
     }
     else

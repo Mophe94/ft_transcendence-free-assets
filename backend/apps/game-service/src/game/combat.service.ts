@@ -76,28 +76,37 @@ export class CombatService {
 
 
 	private handle_action(player: Player, enemy: Player, actionPlayer: CurrentActions, order: number){
-    switch (actionPlayer.actionType) {
-        case "try_attack":
-            this.received_try_attack(player, enemy, actionPlayer.data?.skill);
-            break;
-        case "use_item_combat":
-            this.received_use_item_combat(player, enemy, actionPlayer.data?.item);
-            break;
-        case "change_current_monster":
-            this.received_change_current_monster(player, actionPlayer.data?.slot);
-            break;
-        case "pass":
-            this.received_pass(player);
-            break;
-        default:
-			this.received_pass(player);
-    }
-}
+    	switch (actionPlayer.actionType) {
+			case "try_attack":
+				this.received_try_attack(player, enemy, actionPlayer.data?.skill);
+				break;
+			case "use_item_combat":
+				this.received_use_item_combat(player, enemy, actionPlayer.data?.item);
+				break;
+			case "change_current_monster":
+				this.received_change_current_monster(player, actionPlayer.data?.slot);
+				break;
+			case "pass":
+				this.received_pass(player);
+				break;
+			default:
+				this.received_pass(player);
+			}
+	}
+
+	// Helper
+	private pushResult(map: Map<number, Array<Object>>, playerId: number, result: Object): void {
+		const arr = map.get(playerId);
+		if (arr)
+			arr.push(result);
+		else
+			map.set(playerId, [result]);
+	}
 
 	resolving_battle_round(player1: Player, player2: Player) : Map<number, Array<Object>>{
 		let map_result = new Map<number, Array<Object>>();
-		let first: Player = this.resolve_first(player1, player2);
-		let second: Player = first === player1 ? player2 : player1;
+		const first: Player = this.resolve_first(player1, player2);
+		const second: Player = first === player1 ? player2 : player1;
 		
 		const actionFirst = first.currentActions;
 		const actionSecond = second.currentActions;
@@ -108,27 +117,25 @@ export class CombatService {
 		if (actionFirst.actionType == "change_current_monster")
 			changeMonsterFirst = first.id ;
 
+		// 1
 		this.handle_action(first, second, actionFirst, 1);
-		if (this.action_battle(first, second,  1, 1, changeMonsterFirst) !== undefined && this.action_battle(second, first,  1, 1, changeMonsterFirst) !== undefined)
-			map_result.set(first.id, [this.action_battle(first, second,  1, 1, changeMonsterFirst)])
-			map_result.set(second.id, [this.action_battle(second, first,  1, 1, changeMonsterFirst)])
+		this.pushResult(map_result, first.id, this.action_battle(first, second,  1, 1, changeMonsterFirst));
+		this.pushResult(map_result, second.id, this.action_battle(second, first,  1, 1, changeMonsterFirst));
+
 		if (second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) {
 			second.currentMonster.life.current = 0;
 			return map_result
 		}
-		if (/* first.currentMonster.name !== "" &&  */actionSecond.actionType == "change_current_monster")
+		if (actionSecond.actionType == "change_current_monster")
 			changeMonsterSecond = second.id;
 
+		// 2
 		this.handle_action(second, first, actionSecond, 2);
 
-		if (this.action_battle(first, second,  1, 1, changeMonsterFirst) !== undefined && this.action_battle(second, first,  1, 1, changeMonsterFirst) !== undefined
-			&& this.action_battle(first, second,  2, 2, changeMonsterSecond) !== undefined && this.action_battle(second, first,  2, 2, changeMonsterSecond) !== undefined)
-		map_result.set(first.id, [this.action_battle(first, second,  1, 1, changeMonsterFirst), this.action_battle(first, second,  2, 2, changeMonsterSecond)]);
-		map_result.set(second.id, [this.action_battle(second, first,  1, 1, changeMonsterFirst), this.action_battle(second, first,  2, 2, changeMonsterSecond)])
+		this.pushResult(map_result, first.id, this.action_battle(first, second,  2, 2, changeMonsterSecond));
+		this.pushResult(map_result, second.id, this.action_battle(second, first,  2, 2, changeMonsterSecond));
+
 		return map_result
-		// return [ this.action_battle(first, second, 1, 2, changeMonsterFirst),
-		// 	this.action_battle(second, first, 2, 2, changeMonsterSecond)
-		// ];
 	}
 	
 
