@@ -106,11 +106,11 @@ networks:
 
 volumes:
   game_data:
-    driver: local
-    driver_opts:
-        type: none
-        o: bind
-        device: /var/lib/postgresql/data
+#    driver: local
+#    driver_opts:
+#        type: none
+#        o: bind
+#        device: /var/lib/postgresql/data
 
 #configs:
 secrets:
