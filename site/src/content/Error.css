@@ -1,14 +1,16 @@
 .error-heading {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    font-family: 'New Rocker';
-    font-size: 128px;
-    -webkit-text-stroke: 3px black;
-    color: darkred;
+  /* margin-top: 20px;
+  margin-bottom: 20px; */
+  font-family: 'New Rocker';
+  font-size: clamp(56px, 15vw,128px);
+  text-align: center;
+  -webkit-text-stroke: 3px black;
+  color: darkred;
 }
 .error-msg {
-    font-family: 'Ubuntu';
-    font-size: 28px;
+  font-size: clamp(16px, 5vw, 28px);
+  text-align: center;
+  font-family: 'Ubuntu';
 }
 .error-content-layout {
   display: grid;
@@ -84,4 +86,20 @@
   background-repeat: no-repeat no-repeat;
   grid-row: 3;
   grid-column: 3;
+}
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#error-img {
+  height: clamp(96px, 20vw, 480px);
+  width: clamp(96px, 20vw, 480px);
+  aspect-ratio: 1 / 1;
+}
+
+@media (min-width: 720px) {
+  #error-img {
+  align-self: start;
+}
 }

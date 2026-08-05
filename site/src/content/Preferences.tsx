@@ -180,52 +180,42 @@ export default function Preferences() {
   const theme_img = THEMES[theme_id] ? THEMES[theme_id][1] : THEMES[0][1];
   return (
     <div className="preferences-content-layout">
-        <form id="preferences-form" onSubmit={handleSubmit}>
+      <form id="preferences-form" onSubmit={handleSubmit}>
+        
+        <div className='pref-header'>
+          <div className="preferences-title heading-large">
+            Settings
+          </div>
+        </div>
+
+        <div className="settings-grid">
           
-          <div className='pref-header'>
-            <div className="preferences-title heading-large">
-              Preferences
-            </div>
-            <div className='pref-buttons'>
-              <ResetButton onClick={handleReset} />
-              <SaveButton onClick={() => {}}/>
-            </div>
+          <div className="selection">
+            <div className="selection-label heading-medium">Avatar</div>
+            <LeftArrowButton onClick={decrAvatarId} disabled={avatar_id === 0}/>
+            <img className='selection-img' src={avatar_img} />
+            <RightArrowButton onClick={incrAvatarId} disabled={avatar_id === AVATARS.length - 1}/>
           </div>
 
-          <div className="settings-grid">
-            
-            <div className="avatar-selection">
-              <div className="heading-medium centered">Avatar:</div>
-              <div className='centered aligned'>
-                <LeftArrowButton onClick={decrAvatarId} disabled={avatar_id === 0}/>
-                <img src={avatar_img} />
-                <RightArrowButton onClick={incrAvatarId} disabled={avatar_id === AVATARS.length - 1}/>
-              </div>
-            </div>
-
-            <div className="avatar-selection">
-              <div className="heading-medium centered">Starter:</div>
-              <div className='centered aligned'>
-                <LeftArrowButton onClick={decrStarterId} disabled={starter_id === 0}/>
-                  <img src={starter_img} />
-                <RightArrowButton onClick={incrStarterId} disabled={starter_id === STARTERS.length - 1}/>
-              </div>
-            </div>
-            
-            <div className="theme-selection">
-              <div className="heading-medium centered">Theme:</div>
-              <div>
-                <div className='centered aligned'>
-                  <LeftArrowButton onClick={decrThemeId} disabled={theme_id === 0}/>
-                  <img src={theme_img} />
-                  <RightArrowButton onClick={incrThemeId} disabled={theme_id === THEMES.length - 1}/>
-                </div>
-              </div>
-            </div>
-          
+          <div className="selection">
+            <div className="selection-label heading-medium">Starter</div>
+            <LeftArrowButton onClick={decrStarterId} disabled={starter_id === 0}/>
+            <img className='selection-img' src={starter_img} />
+            <RightArrowButton onClick={incrStarterId} disabled={starter_id === STARTERS.length - 1}/>
           </div>
           
-        </form>
-      </div>
+          <div className="selection">
+            <div className="selection-label heading-medium">Theme</div>
+            <LeftArrowButton onClick={decrThemeId} disabled={theme_id === 0}/>
+            <img className='selection-img' src={theme_img} />
+            <RightArrowButton onClick={incrThemeId} disabled={theme_id === THEMES.length - 1}/>
+          </div>
+        </div>
+        <div className='pref-buttons'>
+          <ResetButton onClick={handleReset} />
+          <SaveButton onClick={() => {}}/>
+        </div>
+      </form>
+    </div>
   );
 }

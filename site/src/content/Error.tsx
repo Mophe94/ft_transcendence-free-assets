@@ -13,9 +13,11 @@ export default function ErrorDisplay({msg = 'Page not found', code}: ErrorDispla
 
   return (
     <RegularBG>
-      <div className='error-heading centered'>Error {code}</div>
-      <div className='error-msg centered'>{msg}</div>
-      <img src={errorGif} alt='error-image'/>
+      <div className='error-container'>
+        <div className='error-heading centered'>Error {code}</div>
+        <div className='error-msg centered'>{msg}</div>
+        <img id='error-img' src={errorGif} alt='error-image'/>
+      </div>
     </RegularBG>
     );
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { WebSocket } from 'ws';
 import { randomUUID } from 'crypto';
@@ -10,9 +10,10 @@ import { FULL } from 'apps/game-service/src/game/game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { RedisService } from '../redis/redis.service';
+import { DEFAULT, LOBBY_KEYS, ROOM_IDS } from './lobby.const';
 
 @Injectable()
-export class LobbyService {
+export class LobbyService implements OnApplicationBootstrap {
   constructor(
     private roomService: RoomService,
     private eventEmitter: EventEmitter2,
@@ -20,22 +21,22 @@ export class LobbyService {
     private redisService: RedisService,
   ) {}
 
-  private rooms = new Map<string, Set<WebSocket>>();
+  // private rooms = new Map<string, Set<WebSocket>>();
 
-  // JOIN LOBBY
+  async onApplicationBootstrap() {
+    await this.redisService.addToSet(LOBBY_KEYS.FREE_IDS, ROOM_IDS);
+  }
+
   async joinLobby(client: WebSocket, userSub: number): Promise<void> {
     const roomId =
-      this.roomService.findAvailableRoom() ?? await this.roomService.createRoom();
+      this.roomService.findAvailableRoom() ??
+      (await this.roomService.createRoom(DEFAULT.CAPACITY));
 
     this.roomService.joinRoom(client, roomId);
+    await this.redisService.addPlayerToRoom(userSub.toString(), roomId);
     console.log('room id: ', roomId);
 
-    await this.redisService.addPlayerToRoom(userSub.toString(), roomId);
-
     const clients = this.roomService.getClients(roomId)!;
-
-    /*     const clientData = clientsMap.get(client);
-    if (clientData) clientData.roomId = roomId; */
 
     console.log(
       `[LobbyService] User ${userSub} joined room ${roomId} (${clients.size}/${FULL})`,
@@ -48,14 +49,7 @@ export class LobbyService {
     });
 
     if (clients.size === FULL) {
-      this.phaseTimer.clear(roomId);
       this.eventEmitter.emit('lobby.start', { roomId, clients });
-    } else if (clients.size === 1) {
-      this.phaseTimer.start(roomId, 'lobby', () => {
-        console.log(`[LobbyService] Room ${roomId} lobby timeout`);
-        //ADD bots ??
-        this.eventEmitter.emit('lobby.start', { roomId, clients });
-      });
     }
   }
 }

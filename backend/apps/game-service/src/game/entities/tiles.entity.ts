@@ -14,7 +14,7 @@ export class Tile {
   id!: number;
 
   @Column({ unique: true })
-  name!: string;
+  type!: string;
 
   @ManyToMany(() => MapEntity, (map: MapEntity) => map.tiles)
   maps!: MapEntity[];

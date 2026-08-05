@@ -150,7 +150,8 @@ CREATE TABLE public.items (
     name character varying(30) CONSTRAINT items_name_not_null NOT NULL,
     type public.object_type_enum CONSTRAINT items_type_not_null NOT NULL,
     value integer CONSTRAINT items_value_not_null NOT NULL,
-    target public.monster_stat_enum
+    target public.monster_stat_enum,
+    scene character varying(30) CONSTRAINT items_scene_not_null NOT NULL
 );
 
 
@@ -358,11 +359,11 @@ ALTER TABLE public.tiles_monsters OWNER TO postgres;
 -- Data for Name: items; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.items (id, name, type, value, target) FROM stdin;
-1	potion	heal	50	\N
-2	bomb	damage	50	\N
-3	lucky clover	capture	100	\N
-4	rage	stat_up	20	attack
+COPY public.items (id, name, type, value, target, scene) FROM stdin;
+1	potion	heal	50	\N	combat
+2	bomb	damage	50	\N	combat
+3	golden ticket	capture	100	\N	map
+4	rage	stat_up	20	attack	combat
 \.
 
 
@@ -401,12 +402,12 @@ COPY public.monsters (id, name, hp_total, attack, attack_spe, defense, defense_s
 2	fishet	120	10	15	5	15	100	water	common
 3	burpy	100	20	30	0	20	80	water	uncommon
 4	sharky	150	20	30	0	20	150	water	rare
-5	squirrel	100	20	20	5	10	110	neutral	common
+5	squirel	100	20	20	5	10	110	neutral	common
 6	papate	180	10	15	5	10	80	earth	uncommon
 7	gigantomakia	200	20	30	15	25	50	earth	rare
 9	monkel	130	15	15	10	20	100	neutral	uncommon
 10	pigeonne	120	25	25	10	10	160	fly	rare
-8	leaves	80	35	45	0	10	100	plant	common
+8	leafs	80	35	45	0	10	100	plant	common
 \.
 
 
@@ -501,15 +502,15 @@ COPY public.tiles (id, type) FROM stdin;
 --
 
 COPY public.tiles_monsters (tile_id, monster_id) FROM stdin;
-3	10
-3	9
-3	8
+3	6
+3	7
+3	5
 2	4
 2	3
 2	2
-1	7
-1	6
-1	5
+1	9
+1	8
+1	10
 \.
 
 

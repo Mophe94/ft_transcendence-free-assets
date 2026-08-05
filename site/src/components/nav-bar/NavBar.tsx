@@ -21,7 +21,7 @@ const publicLinks = {
 const privateLinks = {
   Home: '/Home',
   Play: '/play',
-  'How to Play': '/how_to_play',
+  'How to play': '/howto',
   Readme: '/readme',
   'About us': '/aboutus',
 };
@@ -35,6 +35,7 @@ function NavMenu() {
       <div className="nav-extreme">
         <img src={swordBeg} />
       </div>
+      <div className="nav-menu-label">Menu</div>
       {Object.entries(menuLinks).map(([name, url]) => (
         <React.Fragment key={name}>
           <div className="nav-tab">
@@ -53,7 +54,7 @@ function NavMenu() {
 
 export function NavBar() {
   return (
-    <div className="priv-nav-bar">
+    <div className="nav-bar">
       <NavMenu />
       <AuthSection />
     </div>

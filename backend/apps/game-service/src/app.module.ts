@@ -12,6 +12,7 @@ import { RedisModule } from './redis/redis.module';
 import { RedisService } from './redis/redis.service';
 import { LobbyController } from './lobby/lobby.controller';
 import { AuthModule } from 'apps/account-service/src/auth/auth.module';
+import { HealthModule } from 'libs/shared/src/health/health.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AuthModule } from 'apps/account-service/src/auth/auth.module';
     GameModule,
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
+    HealthModule,
     RedisModule,
   ],
   controllers: [AppController, LobbyController],

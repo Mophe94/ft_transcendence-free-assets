@@ -3,46 +3,72 @@ services:
     build:
       context: nginx
     container_name: nginx
+    depends_on:
+      - users_service
+    env_file:
+      - nginx/.env
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     ports:
       - "80:80"
       - "443:443"
-    env_file:
-      - nginx/.env
-    depends_on:
-      - users_service
     volumes:
       - nginx_ssl:/etc/nginx/ssl
+    
 
   frontend:
     build:
       context: site
     container_name: frontend
-    ports:
-      - "5173:5173"
     env_file:
       - site/.env
+    expose:
+      - 5173
+    healthcheck:
+      test: ["CMD", "node", "/app/healthcheck.js"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
     volumes:
       - ./site:/app
       - /app/node_modules
+
 
   game_service:
     build:
       context: backend
     container_name: game_service
     command: npm run start:dev game-service
+    depends_on:
+      users_db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     env_file:
       - backend/.env.docker
+    expose:
+      - 3000
+    healthcheck:
+      test: ["CMD", "/app/healthcheck.sh"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     secrets:
       - db_game_db_name
       - db_game_username
       - db_game_password
       - redis_password
-    depends_on:
-      users_db:
-        condition: service_healthy
+      - jwt_secret_key
     volumes:
       - ./backend:/app
       - /app/node_modules
+    
 
   chat_service:
     build:
@@ -51,6 +77,14 @@ services:
     command: npm run start:dev chat-service
     env_file:
       - backend/.env.docker
+    expose:
+      - 3000
+    healthcheck:
+      test: ["CMD", "/app/healthcheck.sh"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     secrets:
       - jwt_secret_key
     volumes:
@@ -62,8 +96,19 @@ services:
       context: backend
     container_name: users_service
     command: npm run start:dev account-service
+    depends_on:
+      users_db:
+        condition: service_healthy
     env_file:
       - backend/.env.docker
+    expose:
+      - 3000
+    healthcheck:
+      test: ["CMD", "/app/healthcheck.sh"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     secrets:
       - db_users_db_name
       - db_users_username
@@ -71,15 +116,6 @@ services:
       - fortytwo_client_id
       - fortytwo_client_secret
       - jwt_secret_key
-    depends_on:
-      users_db:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://users_db:3000/health"]
-      interval: 5s
-      timeout: 3s
-      retries: 3
-      start_period: 5s
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -88,6 +124,14 @@ services:
     build:
       context: game_test
     container_name: game
+    expose:
+      - 8060
+    healthcheck:
+      test: ["CMD", "node", "/app/healthcheck.js"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
     volumes:
       - ./game_test:/app
       - /app/node_modules
@@ -98,23 +142,29 @@ services:
     container_name: users_db
     env_file:
       - database/users_db/.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
     secrets:
       - db_users_db_name
       - db_users_username
       - db_users_password
       - db_users_postgres_password
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 3s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
   game_db:
     build:
       context: database/game_db/
     container_name: game_db
     env_file:
       - database/game_db/.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
     secrets:
       - db_game_db_name
       - db_game_username
@@ -125,6 +175,12 @@ services:
     build:
       context: redis/
     container_name: redis
+    healthcheck:
+      test: ["CMD-SHELL", "/app/healthcheck.sh"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
     secrets:
       - redis_password
 

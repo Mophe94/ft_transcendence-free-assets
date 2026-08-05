@@ -2,24 +2,23 @@ export interface GamePayload {
   state: string;
   data: {
     state: string;
-    [key: string]: any;
+    [key: string]: any;q
   };
 }
 
-export const FULL = 4;
+export const FULL = 2;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
   godot_fill: 5,
-  map: 5,
-  team_setup: 20,
-  choose_monster: 30,
-  choose_action: 30,
+  map: 10,
+  team_setup: 5,
+  choose_monster: 23, // happend only if a monster die -> before choose action phase
+  choose_action: 23,
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;
 
-// DELETE when Guard is implemented
 let mockUserCounter = 0;
 export const createMockUser = () => {
   mockUserCounter++;

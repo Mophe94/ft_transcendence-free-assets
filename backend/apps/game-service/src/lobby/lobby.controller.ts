@@ -31,8 +31,8 @@ export class LobbyController {
     }));
 
     const rooms = await Promise.all([
-      ...activeRoomsPromises,
       ...inactiveRoomsPromises,
+      ...activeRoomsPromises,
     ]);
     return { rooms };
   }

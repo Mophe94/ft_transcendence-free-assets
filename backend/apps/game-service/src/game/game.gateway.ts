@@ -130,7 +130,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const userId = clientData.userId;
 
-    const response = await this.gameService.handleMessage(userId, payload);
+    let response = await this.gameService.handleMessage(userId, payload);
+    if (!response) {
+      response = {
+        event: 'game',
+        data: {
+          state: 'undefined payload'
+        }
+      }
+    }
     this.sendToClient(client, response);
   }
 

@@ -6,4 +6,6 @@ RUN apk upgrade && apk add npm
 
 COPY . /app/
 
+RUN chmod +x /app/healthcheck.sh
+
 RUN npm install

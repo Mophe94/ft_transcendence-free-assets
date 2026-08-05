@@ -8,7 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { IncomingMessage } from 'http';
 import type { AuthenticatedSocket } from 'libs/shared/src';
-import { wsAuthService } from 'libs/shared/src/auth/ws-auth.service';
+import { WsAuthService } from 'libs/shared/src/auth/ws-auth.service';
 import { ConfigService } from '@nestjs/config';
 import { Server, WebSocket } from 'ws';
 import { clientsMap } from '../shared/clients.map';
@@ -25,7 +25,7 @@ export class ChatGateway
 
   constructor(
     private configService: ConfigService,
-    private wsAuthService: wsAuthService,
+    private wsAuthService: WsAuthService,
   ) {}
   destroy() {
     if (this.heartbeatInterval) {

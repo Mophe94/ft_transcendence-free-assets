@@ -3,20 +3,18 @@ import { WebSocket } from 'ws';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { PlayerService } from './player/player.service';
 import { MonstersService } from './entities/monsters.service';
+import { TilesService } from './entities/tiles.service';
 import { ItemsService } from './entities/items.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
-import { GamePayload } from './game.type';
-import { clientsMap } from 'apps/game-service/src/shared/clients.map';
+//import { GamePayload } from './game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
-import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
-import { max } from 'node_modules/class-validator/types';
-import { MonsterType } from './entities/types/monster_type.enum';
-import { Skill } from './entities/skills.entity';
+import { FULL, PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
+//import { Skill } from './entities/skills.entity';
 import { AiService } from './ai_service/ai.service';
 import {
-  CurrentMonster,
+  CurrentActions,
   Skill as PlayerSkill,
 } from './player/player.interfaces';
 
@@ -29,20 +27,22 @@ export class GameService implements OnModuleInit {
     private playerService: PlayerService,
     private combatService: CombatService,
     private monstersService: MonstersService,
+    private tilesService: TilesService,
     private itemsService: ItemsService,
     private aiService: AiService,
   ) {}
 
   private gameRooms = new Map<string, Set<number>>();
+  private roomIdByPlayer= new Map<number, string>();
 
   private joinGameRoom(roomId: string, userId: number): Set<number> {
-    let room = this.gameRooms.get(roomId);
-    if (!room) {
-      room = new Set();
-      this.gameRooms.set(roomId, room);
+    let rooms = this.gameRooms.get(roomId);
+    if (!rooms) {
+      rooms = new Set();
+      this.gameRooms.set(roomId, rooms);
     }
-    room.add(userId);
-    return room;
+    rooms.add(userId);
+    return rooms;
   }
 
   private leaveGameRoom(roomId: string, userId: number): void {
@@ -71,17 +71,18 @@ export class GameService implements OnModuleInit {
     userId: number,
     roomId: string,
   ): Promise<void> {
-    const room = this.joinGameRoom(roomId, userId);
-    console.log(`Size = ${room.size}, RoomId = ${roomId}`);
+    const rooms = this.joinGameRoom(roomId, userId);
+    this.roomIdByPlayer.set(userId, roomId);
+    console.log(`Size = ${rooms.size}, RoomId = ${roomId}`);
 
-    if (!this.playerService.getPlayer(userId)) {
+    if (!this.playerService.getPlayer(userId))
       this.playerService.initPlayer(userId);
-    }
+    const player = this.playerService.getPlayer(userId)!;
 
-    if (room.size === FULL) {
-      this.combatService.matchmake(room);
+    if (rooms.size === FULL) {
+      this.combatService.matchmake(rooms);
       // TEST MATCHMAKING //
-      for (const userId of room) {
+      for (const userId of rooms) {
         const player = this.playerService.getPlayer(userId)!;  
         const opponentId = this.combatService.getOpponentId(userId);
         const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
@@ -93,11 +94,11 @@ export class GameService implements OnModuleInit {
         console.log('******************');
       }
 
-      await this.startMapPhase(roomId, room);
-    } else if (room.size === 1) {
+      await this.startMapPhase(roomId, rooms);
+    } else if (rooms.size === 1) {
     this.phaseTimer.start(roomId, 'godot_fill', () => {
       console.log(`[GameService] Room ${roomId} pas remplie côté Godot -> ajout de bots`);
-      this.fillRoomWithBots(roomId, room);
+      this.fillRoomWithBots(roomId, rooms);
       });
     }
   }
@@ -126,7 +127,7 @@ export class GameService implements OnModuleInit {
   }
 
   private sendToPlayer(userId: number, payload: object): void {
-    console.log(`Send_to_player: ${userId} -> ${payload}`);
+    console.log("Send_to_player: ", userId, "MSG: ", payload);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
@@ -134,13 +135,13 @@ export class GameService implements OnModuleInit {
     roomId: string,
     room: Set<number>,
   ): Promise<void> {
-    this.phaseTimer.start(roomId, 'map', () => {
+    this.phaseTimer.start(`game: ${roomId}`, 'map', () => {
       console.log(`Room ${roomId} map phase timeout`);
       this.startTeamSetupPhase(roomId, room);
     });
 
     const mapTimer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.map;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.map;
 
     const payloads = await Promise.all(
       [...room].map(async (userId) => {
@@ -160,15 +161,14 @@ export class GameService implements OnModuleInit {
   }
 
   private startTeamSetupPhase(roomId: string, room: Set<number>) {
-    this.phaseTimer.start(roomId, 'team_setup', () => {
+    this.phaseTimer.start(`game: ${roomId}`, 'team_setup', () => {
       console.log(`Room ${roomId} team_setup phase timeout`);
-      //this.startCombatPhase(roomId, room);
+      this.startCombatPhase(roomId, room);
 
     });
     const teamSetupTimer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.team_setup;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.team_setup;
 
-    // TODO: combat room: player/enemy
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;
       player.timer = teamSetupTimer;
@@ -180,7 +180,7 @@ export class GameService implements OnModuleInit {
       }
 
 		// TEST MATCHMAKING //
-		console.log('USER ID: ', userId, ': ', this.team_setup(player, enemy ?? player));
+		console.log('USER ID: ', userId, /* ': ', this.team_setup(player, enemy ?? player) */);
 		console.log('OPONNENT ID: ', opponentId);
 		console.log('******************');
 		//******************************//
@@ -189,75 +189,249 @@ export class GameService implements OnModuleInit {
     }
   }
 
-/*   private startCombatPhase(roomId: string, room: Set<number>) {
-    this.phaseTimer.start(roomId, 'choose_monster', () => {
+  private startCombatPhase(roomId: string, room: Set<number>) {
+    this.phaseTimer.start(`game: ${roomId}`, 'choose_action', () => {
       console.log(`Room ${roomId} choose_monster timeout`);
 
     });
+
     const combatTimer =
-      this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.choose_monster;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.choose_action;
 
-  } */
+    for (const userId of room) {
+      const player = this.playerService.getPlayer(userId)!;
+      player.timer = combatTimer;
+      }
 
-  async handleMessage(
-    userId: number,
-    payload: any,
-  ): Promise<object | undefined> {
-    const player = this.playerService.getPlayer(userId)!;
-    let result: object | undefined;
-    switch (payload.state) {
-            case "add_item":
-        result = await this.received_add_item(player); break;
-      case "delete_item":
-        result = await this.received_delete_item(player, payload.item); break;
-      case "item_request":
-        result = await this.received_request_item(player); break;
-      case "use_item":
-        result = await this.received_use_item(player, payload.item); break;
-      case 'new_encounter': {
-        result = await this.received_new_encounter(
-          player,
-          2 /* payload.tile */,
-        );
-        break;
+    console.log('Combat timer started');
+  }
+
+  private startNewTurn(roomId: string, room: Set<number>) {
+    this.phaseTimer.start(`game: ${roomId}`, 'choose_action', () => {
+      console.log(`Room ${roomId} choose_action timeout`);
+
+    });
+
+    const actionTimer =
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.choose_monster;
+
+    for (const userId of room) {
+      const player = this.playerService.getPlayer(userId)!;
+      player.timer = actionTimer;
       }
-      case 'try_catch':
-        result = await this.received_try_catch(player);
-        break;
-      case 'delete_monster':
-        result = await this.received_delete_monster(player, payload.monster);
-        break;
-      case 'team_choice': {
-        result = await this.received_team_choice(player, payload.battle_team);
-        break;
-      }
-      /*       case "change_current_monster":
-        result = await this.received_update_current_monster(player, payload.data.slot); break;
-      case "use_item_combat":
-        result = await this.received_use_item_combat(player, enemy, payload.data.item); break;
-      case "try_attack":
-        result = await this.received_try_attack(player, enemy, payload.data.skill); break; */
-      default:
-        return {
-          event: 'game',
-          data: { state: payload.state, reason: 'invalid_action' },
-        };
+
+    console.log('New Turn timer started');
+  }
+
+
+  private has_valid_monsters(player: Player): boolean {
+    for (const monster of player.battle_team) {
+        if (monster.name !== "" && monster.life.current > 0) {
+            return true;
+        }
     }
-    if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
-    console.log('Result payload: ', result);
-    return result;
+    return false;
+  }
+
+  async handleMessage(userId: number, payload: any) : Promise<object | undefined> {
+    let player = this.playerService.getPlayer(userId)!;
+    let userId2 = this.combatService.getOpponentId(userId);
+    const roomId = this.roomIdByPlayer.get(userId)!;
+    
+    if (!userId2) {
+      console.log(`[GameService]: userId2 for ${userId} is missing - using userId as placeholder`);
+      userId2 = userId;
+    }
+    let player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
+
+    if (!player2) {
+      console.log(`[GameService]: No opponent for ${userId} - using player as placeholder`);
+      player2 = player;
+    }
+    let result: object | undefined
+    const state = payload?.state
+    console.log("STATE", state);
+    switch (state) {
+      case "add_item":
+        result = await this.received_add_item(player)
+        break;
+      case "delete_item":
+        result = await this.received_delete_item(player, payload.item)
+        break;
+      case "item_request":
+        result = await this.received_request_item(player)
+        break;
+      case "use_item":
+        result = await this.received_use_item(player, payload.item)
+        break;
+      case "new_encounter":
+        result = await this.received_new_encounter(player, payload.tile)
+        break;
+      case "try_catch":
+        result = await this.received_try_catch(player)
+        break;
+      case "delete_monster":
+        result = await this.received_delete_monster(player, payload.monster)
+        break;
+      case "team_choice":
+        result = await this.received_team_choice(player, payload.battle_team)
+        break;
+      case "change_current_monster":
+      case "use_item_combat":
+      case "try_attack":
+        case "pass":
+          player.currentActions = { 
+            actionType: state,
+            data: payload
+          }
+          console.log("Current actions", player.currentActions);
+          if (player.currentActions.actionType && player2.currentActions.actionType) {
+            const mapResult = await this.combatService.resolving_battle_round(player, player2);
+            player.currentActions.actionType = undefined;
+            player2.currentActions.actionType = undefined;
+            if (mapResult && mapResult.get(player.id) !== undefined && mapResult.get(player2.id) !== undefined){
+              const currentMessagePlayer = mapResult.get(player.id);
+              const currentMessagePlayer2 = mapResult.get(player2.id);
+              console.log("* CurrentMessagePlayer1 *: ", mapResult.get(player.id));
+              console.log("*************************************");
+              console.log("* CurrentMessagePlayer2 *: ", mapResult.get(player2.id));
+              console.log("*************************************");
+
+              for (let i = 0; i < currentMessagePlayer!.length; ++i){
+                this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
+                this.sendToPlayer(userId2, currentMessagePlayer2?.at(i)!);
+              }
+              await new Promise(resolve => setTimeout(resolve, 2000)); // ! "temp fix to synchronizeke"
+
+              if (player.currentMonster.life.current <= 0){
+                if (!this.has_valid_monsters(player)){
+                  this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
+                  this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
+                  // wainting all combat finish
+                }
+                else{
+                  this.sendToPlayer(userId, this.combatService.change_monster(player, player.id));
+                  this.sendToPlayer(userId2, this.combatService.change_monster(player2, player.id));
+                }
+              }
+              else if (player2.currentMonster.life.current <= 0){
+                if (!this.has_valid_monsters(player2)){
+                  this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
+                  this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
+  
+                }
+                else{
+                  this.sendToPlayer(userId, this.combatService.change_monster(player, player2.id));
+                  this.sendToPlayer(userId2, this.combatService.change_monster(player2, player2.id));
+                }
+              }
+    //					else if (!has_valid_monsters(player2)){
+    //						send result_battle(player, player.id)
+    //						send result_battle(player2, player.id)
+    //					}
+              else{
+                this.startNewTurn(roomId, this.gameRooms.get(roomId)!);
+                this.sendToPlayer(userId, this.combatService.new_turn(player));
+                this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+                // si un combat deja finish declenchement du roundLeft
+                // send new_turn(player, rounLeft)
+                // send new_turn(player, roundLeft)
+              }
+            }
+                }
+          break;
+      
+      default:
+        console.log("Unknow state:", state)
+        return undefined
+    }
+    //if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
+    //console.log('Result payload: ', result);
+    //if (state !== "change_current_monster" && state !== "use_item_combat" && state !== "try_attack" && state !== "pass") {
+    //  if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD 2');
+    //  return result
+    //}
+    return result
   }
 
   // HANDLERS
-
+  
   // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
-  private async received_new_encounter(
-    player: Player,
-    tile: number,
-  ): Promise<object | undefined> {
-    const monsters = await this.monstersService.findMonstersByTile(tile);
-    player.current_monster = monsters[1].name; //
-    //console.log('Monsters by tile', monsters[1]);
+  private async received_new_encounter(player: Player, tile: string){
+    const table_encounter = {
+      commun: 65,
+      uncommun: 25,
+      rare: 10
+    }
+    // Retrieve list monsters by tile
+    const tileObject = await this.tilesService.findOneByType(tile);
+    if (!tileObject) {
+      console.log("tileObject is undefined");
+      return undefined;
+    }
+    const tileId = tileObject.id;
+
+    let table_monster = await this.monstersService.findMonstersByTile(tileId);
+    if (!table_monster) {
+      console.log("table_monster is undefined");
+      return undefined;
+    }
+
+    // random rarity
+    let result = Math.floor(Math.random() * 100);
+    let selected_monster = 'default';
+    let rarity: string;
+
+    // rare
+    if (result <= 10) {
+      rarity = 'rare'
+    }
+    else if (result <= 30) {
+      rarity = 'uncommon'
+    }
+    else {
+      rarity = 'common'
+    }
+
+    for (let i = 0; i < table_monster.length; i++) {
+      if (table_monster[i].rarity === rarity)
+          selected_monster = table_monster[i].name;
+    }
+    
+
+    // call monster from db
+    if (result <= table_encounter.rare){
+      result = Math.floor(Math.random() * 100);
+      let gap = Math.floor(100 / table_monster.length);
+      let step = gap;
+      let i = 0;
+      for (i; result > gap && i < table_monster.length - 1; ++i)
+        gap += step;
+      player.current_monster = selected_monster;
+      player.current_monster_rarity = "rare"
+    }
+    else if (result <= table_encounter.uncommun ){ /* && monster.rarity === uncommun exist*/
+      result = Math.floor(Math.random() * 100);
+      let gap = Math.floor(100 / table_monster.length);
+      let step = gap;
+      let i = 0;
+      for (i; result > gap && i < table_monster.length - 1; ++i)
+        gap += step;
+      player.current_monster = selected_monster;
+      player.current_monster_rarity = "uncommon"
+    }
+    else {
+      result = Math.floor(Math.random() * 100);
+      // remplir table monster avec les nom des pq en commun
+      let gap = Math.floor(100 / table_monster.length);
+      let step = gap;
+      let i = 0;
+      for (i; result > gap && i < table_monster.length - 1; ++i)
+        gap += step;
+      player.current_monster = selected_monster;
+      player.current_monster_rarity = "common";
+    }
+    
     return this.new_encounter(player);
   }
 
@@ -270,19 +444,38 @@ export class GameService implements OnModuleInit {
     }
     return this.update_team(player);
   }
-
-  private received_try_catch(player: Player) {
-    let result = Math.floor(Math.random() * 101);
-
-    if (result <= 50) {
-      for (let i = 0; i < player.team.length; ++i) {
-        if (player.team[i] === '') {
-          player.team[i] = player.current_monster;
-          break;
-        }
+  
+  // CHECK MATCH OF MONSTER WITH RANDOM VALUE AND RETURN TRUE IF OK OR FALSE
+  private received_try_catch(player: Player, item?: string){
+    const table_encounter = {
+      common: 75,
+      uncommon: 45,
+      rare: 20
+    }
+    let result: number = 0
+  
+    if (item == undefined)
+      result = Math.floor(Math.random() * 100);
+  
+    let monsterCatch: number = 0
+ 
+    monsterCatch = table_encounter[player.current_monster_rarity as keyof typeof table_encounter]
+    if (monsterCatch !== undefined) {
+      if (result <= monsterCatch) {
+          for (let i = 0; i < player.team.length; ++i) {
+              if (player.team[i] === '') {
+                player.team[i] = player.current_monster;
+                console.log("IF");
+                return this.result_catch(player, 1);
+              }
+          }
       }
-      return this.result_catch(player, 1);
-    } else return this.result_catch(player, 0);
+      else
+        console.log("ELSE");
+        return this.result_catch(player, 0);
+    }
+    else
+      return this.result_catch(player, 0);
   }
 
   // CHECK TEAM SENDED AND IF IT'S EMPTY, ELSE AUTO FULLY BATTLE_TEAM IF IT'S POSSIBLE
@@ -291,77 +484,120 @@ export class GameService implements OnModuleInit {
     player: Player,
     monsters: string[],
   ): Promise<object | undefined> {
-    //retrieve monsters stat from db
-    for (let i = 0; i < monsters.length; ++i) {
-      if (monsters[i] != '') {
-        const monster = await this.monstersService.findOneByName(
-          monsters[i] /* , { skills: true } */
-        );
-        if (!monster) return undefined;
-        console.log(monster);
-        const currentMonster: CurrentMonster = {
-          name: monster.name,
-          type: String(monster.type),
-          slot: i,
-          life: {
-            current: monster.hp_total,
-            max: monster.hp_total,
-          },
-          status: [],
-          skill: [], // 4 slots
-        };
+    const monstersToLoad: {name: string; slot: number}[] = []; //arr objects
+    let count = 0;
 
-        player.battle_team[i] = currentMonster;
+    for (let i = 0; i < monsters.length; i++) {
+      if (monsters[i] !== "") {
+        count ++;
       }
     }
 
-    let count: number = 0;
-    for (let i = 0; i < monsters.length; ++i) {
-      if (monsters[i] !== '') count++;
-    }
     if (count === 0) {
-      for (let i = 0; i < player.team.length; ++i) {
-        if (player.team[i] !== '') {
-          player.battle_team[count]['name'] = player.team[i];
-          player.battle_team[count]['slot'] = count;
-          ++count;
+      for (let i = 0; i < player.team.length && count <= 2; i++) {
+        if (player.team[i] !== "") {
+          monstersToLoad.push({
+            name: player.team[i],
+            slot: count,
+          });
+          count++;
         }
-        if (count === 2) break;
-      }
-    } else {
-      for (let i = 0; i < player.battle_team.length; ++i) {
-        player.battle_team[i]['name'] = monsters[i];
-        player.battle_team[count]['slot'] = i;
       }
     }
-/*     const combatTimer =
-    this.phaseTimer.startTimes.get(roomId)! + PHASE_DURATIONS.choose_monster; */
+    else {
+      for (let i = 0; i < monsters.length && monstersToLoad.length < 3; i++) {
+        for (let j = 0; j < player.team.length; j++) {
+          if (monsters[i] !== "" && monsters[i] === player.team[j]) {
+            monstersToLoad.push({
+              name: player.team[j],
+              slot: monstersToLoad.length,
+            })
+            break;
+          }
+        }
+      }
+    }
+
+
+    for (const {name, slot} of monstersToLoad) {
+      const monster = await this.monstersService.findOneByName(name, { skills: true });
+      if (!monster) return {
+        event: 'game',
+        data: { state: 'team_choice', reason: 'invalid_monster', monster: name },
+      }
+      player.battle_team[slot] = {
+        name: monster.name,
+        slot: slot,
+        life: {
+          current: monster.hp_total,
+          max: monster.hp_total,
+        },
+        type: String(monster.type),
+        attack: monster.attack,
+        attack_spe: monster.attack_spe,
+        defense: monster.defense,
+        defense_spe: monster.defense_spe,
+        speed: monster.speed,
+        status: [],
+        dodge: false, // missing in DB
+        skill: monster.skills.slice(0, 4).map((skill): PlayerSkill => ({
+          name: skill.name,
+          current: skill.power_point,
+          max: skill.power_point,
+          type: skill.type,
+          effect: skill.effect,
+          repetition: skill.repetition,
+          precision: skill.precision,
+          data: skill.data,
+          value: skill.value,
+        }))
+      };
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000)); // ! temp fix to synchronizeke with startCombatTimer
     return this.combat(player);
   }
 
+
   // RECEIVED REQUEST FOR ITEM, CALL DB GAME + CHOICE ONE RANDOM ITEM AND RETURN THIS
-  private received_request_item(player: Player){
-    let item = 'golden ticket';
-    //demande object existant +++++ item = name of item select
-    player.current_item = item
+   private async received_request_item(player: Player){
+    let items = await this.itemsService.findAll();
+    if (!items) {
+      console.log('[ERROR]: items is undefined')
+      return undefined
+    }
+
+    let result = Math.floor(Math.random() * 100);
+    let gap = Math.floor(100 / items.length)
+    let step = gap
+    let i = 0
+    for (i; result > gap && i < items.length - 1; ++i)
+      gap += step
+    player.current_item = items[i].name;
+    
+    let add = false;
+    for (let i = 0; i < player.inventory.length; ++i){
+      if (player.inventory[i]["name"] === player.current_item) {
+        player.inventory[i]["current"] += 1;
+        add = true;
+      }
+    }
+    if (add === false) {
+      for (let j = 0; i < player.inventory.length; j++) {
+        if (player.inventory[j]["name"] === ""){
+          player.inventory[j]["name"] = player.current_item;
+          player.inventory[j]["scene"] = items[i].scene;
+          player.inventory[j]["current"] += 1;
+          player.inventory[j]["value"] = items[i].value;
+          player.inventory[j]["target"] = items[i].target;
+          break;
+        }
+     }
+    }
     return this.new_current_item(player);
   }
 
   // ADD ITEM + RETURN UPDATE_ITEM
   private received_add_item(player: Player){
-    for (let i = 0; i < player.inventory.length; ++i){
-      if (player.inventory[i]["name"] === ""){
-        player.inventory[i]["name"] = player.current_item;
-        player.inventory[i]["scene"] = 'map';
-        player.inventory[i]["current"] += 1;
-        //call pour scene et value et target
-        break;
-      }
-      else if (player.inventory[i]["name"] === player.current_item){
-        player.inventory[i]["current"] += 1;
-        break;
-      }
-    }
     player.current_item = "";
     return this.update_inventory(player);
   }
@@ -369,12 +605,16 @@ export class GameService implements OnModuleInit {
 
   // CALL REMOVE ITEM + ADD MONSTER IN TEAM + SEND RESULT_CATCH WITH UPDATE_TEAM
   private received_use_item(player: Player, item: string){
-    this.received_delete_item(player, item);
+    const userId = this.playerService.getUserId(player);
+    if (!userId)
+      return undefined;
+    this.sendToPlayer(userId, this.received_delete_item(player, item));
 
     for (let i = 0; i < player.team.length; ++i){
-      if (player.team[i] === "")
+      if (player.team[i] === "") {
       player.team[i] = player.current_monster;
       break;
+      }
     }
     return this.result_catch(player, 1);
   }
@@ -423,17 +663,31 @@ export class GameService implements OnModuleInit {
     };
   }
 
-  private result_catch(player: Player, result: number) {
-    return {
-      event: 'game',
-      data: {
-        state: 'result_catch',
-        success: result !== 0 ? 'ok' : 'fail',
-        player: {
-          team: result !== 0 ? player.team : undefined,
+  private result_catch(player: Player, result: number, monsterFlee?: number) {
+    let success: number = 0
+    let msg = {
+          event: "game",
+          data: {
+              state: "result_catch",
+              success: "",
+              player: {
+          team: result !== 0 ? player.team : undefined
         },
-      },
-    };
+          }
+      };
+
+    if (result == 1){
+      msg.data.success = "ok"
+      return msg
+    }
+    else{
+      let flee = Math.floor(Math.random() * 101);
+      if (flee < 50)
+        msg.data.success = "flee"
+      else
+        msg.data.success = "fail"
+      return msg
+    }
   }
 
   private update_inventory(player: Player) {
@@ -462,15 +716,20 @@ export class GameService implements OnModuleInit {
   private received_delete_item(player: Player, item: string){
     for (let i = 0; i < player.inventory.length; ++i){
       if (player.inventory[i]["name"] === item){
+        if (player.inventory[i].current === 1) {
           player.inventory[i]["name"] = "";
           player.inventory[i]["scene"] = "";
           player.inventory[i]["type"] = "";
           player.inventory[i]["target"] = "";
           player.inventory[i]["value"] = 0;
+          player.inventory[i]["current"] = 0;
+        }
+        else 
+          player.inventory[i].current -= 1;
+
         }
         break;
       }
-      console.log(this.update_inventory(player));
     return this.update_inventory(player);
   }
 
@@ -510,7 +769,7 @@ export class GameService implements OnModuleInit {
       event: 'game',
       data: {
         state: 'combat',
-        timer: PHASE_DURATIONS.choose_monster, //player.timer,
+        timer: player.timer,
         player: {
           battle_team: player.battle_team,
         },
@@ -518,13 +777,5 @@ export class GameService implements OnModuleInit {
     };
   }
 
-  changeMonster: (new_monster: number) => object;
-  attack: (enemy: Player, attackName: string) => object;
 
-  /*   //Events
-  @OnEvent('lobby.start')
-  initGameRoom({ roomId }: { roomId: string }): void {
-    console.log('OnEvent -> createRoom()');
-    this.roomService.createRoom(roomId);
-  } */
 }

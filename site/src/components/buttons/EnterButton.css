@@ -6,11 +6,11 @@
 
 .img-container {
   display: flex;
-  width: 35%;
   justify-content: center;
 }
 .img-container img {
-  width: 100%;
+  height: 10vw;
+  max-height: 8rem;
 }
 .img-container:hover .normal_button {
   display: none;
