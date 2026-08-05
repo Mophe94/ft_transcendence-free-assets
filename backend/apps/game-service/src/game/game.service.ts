@@ -101,7 +101,7 @@ export class GameService implements OnModuleInit {
   }
 
   private sendToPlayer(userId: number, payload: object): void {
-    console.log("Send_to_player: ", userId, "MSG: ", payload);
+    console.log("Send_to_player: id: ", userId, payload);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
@@ -333,8 +333,8 @@ export class GameService implements OnModuleInit {
   // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
   private async received_new_encounter(player: Player, tile: string){
     const table_encounter = {
-      commun: 65,
-      uncommun: 25,
+      common: 65,
+      uncommon: 25,
       rare: 10
     }
     // Retrieve list monsters by tile
@@ -353,59 +353,34 @@ export class GameService implements OnModuleInit {
 
     // random rarity
     let result = Math.floor(Math.random() * 100);
-    let selected_monster = 'default';
     let rarity: string;
 
-    // rare
-    if (result <= 10) {
+    if (result <= table_encounter.rare) {
       rarity = 'rare'
     }
-    else if (result <= 30) {
+    else if (result <= table_encounter.uncommon) {
       rarity = 'uncommon'
     }
     else {
       rarity = 'common'
     }
 
+    let selected_monsters: string[] = [];
     for (let i = 0; i < table_monster.length; i++) {
       if (table_monster[i].rarity === rarity)
-          selected_monster = table_monster[i].name;
+          selected_monsters.push(table_monster[i].name);
     }
-    
 
-    // call monster from db
-    if (result <= table_encounter.rare){
-      result = Math.floor(Math.random() * 100);
-      let gap = Math.floor(100 / table_monster.length);
-      let step = gap;
-      let i = 0;
-      for (i; result > gap && i < table_monster.length - 1; ++i)
-        gap += step;
-      player.current_monster = selected_monster;
-      player.current_monster_rarity = "rare"
+    if (selected_monsters.length === 0) {
+      console.log(`No monster of rarity ${rarity} found on tile ${tile}`);
+      return undefined
     }
-    else if (result <= table_encounter.uncommun ){ /* && monster.rarity === uncommun exist*/
-      result = Math.floor(Math.random() * 100);
-      let gap = Math.floor(100 / table_monster.length);
-      let step = gap;
-      let i = 0;
-      for (i; result > gap && i < table_monster.length - 1; ++i)
-        gap += step;
-      player.current_monster = selected_monster;
-      player.current_monster_rarity = "uncommon"
-    }
-    else {
-      result = Math.floor(Math.random() * 100);
-      // remplir table monster avec les nom des pq en commun
-      let gap = Math.floor(100 / table_monster.length);
-      let step = gap;
-      let i = 0;
-      for (i; result > gap && i < table_monster.length - 1; ++i)
-        gap += step;
-      player.current_monster = selected_monster;
-      player.current_monster_rarity = "common";
-    }
-    
+
+    const selected_monster = selected_monsters[Math.floor(Math.random() * selected_monsters.length)];
+
+    player.current_monster = selected_monster;
+    player.current_monster_rarity = rarity;
+
     return this.new_encounter(player);
   }
 
@@ -428,7 +403,7 @@ export class GameService implements OnModuleInit {
     }
     let result: number = 0
   
-    if (item == undefined)
+    if (item === undefined)
       result = Math.floor(Math.random() * 100);
   
     let monsterCatch: number = 0
@@ -439,7 +414,6 @@ export class GameService implements OnModuleInit {
           for (let i = 0; i < player.team.length; ++i) {
               if (player.team[i] === '') {
                 player.team[i] = player.current_monster;
-                console.log("IF");
                 return this.result_catch(player, 1);
               }
           }
