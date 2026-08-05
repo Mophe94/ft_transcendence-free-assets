@@ -421,7 +421,7 @@ export class GameService implements OnModuleInit {
   
   // CHECK MATCH OF MONSTER WITH RANDOM VALUE AND RETURN TRUE IF OK OR FALSE
   private received_try_catch(player: Player, item?: string){
-    const table_encounter = {
+    const table_catch = {
       common: 75,
       uncommon: 45,
       rare: 20
@@ -433,7 +433,7 @@ export class GameService implements OnModuleInit {
   
     let monsterCatch: number = 0
  
-    monsterCatch = table_encounter[player.current_monster_rarity as keyof typeof table_encounter]
+    monsterCatch = table_catch[player.current_monster_rarity as keyof typeof table_catch]
     if (monsterCatch !== undefined) {
       if (result <= monsterCatch) {
           for (let i = 0; i < player.team.length; ++i) {
