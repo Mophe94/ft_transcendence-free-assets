@@ -1,14 +1,14 @@
 import type React from 'react';
 import { ChatContext, type Chat, type Message } from './ChatContext';
 import { useEffect, useState } from 'react';
-import { Color, type ColorType } from '../constants/Colors';
+import { Color } from '../constants/Colors';
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
-  const [userColors, setUserColors] = useState<Map<string, ColorType>>(new Map());
+  const [userColors, setUserColors] = useState<Map<string, Color>>(new Map());
 
-  function getRandomColor(): ColorType {
+  function getRandomColor(): Color {
     const colorArray = Object.values(Color);
     const randomIndex = Math.floor(Math.random() * colorArray.length);
     return colorArray[randomIndex];

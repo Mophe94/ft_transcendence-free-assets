@@ -1,7 +1,7 @@
 import { WebSocket } from 'ws';
 
 export interface ClientData {
-  userId: number;
+  userId: string;
   roomId?: string;
   isAlive: boolean;
 }

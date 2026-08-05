@@ -9,9 +9,17 @@ export class UsersService {
     return await this.repo.save(user);
   }
 
-  async findOneByEmail(email: string): Promise<User | null> {
-    return this.repo.findOne({
-      where: { email },
-    });
+  async findOneByEmail(
+    email: string,
+    withPassword: boolean = false,
+  ): Promise<User | null> {
+    const query = this.repo
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email });
+
+    if (withPassword) {
+      query.addSelect('user.passwordHash');
+    }
+    return query.getOne();
   }
 }

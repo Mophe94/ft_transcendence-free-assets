@@ -17,8 +17,8 @@ import {
 import { LobbyService } from 'apps/game-service/src/lobby/lobby.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { RedisService } from '../redis/redis.service';
-import { WsAuthService } from 'libs/shared/src/auth/ws-auth.service';
 import { IncomingMessage } from 'http';
+import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
 
 @WebSocketGateway(8081, { cors: { origin: true }, path: '/lobby' })
 export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -29,7 +29,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private lobbyService: LobbyService,
     private roomService: RoomService,
     private redisService: RedisService,
-    private readonly wsAuthService: WsAuthService,
+    private readonly wsAuthService: SharedAuthService,
   ) {}
 
   async handleConnection(
@@ -37,8 +37,9 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     request: IncomingMessage,
   ): Promise<void> {
     try {
-      const user = await this.wsAuthService.authenticateClient(client, request);
-      clientsMap.set(client, { userId: user.id, isAlive: true });
+      const user = await this.wsAuthService.verifyWsHandshake(request);
+      console.log(user);
+      clientsMap.set(client, { userId: user.sub, isAlive: true });
       console.log('[LobbyGateway]: Client connected');
     } catch {
       client.close(4001, 'Unauthorized');

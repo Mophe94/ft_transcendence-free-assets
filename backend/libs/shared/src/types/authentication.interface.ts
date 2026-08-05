@@ -4,3 +4,7 @@ import { JwtPayload } from './jwt-payload.interface';
 export interface AuthenticatedSocket extends WebSocket {
   user?: JwtPayload;
 }
+
+export interface AuthenticatedRequest extends Request {
+  user?: JwtPayload;
+}

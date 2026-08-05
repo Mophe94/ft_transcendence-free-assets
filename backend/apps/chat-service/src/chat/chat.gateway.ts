@@ -8,10 +8,11 @@ import {
 } from '@nestjs/websockets';
 import { IncomingMessage } from 'http';
 import type { AuthenticatedSocket } from 'libs/shared/src';
-import { WsAuthService } from 'libs/shared/src/auth/ws-auth.service';
 import { ConfigService } from '@nestjs/config';
 import { Server, WebSocket } from 'ws';
 import { clientsMap } from '../shared/clients.map';
+import { UseGuards } from 'node_modules/@nestjs/common';
+import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
 
 type HeartbeatSocket = AuthenticatedSocket & { isAlive?: boolean };
 
@@ -23,10 +24,7 @@ export class ChatGateway
   server!: Server;
   private heartbeatInterval!: NodeJS.Timeout;
 
-  constructor(
-    private configService: ConfigService,
-    private wsAuthService: WsAuthService,
-  ) {}
+  constructor(private wsAuthService: SharedAuthService) {}
   destroy() {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
@@ -54,8 +52,7 @@ export class ChatGateway
     request: IncomingMessage,
   ): Promise<void> {
     try {
-      const user = await this.wsAuthService.authenticateClient(client, request);
-      console.log(client);
+      const user = await this.wsAuthService.verifyWsHandshake(request);
       client.user = user;
       clientsMap.set(client, user);
       client.isAlive = true;

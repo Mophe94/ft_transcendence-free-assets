@@ -14,8 +14,9 @@ export class JwtHttpGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractTokenFromHeader(request);
-
+    const token = this.extractTokenFromCookie(request);
+    console.log(request.headers)
+    console.log(token)
     if (!token) {
       throw new UnauthorizedException('Missing JWT');
     }
@@ -29,18 +30,13 @@ export class JwtHttpGuard implements CanActivate {
     }
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const authHeader = request.headers.authorization;
-
-    if (typeof authHeader !== 'string') {
-      return undefined;
+  private extractTokenFromCookie(request: Request): string | undefined {
+    if (request.cookies && request.cookies['access_token']) {
+      const token = request.cookies['access_token'] as unknown;
+      if (typeof token === 'string') {
+        return token;
+      }
     }
-
-    const parts = authHeader.split(' ');
-    if (parts.length === 2 && parts[0] === 'Bearer') {
-      return parts[1];
-    }
-
     return undefined;
   }
 }

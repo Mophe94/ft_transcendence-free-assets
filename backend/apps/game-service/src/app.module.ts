@@ -12,6 +12,7 @@ import { RedisModule } from './redis/redis.module';
 import { RedisService } from './redis/redis.service';
 import { LobbyController } from './lobby/lobby.controller';
 import { AuthModule } from 'apps/user-service/src/auth/auth.module';
+import { SharedJwtModule } from 'libs/shared/src/auth/shared-auth.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AuthModule } from 'apps/user-service/src/auth/auth.module';
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     RedisModule,
+    SharedJwtModule,
   ],
   controllers: [AppController, LobbyController],
   providers: [AppService, RedisService],

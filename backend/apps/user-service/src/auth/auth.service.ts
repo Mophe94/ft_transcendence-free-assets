@@ -35,6 +35,7 @@ export class AuthService {
   generateJwt(user: User): string {
     const payload = {
       sub: user.id,
+      username: user.username,
       email: user.email,
       role: user.userRoles,
     };
@@ -45,8 +46,9 @@ export class AuthService {
   async validateUserCredentials(
     email: string,
     password: string,
-  ): Promise<User> {
-    const user = await this.usersService.findOneByEmail(email);
+  ): Promise<{ user: User; token: string }> {
+    const user = await this.usersService.findOneByEmail(email, true);
+    console.log("first", user);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -55,6 +57,10 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    return user;
+
+    const token = this.generateJwt(user);
+    console.log(token);
+
+    return { user, token };
   }
 }

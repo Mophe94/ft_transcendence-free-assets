@@ -15,8 +15,6 @@ import parchDL from '../../assets/background/parchment/parchDL.png';
 import parchDM from '../../assets/background/parchment/parchDM.png';
 import parchDR from '../../assets/background/parchment/parchDR.png';
 
-
-
 const prefStyles = {
   '--img-ul': `url(${parchUL})`,
   '--img-um': `url(${parchUM})`,

@@ -1,8 +1,6 @@
 import './Lobby.css';
 import { useEffect, useState } from 'react';
 import SpecialBG from '../background/SpecialBg';
-
-import join_button from '../assets/buttons/join_button/join_button_regular.png';
 import QuickPairingButton from './buttons/QuickPairingButton';
 import CreateRoomButton from './buttons/CreateRoomButton';
 import SlotBg from '../background/SlotBg';
@@ -42,14 +40,6 @@ export function Lobby() {
       <SpecialBG>
         <div className='heading-medium centered'>Games</div>
         <div className='table-games'>
-          {/* <div className='table-games-header'>
-            <div className='table-col-templ'>
-              <div className='table-head centered'>Room Id</div>
-              <div className='table-head centered'>Players</div>
-              <div className='table-head centered'>Status</div>
-              <div className='table-head centered'>Join?</div>
-            </div>
-          </div> */}
           <div className='table-games-content'>
             {
             listGames.length?
