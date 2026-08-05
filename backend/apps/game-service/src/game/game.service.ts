@@ -231,69 +231,78 @@ export class GameService implements OnModuleInit {
       case "change_current_monster":
       case "use_item_combat":
       case "try_attack":
-      case "pass":
-        player.currentActions = { 
-          actionType: state,
-          data: payload
-        }
-        console.log("Current actions", player.currentActions);
-        if (player.currentActions.actionType && player2.currentActions.actionType) {
-          const arrResult = await this.combatService.resolving_battle_round(player, player2);
-          player.currentActions.actionType = undefined;
-          player2.currentActions.actionType = undefined;
-          if (arrResult && Array.isArray(arrResult)){
-            for (let i = 0; i < arrResult.length; ++i){
-              let packet = arrResult[i]
-              this.sendToPlayer(userId, packet);
-              this.sendToPlayer(userId2, packet);
-            }
-            if (player.currentMonster.life.current <= 0){
-              if (!this.has_valid_monsters(player)){
-                this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
-                this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
-                // wainting all combat finish
-              }
-              else{
-                this.sendToPlayer(userId, this.combatService.change_monster(player, player.id));
-                this.sendToPlayer(userId2, this.combatService.change_monster(player2, player.id));
-              }
-            }
-            else if (player2.currentMonster.life.current <= 0){
-              if (!this.has_valid_monsters(player2)){
-                this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
-                this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
-
-              }
-              else{
-                this.sendToPlayer(userId, this.combatService.change_monster(player, player2.id));
-                this.sendToPlayer(userId2, this.combatService.change_monster(player2, player2.id));
-              }
-            }
-  //					else if (!has_valid_monsters(player2)){
-  //						send result_battle(player, player.id)
-  //						send result_battle(player2, player.id)
-  //					}
-            else{
-              this.sendToPlayer(userId, this.combatService.new_turn(player));
-              this.sendToPlayer(userId2, this.combatService.new_turn(player2));
-              // si un combat deja finish declenchement du roundLeft
-              // send new_turn(player, rounLeft)
-              // send new_turn(player, roundLeft)
-            }
+        case "pass":
+          player.currentActions = { 
+            actionType: state,
+            data: payload
           }
+          console.log("Current actions", player.currentActions);
+          if (player.currentActions.actionType && player2.currentActions.actionType) {
+            const mapResult = await this.combatService.resolving_battle_round(player, player2);
+            player.currentActions.actionType = undefined;
+            player2.currentActions.actionType = undefined;
+            if (mapResult && mapResult.get(player.id) !== undefined && mapResult.get(player2.id) !== undefined){
+              const currentMessagePlayer = mapResult.get(player.id);
+              const currentMessagePlayer2 = mapResult.get(player2.id);
+              console.log("* CurrentMessagePlayer1 *: ", mapResult.get(player.id));
+              console.log("*************************************");
+              console.log("* CurrentMessagePlayer2 *: ", mapResult.get(player2.id));
+              console.log("*************************************");
+
+              for (let i = 0; i < currentMessagePlayer!.length; ++i){
+                this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
+                this.sendToPlayer(userId2, currentMessagePlayer2?.at(i)!);
               }
-        break;
+              await new Promise(resolve => setTimeout(resolve, 1000)); // ! "temp fix to synchronizeke"
+
+              if (player.currentMonster.life.current <= 0){
+                if (!this.has_valid_monsters(player)){
+                  this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
+                  this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
+                  // wainting all combat finish
+                }
+                else{
+                  this.sendToPlayer(userId, this.combatService.change_monster(player, player.id));
+                  this.sendToPlayer(userId2, this.combatService.change_monster(player2, player.id));
+                }
+              }
+              else if (player2.currentMonster.life.current <= 0){
+                if (!this.has_valid_monsters(player2)){
+                  this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
+                  this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
+  
+                }
+                else{
+                  this.sendToPlayer(userId, this.combatService.change_monster(player, player2.id));
+                  this.sendToPlayer(userId2, this.combatService.change_monster(player2, player2.id));
+                }
+              }
+    //					else if (!has_valid_monsters(player2)){
+    //						send result_battle(player, player.id)
+    //						send result_battle(player2, player.id)
+    //					}
+              else{
+                this.sendToPlayer(userId, this.combatService.new_turn(player));
+                this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+                // si un combat deja finish declenchement du roundLeft
+                // send new_turn(player, rounLeft)
+                // send new_turn(player, roundLeft)
+              }
+            }
+                }
+          break;
       
       default:
         console.log("Unknow state:", state)
         return undefined
     }
-    if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD 1');
+    //if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
     //console.log('Result payload: ', result);
-    if (state !== "change_current_monster" && state !== "use_item_combat" && state !== "try_attack" && state !== "pass") {
-      if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD 2');
-      return result
-    }
+    //if (state !== "change_current_monster" && state !== "use_item_combat" && state !== "try_attack" && state !== "pass") {
+    //  if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD 2');
+    //  return result
+    //}
+    return result
   }
 
   // HANDLERS
@@ -319,7 +328,28 @@ export class GameService implements OnModuleInit {
       return undefined;
     }
 
+    // random rarity
     let result = Math.floor(Math.random() * 100);
+    let selected_monster = 'default';
+    let rarity: string;
+
+    // rare
+    if (result <= 10) {
+      rarity = 'rare'
+    }
+    else if (result <= 30) {
+      rarity = 'uncommon'
+    }
+    else {
+      rarity = 'common'
+    }
+
+    for (let i = 0; i < table_monster.length; i++) {
+      if (table_monster[i].rarity === rarity)
+          selected_monster = table_monster[i].name;
+    }
+    
+
     // call monster from db
     if (result <= table_encounter.rare){
       result = Math.floor(Math.random() * 100);
@@ -328,17 +358,17 @@ export class GameService implements OnModuleInit {
       let i = 0;
       for (i; result > gap && i < table_monster.length - 1; ++i)
         gap += step;
-      player.current_monster = table_monster[i].name;
+      player.current_monster = selected_monster;
       player.current_monster_rarity = "rare"
     }
-    else if (result <= table_encounter.uncommun){ /* && monster.rarity === uncommun exist*/
+    else if (result <= table_encounter.uncommun ){ /* && monster.rarity === uncommun exist*/
       result = Math.floor(Math.random() * 100);
       let gap = Math.floor(100 / table_monster.length);
       let step = gap;
       let i = 0;
       for (i; result > gap && i < table_monster.length - 1; ++i)
         gap += step;
-      player.current_monster = table_monster[i].name;
+      player.current_monster = selected_monster;
       player.current_monster_rarity = "uncommon"
     }
     else {
@@ -349,7 +379,7 @@ export class GameService implements OnModuleInit {
       let i = 0;
       for (i; result > gap && i < table_monster.length - 1; ++i)
         gap += step;
-      player.current_monster = table_monster[i].name;
+      player.current_monster = selected_monster;
       player.current_monster_rarity = "common";
     }
     
@@ -375,22 +405,24 @@ export class GameService implements OnModuleInit {
     }
     let result: number = 0
   
-    if (item !== undefined)
-      result = Math.floor(Math.random() * 101);
+    if (item == undefined)
+      result = Math.floor(Math.random() * 100);
   
     let monsterCatch: number = 0
-    console.log("Monster Rarity:", player.current_monster_rarity);
+ 
     monsterCatch = table_encounter[player.current_monster_rarity as keyof typeof table_encounter]
     if (monsterCatch !== undefined) {
       if (result <= monsterCatch) {
           for (let i = 0; i < player.team.length; ++i) {
               if (player.team[i] === '') {
                 player.team[i] = player.current_monster;
+                console.log("IF");
                 return this.result_catch(player, 1);
               }
           }
       }
       else
+        console.log("ELSE");
         return this.result_catch(player, 0);
     }
     else

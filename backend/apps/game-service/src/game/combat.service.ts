@@ -94,7 +94,8 @@ export class CombatService {
     }
 }
 
-	resolving_battle_round(player1: Player, player2: Player){
+	resolving_battle_round(player1: Player, player2: Player) : Map<number, Array<Object>>{
+		let map_result = new Map<number, Array<Object>>();
 		let first: Player = this.resolve_first(player1, player2);
 		let second: Player = first === player1 ? player2 : player1;
 		
@@ -108,22 +109,28 @@ export class CombatService {
 			changeMonsterFirst = first.id ;
 
 		this.handle_action(first, second, actionFirst, 1);
+		if (this.action_battle(first, second,  1, 1, changeMonsterFirst) !== undefined && this.action_battle(second, first,  1, 1, changeMonsterFirst) !== undefined)
+			map_result.set(first.id, [this.action_battle(first, second,  1, 1, changeMonsterFirst)])
+			map_result.set(second.id, [this.action_battle(second, first,  1, 1, changeMonsterFirst)])
 		if (second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) {
 			second.currentMonster.life.current = 0;
-			return [ this.action_battle(first, second,  1, 1, changeMonsterFirst)
-			];
+			return map_result
 		}
-
-		if (first.currentMonster.name !== "" && actionSecond.actionType == "change_current_monster")
+		if (/* first.currentMonster.name !== "" &&  */actionSecond.actionType == "change_current_monster")
 			changeMonsterSecond = second.id;
 
 		this.handle_action(second, first, actionSecond, 2);
 
-		// si change monster envoyer 
-		return [ this.action_battle(first, second, 1, 2, changeMonsterFirst),
-			this.action_battle(second, first, 2, 2, changeMonsterSecond)
-		];
+		if (this.action_battle(first, second,  1, 1, changeMonsterFirst) !== undefined && this.action_battle(second, first,  1, 1, changeMonsterFirst) !== undefined
+			&& this.action_battle(first, second,  2, 2, changeMonsterSecond) !== undefined && this.action_battle(second, first,  2, 2, changeMonsterSecond) !== undefined)
+		map_result.set(first.id, [this.action_battle(first, second,  1, 1, changeMonsterFirst), this.action_battle(first, second,  2, 2, changeMonsterSecond)])
+		map_result.set(second.id, [this.action_battle(second, first,  1, 1, changeMonsterFirst), this.action_battle(second, first,  2, 2, changeMonsterSecond)])
+		return map_result
+		// return [ this.action_battle(first, second, 1, 2, changeMonsterFirst),
+		// 	this.action_battle(second, first, 2, 2, changeMonsterSecond)
+		// ];
 	}
+	
 
 	/* SEND */
 	action_battle(player: Player, player2: Player, order: number, max: number, changePlayerID?: number){

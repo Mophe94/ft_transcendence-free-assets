@@ -504,13 +504,13 @@ COPY public.tiles (id, type) FROM stdin;
 COPY public.tiles_monsters (tile_id, monster_id) FROM stdin;
 3	6
 3	7
-3	10
+3	5
 2	4
 2	3
 2	2
 1	9
 1	8
-1	5
+1	10
 \.
 
 
