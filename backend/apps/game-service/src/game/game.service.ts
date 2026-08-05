@@ -31,15 +31,16 @@ export class GameService implements OnModuleInit {
   ) {}
 
   private gameRooms = new Map<string, Set<number>>();
+  private roomIdByPlayer= new Map<number, string>();
 
   private joinGameRoom(roomId: string, userId: number): Set<number> {
-    let room = this.gameRooms.get(roomId);
-    if (!room) {
-      room = new Set();
-      this.gameRooms.set(roomId, room);
+    let rooms = this.gameRooms.get(roomId);
+    if (!rooms) {
+      rooms = new Set();
+      this.gameRooms.set(roomId, rooms);
     }
-    room.add(userId);
-    return room;
+    rooms.add(userId);
+    return rooms;
   }
 
   private leaveGameRoom(roomId: string, userId: number): void {
@@ -68,17 +69,18 @@ export class GameService implements OnModuleInit {
     userId: number,
     roomId: string,
   ): Promise<void> {
-    const room = this.joinGameRoom(roomId, userId);
-    console.log(`Size = ${room.size}, RoomId = ${roomId}`);
+    const rooms = this.joinGameRoom(roomId, userId);
+    this.roomIdByPlayer.set(userId, roomId);
+    console.log(`Size = ${rooms.size}, RoomId = ${roomId}`);
 
-    if (!this.playerService.getPlayer(userId)) {
+    if (!this.playerService.getPlayer(userId))
       this.playerService.initPlayer(userId);
-    }
+    const player = this.playerService.getPlayer(userId)!;
 
-    if (room.size === FULL) {
-      this.combatService.matchmake(room);
+    if (rooms.size === FULL) {
+      this.combatService.matchmake(rooms);
       // TEST MATCHMAKING //
-      for (const userId of room) {
+      for (const userId of rooms) {
         const player = this.playerService.getPlayer(userId)!;  
         const opponentId = this.combatService.getOpponentId(userId);
         const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
@@ -90,7 +92,7 @@ export class GameService implements OnModuleInit {
         console.log('******************');
       }
 
-      await this.startMapPhase(roomId, room);
+      await this.startMapPhase(roomId, rooms);
     }
   }
   
@@ -162,13 +164,13 @@ export class GameService implements OnModuleInit {
   }
 
   private startCombatPhase(roomId: string, room: Set<number>) {
-    this.phaseTimer.start(`game: ${roomId}`, 'choose_monster', () => {
+    this.phaseTimer.start(`game: ${roomId}`, 'choose_action', () => {
       console.log(`Room ${roomId} choose_monster timeout`);
 
     });
 
     const combatTimer =
-      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.choose_monster;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.choose_action;
 
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;
@@ -176,6 +178,23 @@ export class GameService implements OnModuleInit {
       }
 
     console.log('Combat timer started');
+  }
+
+  private startNewTurn(roomId: string, room: Set<number>) {
+    this.phaseTimer.start(`game: ${roomId}`, 'choose_action', () => {
+      console.log(`Room ${roomId} choose_action timeout`);
+
+    });
+
+    const actionTimer =
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.choose_monster;
+
+    for (const userId of room) {
+      const player = this.playerService.getPlayer(userId)!;
+      player.timer = actionTimer;
+      }
+
+    console.log('New Turn timer started');
   }
 
 
@@ -191,11 +210,14 @@ export class GameService implements OnModuleInit {
   async handleMessage(userId: number, payload: any) : Promise<object | undefined> {
     let player = this.playerService.getPlayer(userId)!;
     let userId2 = this.combatService.getOpponentId(userId);
+    const roomId = this.roomIdByPlayer.get(userId)!;
+    
     if (!userId2) {
       console.log(`[GameService]: userId2 for ${userId} is missing - using userId as placeholder`);
       userId2 = userId;
     }
     let player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
+
     if (!player2) {
       console.log(`[GameService]: No opponent for ${userId} - using player as placeholder`);
       player2 = player;
@@ -253,7 +275,7 @@ export class GameService implements OnModuleInit {
                 this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
                 this.sendToPlayer(userId2, currentMessagePlayer2?.at(i)!);
               }
-              await new Promise(resolve => setTimeout(resolve, 1000)); // ! "temp fix to synchronizeke"
+              await new Promise(resolve => setTimeout(resolve, 2000)); // ! "temp fix to synchronizeke"
 
               if (player.currentMonster.life.current <= 0){
                 if (!this.has_valid_monsters(player)){
@@ -282,6 +304,7 @@ export class GameService implements OnModuleInit {
     //						send result_battle(player2, player.id)
     //					}
               else{
+                this.startNewTurn(roomId, this.gameRooms.get(roomId)!);
                 this.sendToPlayer(userId, this.combatService.new_turn(player));
                 this.sendToPlayer(userId2, this.combatService.new_turn(player2));
                 // si un combat deja finish declenchement du roundLeft
