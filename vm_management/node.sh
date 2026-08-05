@@ -21,7 +21,7 @@ DEFAULT_VM_DIR="$HOME/goinfre/"
 RAM_MB=2048
 VRAM_MB=16
 CPUS=2
-DISK_SIZE_MB=10240
+DISK_SIZE_MB=20280
 
 SSH_PORT="2222"
 SSH_HOST="localhost"
@@ -180,8 +180,8 @@ else
 	"$BASE_DIR/$BASE_IMG" \
 	"$VM_DIR/$VM_NAME/$VM_NAME.vdi"
 
-    VBoxManage modifymedium \
-	"$VM_DIR/$VM_NAME/$VM_NAME.vdi"
+    VBoxManage modifymedium disk \
+	"$VM_DIR/$VM_NAME/$VM_NAME.vdi" \
 	--resize "${DISK_SIZE_MB}"
 
     # Storage Controllers
