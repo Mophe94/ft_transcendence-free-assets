@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Player } from '../player/player';
+import { getRandomBotTeam } from './bot-teams.data';
 
 export type BotMode = 'hardcoded' | 'takeover';
 
@@ -33,20 +34,8 @@ export class AiService {
     const bot = new Player(botId, 'Bot IA', 'dinoBlue');
     bot.isBot = true;
 
-    // Remplissage d'un monstre de test dans son équipe (slot 0)
-    bot.battle_team[0] = {
-      name: 'Pisciner Bot',
-      slot: 0,
-      type: 'Water',
-      life: { current: 100, max: 100 },
-      status: [],
-      skill: [
-        { name: 'Pistolet Eau', current: 10, max: 10, type: 'Water' },
-        { name: 'Charge', current: 15, max: 15, type: 'Normal' },
-        { name: '', current: 0, max: 0, type: '' },
-        { name: '', current: 0, max: 0, type: '' },
-      ],
-    };
+    // Récupération d'une des 6 équipes au hasard !
+    bot.battle_team = getRandomBotTeam();
 
     // On définit le monstre actif
     bot.currentMonster = bot.battle_team[0];

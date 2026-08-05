@@ -108,6 +108,10 @@ export class GameService implements OnModuleInit {
   for (let i = 0; i < missing; i++) {
     const botId = this.aiService.generateBotId();
     const bot = this.aiService.createBotPlayer('hardcoded', botId);
+    // 🔍 INSPECTION DE LA TEAM DU BOT DANS TES LOGS 
+    console.log(`\n================= DATA BOT ${botId} =================`);
+    console.dir(bot.battle_team, { depth: null, colors: true });
+    console.log(`=====================================================\n`);
     this.playerService.injectPlayer(botId, bot);
     room.add(botId);
   }
