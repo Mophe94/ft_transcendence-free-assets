@@ -180,6 +180,10 @@ else
 	"$BASE_DIR/$BASE_IMG" \
 	"$VM_DIR/$VM_NAME/$VM_NAME.vdi"
 
+    VBoxManage modifymedium \
+	"$VM_DIR/$VM_NAME/$VM_NAME.vdi"
+	--resize "${DISK_SIZE_MB}"
+
     # Storage Controllers
     echo "[$SCRIPT_NAME] Adding storage controllers..."
     VBoxManage storagectl "$VM_NAME" \

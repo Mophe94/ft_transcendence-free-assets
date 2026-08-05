@@ -64,7 +64,7 @@ observ:
 	@mkdir -p "/nfs-storage/grafana"
 	@mkdir -p "/nfs-storage/prometheus"
 	@mkdir -p "/nfs-storage/loki"
-	@make image TARGET=observ
+#	@make image TARGET=observ
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 up: build
