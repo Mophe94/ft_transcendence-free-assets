@@ -333,8 +333,8 @@ export class GameService implements OnModuleInit {
   // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
   private async received_new_encounter(player: Player, tile: string){
     const table_encounter = {
-      commun: 60,
-      uncommun: 30,
+      commun: 65,
+      uncommun: 25,
       rare: 10
     }
     // Retrieve list monsters by tile
@@ -422,8 +422,8 @@ export class GameService implements OnModuleInit {
   // CHECK MATCH OF MONSTER WITH RANDOM VALUE AND RETURN TRUE IF OK OR FALSE
   private received_try_catch(player: Player, item?: string){
     const table_encounter = {
-      common: 70,
-      uncommon: 50,
+      common: 75,
+      uncommon: 45,
       rare: 20
     }
     let result: number = 0

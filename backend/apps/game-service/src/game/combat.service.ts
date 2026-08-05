@@ -110,8 +110,8 @@ export class CombatService {
 
 		this.handle_action(first, second, actionFirst, 1);
 		if (this.action_battle(first, second,  1, 1, changeMonsterFirst) !== undefined && this.action_battle(second, first,  1, 1, changeMonsterFirst) !== undefined)
-			map_result.set(first.id, [this.action_battle(first, second,  1, 1, changeMonsterFirst)])
-			map_result.set(second.id, [this.action_battle(second, first,  1, 1, changeMonsterFirst)])
+			map_result.set(first.id, [this.action_battle(first, second,  1, 1, changeMonsterFirst)[0]])
+			map_result.set(second.id, [this.action_battle(second, first,  1, 1, changeMonsterFirst)[0]])
 		if (second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) {
 			second.currentMonster.life.current = 0;
 			return map_result
@@ -123,8 +123,8 @@ export class CombatService {
 
 		if (this.action_battle(first, second,  1, 1, changeMonsterFirst) !== undefined && this.action_battle(second, first,  1, 1, changeMonsterFirst) !== undefined
 			&& this.action_battle(first, second,  2, 2, changeMonsterSecond) !== undefined && this.action_battle(second, first,  2, 2, changeMonsterSecond) !== undefined)
-		map_result.set(first.id, [this.action_battle(first, second,  1, 1, changeMonsterFirst), this.action_battle(first, second,  2, 2, changeMonsterSecond)])
-		map_result.set(second.id, [this.action_battle(second, first,  1, 1, changeMonsterFirst), this.action_battle(second, first,  2, 2, changeMonsterSecond)])
+		map_result.set(first.id, [this.action_battle(first, second,  2, 2, changeMonsterSecond)[1]]);
+		map_result.set(second.id, [this.action_battle(second, first,  2, 2, changeMonsterSecond)[1]])
 		return map_result
 		// return [ this.action_battle(first, second, 1, 2, changeMonsterFirst),
 		// 	this.action_battle(second, first, 2, 2, changeMonsterSecond)
@@ -209,7 +209,8 @@ export class CombatService {
 			data: {
 				state: "next_map",
 				timer: player.timer,
-				current_map: player.current_map
+				current_map: player.current_map,
+				player: player
 			}
 		}
 	}
