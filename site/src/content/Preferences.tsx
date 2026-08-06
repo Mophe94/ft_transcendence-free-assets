@@ -29,17 +29,17 @@ const THEMES = [
   ['dark', moonTheme],
 ];
 
-const AVATARS = [
-  ['DinoGreen', dinoGreen],
-  ['DinoBlue', dinoBlue],
-  ['DinoRed', dinoRed],
-  ['DinoYellow', dinoYellow],
-  ['Ghost', ghost],
-  ['Ghost02', ghost02],
-  ['Ghost03', ghost03],
-  ['Satyr01', satyr01],
-  ['Satyr02', satyr02],
-  ['Satyr03', satyr03],
+const SKINS = [
+  ['dinoGreen', dinoGreen],
+  ['dinoBlue', dinoBlue],
+  ['dinoRed', dinoRed],
+  ['dinoYellow', dinoYellow],
+  ['ghost', ghost],
+  ['ghost02', ghost02],
+  ['ghost03', ghost03],
+  ['satyr01', satyr01],
+  ['satyr02', satyr02],
+  ['satyr03', satyr03],
 ];
 
 const STARTERS = [
@@ -52,7 +52,7 @@ export default function Preferences() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [starter_id, setStarterId] = useState<number>(0);
   const [theme_id, setThemeId] = useState<number>(0);
-  const [avatar_id, setAvatarId] = useState<number>(0);
+  const [avatar_id, setSkinId] = useState<number>(0);
   const [_, setIsSaving] = useState(false);
   const { user } = useAuth();
   const { setTheme } = useTheme();
@@ -67,22 +67,25 @@ export default function Preferences() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("=>",data.settings);
-        setSettings(data.settings);
-        if (data.settings) {
-          if (data.settings.theme) {
-            const tIndex = THEMES.findIndex(([k]) => k === data.settings.theme);
+        console.log("=>",data);
+        setSettings(data);
+        if (data) {
+          if (data.theme) {
+            const tIndex = THEMES.findIndex(([k]) => k === data.theme);
             if (tIndex !== -1) {
               setThemeId(tIndex);
-              setTheme(data.settings.theme);
+              setTheme(data.theme);
             }
           }
-          if (data.settings.starter !== null) {
-            setStarterId(data.settings.starter);
+          if (data.starter !== null) {
+            const tIndex = STARTERS.findIndex(([k]) => k === data.starter);
+            if (tIndex !== -1) {
+              setStarterId(tIndex);
+            }
           }
-          if (data.settings.avatar !== null) {
-            const aIndex = AVATARS.findIndex(([k]) => k === data.settings.avatar);
-            if (aIndex !== -1) setAvatarId(aIndex);
+          if (data.skin !== null) {
+            const aIndex = SKINS.findIndex(([k]) => k === data.skin);
+            if (aIndex !== -1) setSkinId(aIndex);
           }
         }
       })
@@ -99,9 +102,9 @@ export default function Preferences() {
   }
 
   const incrAvatarId = () => {
-    if (avatar_id < AVATARS.length - 1) setAvatarId(avatar_id + 1); }
+    if (avatar_id < SKINS.length - 1) setSkinId(avatar_id + 1); }
   const decrAvatarId = () => {
-    if (avatar_id > 0) setAvatarId(avatar_id - 1);}
+    if (avatar_id > 0) setSkinId(avatar_id - 1);}
 
   const incrStarterId = () => {
     if (starter_id < STARTERS.length - 1) setStarterId(starter_id + 1); }
@@ -127,26 +130,22 @@ export default function Preferences() {
     event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>,
   ) => {
     event.preventDefault();
-    console.log("hello", settings);
     if (!settings) {
       return;
     }
     setIsSaving(true);
-
+    console.log(starter_id, avatar_id, theme_id)
+    console.log(STARTERS[starter_id][0], SKINS[avatar_id][0], THEMES[theme_id][0])
     const updatedSettingsPayload = {
-      settings: {
-        ...settings,
-        id: settings.id,
-        starter: starter_id,
-        avatar: AVATARS[avatar_id][0],
+        starter: STARTERS[starter_id][0],
+        skin: SKINS[avatar_id][0],
         theme: THEMES[theme_id][0]
-      },
     };
     try {
       const response = await fetch(
         `${import.meta.env.VITE_USERS_SERVICE}/settings/update`,
         {
-          method: 'POST',
+          method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -158,7 +157,8 @@ export default function Preferences() {
       if (!response.ok) throw new Error('Update Failed');
 
       const data = await response.json();
-      setSettings(data.settings);
+      setSettings(data);
+      console.log(data);
       showNotification('Saved Successfully', 'success');
     } catch (error) {
       console.error(error);
@@ -169,14 +169,14 @@ export default function Preferences() {
   };
 
   const handleReset = () => {
-    setAvatarId(0);
+    setSkinId(0);
     setStarterId(0);
     setThemeId(0);
     setTheme('light');
   }
 
   const starter_img = STARTERS[starter_id] ? STARTERS[starter_id][1] : STARTERS[0][1];
-  const avatar_img = AVATARS[avatar_id] ? AVATARS[avatar_id][1] : AVATARS[0][1];
+  const avatar_img = SKINS[avatar_id] ? SKINS[avatar_id][1] : SKINS[0][1];
   const theme_img = THEMES[theme_id] ? THEMES[theme_id][1] : THEMES[0][1];
   return (
     <div className="preferences-content-layout">
@@ -194,7 +194,7 @@ export default function Preferences() {
             <div className="selection-label heading-medium">Avatar</div>
             <LeftArrowButton onClick={decrAvatarId} disabled={avatar_id === 0}/>
             <img className='selection-img' src={avatar_img} />
-            <RightArrowButton onClick={incrAvatarId} disabled={avatar_id === AVATARS.length - 1}/>
+            <RightArrowButton onClick={incrAvatarId} disabled={avatar_id === SKINS.length - 1}/>
           </div>
 
           <div className="selection">

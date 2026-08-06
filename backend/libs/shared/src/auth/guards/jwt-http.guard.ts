@@ -15,8 +15,6 @@ export class JwtHttpGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractTokenFromCookie(request);
-    console.log(request.headers)
-    console.log(token)
     if (!token) {
       throw new UnauthorizedException('Missing JWT');
     }

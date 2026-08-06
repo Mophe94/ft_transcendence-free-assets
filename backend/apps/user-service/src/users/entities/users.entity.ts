@@ -99,7 +99,7 @@ export class User {
   @OneToMany(() => Account, (account) => account.user)
   accounts!: Account[];
 
-  @OneToOne(() => UserStats, (stats) => stats.user)
+  @OneToOne(() => UserStats, (stats) => stats.user, { cascade: true })
   stats!: UserStats;
 
   @OneToMany(() => Relationship, (rel) => rel.requester)

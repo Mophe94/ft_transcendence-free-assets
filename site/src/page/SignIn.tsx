@@ -70,7 +70,8 @@ export default function SignIn() {
 
 
   return (
-      <div className="bg-[#e0ce9e] border-2 rounded-md border-[#45341e] w-80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+      <div className="bg-[#e0ce9e]
+        border-2 rounded-md border-[#45341e] w-80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bor">
         <div className="grid grid-cols-2 justify-center">
           <div
             onClick={toggleConnect}
