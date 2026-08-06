@@ -6,6 +6,7 @@ var pending_turn = null
 
 
 signal start_game_scene
+signal action_finished
 
 signal monster_encounter_received
 signal catch_result(success)
@@ -26,7 +27,6 @@ signal enemy_change_monster
 signal new_current_monster
 signal new_enemy_monster
 
-signal action_finished
 signal finish
 
 
@@ -70,26 +70,26 @@ func handle_message_receive(msg):
 				_combat(data)
 				print(msg)
 			"action_battle":
-				_action_battle(data)
+				await _action_battle(data)
 				print("state : " + state + "\nchangemonster : " + str(data["change_monster"]) + "\ntext" + data["player"]["text"])
 			"new_turn":
 				print("state : " + state + "\ntime : " + str(data["timer"]))
-				_new_turn(data)
+				await _new_turn(data)
 			"lose":
 				print("state : " + state + "\ntext : " + data["player"]["text"])
-				_lose(data)
+				await _lose(data)
 			"win":
 				print("state : " + state + "\ntext : " + data["player"]["text"])
-				_win(data)
+				await _win(data)
 			"change_monster":
-				print("state : " + state + "\nchangemonster : " + str(data["change_monster"]) + "\ntext" + data["player"]["text"])
-				_change_monster(data)
+				print("state : " + state + "\nchangemonster : " + "\ntext" + data["player"]["text"])
+				await _change_monster(data)
 			"enemy_change_monster":
-				print("state : " + state + "\nchangemonster : " + str(data["change_monster"]) + "\ntext" + data["player"]["text"])
-				_enemy_change_monster(data)
+				print("state : " + state + "\nchangemonster : " + "\ntext" + data["player"]["text"])
+				await _enemy_change_monster(data)
 			"next_map":
 				print("state : " + state + "\ntime : " + str(data["timer"]))
-				_next_map(data)
+				await _next_map(data)
 			"finish":
 				print("state : " + state)
 				emit_signal("finish")
@@ -303,8 +303,8 @@ func _action_battle(data):
 	if player.has("text"):
 		GeneralData.text = player["text"]
 
-	print("signal emit for change monster end of parse :\n\n")
-	print(signal_to_send)
+#	print("signal emit for change monster end of parse :\n\n")
+#	print(signal_to_send)
 	emit_signal(signal_to_send)
 	await action_finished
 	if pending_turn && order_action >= max_action:
@@ -320,8 +320,6 @@ func _combat(data):
 		if player.has("battle_team"):
 			for i in range(player["battle_team"].size()):
 				var team = player["battle_team"][i]
-#				print("voila le pq numero " + str(i) + " :")
-#				print(team)
 				GeneralData.player["battle_team"][i]["name"] = team["name"]
 				GeneralData.player["battle_team"][i]["slot"] = int(team["slot"])
 				GeneralData.player["battle_team"][i]["life"]["current"] = int(team["life"]["current"])

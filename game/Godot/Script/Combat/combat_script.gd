@@ -94,9 +94,6 @@ func _new_enemy_monster():
 	style_progress_bar()
 	Received.action_finished.emit()
 	
-func _action_play():
-	actionPlay = true
-	
 func _new_turn():
 	actionPlay = false
 	
@@ -191,7 +188,6 @@ func transi_open():
 	transi_scene.queue_free()
 
 func _ready() -> void:
-	$CombatMenus.action_play.connect(_action_play)
 	$CombatMenus.action_combat.connect(show_UI)
 	$CombatMenus.change_monster.connect(_new_current_monster)
 	$CombatMenus.enemy_change_monster.connect(_new_enemy_monster)

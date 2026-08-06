@@ -14,7 +14,6 @@ var SPEED_TEXT = GeneralData.SPEED_TEXT
 @onready var button = [$Button, $Button2, $Button3, $Button4]
 @onready var back_button = $Button5
 
-signal action_play
 signal action_combat
 signal change_monster
 signal enemy_change_monster
@@ -37,31 +36,32 @@ func _win():
 	Received.action_finished.emit()
 
 func _change_monster():
-	await text_show(GeneralData.text)
+	await text_show(GeneralData.text, 1)
 	$Text.text = ""
 	set_menus_select_monster()
 	run_timer.emit()
+	print("signal player change send")
 	Received.action_finished.emit()
 
 func _enemy_change_monster():
 	hide_selection()
-	await text_show(GeneralData.text)
+	await text_show(GeneralData.text, 1)
 	$Text.text = ""
 	run_timer.emit()
+	print("signal enemy change send")
 	Received.action_finished.emit()
 
 func _new_current_monster():
-	await text_show(GeneralData.text)
+	await text_show(GeneralData.text, 1)
 	$Text.text = ""
 	emit_signal("change_monster")
 		
 func _new_enemy_monster():
-	await text_show(GeneralData.text)
+	await text_show(GeneralData.text, 1)
 	$Text.text = ""
 	emit_signal("enemy_change_monster")
 
 func waiting_player(send_func: Callable):
-	action_play.emit()
 	hide_selection()
 	lock_button()
 	send_func.call()
@@ -69,10 +69,11 @@ func waiting_player(send_func: Callable):
 
 func _received_action():
 	emit_signal("action_combat")
-	await text_show(GeneralData.text)
+	await text_show(GeneralData.text, 1)
 	$Text.text = ""
+	print("signal action send")
 	Received.action_finished.emit()
-	
+
 func _new_turn():
 	await text_show(GeneralData.text)
 	$Text.text = ""
@@ -80,14 +81,17 @@ func _new_turn():
 	_back()
 ##############################################################
 
-func text_show(new_text):
+func text_show(new_text, response = null):
 	$Text.show()
 	$Text.visible_characters = 0
 	$Text.text = new_text
 	for i in range($Text.text.length() + 1):
 		$Text.visible_characters = i
 		await get_tree().create_timer(SPEED_TEXT).timeout
-	await get_tree().create_timer(0.5).timeout
+	if response:
+		await get_tree().create_timer(2.0).timeout
+	else:
+		await get_tree().create_timer(0.5).timeout
 
 func lock_button():
 	for i in range(4):
