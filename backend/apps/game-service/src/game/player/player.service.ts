@@ -10,7 +10,7 @@ export class PlayerService {
   initPlayer(userId: number /* , payload: any */): void {
     const player = new Player(
       userId,
-      'Test', //need to retrieve name from userDB
+      userId.toString(), //need to retrieve name from userDB
       'dino',
     );
     this.players.set(userId, player);

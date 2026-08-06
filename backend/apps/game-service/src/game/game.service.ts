@@ -589,7 +589,7 @@ export class GameService implements OnModuleInit {
         state: 'start_game',
         player: {
           id: player.id,
-          name: 'Ce que tu veux',
+          name: player.id.toString(),
           asset: 'dinoBlue',
           team: player.team,
           //monster: player.currentMonster.name,
