@@ -1,4 +1,4 @@
-FROM postgres:18.4-alpine3.22
+FROM base-image
 
 COPY entrypoint.sh /docker-entrypoint-initdb.d/
 COPY game_db_init.sql /app/sql/

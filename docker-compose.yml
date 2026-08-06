@@ -87,10 +87,6 @@ services:
       start_period: 10s
     secrets:
       - jwt_secret_key
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-
   users_service:
     build:
       context: backend

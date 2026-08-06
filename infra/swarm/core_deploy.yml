@@ -2,74 +2,63 @@ services:
 
     registry:
       image: registry:2
-
       deploy:
         replicas: 1
         placement:
           constraints:
-            - node.role == manager
+            - node.labels.leader == true
         restart_policy:
           condition: on-failure
           delay: 5s
           max_attempts: 3
-
       volumes:
         - registry_data:/var/lib/registry
-#      ports:
-#        - "5000:5000"
-
-#      secrets:
-#        - registry_tls_cert
-#        - registry_tls_key
-
-#      environment:
-#          REGISTRY_HTTP_HOST=http://
-#        REGISTRY_HTTP_ADDR: 0.0.0.0:5000
-#        REGISTRY_HTTP_TLS_CERTIFICATE: /run/secrets/registry_tls_cert
-#        REGISTRY_HTTP_TLS_KEY: /run/secrets/registry_tls_key
-
       networks:
         - swarm_net
 
     nginx:
         image: nginx:alpine
-
         ports:
             - "80:80"
             - "443:443"
             - "5050:5050"
-      #- target: 80
-      #  published: 8080
-      #  protocol: tcp
-      #  mode: ingress
-
         configs:
             - source: nginx_conf
               target: /etc/nginx/nginx.conf
-
+            - source: nginx_log
+              target: /etc/nginx/conf.d/logging.conf
         secrets:
           - nginx_crt
           - nginx_key
           - registry_crt
           - registry_key
-
+          - ca_crt
         networks:
             - swarm_net
             - obsrv_net
             - games_net
-
+            - site_net
         deploy:
             replicas: 1
             placement:
                 constraints:
-                    - node.role == manager
+                    - node.labels.leader == true
 
 volumes:
+#  registry_data:
+#    driver: local
+#    driver_opts:
+#      type: nfs
+#      o: "addr=${IP},nfsvers=4,rw,soft"
+#      device: ":/nfs-storage/registry"
   registry_data:
+    driver: local
 
 configs:
     nginx_conf:
-        file: ../containers/nginx/nginx.conf
+      file: ../containers/nginx/nginx.conf
+    nginx_log:
+      file: ../containers/nginx/logging.conf
 
 secrets:
   nginx_crt:
@@ -80,6 +69,8 @@ secrets:
     external: true
   registry_key:
     external: true
+  ca_crt:
+    external: true
 
 networks:
     swarm_net:
@@ -87,4 +78,6 @@ networks:
     obsrv_net:
         external: true
     games_net:
+        external: true
+    site_net:
         external: true
