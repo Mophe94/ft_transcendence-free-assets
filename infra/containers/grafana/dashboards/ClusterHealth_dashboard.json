@@ -1,69 +1,85 @@
 {
+  "uid": "swarm-health",
   "title": "Swarm Cluster Health",
   "timezone": "browser",
   "schemaVersion": 38,
-  "version": 3,
+  "version": 1,
   "refresh": "10s",
+
   "panels": [
+
     {
       "type": "timeseries",
       "title": "CPU Usage by Service",
-      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[1m])) by (service, instance)",
-          "legendFormat": "{{service}}"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "renameByRegex",
-          "options": {
-            "regex": "^([^.]+)\\.[^.]+\\..*$",
-            "renamePattern": "$1"
-          }
+          "expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[1m])) by (container_label_com_docker_swarm_service_name)",
+          "legendFormat": "{{container_label_com_docker_swarm_service_name}}"
         }
       ]
     },
+
+
     {
       "type": "timeseries",
       "title": "Memory Usage by Service",
-      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+
       "targets": [
         {
-          "expr": "sum(container_memory_usage_bytes{name!=\"\"}) by (service, instance)",
-          "legendFormat": "{{service}}"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "renameByRegex",
-          "options": {
-            "regex": "^([^.]+)\\.[^.]+\\..*$",
-            "renamePattern": "$1"
-          }
+          "expr": "sum(container_memory_usage_bytes{name!=\"\"}) by (container_label_com_docker_swarm_service_name)",
+          "legendFormat": "{{container_label_com_docker_swarm_service_name}}"
         }
       ]
     },
+
+
     {
       "type": "timeseries",
       "title": "Container Restarts",
-      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+
       "targets": [
         {
           "expr": "changes(container_start_time_seconds{name!=\"\"}[1h])",
-          "legendFormat": "{{service}}"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "renameByRegex",
-          "options": {
-            "regex": "^([^.]+)\\.[^.]+\\..*$",
-            "renamePattern": "$1"
-          }
+          "legendFormat": "{{container_label_com_docker_swarm_service_name}}"
         }
       ]
     }
+
   ]
 }

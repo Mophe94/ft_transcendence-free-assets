@@ -19,6 +19,9 @@ services:
         networks:
             - site_net
         deploy:
+            labels:
+                prometheus_scrape: "true"
+             #   prometheus_port: ""
             replicas: 1
 #            placement:
 #              constraints:
@@ -45,6 +48,8 @@ services:
           - start:dev
           - chat-service
         deploy:
+            labels:
+                prometheus_scrape: "true"
             replicas: 1
  #           placement:
   #            constraints:
@@ -78,6 +83,8 @@ services:
           - start:dev
           - account-service
         deploy:
+            labels:
+                prometheus_scrape: "true"
             replicas: 1
 #            placement:
 #              constraints:

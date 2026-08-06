@@ -24,7 +24,7 @@ node_launch: wait_tailscale
 	@if [ "$(TYPE)" == "leader" ]; then \
 	    $(MAKE) swarm_setup && \
 	    $(MAKE) core && \
-	    $(MAKE) push website game; \
+	    $(MAKE) push website observ; \
 	fi
 
 swarm_setup:
@@ -71,7 +71,8 @@ up: build
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 down:
-	chmod 777 $(SWARM_SCRIPTS)/end_swarm.sh
+	chmod 777 $(SWARM_SCRIPTS)/end_swarm.sh:wq
+
 	$(SWARM_SCRIPTS)/end_swarm.sh
 	@$(MAKE) --no-print-directory swarm-status
 
