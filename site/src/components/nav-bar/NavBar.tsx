@@ -22,6 +22,7 @@ const privateLinks = {
   Home: '/Home',
   Play: '/play',
   'How to play': '/howto',
+  Admin: '/admin',
   Readme: '/readme',
   'About us': '/aboutus',
 };

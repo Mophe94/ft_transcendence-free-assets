@@ -8,7 +8,7 @@ import AuthCallback from './page/Auth';
 import AppLayout from './layouts/AppLayout';
 import Play from './page/Play';
 import Profile from './page/Profile';
-import Dashboard from './page/Dashboard';
+import Admin from './page/Admin';
 import { useAuth } from './context/AuthContext';
 import { Loading } from './content/Loading';
 import Test from './page/Test';
@@ -34,7 +34,7 @@ function App() {
             <Route path="/play" element={<Play />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:username" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/howto" element={<HowToPlay/>} />
             <Route path='/test' element={<Test />} />
           </Route>
