@@ -10,6 +10,7 @@ export class Player {
 	readonly id: number = -1;
 	readonly name: string = "";
 	readonly asset: string = "";
+	isBot: boolean = false;
 	currentMonster: CurrentMonster = {
 		name: "",
 		slot: -1,

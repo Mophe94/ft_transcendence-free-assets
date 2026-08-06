@@ -48,8 +48,15 @@ export class LobbyService implements OnApplicationBootstrap {
       playerCount: clients.size,
     });
 
-    if (clients.size === FULL) {
+   if (clients.size === FULL) {
+      this.phaseTimer.clear(roomId);
       this.eventEmitter.emit('lobby.start', { roomId, clients });
+    } else if (clients.size === 1) {
+      await this.redisService.setRoomTimer(roomId);
+      this.phaseTimer.start(roomId, 'lobby', () => {
+        console.log(`[LobbyService] Room ${roomId} lobby timeout`);
+        this.eventEmitter.emit('lobby.start', { roomId, clients });
+      });
     }
   }
 }

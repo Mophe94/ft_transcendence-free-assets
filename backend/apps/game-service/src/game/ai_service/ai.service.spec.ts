@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AiService } from './ai.service';
+import { AiService, BOT_SKINS } from './ai.service';
 import { Player } from '../player/player';
+import { PREDEFINED_BOT_TEAMS } from './bot-teams.data';
 
 describe('AiService', () => {
   let service: AiService;
@@ -15,6 +16,30 @@ describe('AiService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('generateBotId', () => {
+    it('should return a negative number', () => {
+      const id = service.generateBotId();
+
+      expect(id).toBeLessThan(0);
+    });
+
+    it('should return a different id on each call', () => {
+      const first = service.generateBotId();
+      const second = service.generateBotId();
+
+      expect(second).not.toBe(first);
+    });
+
+    it('should never collide across many calls', () => {
+      const ids = new Set<number>();
+      for (let i = 0; i < 50; i++) {
+        ids.add(service.generateBotId());
+      }
+
+      expect(ids.size).toBe(50);
+    });
   });
 
   describe('createBotPlayer - mode "hardcoded"', () => {
@@ -54,49 +79,25 @@ describe('AiService', () => {
       expect(bot.name).toBe('Bot IA');
     });
 
-    it('should populate battle_team slot 0 with "Pisciner Bot"', () => {
+    it('should populate all 3 battle_team slots with one of the predefined teams', () => {
       const bot = service.createBotPlayer('hardcoded', -1);
+      const names = bot.battle_team.map((m) => m.name);
 
-      expect(bot.battle_team[0]).toMatchObject({
-        name: 'Pisciner Bot',
-        slot: 0,
-        type: 'Water',
-        life: { current: 100, max: 100 },
-      });
+      expect(names.every((n) => n !== '')).toBe(true);
+
+      const matchesATeam = PREDEFINED_BOT_TEAMS.some(
+        (team) => JSON.stringify(team.map((m) => m.name)) === JSON.stringify(names),
+      );
+      expect(matchesATeam).toBe(true);
     });
 
-    it('should populate the correct skills for the hardcoded monster', () => {
+    it('should give each monster at least one usable skill', () => {
       const bot = service.createBotPlayer('hardcoded', -1);
 
-      expect(bot.battle_team[0].skill[0]).toMatchObject({
-        name: 'Pistolet Eau',
-        current: 10,
-        max: 10,
-        type: 'Water',
-      });
-      expect(bot.battle_team[0].skill[1]).toMatchObject({
-        name: 'Charge',
-        current: 15,
-        max: 15,
-        type: 'Normal',
-      });
-    });
-
-    it('should leave skill slots 2 and 3 empty', () => {
-      const bot = service.createBotPlayer('hardcoded', -1);
-
-      expect(bot.battle_team[0].skill[2]).toMatchObject({
-        name: '',
-        current: 0,
-        max: 0,
-        type: '',
-      });
-      expect(bot.battle_team[0].skill[3]).toMatchObject({
-        name: '',
-        current: 0,
-        max: 0,
-        type: '',
-      });
+      for (const monster of bot.battle_team) {
+        const usableSkills = monster.skill.filter((s) => s.name !== '');
+        expect(usableSkills.length).toBeGreaterThan(0);
+      }
     });
 
     it('should set currentMonster to reference battle_team[0]', () => {
@@ -105,11 +106,36 @@ describe('AiService', () => {
       expect(bot.currentMonster).toEqual(bot.battle_team[0]);
     });
 
-    it('should not mutate battle_team slots 1 and 2 (left at default)', () => {
+    it('should not share team references between two bots (deep clone)', () => {
+      // On force Math.random à piocher systématiquement la même équipe (index 0)
+      // pour tester le clonage sans dépendre du hasard.
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
+      const botA = service.createBotPlayer('hardcoded', -1);
+      const botB = service.createBotPlayer('hardcoded', -2);
+      randomSpy.mockRestore();
+
+      expect(botA.battle_team[0].name).toBe(botB.battle_team[0].name);
+
+      botA.battle_team[0].life.current = 1;
+
+      expect(botB.battle_team[0].life.current).not.toBe(1);
+    });
+
+    it('should assign one of the valid bot skins', () => {
       const bot = service.createBotPlayer('hardcoded', -1);
 
-      expect(bot.battle_team[1].name).toBe('');
-      expect(bot.battle_team[2].name).toBe('');
+      expect(BOT_SKINS).toContain(bot.asset);
+    });
+
+    it('should not always assign the same skin across many bots', () => {
+      const skins = new Set<string>();
+      for (let i = 0; i < 30; i++) {
+        skins.add(service.createBotPlayer('hardcoded', -1).asset);
+      }
+
+      // Sur 30 tirages parmi 10 skins, retomber systématiquement sur le même
+      // serait quasi impossible si le tirage est bien aléatoire (pas un vrai flaky test).
+      expect(skins.size).toBeGreaterThan(1);
     });
   });
 
@@ -157,6 +183,8 @@ describe('AiService', () => {
         scene: 'battle',
         current: 2,
         value: 20,
+        type: '',
+        target: '',
       };
 
       const result = service.createBotPlayer('takeover', -1, human);
@@ -166,15 +194,17 @@ describe('AiService', () => {
         scene: 'battle',
         current: 2,
         value: 20,
+        type: '',
+        target: '',
       });
     });
 
-    it('should fall back to hardcoded bot if mode is "takeover" but humanToReplace is missing', () => {
+    it('should fall back to a hardcoded bot if mode is "takeover" but humanToReplace is missing', () => {
       const bot = service.createBotPlayer('takeover', -1, undefined);
 
       expect(bot.name).toBe('Bot IA');
       expect(bot.isBot).toBe(true);
-      expect(bot.battle_team[0].name).toBe('Pisciner Bot');
+      expect(bot.battle_team.every((m) => m.name !== '')).toBe(true);
     });
   });
 });

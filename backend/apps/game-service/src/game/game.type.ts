@@ -2,7 +2,7 @@ export interface GamePayload {
   state: string;
   data: {
     state: string;
-    [key: string]: any;q
+    [key: string]: any;
   };
 }
 
@@ -11,7 +11,7 @@ export const FULL = 2;
 export const PHASE_DURATIONS = {
   lobby: 10,
   godot_fill: 5,
-  map: 10,
+  map: 30,
   team_setup: 5,
   choose_monster: 23, // happend only if a monster die -> before choose action phase
   choose_action: 23,

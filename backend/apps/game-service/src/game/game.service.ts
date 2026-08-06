@@ -117,14 +117,60 @@ export class GameService implements OnModuleInit {
     room.add(botId);
   }
 
-    console.log(`[GameService] Room ${roomId} complétée avec ${missing} bot(s), taille finale: ${room.size}`);
-
     this.combatService.matchmake(room);
     await this.startMapPhase(roomId, room);
   }
-  onGodotDisconnected(userId: number, roomId: string): void {
-    this.leaveGameRoom(roomId, userId);
+
+ onGodotDisconnected(userId: number, roomId: string): void {
+  this.leaveGameRoom(roomId, userId);
+  void this.handleTakeover(userId, roomId);
+}
+
+private async handleTakeover(userId: number, roomId: string): Promise<void> {
+  const player = this.playerService.getPlayer(userId);
+  if (!player || player.isBot) return; // déjà bot ou introuvable, rien à faire
+
+  const opponentId = this.combatService.getOpponentId(userId);
+  const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
+
+  this.aiService.createBotPlayer('takeover', undefined, player); // flip isBot=true, garde tout son état
+  console.log(`[GameService] Joueur ${userId} déconnecté -> takeover IA`);
+
+  if (enemy && !enemy.isBot) {
+    this.sendToPlayer(enemy.id, this.opponent_takeover(player)); // ⚠️ payload à adapter, voir plus bas
   }
+
+  // Nettoyage si la room ne contient plus que des bots (logique déjà existante)
+  const room = this.gameRooms.get(roomId);
+  if (room && [...room].every((id) => this.playerService.getPlayer(id)?.isBot)) {
+    for (const id of room) this.playerService.removePlayer(id);
+    this.gameRooms.delete(roomId);
+    console.log(`[GameService] Room ${roomId} ne contenait plus que des bots -> nettoyée`);
+    return;
+  }
+
+  if (!enemy) return;
+
+  // Si le joueur n'avait pas encore validé sa battle_team, l'IA choisit à sa place
+  const hasBattleTeam = player.battle_team.some((m) => m.name !== '');
+  if (!hasBattleTeam) {
+    const chosenNames = await this.aiService.chooseCounterTeamByNames(player.team, enemy.team);
+    await this.received_team_choice(player, chosenNames);
+  }
+  // Si le combat est déjà en cours, on ne fait rien de plus pour l'instant —
+  // volontairement laissé de côté, voir note plus bas.
+}
+
+// ⚠️ Payload à adapter à ce qu'attend ton client Godot
+private opponent_takeover(player: Player) {
+  return {
+    event: 'game',
+    data: {
+      state: 'opponent_takeover',
+      message: `${player.name} a été déconnecté et remplacé par une IA.`,
+    },
+  };
+}
 
   private sendToPlayer(userId: number, payload: object): void {
     console.log("Send_to_player: ", userId, "MSG: ", payload);
@@ -184,9 +230,22 @@ export class GameService implements OnModuleInit {
 		console.log('OPONNENT ID: ', opponentId);
 		console.log('******************');
 		//******************************//
+      if (player.isBot && enemy) {
+      this.handleBotTeamChoice(player, enemy); // 👈 déclenche le choix IA
+    }
 
       this.sendToPlayer(userId, this.team_setup(player, enemy ?? player));
     }
+  }
+  
+  private async handleBotTeamChoice(bot: Player, enemy: Player): Promise<void> {
+    // bot.battle_team contient encore le pool de 6 à ce stade (posé par createBotPlayer)
+    const chosenTeam = await this.aiService.chooseCounterTeam(bot.battle_team, enemy.team);
+    bot.battle_team = chosenTeam; // 👈 écrase le pool par les 3 monstres retenus
+
+    console.log(`\n================= BATTLE_TEAM FINAL BOT ${bot.id} =================`);
+    console.dir(bot.battle_team, { depth: null, colors: true });
+    console.log('=====================================================================\n');
   }
 
   private startCombatPhase(roomId: string, room: Set<number>) {

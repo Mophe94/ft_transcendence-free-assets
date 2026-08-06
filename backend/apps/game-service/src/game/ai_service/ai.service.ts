@@ -1,47 +1,139 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Player } from '../player/player';
 import { getRandomBotTeam } from './bot-teams.data';
+import { MonstersService } from '../entities/monsters.service'; // ⚠️ adapte le chemin
+import { CombatService } from '../combat.service'; // ⚠️ adapte le chemin
+import { CurrentMonster } from '../player/player.interfaces'; // ⚠️ adapte le chemin
 
 export type BotMode = 'hardcoded' | 'takeover';
+
+const BOT_SKINS = [
+  'dinoBlue', 'dinoYellow', 'dinoGreen', 'dinoRed',
+  'ghost', 'ghost02', 'ghost03', 'satyr01', 'satyr02', 'satyr03',
+];
+
+function getRandomBotSkin(): string {
+  return BOT_SKINS[Math.floor(Math.random() * BOT_SKINS.length)];
+}
 
 @Injectable()
 export class AiService {
   private readonly logger = new Logger(AiService.name);
   private botIdConter = 0;
-  
+
+  constructor(
+    private readonly monstersService: MonstersService,
+    private readonly combatService: CombatService, // 👈 réutilise la table existante
+  ) {}
+
   public generateBotId(): number {
     return --this.botIdConter;
   }
-  /**
-   * Génère ou transforme un joueur pour l'IA
-   */
+
   public createBotPlayer(
     mode: BotMode = 'hardcoded',
     botId: number = -1,
     humanToReplace?: Player,
   ): Player {
-    // CAS 1 : Déconnexion en plein jeu (Takeover)
     if (mode === 'takeover' && humanToReplace) {
       this.logger.log(`[AiService] Transformation du joueur #${humanToReplace.id} en Bot (Déconnexion)`);
       humanToReplace.isBot = true;
       return humanToReplace;
     }
 
-    // CAS 2 : Bot Hardcodé (Timeout Lobby)
     this.logger.log(`[AiService] Instanciation d'un nouveau Bot (ID: ${botId})`);
-    
-    // Instanciation via le vrai constructeur
-    const bot = new Player(botId, 'Bot IA', 'dinoBlue');
+
+    const bot = new Player(botId, 'Bot IA', getRandomBotSkin());
     bot.isBot = true;
 
-    // Récupération d'une des 6 équipes au hasard !
-    bot.battle_team = getRandomBotTeam();
-
-    // On définit le monstre actif
-    bot.currentMonster = bot.battle_team[0];
+    bot.battle_team = getRandomBotTeam(); // pool de 6, temporaire
+    const names = bot.battle_team.map((m) => m.name).filter((n) => n !== '');
+    bot.team = [...names, '', '', '', '', ''].slice(0, 6);
 
     return bot;
   }
 
+  /**
+   * Choisit les 3 meilleurs monstres du pool (6, depuis bot-teams.data.ts)
+   * pour contrer le roster adverse (6 noms, connus dès le début du team_setup).
+   */
+  public async chooseCounterTeam(
+    pool: CurrentMonster[],
+    opponentNames: string[],
+  ): Promise<CurrentMonster[]> {
+    const opponentTypes = await this.resolveOpponentTypes(opponentNames);
+
+    const scored = pool
+      .filter((m) => m.name !== '')
+      .map((m) => ({
+        monster: m,
+        score: this.scoreAgainstTypes(m.type, opponentTypes),
+      }));
+
+    scored.sort((a, b) => b.score - a.score);
+
+    console.log('\n================= AI COUNTER-PICK SCORING =================');
+    console.table(scored.map(({ monster, score }) => ({ name: monster.name, type: monster.type, score })));
+    console.log(`Adversaire (types): [${opponentTypes.join(', ')}]`);
+    console.log('==============================================================\n');
+
+    return scored.slice(0, 3).map((s, idx) => ({ ...s.monster, slot: idx }));
+  }
+
+    /**
+   * Variante de chooseCounterTeam pour un takeover : le roster vient du vrai
+   * `player.team` (noms capturés en jeu), pas du preset bot-teams.data.ts.
+   * Retourne 3 noms, à passer tels quels à received_team_choice().
+   */
+  public async chooseCounterTeamByNames(
+    rosterNames: string[],
+    opponentNames: string[],
+  ): Promise<string[]> {
+    const roster = await this.resolveRosterWithTypes(rosterNames);
+    const opponentTypes = await this.resolveOpponentTypes(opponentNames);
+
+    const scored = roster.map((m) => ({
+      name: m.name,
+      type: m.type,
+      score: this.scoreAgainstTypes(m.type, opponentTypes),
+    }));
+
+    scored.sort((a, b) => b.score - a.score);
+
+    console.log('\n================= AI COUNTER-PICK SCORING (takeover) =================');
+    console.table(scored);
+    console.log(`Adversaire (types): [${opponentTypes.join(', ')}]`);
+    console.log('=========================================================================\n');
+
+    return scored.slice(0, 3).map((s) => s.name);
+  }
+
+  private async resolveRosterWithTypes(names: string[]): Promise<{ name: string; type: string }[]> {
+    const result: { name: string; type: string }[] = [];
+    for (const name of names) {
+      if (name === '') continue;
+      const monster = await this.monstersService.findOneByName(name);
+      if (monster) result.push({ name: monster.name, type: String(monster.type) });
+    }
+    return result;
+  }
   
+  private scoreAgainstTypes(monsterType: string, opponentTypes: string[]): number {
+    let score = 0;
+    for (const oppType of opponentTypes) {
+      score += this.combatService.getEffectiveness(monsterType, oppType); // dégâts qu'il inflige
+      score -= this.combatService.getEffectiveness(oppType, monsterType); // dégâts qu'il encaisse
+    }
+    return score;
+  }
+
+  private async resolveOpponentTypes(names: string[]): Promise<string[]> {
+    const types: string[] = [];
+    for (const name of names) {
+      if (name === '') continue;
+      const monster = await this.monstersService.findOneByName(name);
+      if (monster) types.push(String(monster.type));
+    }
+    return types;
+  }
 }
