@@ -12,10 +12,6 @@ import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { FULL, PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
-import {
-  CurrentActions,
-  Skill as PlayerSkill,
-} from './player/player.interfaces';
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -123,7 +119,7 @@ export class GameService implements OnModuleInit {
       [...room].map(async (userId) => {
         const player = this.playerService.getPlayer(userId)!;
         player.timer = mapTimer;
-        return { userId, payload: await this.start_game(player) };
+        return { userId, payload: await this.mapService.start_game(player) };
       }),
     );
 
@@ -161,7 +157,7 @@ export class GameService implements OnModuleInit {
 		console.log('******************');
 		//******************************//
 
-      this.sendToPlayer(userId, this.team_setup(player, enemy ?? player));
+      this.sendToPlayer(userId, this.mapService.team_setup(player, enemy ?? player));
     }
   }
 
@@ -229,30 +225,30 @@ export class GameService implements OnModuleInit {
     console.log("STATE", state);
     switch (state) {
       case "add_item":
-        result = await this.received_add_item(player)
+        result = await this.mapService.received_add_item(player)
         break;
       case "delete_item":
-        result = await this.received_delete_item(player, payload.item)
+        result = await this.mapService.received_delete_item(player, payload.item)
         break;
-      case "item_request": {
-        result = await this.received_request_item(player)
+      case "item_request":
+        result = await this.mapService.received_request_item(player)
         break;
       case "use_item": {
 		    this.sendToPlayer(userId, this.mapService.received_delete_item(player, payload.item));
-        result = await this.received_use_item(player, payload.item)
+        result = await this.mapService.received_use_item(player, payload.item)
         break;
       }
       case "new_encounter":
-        result = await this.received_new_encounter(player, payload.tile)
+        result = await this.mapService.received_new_encounter(player, payload.tile)
         break;
       case "try_catch":
-        result = await this.received_try_catch(player)
+        result = await this.mapService.received_try_catch(player)
         break;
       case "delete_monster":
-        result = await this.received_delete_monster(player, payload.monster)
+        result = await this.mapService.received_delete_monster(player, payload.monster)
         break;
       case "team_choice":
-        result = await this.received_team_choice(player, payload.battle_team)
+        result = await this.mapService.received_team_choice(player, payload.battle_team)
         break;
       case "change_current_monster":
       case "use_item_combat":
@@ -278,7 +274,6 @@ export class GameService implements OnModuleInit {
               for (let i = 0; i < currentMessagePlayer!.length; ++i){
                 this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
                 this.sendToPlayer(userId2, currentMessagePlayer2?.at(i)!);
-                await new Promise(resolve => setTimeout(resolve, 500)); // ! temp fix to synchronizeke
 
               }
               await new Promise(resolve => setTimeout(resolve, 2000)); // ! "temp fix to synchronizeke"
@@ -325,11 +320,6 @@ export class GameService implements OnModuleInit {
         console.log("Unknow state:", state)
         return undefined
     }
-    //if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD');
-    //console.log('Result payload: ', result);
-    //if (state !== "change_current_monster" && state !== "use_item_combat" && state !== "try_attack" && state !== "pass") {
-    //  if (!result) console.log('[GAME-SERVICE]: UNDEFINED RESULT PAYLOAD 2');
-    //  return result
-    //}
     return result
+    }
   }

@@ -4,15 +4,25 @@ import { Player } from './player/player';
 import { MonstersService } from './entities/monsters.service';
 import { TilesService } from './entities/tiles.service';
 import { ItemsService } from './entities/items.service';
+import {
+	CurrentActions,
+	Skill as PlayerSkill,
+  } from './player/player.interfaces';
 
 
 @Injectable()
 export class MapService {
 
+	constructor(
+		private monstersService: MonstersService,
+		private tilesService: TilesService,
+		private itemsService: ItemsService,
+	) {}
+
 	// HANDLERS
 	  
 	  // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
-	  private async received_new_encounter(player: Player, tile: string){
+	async received_new_encounter(player: Player, tile: string){
 		const table_encounter = {
 		  common: 65,
 		  uncommon: 25,
@@ -63,9 +73,9 @@ export class MapService {
 		player.current_monster_rarity = rarity;
 	
 		return this.new_encounter(player);
-	  }
+	}
 	
-	  private received_delete_monster(player: Player, monster: string) {
+	received_delete_monster(player: Player, monster: string) {
 		for (let i = 0; i < player.team.length; ++i) {
 		  if (player.team[i] === monster) { 
 			player.team[i] = '';
@@ -73,10 +83,10 @@ export class MapService {
 		  }
 		}
 		return this.update_team(player);
-	  }
+	}
 	  
 	  // CHECK MATCH OF MONSTER WITH RANDOM VALUE AND RETURN TRUE IF OK OR FALSE
-	  private received_try_catch(player: Player, item?: string){
+	received_try_catch(player: Player, item?: string){
 		const table_catch = {
 		  common: 75,
 		  uncommon: 45,
@@ -104,11 +114,11 @@ export class MapService {
 		}
 		else
 		  return this.result_catch(player, 0);
-	  }
+	}
 	
 	  // CHECK TEAM SENDED AND IF IT'S EMPTY, ELSE AUTO FULLY BATTLE_TEAM IF IT'S POSSIBLE
 	  // WHEN BATTLE_TEAM OK CALL DB GAME AND RETURN COMBAT
-	  private async received_team_choice(
+	async received_team_choice(
 		player: Player,
 		monsters: string[],
 	  ): Promise<object | undefined> {
@@ -183,16 +193,16 @@ export class MapService {
 		}
 		await new Promise(resolve => setTimeout(resolve, 1000)); // ! temp fix to synchronizeke with startCombatTimer
 		return this.combat(player);
-	  }
+	}
 	
 	
 	  // RECEIVED REQUEST FOR ITEM, CALL DB GAME + CHOICE ONE RANDOM ITEM AND RETURN THIS
-	   private async received_request_item(player: Player){
+	async received_request_item(player: Player){
 		let items = await this.itemsService.findAll();
 		if (!items) {
 		  console.log('[ERROR]: items is undefined')
 		  return undefined
-		}
+	}
 	
 		let result = Math.floor(Math.random() * 100);
 		let gap = Math.floor(100 / items.length)
@@ -222,21 +232,22 @@ export class MapService {
 		 }
 		}
 		return this.new_current_item(player);
-	  }
+	}
 	
 	  // ADD ITEM + RETURN UPDATE_ITEM
-	  private received_add_item(player: Player){
+	received_add_item(player: Player){
 		player.current_item = "";
 		return this.update_inventory(player);
-	  }
+	}
 	
 	
 	  // CALL REMOVE ITEM + ADD MONSTER IN TEAM + SEND RESULT_CATCH WITH UPDATE_TEAM
-	  private received_use_item(player: Player, item: string){
-		const userId = this.playerService.getUserId(player);
-		if (!userId)
-		  return undefined;
-		this.sendToPlayer(userId, this.received_delete_item(player, item));
+	private received_use_item(player: Player, item: string){
+		// moved in gameService
+		// const userId = this.playerService.getUserId(player);
+		// if (!userId)
+		//   return undefined;
+		// this.sendToPlayer(userId, this.received_delete_item(player, item));
 	
 		for (let i = 0; i < player.team.length; ++i){
 		  if (player.team[i] === "") {
@@ -245,10 +256,10 @@ export class MapService {
 		  }
 		}
 		return this.result_catch(player, 1);
-	  }
+	}
 	
 	  // JSON RESPONSE
-	  async start_game(player: Player) {
+	async start_game(player: Player) {
 		// return {
 		//   event: 'game',
 		//   data: {
@@ -279,9 +290,9 @@ export class MapService {
 			current_map: 'map_01',
 		  },
 		};
-	  }
+	}
 	
-	  private new_encounter(player: Player) {
+	new_encounter(player: Player) {
 		return {
 		  event: 'game',
 		  data: {
@@ -289,9 +300,9 @@ export class MapService {
 			current_monster: player.current_monster,
 		  },
 		};
-	  }
+	}
 	
-	  private result_catch(player: Player, result: number, monsterFlee?: number) {
+	result_catch(player: Player, result: number, monsterFlee?: number) {
 		let success: number = 0
 		let msg = {
 			  event: "game",
@@ -318,7 +329,7 @@ export class MapService {
 		}
 	  }
 	
-	  private update_inventory(player: Player) {
+	update_inventory(player: Player) {
 		return {
 		  event: 'game',
 		  data: {
@@ -328,9 +339,9 @@ export class MapService {
 			},
 		  },
 		};
-	  }
+	}
 	
-	  private new_current_item(player: Player) {
+	new_current_item(player: Player) {
 		return {
 		  event: 'game',
 		  data: {
@@ -338,10 +349,10 @@ export class MapService {
 			current_item: player.current_item,
 		  },
 		};
-	  }
+	}
 	
 		// // DELETE ITEM + SEND UPDATE_ITEM
-	  private received_delete_item(player: Player, item: string){
+	received_delete_item(player: Player, item: string){
 		for (let i = 0; i < player.inventory.length; ++i){
 		  if (player.inventory[i]["name"] === item){
 			if (player.inventory[i].current === 1) {
@@ -359,9 +370,9 @@ export class MapService {
 			break;
 		  }
 		return this.update_inventory(player);
-	  }
+	}
 	
-	  private update_team(player: Player) {
+	update_team(player: Player) {
 		return {
 		  event: 'game',
 		  data: {
@@ -371,9 +382,9 @@ export class MapService {
 			},
 		  },
 		};
-	  }
+	}
 	
-	  private team_setup(player: Player, enemy: Player) {
+	team_setup(player: Player, enemy: Player) {
 		return {
 		  event: 'game',
 		  data: {
@@ -390,9 +401,9 @@ export class MapService {
 			},
 		  },
 		};
-	  }
+	}
 	
-	  private combat(player: Player) {
+	combat(player: Player) {
 		return {
 		  event: 'game',
 		  data: {
@@ -403,9 +414,7 @@ export class MapService {
 			},
 		  },
 		};
-	  }
-	
-	
 	}
-
+	
+	
 }
