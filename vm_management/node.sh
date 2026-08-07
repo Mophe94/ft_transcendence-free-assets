@@ -10,6 +10,7 @@ using_defaults=false
 #Base image -->Default value, overide in CONFIG_FILE
 DEFAULT_BASE_DIR="$HOME/sgoinfre/students/stempels/"
 BASE_IMG="vm_node_base.vdi"
+BASE_IMG_SIZE=10240
 
 SSH_KEY_NAME="transcendence_node"
 SSH_KEY_PASSPHRASE=
@@ -21,7 +22,7 @@ DEFAULT_VM_DIR="$HOME/goinfre/"
 RAM_MB=2048
 VRAM_MB=16
 CPUS=2
-DISK_SIZE_MB=20280
+DISK_SIZE_MB=30720
 
 SSH_PORT="2222"
 SSH_HOST="localhost"
@@ -34,15 +35,13 @@ set -euo pipefail
 
 wait_for_ssh() {
     set +e
-#    mkdir -p "$HOME/.ssh/ssh-mux"
-#    ssh -nNf -o ControlMaster=yes -o ControlPath="$CONTROL_PATH" "$VM_USER"@"$SSH_HOST" -p "$SSH_PORT"
     RESULT=1
     TIMEOUT=30
     INTERVAL=2
     ELAPSED=0
     echo -n "[$SCRIPT_NAME] Waiting for VM to boot."
     while :; do
-	status=$(ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=10 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} "exit 0" 2>&1)
+	status=$(ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=60 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} "exit 0" 2>&1)
 	RESULT=$?
 	if [ $RESULT -eq 0 ]; then
 	    echo " connected"
@@ -180,9 +179,13 @@ else
 	"$BASE_DIR/$BASE_IMG" \
 	"$VM_DIR/$VM_NAME/$VM_NAME.vdi"
 
-    VBoxManage modifymedium disk \
-	"$VM_DIR/$VM_NAME/$VM_NAME.vdi" \
-	--resize "${DISK_SIZE_MB}"
+    resize_disk=false
+    if [ "$DISK_SIZE_MB" -gt "$BASE_IMG_SIZE" ]; then
+	VBoxManage modifymedium disk \
+	    "$VM_DIR/$VM_NAME/$VM_NAME.vdi" \
+	    --resize "${DISK_SIZE_MB}"
+	resize_disk=true
+    fi
 
     # Storage Controllers
     echo "[$SCRIPT_NAME] Adding storage controllers..."
@@ -233,7 +236,7 @@ else
     VM_TARGET_DIR="/"
     set +e
     scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_${TYPE}.sh; bash /setup_${TYPE}.sh ${USER} ${HOST_IP}; exit 0"
+    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_${TYPE}.sh; bash /setup_${TYPE}.sh ${USER} ${HOST_IP} ${resize_disk}; exit 0"
     set -e
 
     while ssh -p $SSH_PORT -o ConnectTimeout=2 -o BatchMode=yes "$VM_USER"@"$SSH_HOST" true >/dev/null 2>&1; do
