@@ -119,9 +119,6 @@ export class CombatService {
 
 		// 1
 		this.handle_action(first, second, actionFirst, 1);
-		//console.log("Second text before", second.text);
-		//console.log("First text before", first.text);
-		//console.log("------------------------");
 
 		second.text = first.text;
 		let temp1 = new Player(first.id, first.name, first.asset);
@@ -131,15 +128,21 @@ export class CombatService {
 		
 		this.pushResult(map_result, first.id, this.action_battle(temp1, temp2,  1, 1, changeMonsterFirst));
 		this.pushResult(map_result, second.id, this.action_battle(temp2, temp1,  1, 1, changeMonsterFirst));
-
-		if (second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) {
-			second.currentMonster.life.current = 0;
+		
+		console.log("First: ", first.forceChooseMonster);
+		if ((second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) || first.forceChooseMonster) {
+			if (first.forceChooseMonster) {
+				console.log("ForceChooseMonster [combat1]", first.forceChooseMonster);			
+				first.forceChooseMonster = false;
+			}
+			console.log("ForceChooseMonster [combat]", first.forceChooseMonster);			
 			return map_result
 		}
+
+		// 2
 		if (actionSecond.actionType == "change_current_monster")
 			changeMonsterSecond = second.id;
 
-		// 2
 		this.handle_action(second, first, actionSecond, 2);
 
 		first.text = second.text;
@@ -220,14 +223,15 @@ export class CombatService {
     	return result
 	}
 
-	next_map(player: Player){
+	next_map(player: Player, player2: Player){
 		return {
 			event: "game",
 			data: {
 				state: "next_map",
 				timer: player.timer,
 				current_map: player.current_map,
-				player: player
+				player: player,
+				enemy: player2,
 			}
 		}
 	}
@@ -261,6 +265,7 @@ export class CombatService {
 		let touch: number = 0;
 		let resultDamage: number = 0;
 		let effectiveness: string = ".";
+		skill.current -= 1;
 		switch (skill.effect) {
 			case "damage":
 				if (enemy.currentMonster.dodge === true){
@@ -383,9 +388,9 @@ export class CombatService {
 		}
 	}
 	
-	//received_change_current_monste helper
+	//received_change_current_monster helper
 	private successAttackCalculation(skill: Skill, enemyMonster: CurrentMonster): boolean{
-		let result = Math.floor(Math.random() * 101);
+		let result = Math.floor(Math.random() * 100);
 		result -= enemyMonster.speed / 10;
 		if (result > skill.precision)
 			return false;
@@ -543,6 +548,4 @@ export class CombatService {
 	private received_pass(player: Player){
 		player.text = player.name + " pass for this turn.";
 	}
-
-
 }

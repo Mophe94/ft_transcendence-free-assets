@@ -76,14 +76,24 @@ export class MapService {
 	}
 	
 	received_delete_monster(player: Player, monster: string) {
-		for (let i = 0; i < player.team.length; ++i) {
-		  if (player.team[i] === monster) { 
-			player.team[i] = '';
-			break;
-		  }
-		}
-		return this.update_team(player);
-	}
+		let count:number = 0;
+		    for (let i = 0; i < player.team.length; ++i) {
+		      if (player.team[i] !== "") {
+		        count++;
+		        break;
+		     }
+		    }
+		    if (count <= 1){
+		        return this.update_team(player);
+		    }
+		    for (let i = 0; i < player.team.length; ++i) {
+		      if (player.team[i] === monster) {
+		        player.team[i] = '';
+		        break;
+		      }
+		    }
+		    return this.update_team(player);
+		  }
 	  
 	  // CHECK MATCH OF MONSTER WITH RANDOM VALUE AND RETURN TRUE IF OK OR FALSE
 	received_try_catch(player: Player, item?: string){
@@ -242,7 +252,7 @@ export class MapService {
 	
 	
 	  // CALL REMOVE ITEM + ADD MONSTER IN TEAM + SEND RESULT_CATCH WITH UPDATE_TEAM
-	private received_use_item(player: Player, item: string){
+	received_use_item(player: Player, item: string){
 		// moved in gameService
 		// const userId = this.playerService.getUserId(player);
 		// if (!userId)
