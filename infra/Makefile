@@ -24,13 +24,13 @@ node_launch: wait_tailscale
 	@if [ "$(TYPE)" == "leader" ]; then \
 	    $(MAKE) swarm_setup && \
 	    $(MAKE) core && \
-	    $(MAKE) push website observ; \
+	    $(MAKE) push website observ game; \
 	fi
 
 swarm_setup:
 	@chmod +x $(SWARM_SCRIPTS)/launch_swarm.sh
 	@$(SWARM_SCRIPTS)/launch_swarm.sh "$(SWARM_SCRIPTS)" "$(HOST_IP)" "$(HOST_TAILSCALE_IP)"
-	@BUILDX_BAKE_ENTITLEMENTS_FS=0 IP=$(IP4) REGISTRY_PORT=$(REG_PORT) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
+	@BUILDX_BAKE_ENTITLEMENTS_FS=0 IP=$(IP4) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=80 docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
 push:
 	$(BAKE_ARG) LOCAL=true docker buildx bake base databases website game -f $(CONTAINER_FILES)/docker-bake.hcl --push >> /home/stempels/infra/build.log
