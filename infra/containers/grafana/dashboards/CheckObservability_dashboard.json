@@ -1,0 +1,124 @@
+{
+  "uid": "swarm-observability",
+  "title": "Swarm Observability",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+
+  "panels": [
+
+    {
+      "type": "stat",
+      "title": "Targets Up",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(up)"
+        }
+      ]
+    },
+
+    {
+      "type": "stat",
+      "title": "Containers Seen",
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "targets": [
+        {
+          "expr": "count(container_last_seen)"
+        }
+      ]
+    },
+
+    {
+      "type": "timeseries",
+      "title": "CPU Usage",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 16,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{id!=\"\"}[1m])) by (name)",
+          "legendFormat": "{{name}}"
+        }
+      ]
+    },
+
+    {
+      "type": "timeseries",
+      "title": "Memory Usage",
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 16,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(container_memory_usage_bytes{id!=\"\"}) by (name)",
+          "legendFormat": "{{name}}"
+        }
+      ]
+    },
+
+    {
+      "type": "logs",
+      "title": "Live Logs",
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 20
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "Loki"
+      },
+      "targets": [
+        {
+          "expr": "{service=~\".+"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "wrapLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none",
+        "prettifyLogMessage": true
+      }
+    }
+
+  ]
+}

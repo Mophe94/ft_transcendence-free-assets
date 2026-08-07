@@ -3,6 +3,9 @@ services:
     registry:
       image: registry:2
       deploy:
+          labels:
+              prometheus_scrape: "false"
+              prometheus_port: "${PROM_SCRAPE_PORT}"
         replicas: 1
         placement:
           constraints:
@@ -39,6 +42,9 @@ services:
             - games_net
             - site_net
         deploy:
+            labels:
+                prometheus_scrape: "false"
+                prometheus_port: "${PROM_SCRAPE_PORT}"
             replicas: 1
             placement:
                 constraints:

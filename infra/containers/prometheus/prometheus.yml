@@ -1,7 +1,6 @@
 global:
   scrape_interval: 15s
 
-
 scrape_configs:
 
   # Container metrics
@@ -9,7 +8,7 @@ scrape_configs:
 
     dns_sd_configs:
       - names:
-          - tasks.cadvisor
+          - tasks.observ_cadvisor
         type: A
         port: 8080
 
@@ -23,7 +22,7 @@ scrape_configs:
 
     dockerswarm_sd_configs:
       - host: unix:///var/run/docker.sock
-        role: tasks
+        role: services
 
     relabel_configs:
 
@@ -37,7 +36,8 @@ scrape_configs:
       # Build address:port
       - source_labels:
           [__address__, __meta_dockerswarm_service_label_prometheus_port]
-        separator: ":"
+        regex: "([^:]+)(?::\\d+)?;(\\d+)"
+        replacement: "$1:$2"
         target_label: __address__
 
 

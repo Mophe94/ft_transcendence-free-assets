@@ -7,32 +7,36 @@ services:
         target: /etc/prometheus/prometheus.yml
 
     deploy:
+      labels:
+          prometheus_scrape: "false"
+          prometheus_port: "${PROM_SCRAPE_PORT}"
       replicas: 1
       placement:
         constraints:
           - node.role == manager
-
     volumes:
       - prom_data:/prometheus
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - obsrv_net
+      - site_net
+      - games_net
 
   grafana:
     image: grafana/grafana
-
     configs:
         - source: grafana_datasources
           target: /etc/grafana/provisioning/datasources/datasources.yml
         - source: grafana_dashboards
           target: /etc/grafana/provisioning/dashboards/dashboards.yml
-
     deploy:
+      labels:
+          prometheus_scrape: "false"
+          prometheus_port: "${PROM_SCRAPE_PORT}"
       replicas: 1
       placement:
         constraints:
           - node.role == manager
-
     environment:
         - GF_SERVER_ROOT_URL=https://${HOST_IP}/grafana/
         - GF_SERVER_SERVE_FROM_SUB_PATH=true
@@ -41,13 +45,11 @@ services:
         - GF_SECURITY_ADMIN_PASSWORD=admin123
         - GF_AUTH_ANONYMOUS_ENABLED=true
         - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
-
     volumes:
         - grafana_data:/var/lib/grafana
         - ../containers/grafana/dashboards:/var/lib/grafana/dashboards
-
     networks:
-      - obsrv_net
+        - obsrv_net
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor
@@ -163,4 +165,8 @@ configs:
 
 networks:
     obsrv_net:
+        external: true
+    site_net:
+        external: true
+    games_net:
         external: true

@@ -33,7 +33,7 @@ export default function Admin() {
         ">
 
           <iframe
-            src="/grafana/d/swarm-health/swarm-cluster-health?kiosk&refresh=10s"
+            src="/grafana/d/swarm-observability/swarm-observability?kiosk&refresh=10s"
             className="
               h-[900px]
               w-full

@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/08/04 12:06:39 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/07 14:51:01 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,6 +27,9 @@ services:
         networks:
             - games_net
         deploy:
+            labels:
+                prometheus_scrape: "false"
+                prometheus_port: "${PROM_SCRAPE_PORT}"
             replicas: 1
         healthcheck:
           test: ["CMD", "/app/healthcheck.sh"]
@@ -41,6 +44,11 @@ services:
          - redis_password 
         networks:
             - games_net
+        deploy:
+            labels:
+                prometheus_scrape: "false"
+                prometheus_port: "${PROM_SCRAPE_PORT}"
+            replicas: 1
         healthcheck:
           test: ["CMD-SHELL", "/app/healthcheck.sh"]
           interval: 15s
@@ -56,6 +64,9 @@ services:
         networks:
             - games_net
         deploy:
+            labels:
+                prometheus_scrape: "false"
+                prometheus_port: "${PROM_SCRAPE_PORT}"
             replicas: 1
         healthcheck:
           test: ["CMD", "node", "/app/healthcheck.js"]
@@ -89,6 +100,9 @@ services:
         networks:
             - games_net
         deploy:
+            labels:
+                prometheus_scrape: "false"
+                prometheus_port: "${PROM_SCRAPE_PORT}"
             replicas: 1
             placement:
               constraints:
