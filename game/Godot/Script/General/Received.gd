@@ -71,24 +71,24 @@ func handle_message_receive(msg):
 				print(msg)
 			"action_battle":
 				await _action_battle(data)
-				print("state : " + state + "\nchangemonster : " + str(data["change_monster"]) + "\ntext" + data["player"]["text"])
+				print("state : " + state + " changemonster : " + str(data["change_monster"]) + " text" + data["player"]["text"])
 			"new_turn":
-				print("state : " + state + "\ntime : " + str(data["timer"]))
+				print("state : " + state + " time : " + str(data["timer"]))
 				await _new_turn(data)
 			"lose":
-				print("state : " + state + "\ntext : " + data["player"]["text"])
+				print("state : " + state)
 				await _lose(data)
 			"win":
-				print("state : " + state + "\ntext : " + data["player"]["text"])
+				print("state : " + state)
 				await _win(data)
 			"change_monster":
-				print("state : " + state + "\nchangemonster : " + "\ntext" + data["player"]["text"])
+				print("state : " + state + " changemonster : " + " text" + data["player"]["text"])
 				await _change_monster(data)
 			"enemy_change_monster":
-				print("state : " + state + "\nchangemonster : " + "\ntext" + data["player"]["text"])
+				print("state : " + state + " changemonster : " + " text" + data["player"]["text"])
 				await _enemy_change_monster(data)
 			"next_map":
-				print("state : " + state + "\ntime : " + str(data["timer"]))
+				print("state : " + state + " time : " + str(data["timer"]))
 				await _next_map(data)
 			"finish":
 				print("state : " + state)
@@ -180,25 +180,11 @@ func _new_turn(data):
 
 
 func _win(data):
-	var player = null
-	if data.has("player"):
-		player = data["player"]
-
-	if player.has("text"):
-		GeneralData.text = player["text"]
 	win.emit()
-	await action_finished
 
 
 func _lose(data):
-	var player = null
-	if data.has("player"):
-		player = data["player"]
-
-	if player.has("text"):
-		GeneralData.text = player["text"]
 	lose.emit()
-	await action_finished
 
 
 func _change_monster(data):

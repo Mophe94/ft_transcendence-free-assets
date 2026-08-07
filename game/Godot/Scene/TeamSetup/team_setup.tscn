@@ -501,7 +501,6 @@ color_ramp = SubResource("Gradient_2ad6k")
 position = Vector2(480, 320)
 amount = 10
 lifetime = 3.0
-trail_enabled = true
 trail_lifetime = 0.2
 trail_sections = 2
 trail_section_subdivisions = 1

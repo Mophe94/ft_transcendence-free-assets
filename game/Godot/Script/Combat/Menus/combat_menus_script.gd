@@ -21,6 +21,9 @@ signal stop_timer
 signal run_timer
 
 ##############################################################
+func _finish():
+	text_show("You are the best take me <3")
+
 func _lose():
 	await text_show("YOU LOSE.")
 	var lose_scene = battle_result["lose"].instantiate()
@@ -33,6 +36,7 @@ func _win():
 	var victory_scene = battle_result["win"].instantiate()
 	get_tree().current_scene.add_child(victory_scene)
 	stop_timer.emit()
+	await get_tree().create_timer(2.0).timeout
 	Received.action_finished.emit()
 
 func _change_monster():
@@ -47,31 +51,33 @@ func _enemy_change_monster():
 	hide_selection()
 	await text_show(GeneralData.text, 1)
 	$Text.text = ""
-	run_timer.emit()
 	print("signal enemy change send")
 	Received.action_finished.emit()
 
 func _new_current_monster():
+	stop_timer.emit()
 	await text_show(GeneralData.text, 1)
 	$Text.text = ""
 	emit_signal("change_monster")
 		
 func _new_enemy_monster():
+	stop_timer.emit()
 	await text_show(GeneralData.text, 1)
 	$Text.text = ""
 	emit_signal("enemy_change_monster")
 
 func waiting_player(send_func: Callable):
+	stop_timer.emit()
 	hide_selection()
 	lock_button()
 	send_func.call()
 	await text_show("Waiting action enemy.")
 
 func _received_action():
+	stop_timer.emit()
 	emit_signal("action_combat")
 	await text_show(GeneralData.text, 1)
 	$Text.text = ""
-	print("signal action send")
 	Received.action_finished.emit()
 
 func _new_turn():
@@ -89,7 +95,7 @@ func text_show(new_text, response = null):
 		$Text.visible_characters = i
 		await get_tree().create_timer(SPEED_TEXT).timeout
 	if response:
-		await get_tree().create_timer(2.0).timeout
+		await get_tree().create_timer(1.0).timeout
 	else:
 		await get_tree().create_timer(0.5).timeout
 
@@ -168,7 +174,7 @@ func set_menus_select_monster():
 				button[i].text = GeneralData.player["battle_team"][i]["name"] + " : " + str(GeneralData.player["battle_team"][i]["life"]["current"]) + "/" + str(GeneralData.player["battle_team"][i]["life"]["max"])
 				button[i].action = "monster"
 				button[i].object = GeneralData.player["battle_team"][i]["slot"]
-	if GeneralData.player["currentMonster"]["name"] != "":
+	if GeneralData.player["currentMonster"]["name"] != "" && GeneralData.player["currentMonster"]["life"]["current"] != 0:
 		back_button.show()
 
 func set_menus_change():
@@ -313,6 +319,7 @@ func _ready() -> void:
 	Received.new_turn.connect(_new_turn)
 	Received.win.connect(_win)
 	Received.lose.connect(_lose)
+	Received.finish.connect(_finish)
 	set_menus_select_monster()
 	for i in range(button.size()):
 		button[i].action_pressed.connect(_on_button_action)
