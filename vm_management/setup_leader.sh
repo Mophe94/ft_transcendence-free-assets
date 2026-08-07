@@ -30,7 +30,7 @@ echo "[${SCRIPT_NAME}] VM ip: ${IP}"
 if [ "$RESIZE_DISK" = "true" ]; then
     echo "[$SCRIPT_NAME] Expanding root partition"
 
-    apk add --no-cache cloud-utils-growpart e2fsprogs
+    apk add --no-cache cloud-utils-growpart e2fsprogs-extra
 
     growpart /dev/sda 3
     resize2fs /dev/sda3
