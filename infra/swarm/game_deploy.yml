@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/08/07 14:51:01 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/07 15:50:00 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,7 @@ services:
           - db_game_db_name
           - db_game_username
           - db_game_password
+          - redis_password
         command:
           - npm
           - run
