@@ -23,8 +23,10 @@ WORKDIR /app
 
 COPY . /app/
 
-RUN npm install
+COPY package*.json /app/
+
+RUN npm ci
 
 RUN chmod +x /app/healthcheck.js
 
-CMD ["npm","run","dev"]
+CMD ["npm","run","dev","--","--host"]
