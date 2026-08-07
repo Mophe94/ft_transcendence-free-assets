@@ -280,12 +280,13 @@ export class CombatService {
 						} 
 						const attackSuccess: boolean = this.successAttackCalculation(skill, enemy.currentMonster);
 						if (attackSuccess === false){
-							if (skill.repetition === 1){
+							if (skill.repetition == 1){
 								player.text = enemy.currentMonster.name + " dodge " + skillName + ".";							
 								return;
 							}
-							else
+							else {
 								continue;
+							}
 						}
 						touch++
 						const resultAttack = this.attackResult(player, skill.type, enemy, enemy.currentMonster.type, player.currentMonster.type);
@@ -296,17 +297,19 @@ export class CombatService {
 						resultDamage += resultAttack.result;
 						enemy.currentMonster.life.current -= resultAttack.result;
 					}
-					if (skill.repetition > 1)
+					if (skill.repetition > 1) {
 						if (skill.repetition > 1){
 							if (resultDamage > 0)
 								player.text += " and hit " + touch + " times for " + resultDamage + " damage";
 							else
 								player.text = enemy.currentMonster.name + " dodge " + skillName + " " + touch + " times.";
 						}
+					}
 					else
 						player.text += " for " + resultDamage + " damage";
 				}
-				player.text += effectiveness;	
+				player.text += effectiveness;
+				console.log("ResultDamage: ", resultDamage);
 				break;
 	
 			case "up_stat":
