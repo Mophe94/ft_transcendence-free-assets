@@ -249,7 +249,7 @@ else
     wait_for_ssh
     declare -A PACK
     PACK[leader]="infra site backend database game_test redis"
-    PACK[worker]=""
+    PACK[worker]="Makefile"
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     set +e
