@@ -34,7 +34,6 @@ function App() {
             <Route path="/play" element={<Play />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:username" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/howto" element={<HowToPlay/>} />
             <Route path='/test' element={<Test />} />
           </Route>
@@ -46,6 +45,9 @@ function App() {
           <Route path='/readme' element={<Readme />} />
           <Route path='/aboutus' element={<AboutUs />} />
         </Route>
+    
+          <Route path="/dashboard" element={<Dashboard />} />
+        
         <Route element={<AppLayout />}>
           <Route path="*" element={<ErrorDisplay msg="Page not found" code={404} />} />
         </Route>
