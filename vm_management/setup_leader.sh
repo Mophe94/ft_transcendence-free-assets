@@ -27,18 +27,12 @@ TAILSCALE_IP_FILE="/etc/tailscale_ip"
 
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"
 
-doas apk update && doas apk add e2fsprogs parted
-
 if [ "$RESIZE_DISK" = "true" ]; then
     echo "[$SCRIPT_NAME] Expanding root partition"
 
-    apk add --no-cache parted e2fsprogs
+    apk add --no-cache cloud-utils-growpart e2fsprogs
 
-    parted /dev/sda --script resizepart 3 100%
-
-    sync
-    partprobe /dev/sda || true
-
+    growpart /dev/sda 3
     resize2fs /dev/sda3
 fi
 
@@ -280,7 +274,6 @@ echo
 echo "Headscale auth key:"
 cat /etc/headscale_authkey
 echo "--------------------------------"
-
 
 echo "[$SCRIPT_NAME] Restarting VM"
 reboot
