@@ -4,15 +4,16 @@ set -e
 #Safeguard
 SCRIPT_NAME="${0##*/}"
 
-if [ ! $# -eq 2 ]; then
-    echo "Usage: ${SCRIPT_NAME} <node new username> <host_ip>"
+if [ $# -ne 3 ]; then
+    echo "Usage: ${SCRIPT_NAME} <node new username> <host_ip> <resize_disk_flag>"
     exit 1
 elif [ -z "$1" ]; then
-    echo "Usage: ${SCRIPT_NAME} <node new username> <host_ip>"
+    echo "Usage: ${SCRIPT_NAME} <node new username> <host_ip> <resize_disk_flag>"
     exit 1
 else
     NEW_USER="$1"
     HOST_IP="$2"
+    RESIZE_DISK="$3"
 fi
 
 #Setup
@@ -25,6 +26,15 @@ HEADSCALE_PORT="8080"
 TAILSCALE_IP_FILE="/etc/tailscale_ip"
 
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"
+
+if [ "$RESIZE_DISK" = "true" ]; then
+    echo "[$SCRIPT_NAME] Expanding root partition"
+
+    apk add --no-cache cloud-utils-growpart e2fsprogs
+
+    growpart /dev/sda 3
+    resize2fs /dev/sda3
+fi
 
 #Change for env procured password
 NEW_USER_HOME="/home/$NEW_USER"
@@ -264,7 +274,6 @@ echo
 echo "Headscale auth key:"
 cat /etc/headscale_authkey
 echo "--------------------------------"
-
 
 echo "[$SCRIPT_NAME] Restarting VM"
 reboot
