@@ -105,8 +105,8 @@ export class CombatService {
 
 	resolving_battle_round(player1: Player, player2: Player) : Map<number, Array<Object>>{
 		let map_result = new Map<number, Array<Object>>();
-		const first: Player = this.resolve_first(player1, player2);
-		const second: Player = first === player1 ? player2 : player1;
+		let first: Player = this.resolve_first(player1, player2);
+		let second: Player = first === player1 ? player2 : player1;
 		
 		const actionFirst = first.currentActions;
 		const actionSecond = second.currentActions;
@@ -119,8 +119,18 @@ export class CombatService {
 
 		// 1
 		this.handle_action(first, second, actionFirst, 1);
-		this.pushResult(map_result, first.id, this.action_battle(first, second,  1, 1, changeMonsterFirst));
-		this.pushResult(map_result, second.id, this.action_battle(second, first,  1, 1, changeMonsterFirst));
+		//console.log("Second text before", second.text);
+		//console.log("First text before", first.text);
+		//console.log("------------------------");
+
+		second.text = first.text;
+		let temp1 = new Player(first.id, first.name, first.asset);
+		Object.assign(temp1, first);
+		let temp2 = new Player(second.id, second.name, second.asset);
+		Object.assign(temp2, second);
+		
+		this.pushResult(map_result, first.id, this.action_battle(temp1, temp2,  1, 1, changeMonsterFirst));
+		this.pushResult(map_result, second.id, this.action_battle(temp2, temp1,  1, 1, changeMonsterFirst));
 
 		if (second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) {
 			second.currentMonster.life.current = 0;
@@ -132,16 +142,16 @@ export class CombatService {
 		// 2
 		this.handle_action(second, first, actionSecond, 2);
 
+		first.text = second.text;
+
 		this.pushResult(map_result, first.id, this.action_battle(first, second,  2, 2, changeMonsterSecond));
 		this.pushResult(map_result, second.id, this.action_battle(second, first,  2, 2, changeMonsterSecond));
 
 		return map_result
 	}
-	
 
 	/* SEND */
 	action_battle(player: Player, player2: Player, order: number, max: number, changePlayerID?: number){
-		player2.text = player.text;
 		let result = {  event: "game",
 			data: {
 				state: "action_battle",
@@ -225,12 +235,13 @@ export class CombatService {
 	/* RECEIVED ACTIONS */
 
 	readonly typeChart: Record<string, Record<string, number>> = {
-		"fire":  { "plant": 2, "water": 0.5, "neutral": 1, "earth": 1 },
-		"water":  { "fire": 2, "plant": 0.5, "earth": 0.5, "neutral": 1 },
-		"earth": { "water": 2, "fire": 0.5, "plant": 0.5, "neutral": 1 },
-		"plant": { "water": 2, "earth": 2, "neutral": 1, "fire": 0.5 },
-		"neutral": { "water": 1, "fire": 1, "plant": 1, "earth": 1 }
-	 }
+		"fire": { "plant": 2, "water": 0.5, "neutral": 1, "earth": 1 , "fly": 1},
+		"water": { "fire": 2, "plant": 0.5, "earth": 0.5, "neutral": 1 , "fly": 1},
+		"earth": { "water": 2, "fire": 0.5, "plant": 0.5, "neutral": 1 , "fly": 1},
+		"plant": { "water": 2, "earth": 2, "neutral": 1, "fire": 0.5 , "fly": 0.5},
+		"neutral": { "water": 1, "fire": 1, "plant": 1, "earth": 1 , "fly": 1},
+		"fly": { "water": 1, "fire": 1, "plant": 2, "earth": 0.5, "neutral": 1 }
+	}
 	
 	
 	private	received_try_attack(player: Player, enemy: Player, skillName: string) {
@@ -376,7 +387,7 @@ export class CombatService {
 	private successAttackCalculation(skill: Skill, enemyMonster: CurrentMonster): boolean{
 		let result = Math.floor(Math.random() * 101);
 		result -= enemyMonster.speed / 10;
-		if (result < skill.precision)
+		if (result > skill.precision)
 			return false;
 		return true;
 	}
