@@ -4,11 +4,11 @@ set -e
 #Safeguard
 SCRIPT_NAME="${0##*/}"
 
-if [ ! $# -eq 2 ]; then
-    echo "Usage: ${SCRIPT_NAME} <node new username> <host ip>"
+if [ ! $# -eq 3 ]; then
+    echo "Usage: ${SCRIPT_NAME} <node new username> <host ip> <flag resize>"
     exit 1
 elif [ -z "$1" ]; then
-    echo "Usage: ${SCRIPT_NAME} <node new username> <host ip>"
+    echo "Usage: ${SCRIPT_NAME} <node new username> <host ip> <flag resize>"
     exit 1
 fi
 
