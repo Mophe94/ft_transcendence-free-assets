@@ -99,7 +99,7 @@ export class GameService implements OnModuleInit {
   }
 
   private sendToPlayer(userId: number, payload: object): void {
-    console.log("Send_to_player: id: ", userId, payload);
+    //console.log("Send_to_player: id: ", userId, payload);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
@@ -206,6 +206,7 @@ export class GameService implements OnModuleInit {
   }
 
   async handleMessage(userId: number, payload: any) : Promise<object | undefined> {
+    let endOfBattle = false;
     let player = this.playerService.getPlayer(userId)!;
     let userId2 = this.combatService.getOpponentId(userId);
     const roomId = this.roomIdByPlayer.get(userId)!;
@@ -215,6 +216,12 @@ export class GameService implements OnModuleInit {
       userId2 = userId;
     }
     let player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
+
+    let playerForce : Player | undefined = undefined;
+    if (player.forceChooseMonster)
+        playerForce = player;
+    else if (player2?.forceChooseMonster)
+        playerForce = player2;
 
     if (!player2) {
       console.log(`[GameService]: No opponent for ${userId} - using player as placeholder`);
@@ -253,13 +260,14 @@ export class GameService implements OnModuleInit {
       case "change_current_monster":
       case "use_item_combat":
       case "try_attack":
-        case "pass":
+      case "pass":
           player.currentActions = { 
             actionType: state,
             data: payload
           }
           console.log("Current actions", player.currentActions);
-          if (player.currentActions.actionType && player2.currentActions.actionType) {
+		    	console.log("ForceChooseMonster [game]", player.forceChooseMonster);			
+          if ((player.currentActions.actionType && player2.currentActions.actionType) || playerForce?.forceChooseMonster) {
             const mapResult = await this.combatService.resolving_battle_round(player, player2);
             player.currentActions.actionType = undefined;
             player2.currentActions.actionType = undefined;
@@ -274,52 +282,60 @@ export class GameService implements OnModuleInit {
               for (let i = 0; i < currentMessagePlayer!.length; ++i){
                 this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
                 this.sendToPlayer(userId2, currentMessagePlayer2?.at(i)!);
-
               }
-              await new Promise(resolve => setTimeout(resolve, 2000)); // ! "temp fix to synchronizeke"
+            }
+            else {
+              console.log("Waiting Player: ");
+              break;
+            }
+            await new Promise(resolve => setTimeout(resolve, 2000)); // ! "temp fix to synchronizeke"
 
-              if (player.currentMonster.life.current <= 0){
+            if (player.currentMonster.life.current <= 0){
                 if (!this.has_valid_monsters(player)){
+                  endOfBattle = true;
                   this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
                   this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
                   // wainting all combat finish
                 }
                 else{
+                  player.forceChooseMonster = true;
                   this.sendToPlayer(userId, this.combatService.change_monster(player, player.id));
                   this.sendToPlayer(userId2, this.combatService.change_monster(player2, player.id));
                 }
-              }
-              else if (player2.currentMonster.life.current <= 0){
-                if (!this.has_valid_monsters(player2)){
-                  this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
-                  this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
-  
-                }
-                else{
-                  this.sendToPlayer(userId, this.combatService.change_monster(player, player2.id));
-                  this.sendToPlayer(userId2, this.combatService.change_monster(player2, player2.id));
-                }
-              }
-    //					else if (!has_valid_monsters(player2)){
-    //						send result_battle(player, player.id)
-    //						send result_battle(player2, player.id)
-    //					}
-              else{
-                this.startNewTurn(roomId, this.gameRooms.get(roomId)!);
-                this.sendToPlayer(userId, this.combatService.new_turn(player));
-                this.sendToPlayer(userId2, this.combatService.new_turn(player2));
-                // si un combat deja finish declenchement du roundLeft
-                // send new_turn(player, rounLeft)
-                // send new_turn(player, roundLeft)
-              }
             }
-                }
-          break;
-      
+            else if (player2.currentMonster.life.current <= 0){
+              if (!this.has_valid_monsters(player2)){
+                endOfBattle = true;
+                this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
+                this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
+              }          
+              else {
+                player2.forceChooseMonster = true;
+                this.sendToPlayer(userId, this.combatService.change_monster(player, player2.id));
+                this.sendToPlayer(userId2, this.combatService.change_monster(player2, player2.id));
+             }
+            }
+            else {
+		    	    console.log("ForceChooseMonster [new_turn]", player.forceChooseMonster);	
+              this.startNewTurn(roomId, this.gameRooms.get(roomId)!);
+              this.sendToPlayer(userId, this.combatService.new_turn(player));
+              this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+              // si un combat deja finish declenchement du roundLeft
+              // send new_turn(player, rounLeft)
+              // send new_turn(player, roundLeft)
+            }
+            if (endOfBattle) {
+              if (player.currentMonster.life.current > 0)
+                this.sendToPlayer(userId, this.combatService.next_map(player, player2));
+              else
+                this.sendToPlayer(userId2, this.combatService.next_map(player2, player));
+            }
+        }
+        break;
       default:
-        console.log("Unknow state:", state)
-        return undefined
+          console.log("Unknow state:", state);
+          return undefined;
     }
     return result
-    }
   }
+}
