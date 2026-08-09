@@ -41,10 +41,13 @@ services:
         - GF_SERVER_ROOT_URL=https://${HOST_IP}/grafana/
         - GF_SERVER_SERVE_FROM_SUB_PATH=true
         - GF_SECURITY_ALLOW_EMBEDDING=true
-        - GF_SECURITY_ADMIN_USER=admin
-        - GF_SECURITY_ADMIN_PASSWORD=admin123
         - GF_AUTH_ANONYMOUS_ENABLED=true
         - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+        - GF_SECURITY_ADMIN_USER__FILE=/run/secret/grafana_admin_user
+        - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana_admin_password
+    secrets:
+        - grafana_admin_user
+        - grafana_admin_password
     volumes:
         - grafana_data:/var/lib/grafana
         - ../containers/grafana/dashboards:/var/lib/grafana/dashboards
@@ -162,6 +165,11 @@ configs:
         file: ../containers/loki/loki_config.yml
     alloy_config:
         file: ../containers/alloy/alloy.conf
+secrets:
+    grafana_admin_user:
+        external: true
+    grafana_admin_password:
+        external: true
 
 networks:
     obsrv_net:

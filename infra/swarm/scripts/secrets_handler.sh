@@ -1,8 +1,8 @@
 #! /bin/bash
+SCRIPT_NAME="${0##*/}"
 
 # Safeguard
 set -euo pipefail
-SCRIPT_NAME="${0##*/}"
 if [ $# -gt 1 ]; then
     echo "[$SCRIPT_NAME] Error: usage: $SCRIPT_NAME <secret_file_path>"
     exit 1
@@ -19,18 +19,24 @@ echo "[$SCRIPT_NAME] loading secrets"
 while IFS='=' read -r key value; do
     #Skip empty lines and comments
     [[ -z "${key// }" ]] && continue
-    [[ -z "${value// }" ]] && continue
     [[ "$key" =~ [[:space:]]*# ]] && continue
+    [[ "${key,,}" == s_* ]] || continue
 
     #Trim IFS
     key=$(xargs <<<"$key")
     value=$(xargs <<<"$value")
 
+    #Skip not set entries
+    [[ -z "${value// }" ]] && continue
+
     #Create secrets
-    if docker secret inspect "$key" >/dev/null 2>&1; then
-	echo "[$SCRIPT_NAME] already existing secret"
+    secret_name="${key,,}"
+    secret_name="${secret_name#s_}"
+    if docker secret inspect "$secret_name" >/dev/null 2>&1; then
+	echo "\t secret already exist: ${secret_name}"
     else
-	echo -n "$value" | docker secret create "$key" -
+        echo -n "\t"
+	echo -n "$value" | docker secret create "$secret_name" -
     fi
-done < "$SECRET_FILE"
+done < "$SECRETS_FILE"
 echo "[$SCRIPT_NAME] secrets loaded"

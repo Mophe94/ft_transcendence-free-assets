@@ -5,20 +5,27 @@ LOCATION := $(shell pwd)
 BUILD_FILE = $(LOCATION)/docker-compose-build.yml
 DEPLOY_FILES = $(LOCATION)/swarm
 SWARM_SCRIPTS = $(LOCATION)/swarm/scripts
+TOOLS_DIR = $(LOCATION)/tools
+ENV_FILE:="$(LOCATION)/.env"
 CONTAINER_FILES:= "$(LOCATION)/containers"
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 HOST_IP:= $(shell cat host_ip.txt)
 HOST_TAILSCALE_IP = $(shell tailscale ip -4)
 REG_PORT?=5050
+PROM_SCRAPE_PORT?=6666
 REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
 TAG ?= latest
 BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) REGISTRY=$(REGISTRY) TAG=$(TAG)
-DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) 
+DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=$(PROM_SCRAPE_PORT) 
 USER_NAME="$(USER)"
 TYPE:=""
 TARGET=""
 
-all: node_launch
+include .env.mk
+export
+.env.mk: env
+
+all: env node_launch
 
 node_launch: wait_tailscale
 	@if [ "$(TYPE)" == "leader" ]; then \
@@ -30,7 +37,7 @@ node_launch: wait_tailscale
 swarm_setup:
 	@chmod +x $(SWARM_SCRIPTS)/launch_swarm.sh
 	@$(SWARM_SCRIPTS)/launch_swarm.sh "$(SWARM_SCRIPTS)" "$(HOST_IP)" "$(HOST_TAILSCALE_IP)"
-	@BUILDX_BAKE_ENTITLEMENTS_FS=0 IP=$(IP4) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=80 docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
+	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
 push:
 	$(BAKE_ARG) LOCAL=true docker buildx bake base databases website game -f $(CONTAINER_FILES)/docker-bake.hcl --push >> /home/stempels/infra/build.log
@@ -136,4 +143,24 @@ wait_tailscale:
 	    fi; \
 	done
 
-PHONY: all node_launch swarm_setup swarm_status push test core website game observ up down swarm-status image wait_tailscale
+env: .env
+	@if [ ! -f "$(TOOLS_DIR)"/create_env.sh ] || [ ! -f "$(TOOLS_DIR)"/check_env.sh ]; then \
+	    echo "Missing env handlers"; \
+	    exit 1; \
+	fi
+	@chmod +x "$(TOOLS_DIR)/check_env.sh"
+	@bash "$(TOOLS_DIR)/check_env.sh" $(ENV_FILE)
+	@chmod +x "$(TOOLS_DIR)/create_env.sh"
+	@bash "$(TOOLS_DIR)/create_env.sh" $(ENV_FILE) > .env.mk
+
+.env:
+	@if [ -f template_env ]; then \
+		echo "Creating .env file, please set all variables"; \
+		cp template_env	.env; \
+		vim -c 'set shortmess+=I' .env; \
+	else \
+		echo "Template_env file missing, you will need to create .env file yourself.\n See READ_ME for how to do it"; \
+		exit 1; \
+	fi
+
+PHONY: all node_launch swarm_setup swarm_status push test core website game observ up down swarm-status image wait_tailscale env

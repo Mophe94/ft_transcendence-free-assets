@@ -1,5 +1,6 @@
-#Put the needed secrets for the project in this file
-# Form: secret_name=secret_value
+#Put the needed environment variables and secrets for the project in this file
+# Variable form:  name=value
+# Secret form:    (s_)name=value -> Secrets need to be prefixed by s_
 # Keep it tidy
 
 ###############################################################################
@@ -7,7 +8,6 @@
 ###############################################################################
 # API 42 defined
 fortytwo_client_id=
-# API 42 defined
 fortytwo_client_secret=
 
 ###############################################################################
@@ -21,11 +21,8 @@ jwt_secret_key=
 ###############################################################################
 # users defined
 db_game_postgres_password=
-# users defined
 db_game_db_name=
-# users defined
 db_game_username=
-# users defined
 db_game_password=
 
 ###############################################################################
@@ -33,11 +30,8 @@ db_game_password=
 ###############################################################################
 # users defined
 db_users_postgres_password=
-# users defined
 db_users_db_name=
-# users defined
 db_users_username=
-# users defined
 db_users_password=
 
 ###############################################################################
@@ -68,3 +62,10 @@ redis_password=
 #   fortytwo_client_id
 #   fortytwo_client_secret
 #   jwt_secret_key
+
+###############################################################################
+# GRAFANA                                                                     #
+###############################################################################
+# user defined
+s_grafana_admin_user=
+s_grafana_admin_password=
