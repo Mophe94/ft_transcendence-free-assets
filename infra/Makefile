@@ -1,23 +1,25 @@
-#SWARM_STATUS := $(shell docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null)
 SCRIPT_NAME:=Infra-Makefile
-STACK_NAME = transcendence
 LOCATION := $(shell pwd)
+
+# FILES Locations
 BUILD_FILE = $(LOCATION)/docker-compose-build.yml
-DEPLOY_FILES = $(LOCATION)/swarm
-SWARM_SCRIPTS = $(LOCATION)/swarm/scripts
-TOOLS_DIR = $(LOCATION)/tools
+DEPLOY_FILES = $(LOCATION)/stacks
+CONFIG_SCRIPTS = $(LOCATION)/swarm_utils/config
+TOOLS_SCRIPTS = $(LOCATION)/swarm_utils/tools
 ENV_FILE:="$(LOCATION)/.env"
 CONTAINER_FILES:= "$(LOCATION)/containers"
+
+# Host informations
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 HOST_IP:= $(shell cat host_ip.txt)
 HOST_TAILSCALE_IP = $(shell tailscale ip -4)
-REG_PORT?=5050
-PROM_SCRAPE_PORT?=6666
-REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
+USER_NAME="$(USER)"
+
+# Miscellanious
 TAG ?= latest
+REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
 BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) REGISTRY=$(REGISTRY) TAG=$(TAG)
 DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=$(PROM_SCRAPE_PORT) 
-USER_NAME="$(USER)"
 TYPE:=""
 TARGET=""
 
@@ -35,8 +37,8 @@ node_launch: wait_tailscale
 	fi
 
 swarm_setup:
-	@chmod +x $(SWARM_SCRIPTS)/launch_swarm.sh
-	@$(SWARM_SCRIPTS)/launch_swarm.sh "$(SWARM_SCRIPTS)" "$(HOST_IP)" "$(HOST_TAILSCALE_IP)"
+	@chmod +x $(CONFIG_SCRIPTS)/launch_swarm.sh
+	@$(CONFIG_SCRIPTS)/launch_swarm.sh "$(CONFIG_SCRIPTS)" "$(HOST_IP)" "$(HOST_TAILSCALE_IP)"
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
 push:
@@ -48,8 +50,8 @@ test:
 
 core:
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
-	chmod +x $(SWARM_SCRIPTS)/registry_check.sh
-	@if ! bash $(SWARM_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \
+	chmod +x $(TOOLS_SCRIPTS)/registry_check.sh
+	@if ! bash $(TOOLS_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \
           exit 1; \
         fi
 
@@ -78,9 +80,9 @@ up: build
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 down:
-	chmod 777 $(SWARM_SCRIPTS)/end_swarm.sh:wq
+	chmod 777 $(CONFIG_SCRIPTS)/end_swarm.sh:wq
 
-	$(SWARM_SCRIPTS)/end_swarm.sh
+	$(CONFIG_SCRIPTS)/end_swarm.sh
 	@$(MAKE) --no-print-directory swarm-status
 
 swarm-status:
@@ -98,8 +100,8 @@ addnode:
 		y|yes) \
 			read -r -t 15 -p "[$(SCRIPT_NAME)] Node user(s): " answer || true; \
 			[ -n "$$answer" ] && \
-				chmod +x "$(SWARM_SCRIPTS)/add_node.sh" && \
-				bash "$(SWARM_SCRIPTS)/add_node.sh" "$(HOST_IP)" $$answer ;; \
+				chmod +x "$(CONFIG_SCRIPTS)/add_node.sh" && \
+				bash "$(CONFIG_SCRIPTS)/add_node.sh" "$(HOST_IP)" $$answer ;; \
 		*) \
 			echo "[$(SCRIPT_NAME)] No node added" ;; \
 	esac
@@ -144,14 +146,14 @@ wait_tailscale:
 	done
 
 env: .env
-	@if [ ! -f "$(TOOLS_DIR)"/create_env.sh ] || [ ! -f "$(TOOLS_DIR)"/check_env.sh ]; then \
+	@if [ ! -f "$(TOOLS_SCRIPTS)"/create_env.sh ] || [ ! -f "$(TOOLS_SCRIPTS)"/check_env.sh ]; then \
 	    echo "Missing env handlers"; \
 	    exit 1; \
 	fi
-	@chmod +x "$(TOOLS_DIR)/check_env.sh"
-	@bash "$(TOOLS_DIR)/check_env.sh" $(ENV_FILE)
-	@chmod +x "$(TOOLS_DIR)/create_env.sh"
-	@bash "$(TOOLS_DIR)/create_env.sh" $(ENV_FILE) > .env.mk
+	@chmod +x "$(TOOLS_SCRIPTS)/check_env.sh"
+	@bash "$(TOOLS_SCRIPTS)/check_env.sh" $(ENV_FILE)
+	@chmod +x "$(TOOLS_SCRIPTS)/create_env.sh"
+	@bash "$(TOOLS_SCRIPTS)/create_env.sh" $(ENV_FILE) > .env.mk
 
 .env:
 	@if [ -f template_env ]; then \
