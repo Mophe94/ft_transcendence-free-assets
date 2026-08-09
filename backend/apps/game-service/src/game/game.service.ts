@@ -265,8 +265,8 @@ export class GameService implements OnModuleInit {
             actionType: state,
             data: payload
           }
-          console.log("Current actions", player.currentActions);
-		    	console.log("ForceChooseMonster [game]", player.forceChooseMonster);			
+//          console.log("Current actions", player.currentActions);
+//		    	console.log("ForceChooseMonster [game]", player.forceChooseMonster);			
           if ((player.currentActions.actionType && player2.currentActions.actionType) || playerForce?.forceChooseMonster) {
             const mapResult = await this.combatService.resolving_battle_round(player, player2);
             player.currentActions.actionType = undefined;
@@ -274,10 +274,10 @@ export class GameService implements OnModuleInit {
             if (mapResult && mapResult.get(player.id) !== undefined && mapResult.get(player2.id) !== undefined){
               const currentMessagePlayer = mapResult.get(player.id);
               const currentMessagePlayer2 = mapResult.get(player2.id);
-              console.log("* CurrentMessagePlayer1 *: ", mapResult.get(player.id));
-              console.log("*************************************");
-              console.log("* CurrentMessagePlayer2 *: ", mapResult.get(player2.id));
-              console.log("*************************************");
+//              console.log("* CurrentMessagePlayer1 *: ", mapResult.get(player.id));
+//              console.log("*************************************");
+//              console.log("* CurrentMessagePlayer2 *: ", mapResult.get(player2.id));
+//              console.log("*************************************");
 
               for (let i = 0; i < currentMessagePlayer!.length; ++i){
                 this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
@@ -316,7 +316,7 @@ export class GameService implements OnModuleInit {
              }
             }
             else {
-		    	    console.log("ForceChooseMonster [new_turn]", player.forceChooseMonster);	
+//		    	    console.log("ForceChooseMonster [new_turn]", player.forceChooseMonster);	
               this.startNewTurn(roomId, this.gameRooms.get(roomId)!);
               this.sendToPlayer(userId, this.combatService.new_turn(player));
               this.sendToPlayer(userId2, this.combatService.new_turn(player2));

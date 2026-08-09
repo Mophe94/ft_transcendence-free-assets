@@ -129,13 +129,13 @@ export class CombatService {
 		this.pushResult(map_result, first.id, this.action_battle(temp1, temp2,  1, 1, changeMonsterFirst));
 		this.pushResult(map_result, second.id, this.action_battle(temp2, temp1,  1, 1, changeMonsterFirst));
 		
-		console.log("First: ", first.forceChooseMonster);
+//		console.log("First: ", first.forceChooseMonster);
 		if ((second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) || first.forceChooseMonster) {
 			if (first.forceChooseMonster) {
-				console.log("ForceChooseMonster [combat1]", first.forceChooseMonster);			
+//				console.log("ForceChooseMonster [combat1]", first.forceChooseMonster);			
 				first.forceChooseMonster = false;
 			}
-			console.log("ForceChooseMonster [combat]", first.forceChooseMonster);			
+//			console.log("ForceChooseMonster [combat]", first.forceChooseMonster);			
 			return map_result
 		}
 
@@ -309,7 +309,6 @@ export class CombatService {
 						player.text += " for " + resultDamage + " damage";
 				}
 				player.text += effectiveness;
-				console.log("ResultDamage: ", resultDamage);
 				break;
 	
 			case "up_stat":
@@ -436,9 +435,11 @@ export class CombatService {
 		}
 	
 		let current_item = player.inventory[i];
+		current_item.current -= 1;
 		const type = current_item.type;
 		switch (type) {
 			case "heal":
+				console.log("3 type: ", type);
 				let result_heal = current_item.value;
 				let temp_life_heal = player.currentMonster.life.current;
 				player.currentMonster.life.current += current_item.value;
@@ -450,6 +451,7 @@ export class CombatService {
 				break;
 	
 			case "damage":
+				console.log("3 type: ", type);
 				let result_damage = current_item.value;
 				let temp_life_damage = enemy.currentMonster.life.current;
 				enemy.currentMonster.life.current -= current_item.value;;
@@ -461,6 +463,7 @@ export class CombatService {
 				break;
 	
 			case "stat_down":
+				console.log("3 type: ", type);
 				switch (current_item.target){
 					case "attack":
 						enemy.currentMonster.attack -= current_item.value;
@@ -485,6 +488,7 @@ export class CombatService {
 				break;
 			
 			case "stat_up":
+				console.log("3 type: ", type);
 				switch (current_item.target){
 					case "attack":
 						player.currentMonster.attack += current_item.value;
@@ -509,6 +513,7 @@ export class CombatService {
 				break;
 	
 			default:
+				console.log("3 type: ", type);
 				this.received_pass(player);
 				return;
 		}
@@ -545,7 +550,7 @@ export class CombatService {
 				}
 			}
 		}
-		console.log("PLAYER text: ", player.text);
+//		console.log("PLAYER text: ", player.text);
 	}
 
 	private received_pass(player: Player){
