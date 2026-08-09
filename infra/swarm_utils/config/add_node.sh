@@ -6,12 +6,12 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/09 10:58:03 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/09 11:03:22 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
-
 SCRIPT_NAME="${0##*/}"
+
 addnote_help() {
     echo "[INFO] Usage ${SCRIPT_NAME}: <leader ip> <leader tailscale ip> <node user> <node user> <...>"
 }

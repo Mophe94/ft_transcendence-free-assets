@@ -1,4 +1,5 @@
 SCRIPT_NAME="${0##*/}"
+
 script_help() {
     echo "[INFO] Usage ${SCRIPT_NAME}: <leader ip> <leader tailscale ip> <node user> <node user> <...>"
 }
