@@ -11,7 +11,7 @@ else
 	echo "[$SCRIPT_NAME] Error: file $1 not found"
 	exit 1
     else
-	SECRET_FILE="$1"
+	SECRETS_FILE="$1"
     fi	
 fi
 

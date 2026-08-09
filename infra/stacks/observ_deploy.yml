@@ -139,19 +139,19 @@ volumes:
       driver: local
       driver_opts:
         type: nfs
-        o: "addr=${IP},nfsvers=4,rw,soft"
+        o: "addr=${NFS_IP},nfsvers=4,rw,soft"
         device: ":/nfs-storage/loki"
     prom_data:
       driver: local
       driver_opts:
         type: nfs
-        o: "addr=${IP},nfsvers=4,rw,soft"
+        o: "addr=${NFS_IP},nfsvers=4,rw,soft"
         device: ":/nfs-storage/prometheus"
     grafana_data:
       driver: local
       driver_opts:
         type: nfs
-        o: "addr=${IP},nfsvers=4,rw,soft"
+        o: "addr=${NFS_IP},nfsvers=4,rw,soft"
         device: ":/nfs-storage/grafana"
 
 configs:

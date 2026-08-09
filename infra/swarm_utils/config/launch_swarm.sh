@@ -14,13 +14,13 @@ HOST_IP="$2"
 HOST_TAILSCALE_IP="$3"
 IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
 
-CONFIG_DIR="${UTILS_DIR}/config/"
-TOOLS_DIR="${UTILS_DIR}/tools/"
-SECRET_FILE=$HOME/infra/secrets.env
+CONFIG_DIR="${UTILS_DIR}/config"
+TOOLS_DIR="${UTILS_DIR}/tools"
+SECRET_FILE="$HOME/infra/.env"
 
 # Creating certificates
 chmod +x "$CONFIG_DIR/create_swarm_certs.sh" 
-bash "${CONFIG_DIR}/create_swarm_certs.sh" "${TOOLS_DIR}/create_swarm_certs.sh" "${HOST_TAILSCALE_IP}"
+bash "${CONFIG_DIR}/create_swarm_certs.sh" "${TOOLS_DIR}/cert_creation.sh" "${HOST_TAILSCALE_IP}"
 
 #INIT THE SWARM AND PUBLISH IS IP OF CONTACT(HOST_IP)#
 if [ ! "$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then

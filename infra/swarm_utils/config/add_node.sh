@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/09 11:03:22 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/09 13:12:39 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -68,7 +68,7 @@ if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
     ssh-keygen -f "$HOME/.ssh/${SSH_KEY_NAME}" -N "$SSH_KEY_PASSPHRASE"
 fi
 
-CONNECTED_NODES=("")
+CONNECTED_NODES=()
 for user in "${NODE_USERS[@]}"; do
     if [ "$user" = "$USER" ]; then
 	continue
@@ -128,22 +128,26 @@ done
 echo "$CONNECTED_NODES"
 
 # Wait for node to join
-start_time=$(date +%s)
 ADDED_NODES=0
 for user in "${CONNECTED_NODES[@]}"; do
+    [ -z "$user" ] && continue
     [ "$user" = "$USER" ] && continue
+    echo "[$SCRIPT_NAME] Waiting for $user to join swarm..."
+    start_time=$(date +%s)
+    while :; do
+        if docker node ls --format '{{.Hostname}}' |
+            grep -Fxq "swarmnode.$user"; then
 
-    now=$(date +%s)
-    elapsed=$((now - start_time))
-    while [ "$elapsed" -ge "$NODE_JOIN_TIMEOUT" ]; do
-        if docker node ls --format '{{.Hostname}}' | grep -Fxq swarmnode."$user"; then
+            echo "[INFO][$SCRIPT_NAME] $user joined the swarm"
             ADDED_NODES=$((ADDED_NODES + 1))
+            break
+        fi
+        elapsed=$(( $(date +%s) - start_time ))
+        if [ "$elapsed" -ge "$NODE_JOIN_TIMEOUT" ]; then
+            echo "[ERROR][$SCRIPT_NAME] Timeout waiting for node $user to join swarm"
             break
         fi
         sleep 2
     done
-    if "$elapsed" -ge "$NODE_JOIN_TIMEOUT"; then
-        echo "[ERROR][$SCRIPT_NAME] Timeout waiting for node $user to join swarm"
-    fi
 done
 echo "[$SCRIPT_NAME] Added $ADDED_NODES nodes"

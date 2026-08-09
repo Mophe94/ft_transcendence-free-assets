@@ -1,13 +1,18 @@
 SCRIPT_NAME:=Infra-Makefile
 LOCATION := $(shell pwd)
 
-# FILES Locations
+# Files Locations
+ENV_FILE:=$(LOCATION)/.env
+ENV_MK:=$(LOCATION)/.env.mk
 BUILD_FILE = $(LOCATION)/docker-compose-build.yml
 DEPLOY_FILES = $(LOCATION)/stacks
+SWARM_UTILS = $(LOCATION)/swarm_utils
 CONFIG_SCRIPTS = $(LOCATION)/swarm_utils/config
 TOOLS_SCRIPTS = $(LOCATION)/swarm_utils/tools
-ENV_FILE:="$(LOCATION)/.env"
 CONTAINER_FILES:= "$(LOCATION)/containers"
+
+include $(ENV_MK)
+export
 
 # Host informations
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
@@ -19,13 +24,9 @@ USER_NAME="$(USER)"
 TAG ?= latest
 REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
 BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) REGISTRY=$(REGISTRY) TAG=$(TAG)
-DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=$(PROM_SCRAPE_PORT) 
+DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=$(PROM_SCRAPE_PORT) NFS_IP=$(HOST_TAILSCALE_IP)
 TYPE:=""
 TARGET=""
-
-include .env.mk
-export
-.env.mk: env
 
 all: env node_launch
 
@@ -38,7 +39,7 @@ node_launch: wait_tailscale
 
 swarm_setup:
 	@chmod +x $(CONFIG_SCRIPTS)/launch_swarm.sh
-	@$(CONFIG_SCRIPTS)/launch_swarm.sh "$(CONFIG_SCRIPTS)" "$(HOST_IP)" "$(HOST_TAILSCALE_IP)"
+	@$(CONFIG_SCRIPTS)/launch_swarm.sh "$(SWARM_UTILS)" "$(HOST_IP)" "$(HOST_TAILSCALE_IP)"
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
 push:
@@ -145,7 +146,9 @@ wait_tailscale:
 	    fi; \
 	done
 
-env: .env
+$(ENV_MK): env
+
+env: $(ENV_FILE)
 	@if [ ! -f "$(TOOLS_SCRIPTS)"/create_env.sh ] || [ ! -f "$(TOOLS_SCRIPTS)"/check_env.sh ]; then \
 	    echo "Missing env handlers"; \
 	    exit 1; \
@@ -155,7 +158,7 @@ env: .env
 	@chmod +x "$(TOOLS_SCRIPTS)/create_env.sh"
 	@bash "$(TOOLS_SCRIPTS)/create_env.sh" $(ENV_FILE) > .env.mk
 
-.env:
+$(ENV_FILE):
 	@if [ -f template_env ]; then \
 		echo "Creating .env file, please set all variables"; \
 		cp template_env	.env; \
