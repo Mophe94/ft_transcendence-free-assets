@@ -1,62 +1,26 @@
 #!/bin/bash
+SCRIPT_NAME="${0##*/}"
 
 #SAFEGUARDING#
 set -euo pipefail
-SCRIPT_NAME="${0##*/}"
 if [ ! $# -eq 3 ]; then
-	echo "Usage: $SCRIPT_NAME <dir> <ip> <tailscale ip>"
+	echo "Usage: $SCRIPT_NAME <swarm_utils dir> <host ip> <tailscale ip>"
 	exit 1
 fi
 
 #ARGUMENTS ASSIGNATION#
-DIR="$1"
+UTILS_DIR="$1"
 HOST_IP="$2"
 HOST_TAILSCALE_IP="$3"
 IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
 
-CERT_DIR="$HOME/infra/swarm_utils/tools/"
+CONFIG_DIR="${UTILS_DIR}/config/"
+TOOLS_DIR="${UTILS_DIR}/tools/"
+SECRET_FILE=$HOME/infra/secrets.env
 
 # Creating certificates
-if [ ! -f ${CERT_DIR}/cert_creation.sh ]; then
-    echo "[$SCRIPT_NAME] ${CERT_DIR}/cert_creation.sh missing, skipping certificate creation"
-else
-    chmod +x ${CERT_DIR}/cert_creation.sh
-    if [ ! -f "$HOME/certs/nginx.crt" ]; then
-	bash ${CERT_DIR}/cert_creation.sh "/etc/certs" "${HOST_TAILSCALE_IP}" nginx
-    else
-	echo "[$SCRIPT_NAME] Nginx certificate already exist"
-    fi
-    if [ ! -f "$HOME/certs/registry.crt" ]; then
-	bash ${CERT_DIR}/cert_creation.sh "/etc/certs" "${HOST_TAILSCALE_IP}" registry
-    else
-	echo "[$SCRIPT_NAME] Registry certificate already exist"
-    fi
-    if [ ! -f "$HOME/certs/worker.crt" ]; then
-	bash ${CERT_DIR}/cert_creation.sh "/etc/certs" "${HOST_TAILSCALE_IP}" worker
-
-	# Adding certificates to docker
-	doas mkdir -p /etc/docker/certs.d/${HOST_TAILSCALE_IP}:5050
-	doas rm -rf "/etc/docker/certs.d/${HOST_TAILSCALE_IP}:5050/worker.*"
-	doas cp "$HOME/certs/worker.crt" "/etc/docker/certs.d/${HOST_TAILSCALE_IP}:5050/client.cert" 
-	doas cp "$HOME/certs/worker.key" "/etc/docker/certs.d/${HOST_TAILSCALE_IP}:5050/client.key" 
-	doas rc-service docker restart
-	COUNTER=0
-	TIMEOUT=30
-	echo "[INFO][$SCRIPT_NAME] Waiting for docker to restart"
-	while ! docker info >/dev/null 2>&1; do
-	    if [ "$COUNTER" -ge "$TIMEOUT" ]; then
-		echo "[ERROR][$SCRIPT_NAME] Docker took to much time"
-		exit 1
-	    fi
-	    COUNTER=$((COUNTER + 1))
-	    sleep 2
-	    echo -n "."
-	done
-	echo ""
-    else
-	echo "[$SCRIPT_NAME] Worker certificate already exist"
-    fi
-fi
+chmod +x "$CONFIG_DIR/create_swarm_certs.sh" 
+bash "${CONFIG_DIR}/create_swarm_certs.sh" "${TOOLS_DIR}/create_swarm_certs.sh" "${HOST_TAILSCALE_IP}"
 
 #INIT THE SWARM AND PUBLISH IS IP OF CONTACT(HOST_IP)#
 if [ ! "$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then
@@ -109,18 +73,17 @@ read -p "[$SCRIPT_NAME] Do you want to add preconfigured node (y/N): " -t 15 ans
 }
 case "${answer,,}" in
 	y|yes)
-	    chmod +x "${DIR}/add_node.sh"
-	   bash "${DIR}/add_node.sh" "${HOST_IP}" "${HOST_TAILSCALE_IP}" agaland bertrmar dbajeux kprist stempels;;
+	    chmod +x "${CONFIG_DIR}/add_node.sh"
+	   bash "${CONFIG_DIR}/add_node.sh" "${HOST_IP}" "${HOST_TAILSCALE_IP}" agaland bertrmar dbajeux kprist stempels;;
 	*) echo "[$SCRIPT_NAME] No node added";;
 esac
 
 #Create secret
-SECRET_FILE=$HOME/infra/secrets.env
 if [ ! -f "$SECRET_FILE" ]; then
     echo "[$SCRIPT_NAME] Secret file: $SECRET_FILE not found"
 else
-    chmod +x "$DIR"/secrets_handler.sh
-    bash "$DIR"/secrets_handler.sh "$SECRET_FILE"
+    chmod +x "$TOOLS_DIR"/secrets_handler.sh
+    bash "$TOOLS_DIR"/secrets_handler.sh "$SECRET_FILE"
 fi
 
 docker service ls

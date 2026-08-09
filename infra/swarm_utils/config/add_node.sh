@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/03 13:28:14 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/09 10:32:16 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -62,17 +62,14 @@ PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
 
 VM_TARGET_DIR="/tmp/"
 
-ADDED_NODES=0
-CONNECTED_NODES=("")
 NODE_JOIN_TIMEOUT=120
-PROMOTE_TIMEOUT=120
-
 
 # Generating ssh key
 if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
     ssh-keygen -f "$HOME/.ssh/${SSH_KEY_NAME}" -N "$SSH_KEY_PASSPHRASE"
 fi
 
+CONNECTED_NODES=("")
 for user in "${NODE_USERS[@]}"; do
     if [ "$user" = "$USER" ]; then
 	continue
@@ -133,6 +130,7 @@ echo "$CONNECTED_NODES"
 
 # Wait for node to join
 start_time=$(date +%s)
+ADDED_NODES=0
 for user in "${CONNECTED_NODES[@]}"; do
     [ "$user" = "$USER" ] && continue
 
@@ -149,44 +147,4 @@ for user in "${CONNECTED_NODES[@]}"; do
         echo "[ERROR][$SCRIPT_NAME] Timeout waiting for node $user to join swarm"
     fi
 done
-
-# Promote to reach manager target
-current_managers() {
-    docker node ls --format '{{.ManagerStatus}}' |
-        grep -Ec 'Leader|Reachable'
-}
-
-start_time=$(date +%s)
-
-#Add security: prevent reaching a even number of manager
-
-while :; do
-    managers=$(current_managers)
-
-    if [ "$managers" -ge "$TARGET_MANAGERS" ] || [ $ADDED_NODES -eq 0 ]; then
-        exit 0
-    fi
-
-    now=$(date +%s)
-    elapsed=$((now - start_time))
-
-    if [ "$elapsed" -ge "$PROMOTE_TIMEOUT" ]; then
-        echo "[ERROR][$SCRIPT_NAME] Timeout waiting to reach $TARGET_MANAGERS managers (current: $managers)"
-        exit 1
-    fi
-
-    while read -r worker; do
-        [ -z "$worker" ] && continue
-
-        echo "Promoting $worker"
-        docker node promote "$worker"
-
-        managers=$((managers + 1))
-	ADDED_NODES=$((ADDED_NODES - 1))
-
-        if [ "$managers" -ge "$TARGET_MANAGERS" ]; then
-            exit 0
-        fi
-    done < <(docker node ls --filter role=worker --format '{{.Hostname}}')
-    sleep 2
-done
+echo "[$SCRIPT_NAME] Added $ADDED_NODES nodes"
