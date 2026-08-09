@@ -22,7 +22,8 @@ DEFAULT_VM_DIR="$HOME/goinfre/"
 RAM_MB=2048
 VRAM_MB=16
 CPUS=2
-DISK_SIZE_MB=30720
+DISK_SIZE_LEADER=30720
+DISK_SIZE_WORKER=10240
 
 SSH_PORT="2222"
 SSH_HOST="localhost"
@@ -64,9 +65,6 @@ wait_for_ssh() {
     set -e
 }
 
-BASE_DIR=""
-VM_DIR=""
-
 # Define role of VM
 if [ $# -eq 2 ]; then
     if [ "$1" == "leader" ] || [ "$1" == "worker" ]; then
@@ -81,7 +79,11 @@ else
     exit 1
 fi
 
+BASE_DIR=""
+VM_DIR=""
 VM_NAME="${TYPE}_node_${USER}"
+VAR="DISK_SIZE_${TYPE^^}"
+DISK_SIZE_MB=${!VAR}
 
 # Check if VM already run, exist, if not create it
 if VBoxManage showvminfo "$VM_NAME" --machinereadable 2>&1 | grep -q '^VMState="running"'; then
