@@ -1,5 +1,4 @@
 #SWARM_STATUS := $(shell docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null)
-STACK_NAME = transcendence
 LOCATION := $(shell pwd)
 VM_SCRIPTS = $(LOCATION)/vm_management
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
@@ -30,13 +29,15 @@ setup_worker:
 	fi
 	@chmod +x $(VM_SCRIPTS)/node.sh;
 	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4);
-	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make TYPE=$(TYPE)"
-
-worker:
-	@$(MAKE) setup_worker TYPE="worker"
 
 leader:
 	@$(MAKE) setup_worker TYPE="leader"
+	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make TYPE=$(TYPE); /bin/bash"
+
+worker:
+	@$(MAKE) setup_worker TYPE="worker"
+	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "/bin/bash"
 
 vm_erase:
 	
+.PHONY: all vm setup_worker leader worker vm_erase
