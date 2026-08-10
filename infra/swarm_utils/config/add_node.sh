@@ -21,6 +21,47 @@ if [ $# -lt 2 ]; then
     exit 1
 fi
 
+get_env_value() {
+    local wanted_key="$1"
+    local key
+    local value
+
+    if [ ! -f "$ENV_FILE" ]; then
+        echo "[ERROR][$SCRIPT_NAME] Missing $ENV_FILE"
+        exit 1
+    fi
+    while IFS='=' read -r key value; do
+        [[ -z "${key//[[:space:]]/}" ]] && continue
+        [[ "$key" =~ ^[[:space:]]*\# ]] && continue
+        key="${key#"${key%%[![:space:]]*}"}"
+        key="${key%"${key##*[![:space:]]}"}"
+        if [ "$key" = "$wanted_key" ]; then
+            printf '%s' "$value"
+            return 0
+        fi
+    done < "$ENV_FILE"
+    return 1
+}
+
+get_42_token() {
+    local client_id
+    local client_secret
+
+    client_id="$(get_env_value s_fortytwo_client_id)" || return 1
+    client_secret="$(get_env_value s_fortytwo_client_secret)" || return 1
+
+    curl -fsS \
+        -X POST \
+        -H "Content-Type: application/x-www-form-urlencoded" \
+        --data-urlencode "grant_type=client_credentials" \
+        --data-urlencode "client_id=$client_id" \
+        --data-urlencode "client_secret=$client_secret" \
+        "https://api.intra.42.fr/oauth/token" |
+        jq -r '.access_token'
+
+    unset client_id client_secret
+}
+
 is_ip() {
     local ip="$1"
     local octet
@@ -36,6 +77,11 @@ is_ip() {
     done
 
     return 0
+}
+
+is_location() {
+    local location="$1"
+    [[ "$location" =~ ^(shi|fu|mi)-r[0-9]+-p[0-9]+$ ]]
 }
 
 if ! is_ip "$1" || ! is_ip "$2"; then
@@ -68,6 +114,7 @@ if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
     ssh-keygen -f "$HOME/.ssh/${SSH_KEY_NAME}" -N "$SSH_KEY_PASSPHRASE"
 fi
 
+# Getting user(s) location/IP
 CONNECTED_NODES=()
 for user in "${NODE_USERS[@]}"; do
     if [ "$user" = "$USER" ]; then
@@ -77,23 +124,27 @@ for user in "${NODE_USERS[@]}"; do
 	continue
     fi
     echo "[$SCRIPT_NAME] Connecting to $user node:"
-    try=0
-    while [ "$try" -lt 3 ]; do
-	read -p "[$SCRIPT_NAME]    IP of $user node host machine: " answer
-	if [ -z "$answer" ] || ! is_ip "$answer"; then
-	    echo "[$SCRIPT_NAME] Invalid IP input, try again."
-	    answer=""
-	    try=$((try + 1))
-	else
-	    HOST_IP=$answer
-	    break
+    HOST_IP="$(get_user_host "$user")"
+	if  ! is_ip "$HOST_IP" && ! is_location "$answer"; then
+		try=0
+    	while [ "$try" -lt 3 ]; do
+		read -p "[$SCRIPT_NAME]    IP of $user node host machine: " answer
+		if [ -z "$answer" ] || ! is_ip "$answer" || ! is_location "$answer"; then
+	   		echo "[$SCRIPT_NAME] Invalid IP input, try again."
+	    	answer=""
+	    	try=$((try + 1))
+		else
+	    	HOST_IP=$answer
+	    	break
+		fi
+    	done
 	fi
-    done
-
     if [ "$try" -eq 3 ]; then
 	echo "[$SCRIPT_NAME] Too many try, aborting."
 	continue
     fi
+
+	# Getting user(s) password
     try=0
     while [ "$try" -lt 3 ]; do
 	ssh -i $HOME/.ssh/${SSH_KEY_NAME} -p "$SSH_PORT" -o StrictHostKeyChecking=no "${user}"@"${HOST_IP}" \
@@ -124,6 +175,7 @@ for user in "${NODE_USERS[@]}"; do
 	echo "[$SCRIPT_NAME] Too many try, aborting."
 	continue
     fi
+	
 done
 echo "$CONNECTED_NODES"
 
