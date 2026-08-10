@@ -40,7 +40,7 @@ wait_for_ssh() {
     TIMEOUT=30
     INTERVAL=2
     ELAPSED=0
-    echo -n "[$SCRIPT_NAME] Waiting for VM to boot."
+    echo -n "[INFO][$SCRIPT_NAME] Waiting for VM to boot."
     while :; do
 	status=$(ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=60 ${VM_USER}@${SSH_HOST} -p${SSH_PORT} "exit 0" 2>&1)
 	RESULT=$?
@@ -71,16 +71,14 @@ get_env_value() {
     local value
 
     if [ ! -f "$ENV_FILE" ]; then
-        echo "[$SCRIPT_NAME] Missing $ENV_FILE"
+        echo "[ERROR][$SCRIPT_NAME] Missing $ENV_FILE"
         exit 1
     fi
     while IFS='=' read -r key value; do
         [[ -z "${key//[[:space:]]/}" ]] && continue
         [[ "$key" =~ ^[[:space:]]*\# ]] && continue
-
         key="${key#"${key%%[![:space:]]*}"}"
         key="${key%"${key##*[![:space:]]}"}"
-
         if [ "$key" = "$wanted_key" ]; then
             printf '%s' "$value"
             return 0
@@ -92,14 +90,14 @@ get_env_value() {
 bootstrap_ssh_key() {
     local root_password
     root_password="$(get_env_value p_root_password)" || {
-        echo "[$SCRIPT_NAME] Missing p_root_password"
+        echo "[ERROR][$SCRIPT_NAME] Missing p_root_password"
         exit 1
     }
     if [ -z "$root_password" ]; then
-        echo "[$SCRIPT_NAME] p_root_password is empty"
+        echo "[ERROR][$SCRIPT_NAME] p_root_password is empty"
         exit 1
     fi
-    echo "[$SCRIPT_NAME] Installing SSH key..."
+    echo "[INFO][$SCRIPT_NAME] Installing SSH key..."
 	local pub_key
 	pub_key="$(cat "$PUB_KEY")"
     SSHPASS="$root_password" sshpass -e \
@@ -113,10 +111,32 @@ bootstrap_ssh_key() {
          grep -qxf \"$pub_key\" ~/.ssh/authorized_keys 2>/dev/null || \
          echo \"$(cat "$pub_key")\" >> ~/.ssh/authorized_keys && \
          chmod 600 ~/.ssh/authorized_keys"
-
     unset root_password
 	unset pub_key
-	echo "[$SCRIPT_NAME] SSH key installed"
+	echo "[INFO][$SCRIPT_NAME] SSH key installed"
+}
+
+run_setup_script() {
+    local user_password
+    user_password="$(get_env_variable p_user_password)" || {
+        echo "[$SCRIPT_NAME] Missing p_user_password"
+        exit 1
+    }
+    if [ -z "$user_password" ]; then
+        echo "[$SCRIPT_NAME] p_user_password is empty"
+        exit 1
+    fi
+
+    echo "[$SCRIPT_NAME] Running setup_${TYPE}.sh..."
+    printf '%s\n' "$user_password" |
+        ssh \
+        -p "$SSH_PORT" \
+        -o StrictHostKeyChecking=no \
+        -o UserKnownHostsFile=/dev/null \
+        "$VM_USER@$SSH_HOST" \
+        "chmod +x /setup_${TYPE}.sh && \
+         bash /setup_${TYPE}.sh ${USER} ${HOST_IP} ${resize_disk}"
+    unset user_password
 }
 
 # Define role of VM
@@ -292,7 +312,7 @@ else
     VM_TARGET_DIR="/"
     set +e
     scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "chmod +x /setup_${TYPE}.sh; bash /setup_${TYPE}.sh ${USER} ${HOST_IP} ${resize_disk}; exit 0"
+	run_setup_script
     set -e
 
     while ssh -p $SSH_PORT -o ConnectTimeout=2 -o BatchMode=yes "$VM_USER"@"$SSH_HOST" true >/dev/null 2>&1; do
