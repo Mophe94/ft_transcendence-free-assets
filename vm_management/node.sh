@@ -65,6 +65,64 @@ wait_for_ssh() {
     set -e
 }
 
+get_vm_password() {
+    local wanted_key="$1"
+    local key
+    local value
+
+    if [ ! -f "$ENV_FILE" ]; then
+        echo "[$SCRIPT_NAME] Missing $ENV_FILE"
+        exit 1
+    fi
+    if [ "$(stat -c '%a' "$ENV_FILE")" != "600" ]; then
+        echo "[$SCRIPT_NAME] $ENV_FILE must have permissions 600"
+        exit 1
+    fi
+    while IFS='=' read -r key value; do
+        [[ -z "${key//[[:space:]]/}" ]] && continue
+        [[ "$key" =~ ^[[:space:]]*\# ]] && continue
+
+        key="${key#"${key%%[![:space:]]*}"}"
+        key="${key%"${key##*[![:space:]]}"}"
+
+        if [ "$key" = "$wanted_key" ]; then
+            printf '%s' "$value"
+            return 0
+        fi
+    done < "$ENV_FILE"
+    return 1
+}
+
+bootstrap_ssh_key() {
+    local root_password
+    root_password="$(get_vm_secret p_root_password)" || {
+        echo "[$SCRIPT_NAME] Missing p_root_password"
+        exit 1
+    }
+    if [ -z "$root_password" ]; then
+        echo "[$SCRIPT_NAME] p_root_password is empty"
+        exit 1
+    fi
+    echo "[$SCRIPT_NAME] Installing SSH key..."
+	local pub_key
+	pub_key="$(cat "$PUB_KEY")"
+    SSHPASS="$root_password" sshpass -e \
+        ssh \
+        -p "$SSH_PORT" \
+        -o StrictHostKeyChecking=no \
+        -o UserKnownHostsFile=/dev/null \
+        "$VM_USER@$SSH_HOST" \
+        "mkdir -p ~/.ssh && \
+         chmod 700 ~/.ssh && \
+         grep -qxf \"$pub_key\" ~/.ssh/authorized_keys 2>/dev/null || \
+         echo \"$(cat "$pub_key")\" >> ~/.ssh/authorized_keys && \
+         chmod 600 ~/.ssh/authorized_keys"
+
+    unset root_password
+	unset pub_key
+	echo "[$SCRIPT_NAME] SSH key installed"
+}
+
 # Define role of VM
 if [ $# -eq 2 ]; then
     if [ "$1" == "leader" ] || [ "$1" == "worker" ]; then
@@ -227,7 +285,7 @@ else
     echo "[$SCRIPT_NAME] Setting up node"
     echo "$HOST_IP" > "infra/host_ip.txt"
     PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
-    ssh -p "$SSH_PORT" -o StrictHostKeyChecking=no "$VM_USER"@"$SSH_HOST" "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat $PUB_KEY)\" ~/.ssh/authorized_keys 2>/dev/null || echo \"$(cat $PUB_KEY)\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
+	bootstrap_ssh_key
 
     echo "[$SCRIPT_NAME] Adding needed file"
     declare -A BUNDLE
