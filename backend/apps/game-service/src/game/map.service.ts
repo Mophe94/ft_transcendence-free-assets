@@ -234,6 +234,7 @@ export class MapService {
 			if (player.inventory[j]["name"] === ""){
 			  player.inventory[j]["name"] = player.current_item;
 			  player.inventory[j]["scene"] = items[i].scene;
+			  player.inventory[j].type = items[i].type;
 			  player.inventory[j]["current"] += 1;
 			  player.inventory[j]["value"] = items[i].value;
 			  player.inventory[j]["target"] = items[i].target;
