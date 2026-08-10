@@ -1,4 +1,3 @@
-import './Chat.css';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ChatContext, type Message } from '../../context/ChatContext';
 import { InputBar } from './InputChat';
@@ -11,9 +10,9 @@ import parchUR from '../../assets/background/parchment/parchUR.png';
 import parchML from '../../assets/background/parchment/parchML.png';
 import parchMM from '../../assets/background/parchment/parchMM.png';
 import parchMR from '../../assets/background/parchment/parchMR.png';
-import parchDL from '../../assets/background/parchment/parchDL.png';
-import parchDM from '../../assets/background/parchment/parchDM.png';
-import parchDR from '../../assets/background/parchment/parchDR.png';
+import parchBL from '../../assets/background/parchment/parchBL.png';
+import parchBM from '../../assets/background/parchment/parchBM.png';
+import parchBR from '../../assets/background/parchment/parchBR.png';
 
 const prefStyles = {
   '--img-ul': `url(${parchUL})`,
@@ -22,9 +21,9 @@ const prefStyles = {
   '--img-ml': `url(${parchML})`,
   '--img-mm': `url(${parchMM})`,
   '--img-mr': `url(${parchMR})`,
-  '--img-dl': `url(${parchDL})`,
-  '--img-dm': `url(${parchDM})`,
-  '--img-dr': `url(${parchDR})`,
+  '--img-bl': `url(${parchBL})`,
+  '--img-bm': `url(${parchBM})`,
+  '--img-br': `url(${parchBR})`,
 } as React.CSSProperties;
 
 const EMPTY_MESSAGES: Message[] = [];
@@ -64,25 +63,31 @@ export default function NewChat() {
 
   return (
     <>
-      <div className={`chat-container  ${visible ? 'visible':''}`} style={prefStyles}>
-        <div className="chat-upperLeft" />
-        <div className="chat-upperMiddle">
-          <div className='chat-heading'>Chat</div>
+      <div
+        className={`fixed bottom-0 left-0 h-full w-[97vw] md:h-[45vh] md:w-[min(50vw,800px)] gap-0 grid-cols-[98px_1fr_64px] grid-rows-[188px_1fr_172px] ${visible ? 'grid':'hidden'}`} style={prefStyles}>
+        <div className="bg-[image:var(--img-ul)] bg-no-repeat" />
+        <div className="bg-[image:var(--img-um)] bg-[round_no-repeat]">
+          <div className='font-rocker text-[#700e0e] [-webkit-text-stroke:2px_#000000] justify-self-center text-[64px] pt-10 font-'>Chat</div>
         </div>
-        <div className="chat-upperRight" />
-        <div className="chat-middleLeft" />
-        <div className="chat-middleMiddle">
+        <div className="bg-[image:var(--img-ur)] bg-no-repeat bg-size[auto_100%]" />
+        <div className="bg-[image:var(--img-ml)] bg-[no-repeat_round]" />
+        <div className="bg-[image:var(--img-mm)] bg-auto bg-repeat-round">
           <MessagesWindow />
         </div>
-        <div className="chat-middleRight" />
-        <div className="chat-bottomLeft" />
-        <div className="chat-bottomMiddle aligned">
+        <div className="bg-[image:var(--img-mr)] bg-[no-repeat_round]" />
+        <div className="bg-[image:var(--img-bl)] bg-no-repeat" />
+        <div className="bg-[image:var(--img-bm)] bg-[round_no-repeat]">
           <InputBar />
         </div>
-        <div className="chat-bottomRight" />
+        <div className="bg-[image:var(--img-br)] bg-no-repeat" />
       </div>
-      <button id='chat-icon' className='clean-btn' onClick={() => setVisible(!visible)}>
-        <img src={chatIcon}/>
+      <button
+        id='chat-icon'
+        className='fixed bottom-0 right-0 '
+        onClick={() => setVisible(!visible)}>
+        <img
+          className='w-[min(10vw,10vh)]'
+          src={chatIcon}/>
       </button>
     </>
   );

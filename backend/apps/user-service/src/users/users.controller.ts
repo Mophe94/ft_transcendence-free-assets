@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtHttpGuard } from 'libs/shared/src/auth/guards/jwt-http.guard';
@@ -35,5 +35,23 @@ export class UsersController {
         totalDamageReceived: user.stats.totalDamageReceived,
       },
     };
+  }
+
+  @Get('check_username')
+  async checkUsername(@Query('username') username: string) {
+    if (!username || username.trim().length === 0) {
+      throw new BadRequestException('Invalid parameters.');
+    }
+    const available = await this.usersService.isUsernameAvailable(username);
+    return available;
+  }
+
+  @Get('check_email')
+  async checkEmail(@Query('email') email: string) {
+    if (!email || email.trim().length === 0) {
+      throw new BadRequestException('Invalid parameters.');
+    }
+    const available = await this.usersService.isEmailAvailable(email);
+    return available;
   }
 }

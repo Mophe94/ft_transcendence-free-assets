@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import './Profile.css'
 import Stats from '../content/Stats';
 import Preferences from '../content/Preferences';
 import ErrorDisplay from '../content/Error';
@@ -58,7 +57,7 @@ export default function Profile() {
 
   return (
     <RegularBG>
-      <div id='profile-layout'>
+      <div className='flex flex-col'>
         <Stats user={ userProfile } stats={ userStats }/>
         <Preferences />
       </div>

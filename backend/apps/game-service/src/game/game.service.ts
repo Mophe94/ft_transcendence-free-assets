@@ -460,6 +460,7 @@ export class GameService implements OnModuleInit {
   // ADD ITEM + RETURN UPDATE_ITEM
   private received_add_item(player: Player) {
     player.current_item = '';
+    console.log(player.inventory);
     return this.update_inventory(player);
   }
 

@@ -17,11 +17,23 @@ export const Color ={
 export type Color = typeof Color[keyof typeof Color];
 
 export const ButtonColor = {
-  Red: 'Red',
-  Green: 'Green',
-  Blue: 'Blue',
-  Black: 'Black',
-  Yellow: 'Yellow',
+  Black: {
+      name: 'Black',
+      textColor: 'text-[#FFFFFF]',
+      borderColor: '[-webkit-text-stroke:2px_#111111]',
+  }, 
+  Blue: {
+      name: 'Blue',
+      textColor: '#FFFFFF',
+      borderColor: '#AAAAAA',
+  }, 
+  Red: {
+      name: 'Red',
+      textColor: 'text-[#F1F310]',
+      borderColor: '[-webkit-text-stroke:2px_#222222]',
+      
+  }, 
 } as const;
 
 export type ButtonColor = typeof ButtonColor[keyof typeof ButtonColor];
+

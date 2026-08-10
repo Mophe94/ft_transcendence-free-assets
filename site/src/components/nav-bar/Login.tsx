@@ -14,7 +14,7 @@ export function AuthSection() {
 
   return (
     <div className="auth-section">
-      {user ? (
+      {user && (
         <div className="login-container">
           <div className="username-container">{user.username}</div>
           
@@ -26,15 +26,11 @@ export function AuthSection() {
               </Link>
             </li>
             <li>
-              <button onClick={handleSignout} className="auth-link clean-btn">
+              <button onClick={handleSignout} className="auth-link">
                 Logout
               </button>
             </li>
           </ul>
-        </div>
-      ) : (
-        <div className='login-container'>
-          <a className="login-link" href={import.meta.env.VITE_42_OAUTH_API_LINK}>Login</a>
         </div>
       )}
     </div>

@@ -3,6 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/users.entity';
 import { UserSettings } from '../users/types/userSettings.interface';
+import { RawUpdateResult } from './types/setting.types';
 
 @Injectable()
 export class SettingsService {
@@ -24,18 +25,17 @@ export class SettingsService {
       .createQueryBuilder()
       .update(User)
       .set({
-        settings: () => `settings || '${JSON.stringify(newSettings)}'::jsonb`,
+        settings: () => 'settings || :newSettings::jsonb',
       })
+      .setParameter('newSettings', JSON.stringify(newSettings))
       .where('id = :id', { id })
       .returning(['settings', 'updatedAt'])
       .execute();
 
-    console.log("result", result)
     if (!result.affected) {
       throw new NotFoundException('Invalid User');
     }
-    console.log("affected", result.affected)
-    const rawList = result.raw as Partial<User>[];
+    const rawList = result.raw as RawUpdateResult[];
     if (!rawList.length) {
       throw new NotFoundException('User not found');
     }

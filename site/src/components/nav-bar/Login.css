@@ -86,7 +86,6 @@
   text-decoration: none;
 }
 
-/* Couleurs du dropdown selon le theme actif sur #main */
 .theme-dark #dropdown-menu {
   background: rgba(20, 10, 50, 0.95);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);

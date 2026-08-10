@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import './Play.css';
 import GameIframe from '../content/GameIframe';
 import GameRoom from '../content/GameRoom';
 

@@ -21,7 +21,7 @@ export class Account {
   userId!: string;
 
   @ManyToOne(() => User, (user) => user.accounts, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' }) // Indique à TypeORM d'utiliser la colonne user_id existante
+  @JoinColumn({ name: 'user_id' })
   user!: User;
 
   @Column({
