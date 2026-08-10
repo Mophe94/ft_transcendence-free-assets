@@ -5,10 +5,13 @@
   "schemaVersion": 38,
   "version": 1,
   "refresh": "5s",
-
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
   "panels": [
-
     {
+      "id": 1,
       "type": "stat",
       "title": "Targets Up",
       "gridPos": {
@@ -23,12 +26,13 @@
       },
       "targets": [
         {
+          "refId": "A",
           "expr": "sum(up)"
         }
       ]
     },
-
     {
+      "id": 2,
       "type": "stat",
       "title": "Containers Seen",
       "gridPos": {
@@ -43,12 +47,13 @@
       },
       "targets": [
         {
+          "refId": "A",
           "expr": "count(container_last_seen)"
         }
       ]
     },
-
     {
+      "id": 3,
       "type": "timeseries",
       "title": "CPU Usage",
       "gridPos": {
@@ -63,13 +68,14 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{id!=\"\"}[1m])) by (name)",
+          "refId": "A",
+          "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{id!=\"\"}[5m]))",
           "legendFormat": "{{name}}"
         }
       ]
     },
-
     {
+      "id": 4,
       "type": "timeseries",
       "title": "Memory Usage",
       "gridPos": {
@@ -84,13 +90,20 @@
       },
       "targets": [
         {
-          "expr": "sum(container_memory_usage_bytes{id!=\"\"}) by (name)",
+          "refId": "A",
+          "expr": "sum by (name) (container_memory_usage_bytes{id!=\"\"})",
           "legendFormat": "{{name}}"
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      }
     },
-
     {
+      "id": 5,
       "type": "logs",
       "title": "Live Logs",
       "gridPos": {
@@ -105,8 +118,8 @@
       },
       "targets": [
         {
-          "expr": "{service=~\".+"}",
-          "refId": "A"
+          "refId": "A",
+          "expr": "{swarm_service=~\".+\"}"
         }
       ],
       "options": {
@@ -119,6 +132,5 @@
         "prettifyLogMessage": true
       }
     }
-
   ]
 }
