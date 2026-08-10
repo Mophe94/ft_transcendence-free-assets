@@ -43,11 +43,12 @@ date -u
 
 #Change for env procured password
 NEW_USER_HOME="/home/$NEW_USER"
-NEW_USER_PASSWORD="Nd${NEW_USER}123"
 
 echo "[$SCRIPT_NAME] Creating user: $NEW_USER"
-adduser -D -h "$NEW_USER_HOME" "$NEW_USER"
+IFS= read -r NEW_USER_PASSWORD
 echo "${NEW_USER}:${NEW_USER_PASSWORD}" | chpasswd
+unset NEW_USER_PASSWORD
+adduser -D -h "$NEW_USER_HOME" "$NEW_USER"
 
 echo "[$SCRIPT_NAME] Setting up ${NEW_USER} permissions"
 addgroup "$NEW_USER" wheel
