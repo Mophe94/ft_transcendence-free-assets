@@ -103,13 +103,15 @@ bootstrap_ssh_key() {
     SSHPASS="$root_password" sshpass -e \
         ssh \
         -p "$SSH_PORT" \
+	-o IdentitiesOnly=yes \
+	-i "$PUB_KEY" \
         -o StrictHostKeyChecking=no \
         -o UserKnownHostsFile=/dev/null \
         "$VM_USER@$SSH_HOST" \
         "mkdir -p ~/.ssh && \
          chmod 700 ~/.ssh && \
          grep -qxf \"$pub_key\" ~/.ssh/authorized_keys 2>/dev/null || \
-         echo \"$(cat "$pub_key")\" >> ~/.ssh/authorized_keys && \
+         echo \"$"$pub_key"\" >> ~/.ssh/authorized_keys && \
          chmod 600 ~/.ssh/authorized_keys"
     unset root_password
 	unset pub_key
@@ -131,6 +133,8 @@ run_setup_script() {
     printf '%s\n' "$user_password" |
         ssh \
         -p "$SSH_PORT" \
+	-o IdentitiesOnly=yes \
+	-i "$PUB_KEY" \
         -o StrictHostKeyChecking=no \
         -o UserKnownHostsFile=/dev/null \
         "$VM_USER@$SSH_HOST" \
@@ -301,7 +305,7 @@ else
     echo "[$SCRIPT_NAME] Setting up node"
     echo "$HOST_IP" > "infra/host_ip.txt"
     PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
-	bootstrap_ssh_key
+    bootstrap_ssh_key
 
     echo "[$SCRIPT_NAME] Adding needed file"
     declare -A BUNDLE
@@ -311,13 +315,14 @@ else
     #echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     VM_TARGET_DIR="/"
     set +e
-    scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+    scp -r -P "$SSH_PORT" -o IdentitiesOnly=yes -i "$PUB_KEY" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+	
 	run_setup_script
     set -e
 
-    while ssh -p $SSH_PORT -o ConnectTimeout=2 -o BatchMode=yes "$VM_USER"@"$SSH_HOST" true >/dev/null 2>&1; do
-	sleep 2
-    done
+#    while ssh -p $SSH_PORT -o IdentitiesOnly=yes -i "$PUB_KEY" -o ConnectTimeout=2 -o BatchMode=yes "$VM_USER"@"$SSH_HOST" true >/dev/null 2>&1; do
+#	sleep 2
+#    done
     echo "[$SCRIPT_NAME] Switching user"
     VM_USER=$USER
     VM_TARGET_DIR="/home/$USER"
@@ -329,6 +334,6 @@ else
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     set +e
-    scp -r -P "$SSH_PORT" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+    scp -r -P "$SSH_PORT" -o IdentitiesOnly=yes -i "$PUB_KEY" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
     set -e
 fi

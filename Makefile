@@ -8,6 +8,7 @@ ENV_MK:=$(LOCATION)/.$(ENV_NAME).mk
 TEMPLATE:=template_$(ENV_NAME)
 
 VM_SCRIPTS = $(LOCATION)/vm_management
+TOOLS_SCRIPTS:=$(LOCATION)/tools
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 USER_NAME="$(USER)"
 TYPE=""
