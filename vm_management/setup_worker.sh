@@ -21,6 +21,14 @@ CERT_DIR="/etc/certs/"
 SSH_CONFIG="/etc/ssh/sshd_config"
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"
 
+echo "[$SCRIPT_NAME] Synchronizing system clock"
+rc-service ntpd stop
+ntpd -nq -p pool.ntp.org
+rc-service ntpd start
+date -u
+
+echo "[$SCRIPT_NAME] Generating CA"
+bash /cert_rootCA.sh "$CERT_DIR"
 #Change for env procured password
 NEW_USER_HOME="/home/$NEW_USER"
 NEW_USER_PASSWORD="Nd${NEW_USER}123"

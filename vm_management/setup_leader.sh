@@ -30,11 +30,17 @@ echo "[${SCRIPT_NAME}] VM ip: ${IP}"
 if [ "$RESIZE_DISK" = "true" ]; then
     echo "[$SCRIPT_NAME] Expanding root partition"
 
-    apk add --no-cache cloud-utils-growpart e2fsprogs-extra
+    apk update && add --no-cache cloud-utils-growpart e2fsprogs-extra
 
     growpart /dev/sda 3
     resize2fs /dev/sda3
 fi
+
+echo "[$SCRIPT_NAME] Synchronizing system clock"
+rc-service ntpd stop
+ntpd -nq -p pool.ntp.org
+rc-service ntpd start
+date -u
 
 #Change for env procured password
 NEW_USER_HOME="/home/$NEW_USER"

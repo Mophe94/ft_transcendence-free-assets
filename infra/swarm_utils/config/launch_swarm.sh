@@ -16,7 +16,7 @@ IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+
 
 CONFIG_DIR="${UTILS_DIR}/config"
 TOOLS_DIR="${UTILS_DIR}/tools"
-SECRET_FILE="$HOME/infra/.env"
+SECRET_FILE="${ENV_FILE:-"$HOME/infra/.env"}"
 
 # Creating certificates
 chmod +x "$CONFIG_DIR/create_swarm_certs.sh" 

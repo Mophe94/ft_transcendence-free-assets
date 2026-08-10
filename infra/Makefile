@@ -1,9 +1,13 @@
 SCRIPT_NAME:=Infra-Makefile
 LOCATION := $(shell pwd)
 
+# Environment files
+ENV_NAME:=env_infra
+ENV_FILE:=$(LOCATION)/.$(ENV_NAME)
+ENV_MK:=$(LOCATION)/.$(ENV_NAME).mk
+TEMPLATE:=template_$(ENV_NAME)
+
 # Files Locations
-ENV_FILE:=$(LOCATION)/.env
-ENV_MK:=$(LOCATION)/.env.mk
 BUILD_FILE = $(LOCATION)/docker-compose-build.yml
 DEPLOY_FILES = $(LOCATION)/stacks
 SWARM_UTILS = $(LOCATION)/swarm_utils
@@ -156,15 +160,15 @@ env: $(ENV_FILE)
 	@chmod +x "$(TOOLS_SCRIPTS)/check_env.sh"
 	@bash "$(TOOLS_SCRIPTS)/check_env.sh" $(ENV_FILE)
 	@chmod +x "$(TOOLS_SCRIPTS)/create_env.sh"
-	@bash "$(TOOLS_SCRIPTS)/create_env.sh" $(ENV_FILE) > .env.mk
+	@bash "$(TOOLS_SCRIPTS)/create_env.sh" $(ENV_FILE) > $(ENV_MK)
 
 $(ENV_FILE):
-	@if [ -f template_env ]; then \
-		echo "Creating .env file, please set all variables"; \
-		cp template_env	.env; \
-		vim -c 'set shortmess+=I' .env; \
+	@if [ -f $(TEMPLATE) ]; then \
+		echo "Creating $(ENV_FILE) file, please set all variables"; \
+		cp $(TEMPLATE) $(ENV_FILE); \
+		vim -c 'set shortmess+=I' $(ENV_FILE); \
 	else \
-		echo "Template_env file missing, you will need to create .env file yourself.\n See READ_ME for how to do it"; \
+		echo "Template_env file missing, you will need to create $(ENV_FILE) file yourself.\n See READ_ME for how to do it"; \
 		exit 1; \
 	fi
 
