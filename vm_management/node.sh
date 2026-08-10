@@ -65,17 +65,13 @@ wait_for_ssh() {
     set -e
 }
 
-get_vm_password() {
+get_env_value() {
     local wanted_key="$1"
     local key
     local value
 
     if [ ! -f "$ENV_FILE" ]; then
         echo "[$SCRIPT_NAME] Missing $ENV_FILE"
-        exit 1
-    fi
-    if [ "$(stat -c '%a' "$ENV_FILE")" != "600" ]; then
-        echo "[$SCRIPT_NAME] $ENV_FILE must have permissions 600"
         exit 1
     fi
     while IFS='=' read -r key value; do
@@ -95,7 +91,7 @@ get_vm_password() {
 
 bootstrap_ssh_key() {
     local root_password
-    root_password="$(get_vm_secret p_root_password)" || {
+    root_password="$(get_env_value p_root_password)" || {
         echo "[$SCRIPT_NAME] Missing p_root_password"
         exit 1
     }
