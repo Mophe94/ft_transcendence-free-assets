@@ -1,6 +1,6 @@
 export const DEFAULT = {
-  COUNTDOWN: 30,
-  CAPACITY: 2,
+  COUNTDOWN: 60,
+  CAPACITY: 4,
 };
 
 export const LOBBY_KEYS = {
@@ -8,12 +8,9 @@ export const LOBBY_KEYS = {
   FREE_IDS: 'lobby:rooms:ids:free',
   ACTIVE_ROOMS: 'lobby:rooms:active',
   INACTIVE_ROOMS: 'lobby:rooms:inactive',
-  ROOM_PLAYERS: (roomId: string) => {
-    return `room:${roomId}:players`;
-  },
-  ROOM_CAPACITY: (roomId: string) => {
-    return `room:${roomId}:capacity`;
-  },
+  ROOM_PLAYERS: (roomId: string) => { `room:${roomId}:players` },
+  ROOM_CAPACITY: (roomId: string) => { `room:${roomId}:capacity` },
+  ROOM_TIMER: (roomId: string) => { `room:${roomId}:timer` },
 };
 
 export const ROOM_IDS = [
@@ -67,4 +64,7 @@ export const ROOM_IDS = [
   'War Room',
   "Wayfarer's Haven",
   'Whispering Keep',
+  'The Silence of the Lambs',
+  'First',
+  'Endless',
 ];
