@@ -13,6 +13,9 @@ USER_NAME="$(USER)"
 TYPE=""
 SSH_PORT=2222
 
+include $(ENV_MK)
+export
+
 all:
 	@$(MAKE) setup_worker TYPE="leader"
 
