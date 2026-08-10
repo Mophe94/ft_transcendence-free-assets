@@ -31,13 +31,11 @@ setup_worker:
 	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4);
 
 leader:
-	TYPE="leader"
-	@$(MAKE) setup_worker
+	@$(MAKE) setup_worker TYPE="leader"
 	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make TYPE=$(TYPE); /bin/bash"
 
 worker:
-	TYPE="worker"
-	@$(MAKE) setup_worker
+	@$(MAKE) setup_worker TYPE="worker"
 	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "/bin/bash"
 
 vm_erase:
