@@ -12,6 +12,7 @@ import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { FULL, PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
+import { RedisStateService } from '../redis/redis_state_player.service';
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -25,6 +26,7 @@ export class GameService implements OnModuleInit {
     private tilesService: TilesService,
     private itemsService: ItemsService,
     private mapService: MapService,
+	private redisStateService: RedisStateService,
   ) {}
 
   private gameRooms = new Map<string, Set<number>>();
@@ -40,11 +42,13 @@ export class GameService implements OnModuleInit {
     return rooms;
   }
 
-  private leaveGameRoom(roomId: string, userId: number): void {
+  private async leaveGameRoom(roomId: string, userId: number): Promise<void> {
     const room = this.gameRooms.get(roomId);
     if (!room) return;
     room.delete(userId);
-    if (room.size === 0) this.gameRooms.delete(roomId);
+    if (room.size === 0){
+		this.gameRooms.delete(roomId);
+	}
   }
 
   // TEST with hardcoded values
@@ -76,10 +80,16 @@ export class GameService implements OnModuleInit {
     const player = this.playerService.getPlayer(userId)!;
 
     if (rooms.size === FULL) {
+	  /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
+	  for (const userId of rooms) {
+		const playerState = this.playerService.getPlayer(userId)!;
+		await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
+	  }
+	  /////////////////////////////////* END */////////////////////////////////
       this.combatService.matchmake(rooms);
       // TEST MATCHMAKING //
       for (const userId of rooms) {
-        const player = this.playerService.getPlayer(userId)!;  
+        const player = this.playerService.getPlayer(userId)!; 
         const opponentId = this.combatService.getOpponentId(userId);
         const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
         if (!enemy) {
@@ -94,7 +104,10 @@ export class GameService implements OnModuleInit {
     }
   }
   
-  onGodotDisconnected(userId: number, roomId: string): void {
+  async onGodotDisconnected(userId: number, roomId: string): Promise<void> {
+	/////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
+    await this.redisStateService.removePlayer(userId.toString());
+	/////////////////////////////////* END */////////////////////////////////
     this.leaveGameRoom(roomId, userId);
   }
 
