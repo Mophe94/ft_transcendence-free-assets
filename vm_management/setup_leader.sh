@@ -26,11 +26,10 @@ HEADSCALE_PORT="8080"
 TAILSCALE_IP_FILE="/etc/tailscale_ip"
 
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"
-
 if [ "$RESIZE_DISK" = "true" ]; then
     echo "[$SCRIPT_NAME] Expanding root partition"
 
-    apk update && add --no-cache cloud-utils-growpart e2fsprogs-extra
+    apk update && apk add --no-cache cloud-utils-growpart e2fsprogs-extra
 
     growpart /dev/sda 3
     resize2fs /dev/sda3
