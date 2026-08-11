@@ -11,11 +11,9 @@ export class RedisStateService {
 
 	async removePlayer(playerId: string): Promise<void> {
 		const playerKey = STATE_PLAYER.player(playerId);
-		const roundKey = STATE_PLAYER.round(playerId);
 		const stateKey = STATE_PLAYER.state(playerId);
 
 		await this.redis.del(stateKey);
-		await this.redis.del(roundKey, playerId);
 		await this.redis.del(playerKey);
 	}
 
@@ -42,27 +40,4 @@ export class RedisStateService {
 		await this.redis.del(stateKey);
 		await this.redis.del(playerKey);
 	}
-
-/* ###################### STATE ###################### */
-
-	async getRound(playerId: string): Promise<string | undefined> {
-		const key = STATE_PLAYER.round(playerId);
-		const data = await this.redis.get(key);
-
-		if (data)
-			return JSON.parse(data);
-		return undefined;
-	}
-
-	async updateRound(playerId: string, round: string): Promise<void> {
-		const key = STATE_PLAYER.round(playerId);
-		await this.redis.set(key, JSON.stringify(round));
-	}
-
-	async removeRound(playerId: string): Promise<void> {
-		const key = STATE_PLAYER.round(playerId);
-
-		await this.redis.del(key);
-	}
-
 }
