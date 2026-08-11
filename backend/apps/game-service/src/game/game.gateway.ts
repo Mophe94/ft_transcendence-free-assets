@@ -156,11 +156,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.broadcast(clients, payload);
   }
 
-  @OnEvent('delete_user')
+  @OnEvent('close_player_socket')
+  onClosePlayerSocket ({ userId }: { userId: number }): void {
+    const client = this.clientsById.get(userId);
+    if (client) client.close(); // trigger handleDisconnect -> cleanupClient
+  }
+  /* @OnEvent('delete_user')
   onDeleteUser({ userId }: {userId: number}): void {
     const client = this.clientsById.get(userId);
     if (client && client > 0)
       client.close(); // call handleDisconnect -> cleanupClient
     // WHAT IF BOT ? 
-  }
+  } */
 }

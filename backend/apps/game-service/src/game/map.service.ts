@@ -186,7 +186,7 @@ export class MapService {
 			defense_spe: monster.defense_spe,
 			speed: monster.speed,
 			status: [],
-			dodge: false, // missing in DB
+			dodge: false,
 			skill: monster.skills.slice(0, 4).map((skill): PlayerSkill => ({
 			  name: skill.name,
 			  current: skill.power_point,

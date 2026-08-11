@@ -219,7 +219,7 @@ export class CombatService {
     	return result
 	}
 
-	next_map(player: Player){
+	next_map(player: Player) {
 		return {
 			event: "game",
 			data: {
