@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/09 13:12:39 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/11 09:14:58 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -134,7 +134,7 @@ SSH_KEY="$HOME/.ssh/${SSH_KEY_NAME}"
 PUB_KEY="$SSH_KEY.pub"
 if [ ! -f "$PUB_KEY" ]; then
 ssh-keygen -t ed25519 \
-	-f "$SSH_KEY" \	   
+	-f "$SSH_KEY" \
 	-N "$SSH_KEY_PASSPHRASE"
 fi
 
@@ -149,9 +149,9 @@ for user in "${NODE_USERS[@]}"; do
     fi
     echo "[$SCRIPT_NAME] Connecting to $user node:"
     HOST_IP="$(get_user_host "$user")"
-	if  ! is_ip "$HOST_IP" && ! is_location "$answer"; then
-		try=0
-    	while [ "$try" -lt 3 ]; do
+    if  ! is_ip "$HOST_IP" && ! is_location "$answer"; then
+	try=0
+	while [ "$try" -lt 3 ]; do
 		read -p "[$SCRIPT_NAME]    IP of $user node host machine: " answer
 		if [ -z "$answer" ] || ! is_ip "$answer" || ! is_location "$answer"; then
 	   		echo "[$SCRIPT_NAME] Invalid IP input, try again."
@@ -162,11 +162,12 @@ for user in "${NODE_USERS[@]}"; do
 	    	break
 		fi
     	done
-	fi
+    fi
     if [ "$try" -eq 3 ]; then
 	echo "[$SCRIPT_NAME] Too many try, aborting."
 	continue
     fi
+done
 
 # Getting user password
 local password=""
