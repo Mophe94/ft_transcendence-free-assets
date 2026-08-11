@@ -89,38 +89,43 @@ get_env_value() {
 
 bootstrap_ssh_key() {
     local root_password
+    local pub_key_content
+
     root_password="$(get_env_value p_root_password)" || {
         echo "[ERROR][$SCRIPT_NAME] Missing p_root_password"
         exit 1
     }
+
     if [ -z "$root_password" ]; then
         echo "[ERROR][$SCRIPT_NAME] p_root_password is empty"
         exit 1
     fi
+
     echo "[INFO][$SCRIPT_NAME] Installing SSH key..."
-	local pub_key
-	pub_key="$(cat "$PUB_KEY")"
+
+    pub_key_content="$(cat "$PUB_KEY")"
     SSHPASS="$root_password" sshpass -e \
         ssh \
         -p "$SSH_PORT" \
-	-o IdentitiesOnly=yes \
-	-i "$PUB_KEY" \
         -o StrictHostKeyChecking=no \
         -o UserKnownHostsFile=/dev/null \
         "$VM_USER@$SSH_HOST" \
-        "mkdir -p ~/.ssh && \
-         chmod 700 ~/.ssh && \
-         grep -qxf \"$pub_key\" ~/.ssh/authorized_keys 2>/dev/null || \
-         echo \"$"$pub_key"\" >> ~/.ssh/authorized_keys && \
-         chmod 600 ~/.ssh/authorized_keys"
+        "mkdir -p ~/.ssh &&
+         chmod 700 ~/.ssh &&
+         touch ~/.ssh/authorized_keys &&
+         chmod 600 ~/.ssh/authorized_keys &&
+         grep -qxF '$pub_key_content' ~/.ssh/authorized_keys ||
+         echo '$pub_key_content' >> ~/.ssh/authorized_keys"
+
     unset root_password
-	unset pub_key
-	echo "[INFO][$SCRIPT_NAME] SSH key installed"
+    unset pub_key_content
+
+    echo "[INFO][$SCRIPT_NAME] SSH key installed"
 }
 
 run_setup_script() {
     local user_password
-    user_password="$(get_env_variable p_user_password)" || {
+    user_password="$(get_env_value p_user_password)" || {
         echo "[$SCRIPT_NAME] Missing p_user_password"
         exit 1
     }
@@ -134,7 +139,7 @@ run_setup_script() {
         ssh \
         -p "$SSH_PORT" \
 	-o IdentitiesOnly=yes \
-	-i "$PUB_KEY" \
+	-i "$SSH_KEY" \
         -o StrictHostKeyChecking=no \
         -o UserKnownHostsFile=/dev/null \
         "$VM_USER@$SSH_HOST" \
@@ -297,14 +302,17 @@ else
     VBoxManage startvm "$VM_NAME" --type headless
 
     # Generating ssh key
-    if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
-	ssh-keygen -f $HOME/.ssh/${SSH_KEY_NAME} -N "$SSH_KEY_PASSPHRASE"
+    SSH_KEY="$HOME/.ssh/${SSH_KEY_NAME}"
+    PUB_KEY="$SSH_KEY.pub"
+    if [ ! -f "$PUB_KEY" ]; then
+	ssh-keygen -t ed25519 \
+	    -f "$SSH_KEY" \
+	    -N "$SSH_KEY_PASSPHRASE"
     fi
     wait_for_ssh
 
     echo "[$SCRIPT_NAME] Setting up node"
     echo "$HOST_IP" > "infra/host_ip.txt"
-    PUB_KEY="$HOME/.ssh/${SSH_KEY_NAME}.pub"
     bootstrap_ssh_key
 
     echo "[$SCRIPT_NAME] Adding needed file"
@@ -315,7 +323,7 @@ else
     #echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     VM_TARGET_DIR="/"
     set +e
-    scp -r -P "$SSH_PORT" -o IdentitiesOnly=yes -i "$PUB_KEY" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+    scp -r -P "$SSH_PORT" -o IdentitiesOnly=yes -i "$SSH_KEY" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
 	
 	run_setup_script
     set -e
@@ -334,6 +342,6 @@ else
     read -r -a files <<< "${PACK[$TYPE]}"
     echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     set +e
-    scp -r -P "$SSH_PORT" -o IdentitiesOnly=yes -i "$PUB_KEY" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+    scp -r -P "$SSH_PORT" -o IdentitiesOnly=yes -i "$SSH_KEY" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
     set -e
 fi
