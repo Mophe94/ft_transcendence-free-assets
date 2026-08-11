@@ -21,9 +21,6 @@ export class GameService implements OnModuleInit {
     private phaseTimer: PhaseTimerService,
     private playerService: PlayerService,
     private combatService: CombatService,
-    private monstersService: MonstersService,
-    private tilesService: TilesService,
-    private itemsService: ItemsService,
     private mapService: MapService,
 	private redisStateService: RedisStateService,
   ) {}
@@ -81,8 +78,8 @@ export class GameService implements OnModuleInit {
     if (rooms.size === FULL) {
 	  /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
 	  for (const userId of rooms) {
-		const playerState = this.playerService.getPlayer(userId)!;
-		await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
+		  const playerState = this.playerService.getPlayer(userId)!;
+	  	await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
 	  }
 	  /////////////////////////////////* END */////////////////////////////////
       this.combatService.matchmake(rooms);
@@ -175,7 +172,7 @@ export class GameService implements OnModuleInit {
 
   private startCombatPhase(roomId: string, room: Set<number>) {
     this.phaseTimer.start(`game: ${roomId}`, 'choose_action', () => {
-      console.log(`Room ${roomId} choose_monster timeout`);
+      console.log(`Room ${roomId} choose_action timeout`);
 
     });
 
@@ -197,7 +194,7 @@ export class GameService implements OnModuleInit {
     });
 
     const actionTimer =
-      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.choose_monster;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.choose_action;
 
     for (const userId of room) {
       const player = this.playerService.getPlayer(userId)!;

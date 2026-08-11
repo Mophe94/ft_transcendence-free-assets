@@ -141,10 +141,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @OnEvent('send_to_player')
-  onStartGame({ userId, payload }: { userId: number; payload: object }): void {
+  onSendToPlayer({ userId, payload }: { userId: number; payload: object }): void {
     const client = this.clientsById.get(userId);
     if (client) {
       this.sendToClient(client, payload);
     }
+  }
+
+  @OnEvent('send_to_room')
+  onSendToRoom({ clients, payload }: { clients: Set<number>; payload: object }): void {
+    this.broadcast(clients, payload);
   }
 }

@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WebSocket } from 'ws'; //!
-import {
-  clientsMap,
-  ClientData,
-} from 'apps/game-service/src/shared/clients.map';
+import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { FULL } from 'apps/game-service/src/game/game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RedisService } from '../redis/redis.service';
@@ -50,7 +47,7 @@ export class RoomService {
 
     if (clients.size === 0) {
 	  /* await this.redis.deleteRoom(roomId); */
-      this.phaseTimer.clear(`game: ${roomId}`);
+      //this.phaseTimer.clear(`game: ${roomId}`);
       this.rooms.delete(roomId);
       console.log(`Room ${roomId} deleted (empty)`);
     }
