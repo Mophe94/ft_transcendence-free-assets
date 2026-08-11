@@ -1,0 +1,18 @@
+#Put the needed environment variables and secrets for the project in this file
+# Variable form:  name=value
+# Secret form:    (s_)name=value -> Secrets need to be prefixed by s_
+# Keep it tidy
+
+###############################################################################
+# GENERAL                                                                     #
+###############################################################################
+# users defined
+BASE_DIR=
+VM_DIR=
+
+###############################################################################
+# Node Password                                                               #
+###############################################################################
+# users defined
+p_root_password=
+p_user_password=
