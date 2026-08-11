@@ -62,6 +62,26 @@ get_42_token() {
     unset client_id client_secret
 }
 
+consume_node_password() {
+    local user="$1"
+    local key="p_node_${user}"
+    local tmp_file
+
+    tmp_file="$(mktemp "${ENV_FILE}.XXXXXX")" || return 1
+
+    if ! sed "/^[[:space:]]*${key}[[:space:]]*=/d" "$ENV_FILE" > "$tmp_file"; then
+        rm -f "$tmp_file"
+        return 1
+    fi
+
+    if ! cat "$tmp_file" > "$ENV_FILE"; then
+        rm -f "$tmp_file"
+        return 1
+    fi
+
+    rm -f "$tmp_file"
+}
+
 is_ip() {
     local ip="$1"
     local octet
@@ -110,8 +130,12 @@ VM_TARGET_DIR="/tmp/"
 NODE_JOIN_TIMEOUT=120
 
 # Generating ssh key
-if [ ! -f "$HOME/.ssh/${SSH_KEY_NAME}.pub" ]; then
-    ssh-keygen -f "$HOME/.ssh/${SSH_KEY_NAME}" -N "$SSH_KEY_PASSPHRASE"
+SSH_KEY="$HOME/.ssh/${SSH_KEY_NAME}"
+PUB_KEY="$SSH_KEY.pub"
+if [ ! -f "$PUB_KEY" ]; then
+ssh-keygen -t ed25519 \
+	-f "$SSH_KEY" \	   
+	-N "$SSH_KEY_PASSPHRASE"
 fi
 
 # Getting user(s) location/IP
@@ -144,40 +168,100 @@ for user in "${NODE_USERS[@]}"; do
 	continue
     fi
 
-	# Getting user(s) password
-    try=0
-    while [ "$try" -lt 3 ]; do
-	ssh -i $HOME/.ssh/${SSH_KEY_NAME} -p "$SSH_PORT" -o StrictHostKeyChecking=no "${user}"@"${HOST_IP}" \
-		    "mkdir -p ~/.ssh && chmod 700 ~/.ssh; grep -qxf \"$(cat "$PUB_KEY")\" ~/.ssh/authorized_keys 2>/dev/null || \
-		    echo \"$(cat "$PUB_KEY")\" >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys; exit 0"
-	if [ "$?" != 0 ]; then
-	    echo -e "[ERROR][$SCRIPT_NAME] Could not connect to $user node\n"
-	    try=$((try + 1))
-	else
-            ssh -p"$SSH_PORT" "${user}"@"${HOST_IP}" "doas rm -rf ${VM_TARGET_DIR}/worker.* ca.crt"
-	    doas scp -i $HOME/.ssh/${SSH_KEY_NAME} -r -P "$SSH_PORT" -o StrictHostKeyChecking=no \
-		/etc/certs/ca.crt \
-		/home/${USER}/certs/worker.crt \
-		/home/${USER}/certs/worker.key \
-		"${user}"@"${HOST_IP}":"$VM_TARGET_DIR"
-	    doas scp -i $HOME/.ssh/${SSH_KEY_NAME} -r -P "$SSH_PORT" -o StrictHostKeyChecking=no \
-		/etc/headscale_authkey \
-		"${user}"@"${HOST_IP}":"$VM_TARGET_DIR/headscale_authkey"
-	    ssh -i $HOME/.ssh/${SSH_KEY_NAME} -p "$SSH_PORT" "$user"@"$HOST_IP" \
-		"doas chmod +x /setup_for_swarm.sh; \
-		doas nohup /setup_for_swarm.sh ${LEADER_IP} ${LEADER_TAILSCALE_IP} "${JOIN_CMD}" 2049 \
-		>/tmp/setup_for_swarm.log 2>&1 < /dev/null &"
-	    CONNECTED_NODES+=("$user")
-	    break
-	fi
-    done
-    if [ "$try" -eq 3 ]; then
-	echo "[$SCRIPT_NAME] Too many try, aborting."
-	continue
+# Getting user password
+local password=""
+if password="$(get_env_value p_node_"$user")"; then
+    password_from_env=true
+else
+    password_from_env=false
+    echo "[$SCRIPT_NAME] No password configured for $user."
+    IFS= read -r -s -p "[$SCRIPT_NAME] Password for $user: " password
+    echo
+fi
+
+pub_key="$(cat "$PUB_KEY")"
+try=0
+while [ "$try" -lt 3 ]; do
+
+    if SSHPASS="$password" sshpass -e \
+        ssh \
+        -i "$SSH_KEY" \
+        -p "$SSH_PORT" \
+        -o StrictHostKeyChecking=no \
+        -o PreferredAuthentications=password \
+        -o PubkeyAuthentication=no \
+        "${user}@${HOST_IP}" \
+        "mkdir -p ~/.ssh && \
+         chmod 700 ~/.ssh && \
+         grep -qxf \"$pub_key\" ~/.ssh/authorized_keys 2>/dev/null || \
+         echo \"$pub_key\" >> ~/.ssh/authorized_keys && \
+         chmod 600 ~/.ssh/authorized_keys"
+    then
+        echo "[$SCRIPT_NAME] SSH key installed for $user."
+
+        # The bootstrap password has now been successfully used.
+        if [ "$password_from_env" = true ]; then
+            if ! consume_node_password "$user"; then
+                echo "[ERROR][$SCRIPT_NAME] Failed to remove bootstrap password for $user."
+                unset password
+                continue
+            fi
+        fi
+        unset password
+
+        # From here onward, authentication is done with the SSH key.
+        ssh -i "$SSH_KEY" \
+            -p "$SSH_PORT" \
+            -o StrictHostKeyChecking=no \
+            "${user}@${HOST_IP}" \
+            "doas rm -rf ${VM_TARGET_DIR}/worker.* ca.crt"
+
+        doas scp \
+            -i "$SSH_KEY" \
+            -r \
+            -P "$SSH_PORT" \
+            -o StrictHostKeyChecking=no \
+            /etc/certs/ca.crt \
+            "/home/${USER}/certs/worker.crt" \
+            "/home/${USER}/certs/worker.key" \
+            "${user}@${HOST_IP}:${VM_TARGET_DIR}"
+
+        doas scp \
+            -i "$SSH_KEY" \
+            -r \
+            -P "$SSH_PORT" \
+            -o StrictHostKeyChecking=no \
+            /etc/headscale_authkey \
+            "${user}@${HOST_IP}:${VM_TARGET_DIR}/headscale_authkey"
+
+        ssh \
+            -i "$SSH_KEY" \
+            -p "$SSH_PORT" \
+            "$user@$HOST_IP" \
+            "doas chmod +x /setup_for_swarm.sh; \
+             doas nohup /setup_for_swarm.sh \
+             ${LEADER_IP} \
+             ${LEADER_TAILSCALE_IP} \
+             \"${JOIN_CMD}\" \
+             2049 \
+             >/tmp/setup_for_swarm.log 2>&1 < /dev/null &"
+
+        CONNECTED_NODES+=("$user")
+        break
+
+    else
+        echo "[ERROR][$SCRIPT_NAME] Could not authenticate to $user node."
+        try=$((try + 1))
+        if [ "$try" -lt 3 ]; then
+            echo "[$SCRIPT_NAME] Retrying..."
+        fi
     fi
-	
 done
-echo "$CONNECTED_NODES"
+unset password
+if [ "$try" -eq 3 ]; then
+    echo "[$SCRIPT_NAME] Too many tries, aborting."
+    continue
+fi
 
 # Wait for node to join
 ADDED_NODES=0
