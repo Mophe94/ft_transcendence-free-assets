@@ -124,11 +124,11 @@ export class GameService implements OnModuleInit {
 
   private async eliminatePlayer(userId: number, roomId: string): Promise<void> {
     await this.onGodotDisconnected(userId, roomId);
-    this.eventEmitter.emit('close_player_socket', { userId });
+    //this.eventEmitter.emit('close_player_socket', { userId });
   }
 
   private sendToPlayer(userId: number, payload: object): void {
-    //console.log("Send_to_player: id: ", userId, payload);
+    console.log("Send_to_player: id: ", userId, payload);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
