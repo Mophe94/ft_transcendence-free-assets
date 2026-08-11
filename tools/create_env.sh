@@ -21,6 +21,7 @@ while IFS='=' read -r key value; do
     [[ -z "${key// }" ]] && continue
     [[ "$key" =~ [[:space:]]*# ]] && continue
     [[ "${key,,}" == s_* ]] && continue
+    [[ "${key,,}" == p_* ]] && continue
 
     #Trim IFS
     key=$(xargs <<<"$key")

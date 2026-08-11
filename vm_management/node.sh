@@ -326,7 +326,7 @@ else
 	run_setup_script
     set -e
 
-    while ssh -p $SSH_PORT -o IdentitiesOnly=yes -i "$PUB_KEY" -o ConnectTimeout=2 -o BatchMode=yes "$VM_USER"@"$SSH_HOST" true >/dev/null 2>&1; do
+    while ssh -p $SSH_PORT -o IdentitiesOnly=yes -i "$SSH_KEY" -o ConnectTimeout=2 -o BatchMode=yes "$VM_USER"@"$SSH_HOST" true >/dev/null 2>&1; do
 	sleep 2
     done
     echo "[$SCRIPT_NAME] Switching user"
