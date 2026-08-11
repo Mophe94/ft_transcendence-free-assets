@@ -30,7 +30,7 @@ export class LobbyService implements OnApplicationBootstrap {
   async joinLobby(client: WebSocket, userSub: number): Promise<void> {
     const roomId =
       this.roomService.findAvailableRoom() ??
-      (await this.roomService.createRoom());
+      (await this.roomService.createRoom(4));
 
     this.roomService.joinRoom(client, roomId);
     await this.redisService.addPlayerToRoom(userSub.toString(), roomId);

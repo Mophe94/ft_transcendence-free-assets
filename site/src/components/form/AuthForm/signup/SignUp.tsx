@@ -47,7 +47,7 @@ export default function SignUpForm() {
 
 
   return (
-    <form id="signup" onSubmit={handleSignUp} className="flex flex-col p-3 w-full max-w-100 align-center">
+    <form id="signup" onSubmit={handleSignUp} className="flex flex-col px-3 w-full max-w-100 align-center">
       <SignUpEmail
         value={formData.email}
         onChange={(email, isValid) => {
@@ -70,7 +70,7 @@ export default function SignUpForm() {
           setValidity((prev) => ({ ...prev, passwordValid: isValid }));
         }}
       />
-      <div className="flex flex-row justify-around mt-4 h-[clamp(2.5rem,11vw,4rem)]">
+      <div className="flex flex-row justify-around mt-6">
         <ColoredButton
           color={ButtonColor.Red}
           text="Join the Battle"

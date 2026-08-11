@@ -38,7 +38,7 @@ function NavMenu() {
       <div className="
         hidden md:flex md:items-center md:justify-center md:flex-none md:overflow-hidden md:box-border
         md:max-w-50 md:px-[0.7vw]
-        md:font-['New_Rocker',system-ui] md:text-(length:--nav-font) md:text-[rgb(85,85,85)]
+        md:font-rocker md:text-(length:--nav-font) md:text-[rgb(85,85,85)]
         md:[-webkit-text-stroke:1px_black] md:whitespace-nowrap
         md:bg-(image:--sword-mid) md:bg-[round_no-repeat] md:bg-size-[auto_100%] md:bg-center
         h-full
@@ -53,7 +53,7 @@ function NavMenu() {
             md:group-hover:max-w-[320px] md:group-hover:px-[0.7vw]">
             <Link to={url} className="
               font-['Ubuntu',system-ui] text-[rgb(17,17,17)] text-(length:--nav-font) whitespace-nowrap no-underline
-              md:font-['New_Rocker',system-ui] md:[-webkit-text-stroke:1px_black] md:opacity-0 
+              md:font-rocker md:[-webkit-text-stroke:1px_black] md:opacity-0 
               md:transition-opacity md:duration-250 md:delay-100 md:text-[rgb(121,121,121)]
               md:group-hover:opacity-100">
               {name}
@@ -71,14 +71,8 @@ function NavMenu() {
 export function NavBar() {
   return (
     <div className="nav-bar w-full flex items-center justify-between box-border
-        
-        /* Mobile / Défaut (< 480px) */
         [--nav-h:8vw] [--nav-font:2.6vw] gap-[1vw] px-[1vw]
-        
-        /* Tablette / Ordinateur portable (481px à 767px) */
         min-[481px]:[--nav-h:clamp(2rem,6vw,5rem)] min-[481px]:[--nav-font:clamp(0.8rem,1.4vw,1.1rem)] min-[480px]:gap-2 min-[481px]:px-2
-        
-        /* Desktop (>= 768px) */
         md:[--nav-h:clamp(3rem,7vw,8rem)] md:[--nav-font:clamp(1rem,3vw,3rem)] md:gap-[0.8vw] md:px-[0.8vw]">
       <NavMenu />
       <AuthSection />

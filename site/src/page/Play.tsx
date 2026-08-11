@@ -39,7 +39,7 @@ export default function Play() {
     return () => {
       ws.close();
     };
-  }, [capacity]);
+  }, []);
 
   
   if (gameStart && userToken && roomToken) {

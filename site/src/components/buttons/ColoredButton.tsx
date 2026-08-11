@@ -1,96 +1,90 @@
-import { ButtonColor } from "../../constants/Colors";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-
-const NATIVE_HEIGHT = 84;
+import { useState, useEffect } from 'react';
+import { ButtonColor } from '../../constants/Colors';
 
 interface ButtonProps {
-  color: ButtonColor;
+  color?: ButtonColor;
   className?: string;
-  func: () => void;
+  func?: () => void;
   text: string;
+  scale?: number;
 }
 
 const colorLoader = {
   Blue: () => import("../../assets/buttons/colored_buttons/blue"),
   Red: () => import("../../assets/buttons/colored_buttons/red"),
   Black: () => import("../../assets/buttons/colored_buttons/black"),
+  Green: () => import("../../assets/buttons/colored_buttons/green"),
+  Purple: () => import("../../assets/buttons/colored_buttons/purple"),
 } as const;
 
-export default function ColoredButton({ color = ButtonColor.Blue, func, text, className = "" }: ButtonProps) {
-  const [sprites, setSprites] = useState<Record<string, string> | null>(null);
-
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-
-  const [scale, setScale] = useState(1);
-  const [nativeWidth, setNativeWidth] = useState(0);
+const useIsDesktop = () => {
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(min-width: 640px)').matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    colorLoader[color.name]().then((module) => setSprites(module.default));
-  }, [color]);
+    const media = window.matchMedia('(min-width: 640px)');
 
-  useLayoutEffect(() => {
-    if (!wrapperRef.current) return;
-    const el = wrapperRef.current;
-    const ro = new ResizeObserver(([entry]) => {
-      setScale(entry.contentRect.height / NATIVE_HEIGHT);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
+    const listener = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    media.addEventListener('change', listener);
+    
+    return () => media.removeEventListener('change', listener);
   }, []);
 
+  return isDesktop;
+}
 
-  useLayoutEffect(() => {
-    if (!buttonRef.current) return;
-    setNativeWidth(buttonRef.current.offsetWidth);
-  }, [sprites, text]);
+export default function ColoredButton({ color = ButtonColor.Black, func = () => {}, text, className = '' }: ButtonProps) {
+  const [sprites, setSprites] = useState<Record<string, string> | null>(null);
+  const [isActive, setIsActive] = useState(false);
+  const isDesktop = useIsDesktop();
 
-  const pixelated: React.CSSProperties = { imageRendering: "pixelated" };
+  useEffect(() => {
+    colorLoader[color.name]().then((mod) => setSprites(mod.default));
+  }, [color]);
+
+  if (!sprites) return null;
+
+  const currentSheet = isDesktop
+    ? (isActive ? sprites.pressed_m : sprites.reg_m)
+    : (isActive ? sprites.pressed_s : sprites.reg_s);
+
+  const slice = isDesktop
+    ? (isActive ? '29 32 21 32 fill' : '22 32 28 32 fill')
+    : (isActive ? '14 16 11 16 fill' : '11 16 14 16 fill');
+
+  const borderWidth = isDesktop
+    ? (isActive ? '29px 32px 21px 32px' : '22px 32px 28px 32px')
+    : (isActive ? '14px 16px 11px 16px' : '11px 16px 14px 16px');
 
   return (
-    <div ref={wrapperRef} className={`relative ${className} flex  flex-row justify-center`} style={{ width: nativeWidth * scale || undefined }}>
-      {sprites && (
-        <button
-          ref={buttonRef}
-          onClick={func}
-          style={{
-            transform: `scale(${scale})`,
-            transformOrigin: "top center",
-            willChange: "transform",
-            backfaceVisibility: "hidden",
-            height: "max-content",
-          }}
-          className="group inline-grid grid-cols-[32px_1fr_32px] grid-rows-[22px_1fr_28px] active:grid-rows-[29px_1fr_21px] select-none cursor-pointer gap-0"
-        >
-          <div className="bg-no-repeat group-active:hidden -mr-px -mb-px" style={{ backgroundImage: `url(${sprites.reg_UL})`, ...pixelated }} />
-          <div className="bg-no-repeat hidden group-active:block -mr-px -mb-px" style={{ backgroundImage: `url(${sprites.pressed_UL})`, ...pixelated }} />
-          <div className="bg-repeat-x group-active:hidden -mx-px -mb-px" style={{ backgroundImage: `url(${sprites.reg_UM})`, ...pixelated }} />
-          <div className="bg-repeat-x hidden group-active:block -mx-px -mb-px" style={{ backgroundImage: `url(${sprites.pressed_UM})`, ...pixelated }} />
-          <div className="bg-no-repeat group-active:hidden -ml-px -mb-px" style={{ backgroundImage: `url(${sprites.reg_UR})`, ...pixelated }} />
-          <div className="bg-no-repeat hidden group-active:block -ml-px -mb-px" style={{ backgroundImage: `url(${sprites.pressed_UR})`, ...pixelated }} />
-
-          <div className="bg-repeat-y group-active:hidden -mr-px -my-px" style={{ backgroundImage: `url(${sprites.reg_ML})`, ...pixelated }} />
-          <div className="bg-repeat-y hidden group-active:block -mr-px -my-px" style={{ backgroundImage: `url(${sprites.pressed_ML})`, ...pixelated }} />
-
-          <div className="relative flex items-center justify-center">
-            <div className="absolute inset-0 group-active:hidden bg-repeat -m-px" style={{ backgroundImage: `url(${sprites.reg_MM})`, ...pixelated }} />
-            <div className="absolute inset-0 hidden group-active:block bg-repeat -m-px" style={{ backgroundImage: `url(${sprites.pressed_MM})`, ...pixelated }} />
-            <span className={`-translate-y-1.25 leading-none font-agba whitespace-nowrap [text-shadow:0_0_4px_#000] ${color.textColor} -m-px text-3xl ${color.borderColor} mx-4`}>
-              {text}
-            </span>
-          </div>
-
-          <div className="bg-repeat-y group-active:hidden -ml-px -my-px" style={{ backgroundImage: `url(${sprites.reg_MR})`, ...pixelated }} />
-          <div className="bg-repeat-y hidden group-active:block -ml-px -my-px" style={{ backgroundImage: `url(${sprites.pressed_MR})`, ...pixelated }} />
-
-          <div className="bg-no-repeat group-active:hidden -mt-px -mr-px" style={{ backgroundImage: `url(${sprites.reg_BL})`, ...pixelated }} />
-          <div className="bg-no-repeat hidden group-active:block -mt-px -mr-px" style={{ backgroundImage: `url(${sprites.pressed_BL})`, ...pixelated }} />
-          <div className="bg-repeat-x group-active:hidden -mt-px -mx-px" style={{ backgroundImage: `url(${sprites.reg_BM})`, ...pixelated }} />
-          <div className="bg-repeat-x hidden group-active:block -mt-px -mx-px" style={{ backgroundImage: `url(${sprites.pressed_BM})`, ...pixelated }} />
-          <div className="bg-no-repeat group-active:hidden -mt-px -ml-px" style={{ backgroundImage: `url(${sprites.reg_BR})`, ...pixelated }} />
-          <div className="bg-no-repeat hidden group-active:block -mt-px -ml-px" style={{ backgroundImage: `url(${sprites.pressed_BR})`, ...pixelated }} />
-        </button>
-      )}
-    </div>
+    <button
+      onMouseDown={() => setIsActive(true)}
+      onMouseUp={() => setIsActive(false)}
+      onMouseLeave={() => setIsActive(false)}
+      onClick={func}
+      style={{
+        borderImageSource: `url(${currentSheet})`,
+        borderImageSlice: slice,
+        borderWidth: borderWidth,
+        borderStyle: 'solid',
+        borderImageRepeat: 'round',
+      }}
+      className={`w-min h-full cursor-pointer isolate font-im-fell font-bold flex items-center justify-center pixelated ${className}`}
+    >
+      <div
+        data-text={text}
+        className={`relative ${color.textColor} self-center text-nowrap -m-1
+          before:content-[attr(data-text)] 
+          before:absolute before:inset-0 before:-z-10 
+          ${color.borderColor} 
+          before:text-transparent`}
+      >
+        {text}
+      </div>
+    </button>
   );
 }

@@ -44,7 +44,7 @@ export default function Landing() {
           color={ButtonColor.Red}
           text="Enter"
           func={displaySignin}
-          className="mx-4 h-[clamp(1rem,6vw,5rem)]"
+          className="text-[clamp(0.5rem,2.5vw,5rem)] px-2"
         />
       </div>
         <div className={`${signin? 'block': 'hidden'} w-full h-full backdrop-blur-sm fixed inset-0 bg-black/40 z-50`}>

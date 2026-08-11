@@ -1,17 +1,24 @@
 import { useState } from "react";
-import ColorButton from "../../../buttons/ColoredButton";
+import ColorButton from "../../../buttons/ColoredButton2";
 import { ButtonColor } from "../../../../constants/Colors";
 import { inputClassName, labelClassName } from "../signup/SignUpConst";
+import ColoredButton from "../../../buttons/ColoredButton";
+import { useNotification } from "../../../../context/NotifContext";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../../context/AuthContext";
 
 interface SignInFormData {
   email: string;
   password: string;
 }
 export default function SignInForm () {
+  const { setUser } = useAuth();
   const [signInData, setSignInData] = useState<SignInFormData>({
     email: '',
     password: '',
   });
+  const { showNotification } = useNotification();
+  const navigate = useNavigate();
 
   const handleSignInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value} = e.target;
@@ -19,21 +26,34 @@ export default function SignInForm () {
     console.log(signInData);
   }
   
-  const signInUser = async () => {
+  const handleSignIn = async () => {
 
-    await fetch(`${import.meta.env.VITE_USERS_SERVICE}/auth/signin`, {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_USERS_SERVICE}/auth/signin`, {
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(signInData),
       method: 'POST',
       credentials: 'include',
-    })
-    .then((res) => {
-      console.log(res);
-    })
-    
+      })
+      if(!res.ok) {
+        showNotification('Wrong Credentials', 'error');
+        return;
+      }
+      const userData = await res.json();
+
+      setUser(userData);
+      navigate('/home');
+    } catch (_e) {
+      showNotification('An error occurd', 'error');
+    }
   }
+
+  const redirectFortyTwo = () => {
+    window.location.href = import.meta.env.VITE_42_OAUTH_API_LINK;
+  }
+
   return (
     <form id="signin" onSubmit={(e) => e.preventDefault()}className="flex flex-col p-3 w-full gap-3">
       <label htmlFor="email" className={labelClassName}>Email</label>
@@ -58,19 +78,19 @@ export default function SignInForm () {
       
       <div className="flex flex-row justify-around mt-3 h-[clamp(2.5rem,11vw,4rem)] w-full">
         <div>
-          <ColorButton
+          <ColoredButton
             color={ButtonColor.Red}
             text="Enter"
-            func={signInUser}
-            className="h-full w-full"
+            func={handleSignIn}
+            className=""
           />
         </div>
         <div>
-          <ColorButton
+          <ColoredButton
             color={ButtonColor.Black}
             text="42"
-            func={() => {}}
-            className="h-full w-full"
+            func={redirectFortyTwo}
+            className="px-3"
           />
         </div>
       </div>

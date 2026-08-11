@@ -18,7 +18,7 @@ export default function AuthForm() {
       <div className="
         absolute top-1/2 left-1/2
         -translate-x-1/2 -translate-y-1/2
-        w-1/2 h-[clamp(0rem,50vw,50%)]  max-w-120 max-h-120  min-w-80 min-h-80
+        w-1/2 h-[clamp(0rem,60vw,550px)]  max-w-120 min-w-80 min-h-80
         bg-[#e0ce9e] border-2 rounded-md border-[#45341e]">
         <div className="grid grid-cols-2 justify-center">
           <div

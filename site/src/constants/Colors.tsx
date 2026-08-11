@@ -19,20 +19,39 @@ export type Color = typeof Color[keyof typeof Color];
 export const ButtonColor = {
   Black: {
       name: 'Black',
-      textColor: 'text-[#FFFFFF]',
-      borderColor: '[-webkit-text-stroke:2px_#111111]',
+      textColor: 'text-[#000000]',
+      borderColor: 'before:[-webkit-text-stroke:4px_#e3e7ec]',
+      bg_reg: 'bg-[#323441]',
+      bg_pressed: 'bg-[#323441]',
   }, 
   Blue: {
       name: 'Blue',
-      textColor: '#FFFFFF',
-      borderColor: '#AAAAAA',
+      textColor: 'text-[#41919d]',
+      borderColor: 'before:[-webkit-text-stroke:4px_#f2eadb]',
+      bg_reg: 'bg-[#41919d]',
+      bg_pressed: 'bg-[#4a6982]',
   }, 
   Red: {
       name: 'Red',
-      textColor: 'text-[#F1F310]',
-      borderColor: '[-webkit-text-stroke:2px_#222222]',
-      
-  }, 
+      textColor: 'text-[#fff657]',
+      borderColor: 'before:[-webkit-text-stroke:4px_maroon]',
+      bg_reg: 'bg-[#f65555]',
+      bg_pressed: 'bg-[#f65555]',
+  },
+  Green: {
+      name: 'Green',
+      textColor: 'text-[#327c00]',
+      borderColor: 'before:[-webkit-text-stroke:4px_#caffc8]',
+      bg_reg: 'bg-[#15b122]',
+      bg_pressed: 'bg-[#10901a]',
+  },
+  Purple: {
+      name: 'Purple',
+      textColor: 'text-[#88186b]',
+      borderColor: 'before:[-webkit-text-stroke:4px_#f2eadb]',
+      bg_reg: 'bg-[#88186b]',
+      bg_pressed: 'bg-[#6d1256]',
+  },
 } as const;
 
 export type ButtonColor = typeof ButtonColor[keyof typeof ButtonColor];
