@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/11 09:14:58 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/11 09:59:59 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -62,6 +62,52 @@ get_42_token() {
     unset client_id client_secret
 }
 
+get_user_host() {
+    local user="$1"
+    local token
+    local host
+
+    if [ -z "$user" ]; then
+        return 1
+    fi
+
+    token="$(get_42_token)" || {
+        echo "[ERROR][$SCRIPT_NAME] Failed to get 42 API token." >&2
+        return 1
+    }
+
+    if [ -z "$token" ] || [ "$token" = "null" ]; then
+        echo "[ERROR][$SCRIPT_NAME] Empty 42 API token." >&2
+        unset token
+        return 1
+    fi
+
+    host="$(
+        curl -fsS \
+            -H "Authorization: Bearer $token" \
+            "https://api.intra.42.fr/v2/users/${user}/locations" |
+        jq -er '
+            map(select(.end_at == null))
+            | .[0].host // empty
+        '
+    )" || {
+        echo "[INFO][$SCRIPT_NAME] No current location found for $user." >&2
+        unset token
+        return 1
+    }
+
+    if [ -z "$host" ]; then
+        echo "[INFO][$SCRIPT_NAME] No current location found for $user." >&2
+        unset token
+        return 1
+    fi
+
+    printf '%s' "$host"
+
+    unset token host
+    return 0
+}
+
 consume_node_password() {
     local user="$1"
     local key="p_node_${user}"
@@ -101,7 +147,7 @@ is_ip() {
 
 is_location() {
     local location="$1"
-    [[ "$location" =~ ^(shi|fu|mi)-r[0-9]+-p[0-9]+$ ]]
+    [[ "$location" =~ ^(shi|fu|mi)-(r|c)[0-9]+-p[0-9]+$ ]]
 }
 
 if ! is_ip "$1" || ! is_ip "$2"; then
@@ -149,7 +195,7 @@ for user in "${NODE_USERS[@]}"; do
     fi
     echo "[$SCRIPT_NAME] Connecting to $user node:"
     HOST_IP="$(get_user_host "$user")"
-    if  ! is_ip "$HOST_IP" && ! is_location "$answer"; then
+    if  ! is_ip "$HOST_IP" && ! is_location "$HOST_IP"; then
 	try=0
 	while [ "$try" -lt 3 ]; do
 		read -p "[$SCRIPT_NAME]    IP of $user node host machine: " answer
@@ -207,6 +253,7 @@ while [ "$try" -lt 3 ]; do
                 unset password
                 continue
             fi
+	    try=3
         fi
         unset password
 
@@ -260,7 +307,7 @@ while [ "$try" -lt 3 ]; do
 done
 unset password
 if [ "$try" -eq 3 ]; then
-    echo "[$SCRIPT_NAME] Too many tries, aborting."
+    echo "[$SCRIPT_NAME] Connection failed, aborting."
     continue
 fi
 
