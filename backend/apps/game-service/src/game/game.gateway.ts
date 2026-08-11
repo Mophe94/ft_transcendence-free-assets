@@ -78,6 +78,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!user) return;
 
     this.clientsById.delete(user.userId);
+
     if (user.roomId) {
       this.gameService.onGodotDisconnected(user.userId, user.roomId);
     }
@@ -140,6 +141,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.sendToClient(client, response);
   }
 
+  /* ----------- EVENTS ----------- */
+
   @OnEvent('send_to_player')
   onSendToPlayer({ userId, payload }: { userId: number; payload: object }): void {
     const client = this.clientsById.get(userId);
@@ -149,7 +152,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @OnEvent('send_to_room')
-  onSendToRoom({ clients, payload }: { clients: Set<number>; payload: object }): void {
+  onSendToRoom({ clients, payload }: { clients: Set<WebSocket>; payload: object }): void {
     this.broadcast(clients, payload);
+  }
+
+  @OnEvent('delete_user')
+  onDeleteUser({ userId }: {userId: number}): void {
+    const client = this.clientsById.get(userId);
+    if (client && client > 0)
+      client.close(); // call handleDisconnect -> cleanupClient
+    // WHAT IF BOT ? 
   }
 }

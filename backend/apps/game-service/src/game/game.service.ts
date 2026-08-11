@@ -24,8 +24,9 @@ export class GameService implements OnModuleInit {
     private mapService: MapService,
 	private redisStateService: RedisStateService,
   ) {}
-
-  private gameRooms = new Map<string, Set<number>>();
+  // roomId -> usersIds
+  gameRooms = new Map<string, Set<number>>();
+  // userId -> roomId
   private roomIdByPlayer= new Map<number, string>();
 
   private joinGameRoom(roomId: string, userId: number): Set<number> {
@@ -49,17 +50,20 @@ export class GameService implements OnModuleInit {
 
   // TEST with hardcoded values
   onModuleInit(): void {
-    this.registerRoom('test-room', [1, 2, 3, 4, 5, 6, 7, 8]);
+    this.registerRoom('test-room', [1, 2, 3, 4]);
   }
   // roomIds + authorized users -> next Redis
-  private readonly autorizedPlayers = new Map<string, Set<number>>();
+  private readonly authorizedPlayers = new Map<string, Set<number>>();
+  private activePlayers = new Map<string, Set<number>>();
+
 
   registerRoom(roomId: string, userIds: number[]): void {
-    this.autorizedPlayers.set(roomId, new Set(userIds));
+    this.authorizedPlayers.set(roomId, new Set(userIds));
+    this.activePlayers.set(roomId, new Set(userIds));
   }
 
   isPlayerInRoom(userId: number, roomId: string): boolean {
-    return this.autorizedPlayers.get(roomId)?.has(userId) ?? false;
+    return this.authorizedPlayers.get(roomId)?.has(userId) ?? false;
   }
 
   async onGodotConnected(
@@ -75,7 +79,7 @@ export class GameService implements OnModuleInit {
       this.playerService.initPlayer(userId);
     const player = this.playerService.getPlayer(userId)!;
 
-    if (rooms.size === FULL) {
+    if (rooms.size === this.activePlayers.get(roomId)?.size) {
 	  /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
 	  for (const userId of rooms) {
 		  const playerState = this.playerService.getPlayer(userId)!;
@@ -105,6 +109,8 @@ export class GameService implements OnModuleInit {
     await this.redisStateService.removePlayer(userId.toString());
 	/////////////////////////////////* END */////////////////////////////////
     this.leaveGameRoom(roomId, userId);
+    this.activePlayers.get(roomId)?.delete(userId);
+    this.startNextRound(roomId);
   }
 
   private sendToPlayer(userId: number, payload: object): void {
@@ -112,9 +118,22 @@ export class GameService implements OnModuleInit {
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
+  startNextRound(roomId: string): void {
+    const active = this.activePlayers.get(roomId);
+    const connected = this.gameRooms.get(roomId);
+    if (!active || !connected) return;
+
+    console.log(`[GameService] activePlayers=${this.activePlayers.get(roomId)?.size}, connected=${this.gameRooms.get(roomId)?.size}`);
+    if (active.size >= 2 && connected.size == active.size && !(active.size % 2)) {
+      this.combatService.matchmake(connected);
+      this.startMapPhase(roomId, connected, "nextMap");
+    }
+  }
+
   private async startMapPhase(
     roomId: string,
     room: Set<number>,
+    nextMap?: string,
   ): Promise<void> {
     this.phaseTimer.start(`game: ${roomId}`, 'map', () => {
       console.log(`Room ${roomId} map phase timeout`);
@@ -128,7 +147,10 @@ export class GameService implements OnModuleInit {
       [...room].map(async (userId) => {
         const player = this.playerService.getPlayer(userId)!;
         player.timer = mapTimer;
-        return { userId, payload: await this.mapService.start_game(player) };
+        if (nextMap)
+          return {userId, payload: await this.combatService.next_map(player)};
+        else
+          return { userId, payload: await this.mapService.start_game(player) };
       }),
     );
 
@@ -216,6 +238,7 @@ export class GameService implements OnModuleInit {
 
   async handleMessage(userId: number, payload: any) : Promise<object | undefined> {
     let endOfBattle = false;
+    let loser;
     let player = this.playerService.getPlayer(userId)!;
     let userId2 = this.combatService.getOpponentId(userId);
     const roomId = this.roomIdByPlayer.get(userId)!;
@@ -302,6 +325,7 @@ export class GameService implements OnModuleInit {
             if (player.currentMonster.life.current <= 0){
                 if (!this.has_valid_monsters(player)){
                   endOfBattle = true;
+                  loser = userId;
                   this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
                   this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
                   // wainting all combat finish
@@ -315,6 +339,7 @@ export class GameService implements OnModuleInit {
             else if (player2.currentMonster.life.current <= 0){
               if (!this.has_valid_monsters(player2)){
                 endOfBattle = true;
+                loser = userId2;
                 this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
                 this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
               }          
@@ -331,13 +356,18 @@ export class GameService implements OnModuleInit {
               this.sendToPlayer(userId2, this.combatService.new_turn(player2));
               // si un combat deja finish declenchement du roundLeft
               // send new_turn(player, rounLeft)
-              // send new_turn(player, roundLeft)
+              // send new_turn(player, roundLeft)                                                                                                                                                            
             }
             if (endOfBattle) {
-              if (player.currentMonster.life.current > 0)
-                this.sendToPlayer(userId, this.combatService.next_map(player, player2));
-              else
-                this.sendToPlayer(userId2, this.combatService.next_map(player2, player));
+              const winner = loser === userId ? userId2 : userId;
+
+              const roomId = this.combatService.playerCombatRoom.get(loser);
+              const players = this.combatService.combatRooms.get(roomId!);
+
+              this.combatService.playerCombatRoom.delete(loser);
+              this.combatService.playerCombatRoom.delete(winner);
+              this.combatService.combatRooms.delete(roomId!);
+              this.eventEmitter.emit('delete_user', { userId: loser });
             }
         }
         break;
@@ -347,4 +377,4 @@ export class GameService implements OnModuleInit {
     }
     return result
   }
-}
+} 

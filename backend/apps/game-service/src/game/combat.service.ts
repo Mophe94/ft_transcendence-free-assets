@@ -7,9 +7,9 @@ import { CurrentActions, CurrentMonster, Skill } from './player/player.interface
 @Injectable()
 export class CombatService {
 	// combatRoomId -> [userIdA, userIdB]
-	private combatRooms = new Map<string, [number, number]>();
+	combatRooms = new Map<string, [number, number]>();
 	// userId -> combatRoomId
-	private playerCombatRoom = new Map<number, string>();
+	playerCombatRoom = new Map<number, string>();
 
 	// Called when a room in GameService reaches FULL state
 	matchmake(rooms: Set<number>): void {
@@ -219,7 +219,7 @@ export class CombatService {
     	return result
 	}
 
-	next_map(player: Player, player2: Player){
+	next_map(player: Player){
 		return {
 			event: "game",
 			data: {
@@ -227,7 +227,6 @@ export class CombatService {
 				timer: player.timer,
 				current_map: player.current_map,
 				player: player,
-				enemy: player2,
 			}
 		}
 	}
