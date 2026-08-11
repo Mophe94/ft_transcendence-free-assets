@@ -78,6 +78,9 @@ case "${answer,,}" in
 	*) echo "[$SCRIPT_NAME] No node added";;
 esac
 
+chmod +x add_manager.sh
+bash add_manager.sh "$MANAGER_NUMBER"
+
 #Create secret
 if [ ! -f "$SECRET_FILE" ]; then
     echo "[$SCRIPT_NAME] Secret file: $SECRET_FILE not found"
