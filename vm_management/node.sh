@@ -4,7 +4,7 @@ SCRIPT_NAME="${0##*/}"
 SCRIPT_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Set script variable
-CONFIG_FILE="$SCRIPT_LOCATION/worker_config.txt"
+CONFIG_FILE=${ENV_FILE}
 using_defaults=false
 
 #Base image -->Default value, overide in CONFIG_FILE
@@ -162,8 +162,6 @@ else
     exit 1
 fi
 
-BASE_DIR=""
-VM_DIR=""
 VM_NAME="${TYPE}_node_${USER}"
 VAR="DISK_SIZE_${TYPE^^}"
 DISK_SIZE_MB=${!VAR}
@@ -179,7 +177,7 @@ elif VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; then
     wait_for_ssh
 elif [ -f "$VM_DIR/$VM_NAME/$VM_NAME.vbox" ]; then
     echo "[$SCRIPT_NAME] $VM_NAME exist but is not registered. Registering now..."
-    VBoxManage registrvm "$VM_DIR/$VM_NAME/$VM_NAME.vbox"
+    VBoxManage registervm "$VM_DIR/$VM_NAME/$VM_NAME.vbox"
     # Start VM
     echo "[$SCRIPT_NAME] Starting VM..."
     VBoxManage startvm "$VM_NAME" --type headless
