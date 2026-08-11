@@ -239,6 +239,10 @@ export class GameService implements OnModuleInit {
 
   private startNewTurn(combatRoomId: string, room: Set<number>) {
     const timerKey = combatRoomId ? `combat: ${combatRoomId}` : undefined;
+    if (!combatRoomId) {
+      console.warn(`[GameService] Message reçu hors combat actif pour ??, ignoré`);
+      return undefined;
+    }
     if (!timerKey) return;
 
     this.phaseTimer.start(timerKey, 'choose_action', () => {
@@ -273,8 +277,8 @@ export class GameService implements OnModuleInit {
     const roomId = this.roomIdByPlayer.get(userId)!;
     
     if (!userId2) {
-      console.log(`[GameService]: userId2 for ${userId} is missing - using userId as placeholder`);
-      userId2 = userId;
+      console.log(`[GameService]: userId2 for ${userId} is missing !!!`);
+      return undefined;
     }
     let player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
 
@@ -339,15 +343,6 @@ export class GameService implements OnModuleInit {
             //  console.log("*************************************");
             //  console.log("* CurrentActionBattlePlayer2 *: ", mapResult.get(player2.id));
             //  console.log("*************************************");
-             console.log(
-              "CurrentActionBattlePlayer1:",
-              JSON.stringify(mapResult.get(player.id), null, 2)
-            );
-            
-            console.log(
-              "CurrentActionBattlePlayer2:",
-              JSON.stringify(mapResult.get(player2.id), null, 2)
-            );
               for (let i = 0; i < currentMessagePlayer!.length; ++i){
                 this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
                 this.sendToPlayer(userId2, currentMessagePlayer2?.at(i)!);

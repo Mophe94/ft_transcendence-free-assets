@@ -134,11 +134,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
       }
     }
+    this.sendToClient(client, response);
+
 	/////////////////////////////////* REDIS STATE : UPDATE STATE */////////////////////////////////
-	const playerState = this.playerService.getPlayer(userId)!;
+	  const playerState = this.playerService.getPlayer(userId)!;
     await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
 	/////////////////////////////////* END */////////////////////////////////
-    this.sendToClient(client, response);
   }
 
   /* ----------- EVENTS ----------- */
