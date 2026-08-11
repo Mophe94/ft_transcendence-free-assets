@@ -76,14 +76,24 @@ export class MapService {
 	}
 	
 	received_delete_monster(player: Player, monster: string) {
-		for (let i = 0; i < player.team.length; ++i) {
-		  if (player.team[i] === monster) { 
-			player.team[i] = '';
-			break;
-		  }
-		}
-		return this.update_team(player);
-	}
+		let count:number = 0;
+		    for (let i = 0; i < player.team.length; ++i) {
+		      if (player.team[i] !== "") {
+		        count++;
+		        break;
+		     }
+		    }
+		    if (count <= 1){
+		        return this.update_team(player);
+		    }
+		    for (let i = 0; i < player.team.length; ++i) {
+		      if (player.team[i] === monster) {
+		        player.team[i] = '';
+		        break;
+		      }
+		    }
+		    return this.update_team(player);
+		  }
 	  
 	  // CHECK MATCH OF MONSTER WITH RANDOM VALUE AND RETURN TRUE IF OK OR FALSE
 	received_try_catch(player: Player, item?: string){
@@ -224,6 +234,7 @@ export class MapService {
 			if (player.inventory[j]["name"] === ""){
 			  player.inventory[j]["name"] = player.current_item;
 			  player.inventory[j]["scene"] = items[i].scene;
+			  player.inventory[j].type = items[i].type;
 			  player.inventory[j]["current"] += 1;
 			  player.inventory[j]["value"] = items[i].value;
 			  player.inventory[j]["target"] = items[i].target;

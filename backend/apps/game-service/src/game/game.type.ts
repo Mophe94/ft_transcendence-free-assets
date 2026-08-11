@@ -13,8 +13,8 @@ export const PHASE_DURATIONS = {
   godot_fill: 5,
   map: 30,
   team_setup: 5,
-  choose_monster: 23, // happend only if a monster die -> before choose action phase
-  choose_action: 23,
+  choose_monster: 223, // happend only if a monster die -> before choose action phase
+  choose_action: 223,
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;

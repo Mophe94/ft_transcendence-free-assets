@@ -119,9 +119,6 @@ export class CombatService {
 
 		// 1
 		this.handle_action(first, second, actionFirst, 1);
-		//console.log("Second text before", second.text);
-		//console.log("First text before", first.text);
-		//console.log("------------------------");
 
 		second.text = first.text;
 		let temp1 = new Player(first.id, first.name, first.asset);
@@ -131,15 +128,21 @@ export class CombatService {
 		
 		this.pushResult(map_result, first.id, this.action_battle(temp1, temp2,  1, 1, changeMonsterFirst));
 		this.pushResult(map_result, second.id, this.action_battle(temp2, temp1,  1, 1, changeMonsterFirst));
-
-		if (second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) {
-			second.currentMonster.life.current = 0;
+		
+//		console.log("First: ", first.forceChooseMonster);
+		if ((second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) || first.forceChooseMonster) {
+			if (first.forceChooseMonster) {
+//				console.log("ForceChooseMonster [combat1]", first.forceChooseMonster);			
+				first.forceChooseMonster = false;
+			}
+//			console.log("ForceChooseMonster [combat]", first.forceChooseMonster);			
 			return map_result
 		}
+
+		// 2
 		if (actionSecond.actionType == "change_current_monster")
 			changeMonsterSecond = second.id;
 
-		// 2
 		this.handle_action(second, first, actionSecond, 2);
 
 		first.text = second.text;
@@ -220,14 +223,15 @@ export class CombatService {
     	return result
 	}
 
-	next_map(player: Player){
+	next_map(player: Player, player2: Player){
 		return {
 			event: "game",
 			data: {
 				state: "next_map",
 				timer: player.timer,
 				current_map: player.current_map,
-				player: player
+				player: player,
+				enemy: player2,
 			}
 		}
 	}
@@ -264,6 +268,7 @@ export class CombatService {
 		let touch: number = 0;
 		let resultDamage: number = 0;
 		let effectiveness: string = ".";
+		skill.current -= 1;
 		switch (skill.effect) {
 			case "damage":
 				if (enemy.currentMonster.dodge === true){
@@ -278,12 +283,13 @@ export class CombatService {
 						} 
 						const attackSuccess: boolean = this.successAttackCalculation(skill, enemy.currentMonster);
 						if (attackSuccess === false){
-							if (skill.repetition === 1){
+							if (skill.repetition == 1){
 								player.text = enemy.currentMonster.name + " dodge " + skillName + ".";							
 								return;
 							}
-							else
+							else {
 								continue;
+							}
 						}
 						touch++
 						const resultAttack = this.attackResult(player, skill.type, enemy, enemy.currentMonster.type, player.currentMonster.type);
@@ -294,17 +300,18 @@ export class CombatService {
 						resultDamage += resultAttack.result;
 						enemy.currentMonster.life.current -= resultAttack.result;
 					}
-					if (skill.repetition > 1)
+					if (skill.repetition > 1) {
 						if (skill.repetition > 1){
 							if (resultDamage > 0)
 								player.text += " and hit " + touch + " times for " + resultDamage + " damage";
 							else
 								player.text = enemy.currentMonster.name + " dodge " + skillName + " " + touch + " times.";
 						}
+					}
 					else
 						player.text += " for " + resultDamage + " damage";
 				}
-				player.text += effectiveness;	
+				player.text += effectiveness;
 				break;
 	
 			case "up_stat":
@@ -386,9 +393,9 @@ export class CombatService {
 		}
 	}
 	
-	//received_change_current_monste helper
+	//received_change_current_monster helper
 	private successAttackCalculation(skill: Skill, enemyMonster: CurrentMonster): boolean{
-		let result = Math.floor(Math.random() * 101);
+		let result = Math.floor(Math.random() * 100);
 		result -= enemyMonster.speed / 10;
 		if (result > skill.precision)
 			return false;
@@ -431,9 +438,11 @@ export class CombatService {
 		}
 	
 		let current_item = player.inventory[i];
+		current_item.current -= 1;
 		const type = current_item.type;
 		switch (type) {
 			case "heal":
+				console.log("3 type: ", type);
 				let result_heal = current_item.value;
 				let temp_life_heal = player.currentMonster.life.current;
 				player.currentMonster.life.current += current_item.value;
@@ -445,6 +454,7 @@ export class CombatService {
 				break;
 	
 			case "damage":
+				console.log("3 type: ", type);
 				let result_damage = current_item.value;
 				let temp_life_damage = enemy.currentMonster.life.current;
 				enemy.currentMonster.life.current -= current_item.value;;
@@ -456,6 +466,7 @@ export class CombatService {
 				break;
 	
 			case "stat_down":
+				console.log("3 type: ", type);
 				switch (current_item.target){
 					case "attack":
 						enemy.currentMonster.attack -= current_item.value;
@@ -480,6 +491,7 @@ export class CombatService {
 				break;
 			
 			case "stat_up":
+				console.log("3 type: ", type);
 				switch (current_item.target){
 					case "attack":
 						player.currentMonster.attack += current_item.value;
@@ -504,6 +516,7 @@ export class CombatService {
 				break;
 	
 			default:
+				console.log("3 type: ", type);
 				this.received_pass(player);
 				return;
 		}
@@ -540,12 +553,10 @@ export class CombatService {
 				}
 			}
 		}
-		console.log("PLAYER text: ", player.text);
+//		console.log("PLAYER text: ", player.text);
 	}
 
 	private received_pass(player: Player){
 		player.text = player.name + " pass for this turn.";
 	}
-
-
 }

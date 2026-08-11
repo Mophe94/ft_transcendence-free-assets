@@ -16,6 +16,9 @@ import { ClientData } from 'apps/game-service/src/shared/clients.map';
 import { FULL } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
+import { ROOM_IDS } from '../lobby/lobby.const';
+import { Player } from './player/player';
+import { RedisStateService } from '../redis/redis_state_player.service';
 
 @WebSocketGateway(8082, { cors: { origin: true }, path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -23,8 +26,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   constructor(
+	private playerService: PlayerService,
+	private redisStateService: RedisStateService,
     private gameService: GameService,
-    private playerService: PlayerService,
   ) {}
   private clients = new Map<WebSocket, ClientData>();
   private clientsById = new Map<number, WebSocket>();
@@ -130,6 +134,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
       }
     }
+	/////////////////////////////////* REDIS STATE : UPDATE STATE */////////////////////////////////
+	const playerState = this.playerService.getPlayer(userId)!;
+    await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
+	/////////////////////////////////* END */////////////////////////////////
     this.sendToClient(client, response);
   }
 
