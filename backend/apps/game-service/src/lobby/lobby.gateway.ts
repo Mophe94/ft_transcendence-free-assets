@@ -70,7 +70,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.close();
       return;
     }
-    void this.lobbyService.joinLobby(client, clientData.userId);
+    this.lobbyService.joinLobby(client, clientData.userId);
   }
 
   @OnEvent('lobby.player_joined')
@@ -104,14 +104,12 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private startGame(roomId: string, clients: Set<WebSocket>): void {
-    const serverTime = Math.floor((Date.now() + 50000) / 1000);
 
     this.broadcast(clients, {
       event: 'game',
       state: 'start_game',
       data: {
         roomId: roomId,
-        startTime: serverTime,
       },
     });
   }

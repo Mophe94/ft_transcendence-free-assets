@@ -76,23 +76,32 @@ export class CombatService {
 
 
 	private handle_action(player: Player, enemy: Player, actionPlayer: CurrentActions, order: number){
-    switch (actionPlayer.actionType) {
-        case "try_attack":
-            this.received_try_attack(player, enemy, actionPlayer.data?.skill);
-            break;
-        case "use_item_combat":
-            this.received_use_item_combat(player, enemy, actionPlayer.data?.item);
-            break;
-        case "change_current_monster":
-            this.received_change_current_monster(player, actionPlayer.data?.slot);
-            break;
-        case "pass":
-            this.received_pass(player);
-            break;
-        default:
-			this.received_pass(player);
-    }
-}
+    	switch (actionPlayer.actionType) {
+			case "try_attack":
+				this.received_try_attack(player, enemy, actionPlayer.data?.skill);
+				break;
+			case "use_item_combat":
+				this.received_use_item_combat(player, enemy, actionPlayer.data?.item);
+				break;
+			case "change_current_monster":
+				this.received_change_current_monster(player, actionPlayer.data?.slot);
+				break;
+			case "pass":
+				this.received_pass(player);
+				break;
+			default:
+				this.received_pass(player);
+			}
+	}
+
+	// Helper
+	private pushResult(map: Map<number, Array<Object>>, playerId: number, result: Object): void {
+		const arr = map.get(playerId);
+		if (arr)
+			arr.push(result);
+		else
+			map.set(playerId, [result]);
+	}
 
 	resolving_battle_round(player1: Player, player2: Player) : Map<number, Array<Object>>{
 		let map_result = new Map<number, Array<Object>>();
@@ -108,33 +117,41 @@ export class CombatService {
 		if (actionFirst.actionType == "change_current_monster")
 			changeMonsterFirst = first.id ;
 
+		// 1
 		this.handle_action(first, second, actionFirst, 1);
-		if (this.action_battle(first, second,  1, 1, changeMonsterFirst) !== undefined && this.action_battle(second, first,  1, 1, changeMonsterFirst) !== undefined)
-			map_result.set(first.id, [this.action_battle(first, second,  1, 1, changeMonsterFirst)])
-			map_result.set(second.id, [this.action_battle(second, first,  1, 1, changeMonsterFirst)])
+		//console.log("Second text before", second.text);
+		//console.log("First text before", first.text);
+		//console.log("------------------------");
+
+		second.text = first.text;
+		let temp1 = new Player(first.id, first.name, first.asset);
+		Object.assign(temp1, first);
+		let temp2 = new Player(second.id, second.name, second.asset);
+		Object.assign(temp2, second);
+		
+		this.pushResult(map_result, first.id, this.action_battle(temp1, temp2,  1, 1, changeMonsterFirst));
+		this.pushResult(map_result, second.id, this.action_battle(temp2, temp1,  1, 1, changeMonsterFirst));
+
 		if (second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) {
 			second.currentMonster.life.current = 0;
 			return map_result
 		}
-		if (/* first.currentMonster.name !== "" &&  */actionSecond.actionType == "change_current_monster")
+		if (actionSecond.actionType == "change_current_monster")
 			changeMonsterSecond = second.id;
 
+		// 2
 		this.handle_action(second, first, actionSecond, 2);
 
-		if (this.action_battle(first, second,  1, 1, changeMonsterFirst) !== undefined && this.action_battle(second, first,  1, 1, changeMonsterFirst) !== undefined
-			&& this.action_battle(first, second,  2, 2, changeMonsterSecond) !== undefined && this.action_battle(second, first,  2, 2, changeMonsterSecond) !== undefined)
-		map_result.set(first.id, [this.action_battle(first, second,  1, 1, changeMonsterFirst), this.action_battle(first, second,  2, 2, changeMonsterSecond)]);
-		map_result.set(second.id, [this.action_battle(second, first,  1, 1, changeMonsterFirst), this.action_battle(second, first,  2, 2, changeMonsterSecond)])
+		first.text = second.text;
+
+		this.pushResult(map_result, first.id, this.action_battle(first, second,  2, 2, changeMonsterSecond));
+		this.pushResult(map_result, second.id, this.action_battle(second, first,  2, 2, changeMonsterSecond));
+
 		return map_result
-		// return [ this.action_battle(first, second, 1, 2, changeMonsterFirst),
-		// 	this.action_battle(second, first, 2, 2, changeMonsterSecond)
-		// ];
 	}
-	
 
 	/* SEND */
 	action_battle(player: Player, player2: Player, order: number, max: number, changePlayerID?: number){
-		player2.text = player.text;
 		let result = {  event: "game",
 			data: {
 				state: "action_battle",
@@ -218,12 +235,12 @@ export class CombatService {
 	/* RECEIVED ACTIONS */
 
 	readonly typeChart: Record<string, Record<string, number>> = {
-		"fire":  { "plant": 2, "water": 0.5, "neutral": 1, "earth": 1 },
-		"water":  { "fire": 2, "plant": 0.5, "earth": 0.5, "neutral": 1 },
-		"earth": { "water": 2, "fire": 0.5, "plant": 0.5, "neutral": 1 },
-		"plant": { "water": 2, "earth": 2, "neutral": 1, "fire": 0.5 },
-		"fly": { "plant": 2, "earth": 0.5, "fire": 1, "water": 1, "neutral": 1 },
-		"neutral": { "water": 1, "fire": 1, "plant": 1, "earth": 1 }
+		"fire": { "plant": 2, "water": 0.5, "neutral": 1, "earth": 1 , "fly": 1},
+		"water": { "fire": 2, "plant": 0.5, "earth": 0.5, "neutral": 1 , "fly": 1},
+		"earth": { "water": 2, "fire": 0.5, "plant": 0.5, "neutral": 1 , "fly": 1},
+		"plant": { "water": 2, "earth": 2, "neutral": 1, "fire": 0.5 , "fly": 0.5},
+		"neutral": { "water": 1, "fire": 1, "plant": 1, "earth": 1 , "fly": 1},
+		"fly": { "water": 1, "fire": 1, "plant": 2, "earth": 0.5, "neutral": 1 }
 	}
 	
 	getEffectiveness(attackerType: string, defenderType: string): number {
@@ -373,7 +390,7 @@ export class CombatService {
 	private successAttackCalculation(skill: Skill, enemyMonster: CurrentMonster): boolean{
 		let result = Math.floor(Math.random() * 101);
 		result -= enemyMonster.speed / 10;
-		if (result < skill.precision)
+		if (result > skill.precision)
 			return false;
 		return true;
 	}

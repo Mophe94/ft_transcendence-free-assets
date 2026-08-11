@@ -33,73 +33,98 @@ function skill(name: keyof typeof SKILLS_DB): Skill {
 }
 const emptySkill: Skill = { name: '', current: 0, max: 0, type: '', effect: '', repetition: 1, precision: 100, data: '', value: 0 };
 
-// ⚠️ attack/attack_spe/defense/defense_spe/speed/dodge : toujours des placeholders, pas de table
-// "monsters" reçue pour les vérifier. Seules les attaques ci-dessus sont maintenant des vraies données.
-const baseStats = { attack: 20, attack_spe: 20, defense: 20, defense_spe: 20, speed: 20, dodge: false };
+// ---------------------------------------------------------------------------
+// Table des 10 vrais monstres (copiée depuis public.monsters en DB) +
+// leurs skills réels (copiés depuis public.monsters_skills).
+// Stats/skills identiques à ce que reçoit un joueur humain via
+// MapService.received_team_choice -> monstersService.findOneByName().
+// ---------------------------------------------------------------------------
+const MONSTERS_DB: Record<
+  string,
+  {
+    hp: number;
+    attack: number;
+    attack_spe: number;
+    defense: number;
+    defense_spe: number;
+    speed: number;
+    type: string;
+    skills: (keyof typeof SKILLS_DB)[];
+  }
+> = {
+  pisciner: { hp: 50, attack: 10, attack_spe: 10, defense: 5, defense_spe: 5, speed: 50, type: 'neutral', skills: ['think', 'bite'] },
+  fishet: { hp: 120, attack: 10, attack_spe: 15, defense: 5, defense_spe: 15, speed: 100, type: 'water', skills: ['swimming', 'splash', 'bubulle'] },
+  burpy: { hp: 100, attack: 20, attack_spe: 30, defense: 0, defense_spe: 20, speed: 80, type: 'water', skills: ['claw', 'bite', 'bubulle'] },
+  sharky: { hp: 150, attack: 20, attack_spe: 30, defense: 0, defense_spe: 20, speed: 150, type: 'water', skills: ['bite', 'splash', 'bubulle', 'tsunami'] },
+  squirel: { hp: 100, attack: 20, attack_spe: 20, defense: 5, defense_spe: 10, speed: 110, type: 'neutral', skills: ['claw', 'bite', 'kawai'] },
+  papate: { hp: 180, attack: 10, attack_spe: 15, defense: 5, defense_spe: 10, speed: 80, type: 'earth', skills: ['rock', 'grow', 'slap'] },
+  gigantomakia: { hp: 200, attack: 20, attack_spe: 30, defense: 15, defense_spe: 25, speed: 50, type: 'earth', skills: ['rock', 'bite', 'armor', 'ultralaser'] },
+  leafs: { hp: 80, attack: 35, attack_spe: 45, defense: 0, defense_spe: 10, speed: 100, type: 'plant', skills: ['tranche', 'slap', 'whip-vine'] },
+  monkel: { hp: 130, attack: 15, attack_spe: 15, defense: 10, defense_spe: 20, speed: 100, type: 'neutral', skills: ['slap', 'rock', 'multi-punch'] },
+  pigeonne: { hp: 120, attack: 25, attack_spe: 25, defense: 10, defense_spe: 10, speed: 160, type: 'fly', skills: ['pic', 'slap', 'tornade', 'dodge'] },
+};
 
-// Le catalogue des 6 équipes du Bot
+// Construit un CurrentMonster complet à partir du nom + du slot voulu dans
+// l'équipe. Empêche structurellement le bug de l'ancien fichier (nom/slot/
+// stats copiés-collés identiques sur plusieurs entrées) : ici chaque
+// monstre n'existe qu'une fois dans MONSTERS_DB, tout le reste en découle.
+function monster(name: keyof typeof MONSTERS_DB, slot: number): CurrentMonster {
+  const m = MONSTERS_DB[name];
+  const filledSkills = m.skills.map(skill);
+  const skills = [...filledSkills, ...Array(4 - filledSkills.length).fill(emptySkill)];
+  return {
+    name,
+    slot,
+    type: m.type,
+    life: { current: m.hp, max: m.hp },
+    status: [],
+    attack: m.attack,
+    attack_spe: m.attack_spe,
+    defense: m.defense,
+    defense_spe: m.defense_spe,
+    speed: m.speed,
+    dodge: false,
+    skill: skills,
+  } as CurrentMonster;
+}
+
+// Le catalogue des 10 équipes du Bot. Chaque équipe = un pool de 6 noms
+// DISTINCTS (vérifié), dans lequel chooseCounterTeam() choisira les 3
+// meilleurs contre le roster adverse.
 export const PREDEFINED_BOT_TEAMS: CurrentMonster[][] = [
+  // Équipe 1 : Aquatique — dominance water, bon capital PV
+  [monster('fishet', 0), monster('burpy', 1), monster('sharky', 2), monster('pisciner', 3), monster('squirel', 4), monster('monkel', 5)],
 
+  // Équipe 2 : Terrestre — earth/neutral, tanky
+  [monster('papate', 0), monster('gigantomakia', 1), monster('squirel', 2), monster('monkel', 3), monster('leafs', 4), monster('pisciner', 5)],
 
-  // Équipe 5 : Starter / Débutant (pisciner, squirrel, papate)
-  [
-    {
-      name: 'pisciner', slot: 0, type: 'neutral', life: { current: 50, max: 50 }, status: [], ...baseStats,
-      skill: [skill('slap'), skill('splash'), emptySkill, emptySkill],
-    },
-    {
-      name: 'pisciner', slot: 1, type: 'neutral', life: { current: 100, max: 100 }, status: [], ...baseStats,
-      skill: [skill('bite'), skill('multi-punch'), emptySkill, emptySkill],
-    },
-    {
-      name: 'pisciner', slot: 2, type: 'earth', life: { current: 180, max: 180 }, status: [], ...baseStats,
-      skill: [skill('rock'), skill('multi-punch'), emptySkill, emptySkill],
-    },
-    {
-      name: 'pisciner', slot: 2, type: 'earth', life: { current: 180, max: 180 }, status: [], ...baseStats,
-      skill: [skill('rock'), skill('multi-punch'), emptySkill, emptySkill],
-    },
-    {
-      name: 'pisciner', slot: 2, type: 'earth', life: { current: 180, max: 180 }, status: [], ...baseStats,
-      skill: [skill('rock'), skill('multi-punch'), emptySkill, emptySkill],
-    },
-    {
-      name: 'pisciner', slot: 2, type: 'earth', life: { current: 180, max: 180 }, status: [], ...baseStats,
-      skill: [skill('rock'), skill('multi-punch'), emptySkill, emptySkill],
-    },
-  ],
+  // Équipe 3 : Aérienne — vitesse et couverture fly
+  [monster('pigeonne', 0), monster('fishet', 1), monster('squirel', 2), monster('monkel', 3), monster('burpy', 4), monster('leafs', 5)],
 
-  // Équipe 6 : Aérienne & Aquatique (pigeonne, burpy, fishet)
-  [
-    {
-      name: 'sharky', slot: 0, type: 'neutral', life: { current: 50, max: 50 }, status: [], ...baseStats,
-      skill: [skill('slap'), skill('splash'), emptySkill, emptySkill],
-    },
-    {
-      name: 'sharky', slot: 1, type: 'neutral', life: { current: 100, max: 100 }, status: [], ...baseStats,
-      skill: [skill('bite'), skill('multi-punch'), emptySkill, emptySkill],
-    },
-    {
-      name: 'sharky', slot: 2, type: 'earth', life: { current: 180, max: 180 }, status: [], ...baseStats,
-      skill: [skill('rock'), skill('multi-punch'), emptySkill, emptySkill],
-    },
-    {
-      name: 'sharky', slot: 2, type: 'earth', life: { current: 180, max: 180 }, status: [], ...baseStats,
-      skill: [skill('rock'), skill('multi-punch'), emptySkill, emptySkill],
-    },
-    {
-      name: 'sharky', slot: 2, type: 'earth', life: { current: 180, max: 180 }, status: [], ...baseStats,
-      skill: [skill('rock'), skill('multi-punch'), emptySkill, emptySkill],
-    },
-    {
-      name: 'sharky', slot: 2, type: 'earth', life: { current: 180, max: 180 }, status: [], ...baseStats,
-      skill: [skill('rock'), skill('multi-punch'), emptySkill, emptySkill],
-    },
-  ],
+  // Équipe 4 : Végétale — plant en tête, soutien earth/water
+  [monster('leafs', 0), monster('papate', 1), monster('gigantomakia', 2), monster('monkel', 3), monster('fishet', 4), monster('squirel', 5)],
+
+  // Équipe 5 : Équilibrée — un représentant par type dispo
+  [monster('pisciner', 0), monster('fishet', 1), monster('papate', 2), monster('leafs', 3), monster('pigeonne', 4), monster('monkel', 5)],
+
+  // Équipe 6 : Rapide — priorité à la vitesse (sharky 150, pigeonne 160, squirel 110)
+  [monster('pigeonne', 0), monster('sharky', 1), monster('squirel', 2), monster('fishet', 3), monster('monkel', 4), monster('burpy', 5)],
+
+  // Équipe 7 : Tank — HP/def max (gigantomakia 200hp, papate 180hp)
+  [monster('gigantomakia', 0), monster('papate', 1), monster('sharky', 2), monster('monkel', 3), monster('fishet', 4), monster('pigeonne', 5)],
+
+  // Équipe 8 : Glass cannon — attaque forte, défense faible (leafs 35/45 atk, def 0)
+  [monster('leafs', 0), monster('burpy', 1), monster('sharky', 2), monster('pigeonne', 3), monster('squirel', 4), monster('monkel', 5)],
+
+  // Équipe 9 : Débutant — monstres communs/uncommon, stats modestes
+  [monster('pisciner', 0), monster('fishet', 1), monster('squirel', 2), monster('leafs', 3), monster('burpy', 4), monster('monkel', 5)],
+
+  // Équipe 10 : Élite — les rares en priorité (sharky, gigantomakia, pigeonne)
+  [monster('sharky', 0), monster('gigantomakia', 1), monster('pigeonne', 2), monster('burpy', 3), monster('monkel', 4), monster('papate', 5)],
 ];
 
 /**
- * Tire au sort l'une des 6 équipes prédéfinies
+ * Tire au sort l'une des 10 équipes prédéfinies
  */
 export function getRandomBotTeam(): CurrentMonster[] {
   const randomIndex = Math.floor(Math.random() * PREDEFINED_BOT_TEAMS.length);

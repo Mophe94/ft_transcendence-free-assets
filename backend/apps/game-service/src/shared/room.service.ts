@@ -53,7 +53,7 @@ export class RoomService {
     console.log(`Client left ${roomId}, ${clients.size} players remaining`);
 
     if (clients.size === 0) {
-      this.phaseTimer.clear(roomId);
+      this.phaseTimer.clear(`game: ${roomId}`);
       this.rooms.delete(roomId);
       console.log(`Room ${roomId} deleted (empty)`);
     }

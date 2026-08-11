@@ -11,20 +11,11 @@ import { Interval } from '@nestjs/schedule';
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
 import { PlayerService } from './player/player.service';
-import {
-  GamePayload,
-  PHASE_DURATIONS,
-  PhaseName,
-  createMockUser,
-} from './game.type';
+import { GamePayload, createMockUser } from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
-import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { FULL } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
-import { intervalProvider } from 'node_modules/rxjs/dist/types/internal/scheduler/intervalProvider';
 import { OnEvent } from '@nestjs/event-emitter';
-
-import { clientsMap } from 'apps/chat-service/src/shared/clients.map';
 
 @WebSocketGateway(8082, { cors: { origin: true }, path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {

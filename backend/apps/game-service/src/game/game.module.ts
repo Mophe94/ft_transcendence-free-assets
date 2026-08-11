@@ -6,16 +6,20 @@ import { PlayerService } from './player/player.service';
 import { CombatService } from './combat.service';
 import { EntityModule } from './entities/entity.module';
 import { RedisService } from '../redis/redis.service';
+import { WsAuthModule } from 'libs/shared/src/auth/ws-auth.module';
+import { MapService } from './map.service';
+
 import { AiService } from './ai_service/ai.service';
 @Module({
   providers: [
     GameGateway,
     GameService,
     PlayerService,
+    MapService,
     CombatService,
     RedisService,
     AiService,
   ],
-  imports: [SharedModule, EntityModule],
+  imports: [SharedModule, EntityModule, WsAuthModule],
 })
 export class GameModule {}

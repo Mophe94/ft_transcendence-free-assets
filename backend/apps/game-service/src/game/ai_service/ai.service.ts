@@ -19,7 +19,7 @@ function getRandomBotSkin(): string {
 @Injectable()
 export class AiService {
   private readonly logger = new Logger(AiService.name);
-  private botIdConter = 0;
+  private botIdConter = -1000;
 
   constructor(
     private readonly monstersService: MonstersService,
@@ -136,4 +136,23 @@ export class AiService {
     }
     return types;
   }
+
+  public decideAction(bot: Player, opponent: Player): CurrentActions {
+  const monster = bot.currentMonster;
+
+  // Pas de monstre actif (début de combat ou monstre KO) -> en choisir un
+  if (!monster || monster.name === '' || monster.life.current <= 0) {
+    const slot = bot.battle_team.findIndex((m) => m.name !== '' && m.life.current > 0);
+    if (slot !== -1) {
+      return { actionType: 'change_current_monster', data: { slot } };
+    }
+    return { actionType: 'pass' };
+  }
+
+  const availableSkill = monster.skill.find((s) => s.name !== '' && s.current > 0);
+  if (availableSkill) {
+    return { actionType: 'try_attack', data: { skill: availableSkill.name } };
+  }
+  return { actionType: 'pass' };
+}
 }
