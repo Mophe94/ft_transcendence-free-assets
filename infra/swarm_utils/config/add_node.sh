@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/11 09:59:59 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/11 10:52:11 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -194,12 +194,14 @@ for user in "${NODE_USERS[@]}"; do
 	continue
     fi
     echo "[$SCRIPT_NAME] Connecting to $user node:"
-    HOST_IP="$(get_user_host "$user")"
-    if  ! is_ip "$HOST_IP" && ! is_location "$HOST_IP"; then
+    if ! HOST_IP="$(get_user_host "$user")"; then
+	continue
+    fi
+    if  ! { is_ip "$HOST_IP" || is_location "$HOST_IP"; }; then
 	try=0
 	while [ "$try" -lt 3 ]; do
 		read -p "[$SCRIPT_NAME]    IP of $user node host machine: " answer
-		if [ -z "$answer" ] || ! is_ip "$answer" || ! is_location "$answer"; then
+		if [ -z "$answer" ] || ! { is_ip "$answer" || is_location "$answer"; }; then
 	   		echo "[$SCRIPT_NAME] Invalid IP input, try again."
 	    	answer=""
 	    	try=$((try + 1))
@@ -213,23 +215,22 @@ for user in "${NODE_USERS[@]}"; do
 	echo "[$SCRIPT_NAME] Too many try, aborting."
 	continue
     fi
-done
-
-# Getting user password
-local password=""
-if password="$(get_env_value p_node_"$user")"; then
-    password_from_env=true
-else
-    password_from_env=false
-    echo "[$SCRIPT_NAME] No password configured for $user."
-    IFS= read -r -s -p "[$SCRIPT_NAME] Password for $user: " password
-    echo
-fi
 
 pub_key="$(cat "$PUB_KEY")"
+
+# Getting user password
+password_from_env=false
+if password="$(get_env_value "p_node_${user}")"; then
+    password_from_env=true
+    printf '%s' "$password"
+else
+    echo "[$SCRIPT_NAME] No password configured for $user." >&2
+    IFS= read -r -s -p "[$SCRIPT_NAME] Password for $user: " password
+    echo >&2
+fi
+
 try=0
 while [ "$try" -lt 3 ]; do
-
     if SSHPASS="$password" sshpass -e \
         ssh \
         -i "$SSH_KEY" \
@@ -302,14 +303,13 @@ while [ "$try" -lt 3 ]; do
         try=$((try + 1))
         if [ "$try" -lt 3 ]; then
             echo "[$SCRIPT_NAME] Retrying..."
+	else
+	    echo "[$SCRIPT_NAME] Too many try, aborting."
+	    unset password
         fi
     fi
 done
-unset password
-if [ "$try" -eq 3 ]; then
-    echo "[$SCRIPT_NAME] Connection failed, aborting."
-    continue
-fi
+done
 
 # Wait for node to join
 ADDED_NODES=0

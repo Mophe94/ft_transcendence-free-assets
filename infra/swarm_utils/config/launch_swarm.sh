@@ -78,8 +78,8 @@ case "${answer,,}" in
 	*) echo "[$SCRIPT_NAME] No node added";;
 esac
 
-chmod +x add_manager.sh
-bash add_manager.sh "$MANAGER_NUMBER"
+chmod +x "$CONFIG_DIR"/add_manager.sh
+bash "$CONFIG_DIR"/add_manager.sh "$MANAGER_NUMBER"
 
 #Create secret
 if [ ! -f "$SECRET_FILE" ]; then
