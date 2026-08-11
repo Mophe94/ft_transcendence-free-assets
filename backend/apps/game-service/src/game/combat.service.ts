@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Player } from './player/player';
-import {
-	CurrentActions,
-	CurrentMonster,
-	Skill
-  } from './player/player.interfaces';
+import { CurrentActions, CurrentMonster, Skill } from './player/player.interfaces';
 
 
 @Injectable()

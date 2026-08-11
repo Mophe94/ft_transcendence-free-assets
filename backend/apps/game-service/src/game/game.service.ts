@@ -8,11 +8,10 @@ import { ItemsService } from './entities/items.service';
 import { MapService } from './map.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
-//import { GamePayload } from './game.type';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { FULL, PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
-import { RedisStateService } from '../redis/redis_state_player.service';
+import { RedisStateService } from '../redis/redis_state.service';
 
 @Injectable()
 export class GameService implements OnModuleInit {

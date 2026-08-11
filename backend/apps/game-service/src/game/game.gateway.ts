@@ -17,8 +17,7 @@ import { FULL } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ROOM_IDS } from '../lobby/lobby.const';
-import { Player } from './player/player';
-import { RedisStateService } from '../redis/redis_state_player.service';
+import { RedisStateService } from '../redis/redis_state.service';
 
 @WebSocketGateway(8082, { cors: { origin: true }, path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {

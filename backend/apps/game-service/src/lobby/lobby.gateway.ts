@@ -10,10 +10,6 @@ import {
 import { WebSocket, Server } from 'ws';
 import { OnEvent } from '@nestjs/event-emitter';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
-import {
-  PHASE_DURATIONS,
-  createMockUser,
-} from 'apps/game-service/src/game/game.type';
 import { LobbyService } from 'apps/game-service/src/lobby/lobby.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { RedisService } from '../redis/redis.service';
