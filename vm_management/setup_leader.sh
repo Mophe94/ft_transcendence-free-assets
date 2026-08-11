@@ -45,10 +45,10 @@ date -u
 NEW_USER_HOME="/home/$NEW_USER"
 
 echo "[$SCRIPT_NAME] Creating user: $NEW_USER"
+adduser -D -h "$NEW_USER_HOME" "$NEW_USER"
 IFS= read -r NEW_USER_PASSWORD
 echo "${NEW_USER}:${NEW_USER_PASSWORD}" | chpasswd
 unset NEW_USER_PASSWORD
-adduser -D -h "$NEW_USER_HOME" "$NEW_USER"
 
 echo "[$SCRIPT_NAME] Setting up ${NEW_USER} permissions"
 addgroup "$NEW_USER" wheel
@@ -86,9 +86,11 @@ bash /cert_rootCA.sh ${CERT_DIR}
 
 echo "[$SCRIPT_NAME] Adding utils"
 apk update
-apk add curl \
+apk add --no-cache \
+	curl \
 	vim \
-	jq
+	jq \
+	sshpass
 
 echo "[$SCRIPT_NAME] Setting up tailscape"
 apk add tailscale
