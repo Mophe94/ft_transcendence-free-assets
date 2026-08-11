@@ -90,36 +90,55 @@ get_env_value() {
 bootstrap_ssh_key() {
     local root_password
     local pub_key_content
+    local askpass
 
     root_password="$(get_env_value p_root_password)" || {
         echo "[ERROR][$SCRIPT_NAME] Missing p_root_password"
         exit 1
     }
-
     if [ -z "$root_password" ]; then
         echo "[ERROR][$SCRIPT_NAME] p_root_password is empty"
         exit 1
     fi
-
     echo "[INFO][$SCRIPT_NAME] Installing SSH key..."
-
     pub_key_content="$(cat "$PUB_KEY")"
-    SSHPASS="$root_password" sshpass -e \
-        ssh \
+
+    # Create a temporary SSH_ASKPASS helper.
+    askpass="$(mktemp)"
+    chmod 700 "$askpass"
+
+    cat > "$askpass" <<EOF
+#!/bin/sh
+printf '%s\n' '$root_password'
+EOF
+    export SSH_ASKPASS="$askpass"
+    export SSH_ASKPASS_REQUIRE=force
+    # SSH must not have a controlling terminal, otherwise it may
+    # try to ask for the password directly.
+    setsid ssh \
         -p "$SSH_PORT" \
         -o StrictHostKeyChecking=no \
         -o UserKnownHostsFile=/dev/null \
+        -o PreferredAuthentications=password \
+        -o PubkeyAuthentication=no \
         "$VM_USER@$SSH_HOST" \
         "mkdir -p ~/.ssh &&
          chmod 700 ~/.ssh &&
          touch ~/.ssh/authorized_keys &&
          chmod 600 ~/.ssh/authorized_keys &&
-         grep -qxF '$pub_key_content' ~/.ssh/authorized_keys ||
-         echo '$pub_key_content' >> ~/.ssh/authorized_keys"
+         (grep -qxF '$pub_key_content' ~/.ssh/authorized_keys ||
+          echo '$pub_key_content' >> ~/.ssh/authorized_keys)"
 
+    local result=$?
+    rm -f "$askpass"
+    unset SSH_ASKPASS
+    unset SSH_ASKPASS_REQUIRE
     unset root_password
     unset pub_key_content
-
+    if [ "$result" -ne 0 ]; then
+        echo "[ERROR][$SCRIPT_NAME] Failed to install SSH key"
+        return "$result"
+    fi
     echo "[INFO][$SCRIPT_NAME] SSH key installed"
 }
 
