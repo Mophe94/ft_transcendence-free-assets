@@ -290,7 +290,7 @@ export class MapService {
 			state: 'start_game',
 			player: {
 			  id: player.id,
-			  name: 'Ce que tu veux',
+			  name: '',
 			  asset: 'dinoBlue',
 			  team: player.team,
 			  //monster: player.currentMonster.name,
