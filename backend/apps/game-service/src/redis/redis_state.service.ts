@@ -19,7 +19,7 @@ export class RedisStateService {
 
 /* ###################### STATE ###################### */
 
-	async getSatePlayer(playerId: string): Promise<Object | undefined> {
+	async getStatePlayer(playerId: string): Promise<Object | undefined> {
 		const key = STATE_PLAYER.state(playerId);
 		const data = await this.redis.get(key);
 
@@ -30,7 +30,8 @@ export class RedisStateService {
 
 	async updateStatePlayer(playerId: string, state: Object): Promise<void> {
 		const key = STATE_PLAYER.state(playerId);
-		await this.redis.set(key, JSON.stringify(state));
+		// Expire after 1h
+		await this.redis.set(key, JSON.stringify(state), "EX", 3600);
 	}
 
 	async removeStatePlayer(playerId: string): Promise<void> {
