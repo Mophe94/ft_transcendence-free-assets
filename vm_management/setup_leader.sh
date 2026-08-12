@@ -103,18 +103,6 @@ fi
 echo "[$SCRIPT_NAME] Changing VM hostname to: swarmnode.${NEW_USER}"
 echo "swarmnode.${NEW_USER}" > /etc/hostname
 
-#Server CA creation
-
-echo "[$SCRIPT_NAME] Setting up directory"
-mkdir -p ${CERT_DIR}
-mv /cert_info.env ${CERT_DIR}/cert_info.env 
-
-#Server CA generation
-echo "[$SCRIPT_NAME] Generating CA"
-
-chmod +x /cert_rootCA.sh
-bash /cert_rootCA.sh ${CERT_DIR}
-
 echo "[$SCRIPT_NAME] Adding utils"
 apk update
 apk add --no-cache \
@@ -128,19 +116,8 @@ apk add tailscale
 rc-update add tailscale default
 service tailscale start
 
-echo "[${SCRIPT_NAME}] Configuring Docker startup dependency on Tailscale"
-mkdir -p /etc/conf.d
-if [ -f /etc/conf.d/docker ]; then
-    if ! grep -q 'rc_need="tailscale"' /etc/conf.d/docker; then
-        echo 'rc_need="tailscale"' | doas tee -a /etc/conf.d/docker >/dev/null
-    fi
-else
-    echo 'rc_need="tailscale"' | doas tee /etc/conf.d/docker >/dev/null
-fi
-
 echo "[$SCRIPT_NAME] Setting up Headscale"
 mkdir -p ${HEADSCALE_DIR}/{config,data}
-
 
 cat > ${HEADSCALE_DIR}/config/config.yaml <<EOF
 server_url: http://${HOST_IP}:9090
@@ -264,6 +241,26 @@ mkdir -p /nfs-storage/{registry,monitoring,backups} \
 echo "/nfs-storage *(rw,sync,no_subtree_check,no_root_squash)" >> "/etc/exports"
 exportfs -ra
 #check with exportfs -v
+
+#Server CA creation
+echo "[$SCRIPT_NAME] Setting up directory"
+mkdir -p ${CERT_DIR}
+mv /cert_info.env ${CERT_DIR}/cert_info.env 
+
+#Server CA generation
+echo "[$SCRIPT_NAME] Generating CA"
+chmod +x /cert_rootCA.sh
+bash /cert_rootCA.sh ${CERT_DIR} ${TAILSCALE_IP}
+
+echo "[${SCRIPT_NAME}] Configuring Docker startup dependency on Tailscale"
+mkdir -p /etc/conf.d
+if [ -f /etc/conf.d/docker ]; then
+    if ! grep -q 'rc_need="tailscale"' /etc/conf.d/docker; then
+        echo 'rc_need="tailscale"' | doas tee -a /etc/conf.d/docker >/dev/null
+    fi
+else
+    echo 'rc_need="tailscale"' | doas tee /etc/conf.d/docker >/dev/null
+fi
 
 echo "[$SCRIPT_NAME] Setting up Docker Daemon"
 mkdir -p "/etc/docker"

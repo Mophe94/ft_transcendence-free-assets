@@ -1,12 +1,15 @@
 #! /bin/bash
-
 SCRIPT_NAME="${0##*/}"
-if [ ! $# -eq 1 ]; then
-    echo "Usage: ${SCRIPT_NAME} <certs directory path>"
-    exit 1
-fi
 LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CERT_DIR="$1"
+
+# Safeguard
+if [ $# -ne 2 ]; then
+    echo "Usage: ${SCRIPT_NAME} <certs directory path> <IP>"
+    exit 1
+else
+    CERT_DIR="$1"
+    IP="$2"
+fi
 
 echo "[$SCRIPT_NAME] Setting up directory"
 mkdir -p ${CERT_DIR}
