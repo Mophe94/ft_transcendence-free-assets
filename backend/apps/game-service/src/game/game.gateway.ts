@@ -159,7 +159,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent('delete_user')
   onDeleteUser({ userId }: {userId: number}): void {
     const client = this.clientsById.get(userId);
-    if (client && client > 0)
+    if (client)
       client.close(); // call handleDisconnect -> cleanupClient
     // WHAT IF BOT ? 
   }
