@@ -18,7 +18,7 @@ include $(ENV_MK)
 export
 
 all:
-	@$(MAKE) setup_worker TYPE="leader"
+	@$(MAKE) leader
 
 vm : 
 	@if [ "$(USER)" != "stempels" ]; then \
@@ -43,7 +43,8 @@ setup_worker:
 
 leader:
 	@$(MAKE) setup_worker TYPE="leader"
-	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make TYPE=leader; /bin/bash"
+	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make"
+	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "/bin/bash"
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"

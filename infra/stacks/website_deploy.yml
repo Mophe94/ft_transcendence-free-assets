@@ -151,9 +151,9 @@ volumes:
 #        o: bind
 #        device: /var/lib/postgresql/data
 
-configs:
-  load_secrets:
-    file: "$HOME/infra/swarm/scripts/load_secrets.sh"
+#configs:
+#  load_secrets:
+#    file: "$HOME/infra/swarm/scripts/load_secrets.sh"
 
 secrets:
   db_users_db_name:

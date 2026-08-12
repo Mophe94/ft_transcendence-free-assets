@@ -29,17 +29,14 @@ TAG ?= latest
 REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
 BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) REGISTRY=$(REGISTRY) TAG=$(TAG)
 DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=$(PROM_SCRAPE_PORT) NFS_IP=$(HOST_TAILSCALE_IP)
-TYPE:=""
 TARGET=""
 
 all: env node_launch
 
 node_launch: wait_tailscale
-	@if [ "$(TYPE)" == "leader" ]; then \
-	    $(MAKE) swarm_setup && \
-	    $(MAKE) core && \
-	    $(MAKE) push website observ game; \
-	fi
+	$(MAKE) swarm_setup
+	$(MAKE) core
+	$(MAKE) push website observ game
 
 swarm_setup:
 	@chmod +x $(CONFIG_SCRIPTS)/launch_swarm.sh
@@ -64,21 +61,21 @@ website:
 	@doas mkdir -p "/var/lib/postgresql/data"
 	@doas mkdir -p "/var/lib/game/data"
 	@mkdir -p "/nfs-storage/users_data"
-	@make image TARGET=website
+	@make image TARGET=$@
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 game:
 	@doas mkdir -p "/var/lib/postgresql/data"
 	@doas mkdir -p "/var/lib/game/data"
 	@mkdir -p "/nfs-storage/game_data"
-	@make image TARGET=game
+	@make image TARGET=$@
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 observ:
 	@mkdir -p "/nfs-storage/grafana"
 	@mkdir -p "/nfs-storage/prometheus"
 	@mkdir -p "/nfs-storage/loki"
-#	@make image TARGET=observ
+#	@make image TARGET=$@
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 up: build
