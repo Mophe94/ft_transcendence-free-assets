@@ -2,15 +2,12 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { WebSocket } from 'ws';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { PlayerService } from './player/player.service';
-import { MonstersService } from './entities/monsters.service';
-import { TilesService } from './entities/tiles.service';
-import { ItemsService } from './entities/items.service';
 import { MapService } from './map.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
-import { FULL, PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
+import { PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
 import { RedisStateService } from '../redis/redis_state.service';
 
 @Injectable()
@@ -86,7 +83,7 @@ export class GameService implements OnModuleInit {
     if (!this.playerService.getPlayer(userId))
       this.playerService.initPlayer(userId);
     const player = this.playerService.getPlayer(userId)!;
-    player.roundsRemaining = this.activePlayers.get(roomId)?.size!;
+    player.roundsRemaining = 2 //this.activePlayers.get(roomId)?.size! / 2;
     console.log("ON GODOT CONNECTED ROUND REMAINING: ", player.roundsRemaining);
 
     if (rooms.size === this.activePlayers.get(roomId)?.size) {
@@ -337,11 +334,7 @@ export class GameService implements OnModuleInit {
           player.currentActions = { 
             actionType: state,
             data: payload
-          }
-
-          // Adapt rounds left
-          player.roundsRemaining -= 1;
-          player2.roundsRemaining -= 1;
+          };
 
           if ((player.currentActions.actionType && player2.currentActions.actionType) || playerForce?.forceChooseMonster) {
             const mapResult = await this.combatService.resolving_battle_round(player, player2);
@@ -369,6 +362,12 @@ export class GameService implements OnModuleInit {
                 if (!this.has_valid_monsters(player)){
                   endOfBattle = true;
                   loser = player.id;
+                // Adapt rounds left + reset battle team
+                player.roundsRemaining -= 1
+                player2.roundsRemaining -= 1
+                player.battle_team = [], [], [];
+                player2.battle_team = [], [], [];
+                
                   this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
                   this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
                   // wainting all combat finish
@@ -383,6 +382,12 @@ export class GameService implements OnModuleInit {
               if (!this.has_valid_monsters(player2)){
                 endOfBattle = true;
                 loser = player2.id;
+                // Adapt rounds left + reset battle team
+                player.roundsRemaining -= 1
+                player2.roundsRemaining -= 1
+                player.battle_team = [], [], [];
+                player2.battle_team = [], [], [];
+
                 this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
                 this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
               }
@@ -393,7 +398,6 @@ export class GameService implements OnModuleInit {
              }
             }
             else {
-//		    	    console.log("ForceChooseMonster [new_turn]", player.forceChooseMonster);	
               this.startNewTurn(combatRoomId!, new Set([userId, userId2]));
               this.sendToPlayer(userId, this.combatService.new_turn(player));
               this.sendToPlayer(userId2, this.combatService.new_turn(player2));
