@@ -225,7 +225,7 @@ export class CombatService {
 			data: {
 				state: "next_map",
 				timer: player.timer,
-				current_map: player.current_map,
+				current_map: 'map_01', //player.current_map,
 				player: player,
 			}
 		}
