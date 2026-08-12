@@ -84,7 +84,7 @@ export class GameService implements OnModuleInit {
     if (!this.playerService.getPlayer(userId))
       this.playerService.initPlayer(userId);
     const player = this.playerService.getPlayer(userId)!;
-    
+
     // change FULL for real room capacity
     player.roundsRemaining = Math.log2(FULL); //this.activePlayersByRoom.get(roomId)?.size! / 2;
     console.log("ON GODOT CONNECTED ROUND REMAINING: ", player.roundsRemaining);
@@ -177,9 +177,6 @@ export class GameService implements OnModuleInit {
         const player = this.playerService.getPlayer(userId)!;
         player.timer = mapTimer;
         if (nextRound) {
-          // console.log("PLAYER NEXT MAP: ", player)
-          // console.log("================================");
-
           return {userId, payload: this.combatService.next_map(player)};
         }
         else
@@ -287,9 +284,14 @@ export class GameService implements OnModuleInit {
     const roomId = this.roomIdByPlayer.get(userId)!;
     
     if (!userId2) {
-      console.log(`[GameService]: userId2 for ${userId} is missing !!!`);
+      console.log(`[GameService]: userId2 for ${userId} is missing`);
       return undefined;
     }
+    if (!combatRoomId) {
+      console.log(`[GameService] Missing combat room at end of combat, userId=${userId}`);
+      return undefined;
+    }
+
     let player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
 
     let playerForce : Player | undefined = undefined;
@@ -349,10 +351,7 @@ export class GameService implements OnModuleInit {
             if (mapResult && mapResult.get(player.id) !== undefined && mapResult.get(player2.id) !== undefined){
               const currentMessagePlayer = mapResult.get(player.id);
               const currentMessagePlayer2 = mapResult.get(player2.id);
-            //  console.log("* CurrentActionBattlePlayer1 *: ", mapResult.get(player.id));
-            //  console.log("*************************************");
-            //  console.log("* CurrentActionBattlePlayer2 *: ", mapResult.get(player2.id));
-            //  console.log("*************************************");
+
               for (let i = 0; i < currentMessagePlayer!.length; ++i){
                 this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
                 this.sendToPlayer(userId2, currentMessagePlayer2?.at(i)!);
@@ -362,7 +361,6 @@ export class GameService implements OnModuleInit {
               console.log("Waiting Player: ");
               break;
             }
-            //await new Promise(resolve => setTimeout(resolve, 2000)); // ! "temp fix to synchronizeke"
 
             if (player.currentMonster.life.current <= 0){
                 if (!this.has_valid_monsters(player)){
@@ -371,12 +369,12 @@ export class GameService implements OnModuleInit {
                 // Adapt rounds left + reset battle team
                 player.roundsRemaining -= 1
                 player2.roundsRemaining -= 1
-                player.battle_team = [], [], [];
-                player2.battle_team = [], [], [];
+                player.battle_team = [];
+                player2.battle_team = [];
                 
                   this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
                   this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
-                  // wainting all combat finish
+                  // waiting all combat finish
                 }
                 else{
                   player.forceChooseMonster = true;
@@ -391,8 +389,8 @@ export class GameService implements OnModuleInit {
                 // Adapt rounds left + reset battle team
                 player.roundsRemaining -= 1
                 player2.roundsRemaining -= 1
-                player.battle_team = [], [], [];
-                player2.battle_team = [], [], [];
+                player.battle_team = [];
+                player2.battle_team = [];
 
                 this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
                 this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
@@ -404,7 +402,7 @@ export class GameService implements OnModuleInit {
              }
             }
             else {
-              this.startNewTurn(combatRoomId!, new Set([userId, userId2]));
+              this.startNewTurn(combatRoomId, new Set([userId, userId2]));
               this.sendToPlayer(userId, this.combatService.new_turn(player));
               this.sendToPlayer(userId2, this.combatService.new_turn(player2));
               // si un combat deja finish declenchement du roundLeft
@@ -416,13 +414,10 @@ export class GameService implements OnModuleInit {
 
 
               this.combatService.playerCombatRoom.delete(loser);
-              this.combatService.playerCombatRoom.delete(winner);
-              if (combatRoomId) {
-                this.combatService.combatRooms.delete(combatRoomId!);
-                this.phaseTimer.clear(`combat: ${combatRoomId}`);
-              
+              this.combatService.playerCombatRoom.delete(winner);   
+              this.combatService.combatRooms.delete(combatRoomId!);
+              this.phaseTimer.clear(`combat: ${combatRoomId}`);
 
-              // reinitialize winner
               let winner_player = player.id === winner ? player : player2;
               
               console.log("END OF BATTLE: ROUNDS LEFT: ", player.roundsRemaining);
@@ -430,17 +425,15 @@ export class GameService implements OnModuleInit {
               if (winner_player.roundsRemaining === 0)
                 this.sendToPlayer(winner_player.id, {event: 'game', data: {state: 'finish'}});
 
-              //winner_player.roundsRemaining = 0;
+              // reinitialize winner
               winner_player.forceChooseMonster = false;
               winner_player.currentActions.actionType = undefined;
               winner_player.currentActions.data = "";
               winner_player.text = "";
 
               await this.eliminatePlayer(loser, roomId)
-              //this.eventEmitter.emit('delete_user', { userId: loser });
             }
           }
-        }
         break;
       default:
           console.log("Unknow state:", state);
