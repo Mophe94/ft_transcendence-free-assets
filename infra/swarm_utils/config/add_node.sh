@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/11 10:52:11 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/12 15:00:13 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -187,6 +187,7 @@ fi
 # Getting user(s) location/IP
 CONNECTED_NODES=()
 for user in "${NODE_USERS[@]}"; do
+    try=0
     if [ "$user" = "$USER" ]; then
 	continue
     elif docker node ls --format '{{.Hostname}}' | grep -Fxq swarmnode."$user"; then
@@ -198,7 +199,6 @@ for user in "${NODE_USERS[@]}"; do
 	continue
     fi
     if  ! { is_ip "$HOST_IP" || is_location "$HOST_IP"; }; then
-	try=0
 	while [ "$try" -lt 3 ]; do
 		read -p "[$SCRIPT_NAME]    IP of $user node host machine: " answer
 		if [ -z "$answer" ] || ! { is_ip "$answer" || is_location "$answer"; }; then
@@ -216,99 +216,99 @@ for user in "${NODE_USERS[@]}"; do
 	continue
     fi
 
-pub_key="$(cat "$PUB_KEY")"
+    pub_key="$(cat "$PUB_KEY")"
 
-# Getting user password
-password_from_env=false
-if password="$(get_env_value "p_node_${user}")"; then
-    password_from_env=true
-    printf '%s' "$password"
-else
-    echo "[$SCRIPT_NAME] No password configured for $user." >&2
-    IFS= read -r -s -p "[$SCRIPT_NAME] Password for $user: " password
-    echo >&2
-fi
-
-try=0
-while [ "$try" -lt 3 ]; do
-    if SSHPASS="$password" sshpass -e \
-        ssh \
-        -i "$SSH_KEY" \
-        -p "$SSH_PORT" \
-        -o StrictHostKeyChecking=no \
-        -o PreferredAuthentications=password \
-        -o PubkeyAuthentication=no \
-        "${user}@${HOST_IP}" \
-        "mkdir -p ~/.ssh && \
-         chmod 700 ~/.ssh && \
-         grep -qxf \"$pub_key\" ~/.ssh/authorized_keys 2>/dev/null || \
-         echo \"$pub_key\" >> ~/.ssh/authorized_keys && \
-         chmod 600 ~/.ssh/authorized_keys"
-    then
-        echo "[$SCRIPT_NAME] SSH key installed for $user."
-
-        # The bootstrap password has now been successfully used.
-        if [ "$password_from_env" = true ]; then
-            if ! consume_node_password "$user"; then
-                echo "[ERROR][$SCRIPT_NAME] Failed to remove bootstrap password for $user."
-                unset password
-                continue
-            fi
-	    try=3
-        fi
-        unset password
-
-        # From here onward, authentication is done with the SSH key.
-        ssh -i "$SSH_KEY" \
-            -p "$SSH_PORT" \
-            -o StrictHostKeyChecking=no \
-            "${user}@${HOST_IP}" \
-            "doas rm -rf ${VM_TARGET_DIR}/worker.* ca.crt"
-
-        doas scp \
-            -i "$SSH_KEY" \
-            -r \
-            -P "$SSH_PORT" \
-            -o StrictHostKeyChecking=no \
-            /etc/certs/ca.crt \
-            "/home/${USER}/certs/worker.crt" \
-            "/home/${USER}/certs/worker.key" \
-            "${user}@${HOST_IP}:${VM_TARGET_DIR}"
-
-        doas scp \
-            -i "$SSH_KEY" \
-            -r \
-            -P "$SSH_PORT" \
-            -o StrictHostKeyChecking=no \
-            /etc/headscale_authkey \
-            "${user}@${HOST_IP}:${VM_TARGET_DIR}/headscale_authkey"
-
-        ssh \
-            -i "$SSH_KEY" \
-            -p "$SSH_PORT" \
-            "$user@$HOST_IP" \
-            "doas chmod +x /setup_for_swarm.sh; \
-             doas nohup /setup_for_swarm.sh \
-             ${LEADER_IP} \
-             ${LEADER_TAILSCALE_IP} \
-             \"${JOIN_CMD}\" \
-             2049 \
-             >/tmp/setup_for_swarm.log 2>&1 < /dev/null &"
-
-        CONNECTED_NODES+=("$user")
-        break
-
+    # Getting user password
+    password_from_env=false
+    if password="$(get_env_value "p_node_${user}")"; then
+	password_from_env=true
+	printf '%s' "$password"
     else
-        echo "[ERROR][$SCRIPT_NAME] Could not authenticate to $user node."
-        try=$((try + 1))
-        if [ "$try" -lt 3 ]; then
-            echo "[$SCRIPT_NAME] Retrying..."
-	else
-	    echo "[$SCRIPT_NAME] Too many try, aborting."
-	    unset password
-        fi
+	echo "[$SCRIPT_NAME] No password configured for $user." >&2
+	IFS= read -r -s -p "[$SCRIPT_NAME] Password for $user: " password
+	echo >&2
     fi
-done
+
+    try=0
+    while [ "$try" -lt 3 ]; do
+	if SSHPASS="$password" sshpass -e \
+	    ssh \
+	    -i "$SSH_KEY" \
+	    -p "$SSH_PORT" \
+	    -o StrictHostKeyChecking=no \
+	    -o PreferredAuthentications=password \
+	    -o PubkeyAuthentication=no \
+	    "${user}@${HOST_IP}" \
+	    "mkdir -p ~/.ssh && \
+	     chmod 700 ~/.ssh && \
+	     grep -qxf \"$pub_key\" ~/.ssh/authorized_keys 2>/dev/null || \
+	     echo \"$pub_key\" >> ~/.ssh/authorized_keys && \
+	     chmod 600 ~/.ssh/authorized_keys"
+	then
+	    echo "[$SCRIPT_NAME] SSH key installed for $user."
+
+	    # The bootstrap password has now been successfully used.
+	    if [ "$password_from_env" = true ]; then
+		if ! consume_node_password "$user"; then
+		    echo "[ERROR][$SCRIPT_NAME] Failed to remove bootstrap password for $user."
+		    unset password
+		    continue
+		fi
+		try=3
+	    fi
+	    unset password
+
+	    # From here onward, authentication is done with the SSH key.
+	    ssh -i "$SSH_KEY" \
+		-p "$SSH_PORT" \
+		-o StrictHostKeyChecking=no \
+		"${user}@${HOST_IP}" \
+		"doas rm -rf ${VM_TARGET_DIR}/worker.* ca.crt"
+
+	    doas scp \
+		-i "$SSH_KEY" \
+		-r \
+		-P "$SSH_PORT" \
+		-o StrictHostKeyChecking=no \
+		/etc/certs/ca.crt \
+		"/home/${USER}/certs/worker.crt" \
+		"/home/${USER}/certs/worker.key" \
+		"${user}@${HOST_IP}:${VM_TARGET_DIR}"
+
+	    doas scp \
+		-i "$SSH_KEY" \
+		-r \
+		-P "$SSH_PORT" \
+		-o StrictHostKeyChecking=no \
+		/etc/headscale_authkey \
+		"${user}@${HOST_IP}:${VM_TARGET_DIR}/headscale_authkey"
+
+	    ssh \
+		-i "$SSH_KEY" \
+		-p "$SSH_PORT" \
+		"$user@$HOST_IP" \
+		"doas chmod +x /setup_for_swarm.sh; \
+		 doas nohup /setup_for_swarm.sh \
+		 ${LEADER_IP} \
+		 ${LEADER_TAILSCALE_IP} \
+		 \"${JOIN_CMD}\" \
+		 2049 \
+		 >/tmp/setup_for_swarm.log 2>&1 < /dev/null &"
+
+	    CONNECTED_NODES+=("$user")
+	    break
+
+	else
+	    echo "[ERROR][$SCRIPT_NAME] Could not authenticate to $user node."
+	    try=$((try + 1))
+	    if [ "$try" -lt 3 ]; then
+		echo "[$SCRIPT_NAME] Retrying..."
+	    else
+		echo "[$SCRIPT_NAME] Too many try, aborting."
+		unset password
+	    fi
+	fi
+    done
 done
 
 # Wait for node to join

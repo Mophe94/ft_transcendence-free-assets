@@ -69,7 +69,6 @@ date -u
 
 #Change for env procured password
 NEW_USER_HOME="/home/$NEW_USER"
-NEW_USER_PASSWORD="Nd${NEW_USER}123"
 
 echo "[$SCRIPT_NAME] Creating user: $NEW_USER"
 adduser -D -h "$NEW_USER_HOME" "$NEW_USER"
