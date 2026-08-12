@@ -385,82 +385,80 @@ private toClientSafePayload(payload: any): any {
       case "use_item_combat":
       case "try_attack":
       case "pass":
-          player.currentActions = { 
-            actionType: state,
-            data: payload
+        player.currentActions = {
+          actionType: state,
+          data: payload,
+        };
+
+        if (player2.isBot) {
+          player2.currentActions = this.aiService.decideAction(player2, player);
+        }
+
+        if ((player.currentActions.actionType && player2.currentActions.actionType) ||
+          playerForce?.forceChooseMonster) {
+          const mapResult = await this.combatService.resolving_battle_round(player, player2);
+          player.currentActions.actionType = undefined;
+          player2.currentActions.actionType = undefined;
+
+          if (
+            mapResult &&
+            mapResult.get(player.id) !== undefined &&
+            mapResult.get(player2.id) !== undefined
+          ) {
+            const currentMessagePlayer = mapResult.get(player.id);
+            const currentMessagePlayer2 = mapResult.get(player2.id);
+
+            for (let i = 0; i < currentMessagePlayer!.length; ++i) {
+              this.sendToPlayer(userId, this.toClientSafePayload(currentMessagePlayer?.at(i)!));
+              this.sendToPlayer(userId2, this.toClientSafePayload(currentMessagePlayer2?.at(i)!));
+            }
+          } else {
+            console.log("Waiting Player: ");
+            // rien à envoyer : le round n'est pas encore résolu pour les deux joueurs
           }
-//          console.log("Current actions", player.currentActions);
-//		    	console.log("ForceChooseMonster [game]", player.forceChooseMonster);			
-          if (player2.isBot) {
-            player2.currentActions = this.aiService.decideAction(player2, player);
+
+          await new Promise((resolve) => setTimeout(resolve, 2000)); // ! "temp fix to synchronize"
+
+          if (player.currentMonster.life.current <= 0) {
+            if (!this.has_valid_monsters(player)) {
+              endOfBattle = true;
+              player.hasLost = true;
+              player2.round += 1;
+              this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
+              this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
+              // waiting all combat finish
+            } else {
+              player.forceChooseMonster = true;
+              this.sendToPlayer(userId, this.combatService.change_monster(player, player.id));
+              this.sendToPlayer(userId2, this.combatService.change_monster(player2, player.id));
+            }
+          } else if (player2.currentMonster.life.current <= 0) {
+            if (!this.has_valid_monsters(player2)) {
+              endOfBattle = true;
+              player.hasLost = true;
+              player2.round += 1;
+              this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
+              this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
+            } else {
+              player2.forceChooseMonster = true;
+              this.sendToPlayer(userId, this.combatService.change_monster(player, player2.id));
+              this.sendToPlayer(userId2, this.combatService.change_monster(player2, player2.id));
+            }
+          } else {
+            this.startNewTurn(roomId, this.gameRooms.get(roomId)!);
+            this.sendToPlayer(userId, this.combatService.new_turn(player));
+            this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+            // si un combat est déjà fini, déclenchement du roundLeft
+            // send new_turn(player, roundLeft)
           }
-          if ((player.currentActions.actionType && player2.currentActions.actionType) || playerForce?.forceChooseMonster) {
-            const mapResult = await this.combatService.resolving_battle_round(player, player2);
-            player.currentActions.actionType = undefined;
-            player2.currentActions.actionType = undefined;
-            if (mapResult && mapResult.get(player.id) !== undefined && mapResult.get(player2.id) !== undefined){
-              const currentMessagePlayer = mapResult.get(player.id);
-              const currentMessagePlayer2 = mapResult.get(player2.id);
-//              console.log("* CurrentMessagePlayer1 *: ", mapResult.get(player.id));
-//              console.log("*************************************");
-//              console.log("* CurrentMessagePlayer2 *: ", mapResult.get(player2.id));
-//              console.log("*************************************");
 
-              for (let i = 0; i < currentMessagePlayer!.length; ++i){
-                // this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
-                // this.sendToPlayer(userId2, currentMessagePlayer2?.at(i)!);
-              }
+          if (endOfBattle) {
+            if (player.currentMonster.life.current > 0) {
+              this.sendToPlayer(userId, this.combatService.next_map(player, player2));
+            } else {
+              this.sendToPlayer(userId2, this.combatService.next_map(player2, player));
             }
-            else {
-              console.log("Waiting Player: ");
-              break;                for (let i = 0; i < currentMessagePlayer!.length; ++i){
-                  this.sendToPlayer(userId, this.toClientSafePayload(currentMessagePlayer?.at(i)!));
-                  this.sendToPlayer(userId2, this.toClientSafePayload(currentMessagePlayer2?.at(i)!));
-                }
-
-            }
-            await new Promise(resolve => setTimeout(resolve, 2000)); // ! "temp fix to synchronizeke"
-
-            if (player.currentMonster.life.current <= 0){
-                if (!this.has_valid_monsters(player)){
-                  endOfBattle = true;
-                  this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
-                  this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
-                  // wainting all combat finish
-                }
-                else{
-                  player.forceChooseMonster = true;
-                  this.sendToPlayer(userId, this.combatService.change_monster(player, player.id));
-                  this.sendToPlayer(userId2, this.combatService.change_monster(player2, player.id));
-                }
-            }
-            else if (player2.currentMonster.life.current <= 0){
-              if (!this.has_valid_monsters(player2)){
-                endOfBattle = true;
-                this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
-                this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
-              }          
-              else {
-                player2.forceChooseMonster = true;
-                this.sendToPlayer(userId, this.combatService.change_monster(player, player2.id));
-                this.sendToPlayer(userId2, this.combatService.change_monster(player2, player2.id));
-             }
-            }
-            else {
-//		    	    console.log("ForceChooseMonster [new_turn]", player.forceChooseMonster);	
-              this.startNewTurn(roomId, this.gameRooms.get(roomId)!);
-              this.sendToPlayer(userId, this.combatService.new_turn(player));
-              this.sendToPlayer(userId2, this.combatService.new_turn(player2));
-              // si un combat deja finish declenchement du roundLeft
-              // send new_turn(player, rounLeft)
-              // send new_turn(player, roundLeft)
-            }
-            if (endOfBattle) {
-              if (player.currentMonster.life.current > 0)
-                this.sendToPlayer(userId, this.combatService.next_map(player, player2));
-              else
-                this.sendToPlayer(userId2, this.combatService.next_map(player2, player));
-            }
+          }
         }
         break;
       default:

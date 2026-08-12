@@ -93,31 +93,31 @@ function monster(name: keyof typeof MONSTERS_DB, slot: number): CurrentMonster {
 // meilleurs contre le roster adverse.
 export const PREDEFINED_BOT_TEAMS: CurrentMonster[][] = [
   // Équipe 1 : Aquatique — dominance water, bon capital PV
-  [monster('fishet', 0), monster('burpy', 1), monster('sharky', 2), monster('pisciner', 3), monster('squirel', 4), monster('monkel', 5)],
+  [monster('pisciner', 0), monster('pisciner', 1), monster('pisciner', 2), monster('pisciner', 3), monster('pisciner', 4), monster('pisciner', 5)],
 
   // Équipe 2 : Terrestre — earth/neutral, tanky
-  [monster('papate', 0), monster('gigantomakia', 1), monster('squirel', 2), monster('monkel', 3), monster('leafs', 4), monster('pisciner', 5)],
+  [monster('pisciner', 0), monster('pisciner', 1), monster('pisciner', 2), monster('pisciner', 3), monster('pisciner', 4), monster('pisciner', 5)],
 
   // Équipe 3 : Aérienne — vitesse et couverture fly
-  [monster('pigeonne', 0), monster('fishet', 1), monster('squirel', 2), monster('monkel', 3), monster('burpy', 4), monster('leafs', 5)],
+  [monster('pisciner', 0), monster('pisciner', 1), monster('pisciner', 2), monster('pisciner', 3), monster('pisciner', 4), monster('pisciner', 5)],
 
   // Équipe 4 : Végétale — plant en tête, soutien earth/water
-  [monster('leafs', 0), monster('papate', 1), monster('gigantomakia', 2), monster('monkel', 3), monster('fishet', 4), monster('squirel', 5)],
+  [monster('pisciner', 0), monster('pisciner', 1), monster('pisciner', 2), monster('pisciner', 3), monster('pisciner', 4), monster('pisciner', 5)],
 
   // Équipe 5 : Équilibrée — un représentant par type dispo
-  [monster('pisciner', 0), monster('fishet', 1), monster('papate', 2), monster('leafs', 3), monster('pigeonne', 4), monster('monkel', 5)],
+  [monster('pisciner', 0), monster('pisciner', 1), monster('pisciner', 2), monster('pisciner', 3), monster('pisciner', 4), monster('pisciner', 5)],
 
   // Équipe 6 : Rapide — priorité à la vitesse (sharky 150, pigeonne 160, squirel 110)
-  [monster('pigeonne', 0), monster('sharky', 1), monster('squirel', 2), monster('fishet', 3), monster('monkel', 4), monster('burpy', 5)],
+  [monster('pisciner', 0), monster('pisciner', 1), monster('pisciner', 2), monster('pisciner', 3), monster('pisciner', 4), monster('pisciner', 5)],
 
   // Équipe 7 : Tank — HP/def max (gigantomakia 200hp, papate 180hp)
-  [monster('gigantomakia', 0), monster('papate', 1), monster('sharky', 2), monster('monkel', 3), monster('fishet', 4), monster('pigeonne', 5)],
+  [monster('pisciner', 0), monster('pisciner', 1), monster('pisciner', 2), monster('pisciner', 3), monster('pisciner', 4), monster('pisciner', 5)],
 
   // Équipe 8 : Glass cannon — attaque forte, défense faible (leafs 35/45 atk, def 0)
-  [monster('leafs', 0), monster('burpy', 1), monster('sharky', 2), monster('pigeonne', 3), monster('squirel', 4), monster('monkel', 5)],
+  [monster('pisciner', 0), monster('pisciner', 1), monster('pisciner', 2), monster('pisciner', 3), monster('pisciner', 4), monster('pisciner', 5)],
 
   // Équipe 9 : Débutant — monstres communs/uncommon, stats modestes
-  [monster('pisciner', 0), monster('fishet', 1), monster('squirel', 2), monster('leafs', 3), monster('burpy', 4), monster('monkel', 5)],
+  [monster('pisciner', 0), monster('pisciner', 1), monster('pisciner', 2), monster('pisciner', 3), monster('pisciner', 4), monster('pisciner', 5)],
 
   // Équipe 10 : Élite — les rares en priorité (sharky, gigantomakia, pigeonne)
   [monster('sharky', 0), monster('gigantomakia', 1), monster('pigeonne', 2), monster('burpy', 3), monster('monkel', 4), monster('papate', 5)],

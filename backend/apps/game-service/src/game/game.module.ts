@@ -10,6 +10,7 @@ import { WsAuthModule } from 'libs/shared/src/auth/ws-auth.module';
 import { MapService } from './map.service';
 
 import { AiService } from './ai_service/ai.service';
+import { RedisStateService } from '../redis/redis_state_player.service';
 @Module({
   providers: [
     GameGateway,
@@ -18,6 +19,7 @@ import { AiService } from './ai_service/ai.service';
     MapService,
     CombatService,
     RedisService,
+    RedisStateService,
     AiService,
   ],
   imports: [SharedModule, EntityModule, WsAuthModule],

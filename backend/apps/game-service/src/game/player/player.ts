@@ -261,7 +261,7 @@ import {
 			  ],
 		  },
 	  ];
-	team: string[] = ['pisciner', 'burpy', 'fishet', '', '', ''];
+	team: string[] = ['gigantomakia', 'burpy', 'fishet', '', '', ''];
 	  inventory: Inventory[] = [
 		  {
 			  name: "",
@@ -301,6 +301,8 @@ import {
 		  data: undefined
 	  };
 	  forceChooseMonster: boolean = false
+	  hasLost: boolean = false
+	  round: number = 1
 	  timer: number = 0
 	  current_map: string = ""
 	  current_monster: string = ""

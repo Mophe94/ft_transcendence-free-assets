@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Player } from '../player/player';
 import { getRandomBotTeam } from './bot-teams.data';
-import { MonstersService } from '../entities/monsters.service'; // ⚠️ adapte le chemin
-import { CombatService } from '../combat.service'; // ⚠️ adapte le chemin
-import { CurrentMonster } from '../player/player.interfaces'; // ⚠️ adapte le chemin
+import { MonstersService } from '../entities/monsters.service'; 
+import { CombatService } from '../combat.service'; 
+import { CurrentMonster,CurrentActions } from '../player/player.interfaces';
 
 export type BotMode = 'hardcoded' | 'takeover';
 
@@ -23,7 +23,7 @@ export class AiService {
 
   constructor(
     private readonly monstersService: MonstersService,
-    private readonly combatService: CombatService, // 👈 réutilise la table existante
+    private readonly combatService: CombatService, // réutilise la table existante
   ) {}
 
   public generateBotId(): number {
@@ -138,21 +138,21 @@ export class AiService {
   }
 
   public decideAction(bot: Player, opponent: Player): CurrentActions {
-  const monster = bot.currentMonster;
+    const monster = bot.currentMonster;
 
-  // Pas de monstre actif (début de combat ou monstre KO) -> en choisir un
-  if (!monster || monster.name === '' || monster.life.current <= 0) {
-    const slot = bot.battle_team.findIndex((m) => m.name !== '' && m.life.current > 0);
-    if (slot !== -1) {
-      return { actionType: 'change_current_monster', data: { slot } };
+    // Pas de monstre actif (début de combat ou monstre KO) -> en choisir un
+    if (!monster || monster.name === '' || monster.life.current <= 0) {
+      const slot = bot.battle_team.findIndex((m) => m.name !== '' && m.life.current > 0);
+      if (slot !== -1) {
+        return { actionType: 'change_current_monster', data: { slot } };
+      }
+      return { actionType: 'pass', data: undefined };
     }
-    return { actionType: 'pass' };
-  }
 
-  const availableSkill = monster.skill.find((s) => s.name !== '' && s.current > 0);
-  if (availableSkill) {
-    return { actionType: 'try_attack', data: { skill: availableSkill.name } };
+    const availableSkill = monster.skill.find((s) => s.name !== '' && s.current > 0);
+    if (availableSkill) {
+      return { actionType: 'try_attack', data: { skill: availableSkill.name } };
+    }
+    return { actionType: 'pass', data: undefined };
   }
-  return { actionType: 'pass' };
-}
 }
