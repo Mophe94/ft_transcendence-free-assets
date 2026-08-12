@@ -31,7 +31,7 @@ BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) REGISTRY=$
 DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=$(PROM_SCRAPE_PORT) NFS_IP=$(HOST_TAILSCALE_IP)
 TARGET=""
 
-all: env node_launch
+all: node_launch
 
 node_launch: wait_tailscale
 	$(MAKE) swarm_setup
@@ -147,9 +147,7 @@ wait_tailscale:
 	    fi; \
 	done
 
-$(ENV_MK): env
-
-env: $(ENV_FILE)
+$(ENV_MK): $(ENV_FILE)
 	@if [ ! -f "$(TOOLS_SCRIPTS)"/create_env.sh ] || [ ! -f "$(TOOLS_SCRIPTS)"/check_env.sh ]; then \
 	    echo "Missing env handlers"; \
 	    exit 1; \
@@ -169,4 +167,4 @@ $(ENV_FILE):
 		exit 1; \
 	fi
 
-PHONY: all node_launch swarm_setup swarm_status push test core website game observ up down swarm-status image wait_tailscale env
+PHONY: all node_launch swarm_setup swarm_status push test core website game observ up down swarm-status image wait_tailscale

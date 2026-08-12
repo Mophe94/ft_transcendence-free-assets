@@ -52,10 +52,7 @@ worker:
 
 vm_erase:
 
-
-$(ENV_MK): env
-
-env: $(ENV_FILE)
+$(ENV_MK): $(ENV_FILE)
 	@if [ ! -f "$(TOOLS_SCRIPTS)"/create_env.sh ] || [ ! -f "$(TOOLS_SCRIPTS)"/check_env.sh ]; then \
 	    echo "Missing env handlers"; \
 	    exit 1; \
@@ -75,5 +72,4 @@ $(ENV_FILE):
 		exit 1; \
 	fi
 	
-.PHONY: all vm setup_worker leader worker vm_erase env
-
+.PHONY: all vm setup_worker leader worker vm_erase
