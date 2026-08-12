@@ -123,12 +123,13 @@ export class GameService implements OnModuleInit {
   }
 
   private async eliminatePlayer(userId: number, roomId: string): Promise<void> {
-    await this.onGodotDisconnected(userId, roomId);
-    //this.eventEmitter.emit('close_player_socket', { userId });
+    //await this.onGodotDisconnected(userId, roomId);
+    await new Promise(resolve => setTimeout(resolve, 10000)); // ! "temp fix to synchronizeke"
+    this.eventEmitter.emit('close_player_socket', { userId });
   }
 
   private sendToPlayer(userId: number, payload: object): void {
-    console.log("Send_to_player: id: ", userId, payload);
+    console.log("Send_to_player: id: ", userId);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
@@ -240,7 +241,7 @@ export class GameService implements OnModuleInit {
   private startNewTurn(combatRoomId: string, room: Set<number>) {
     const timerKey = combatRoomId ? `combat: ${combatRoomId}` : undefined;
     if (!combatRoomId) {
-      console.warn(`[GameService] Message reçu hors combat actif pour ??, ignoré`);
+      console.log("[GameService] - StartNewTurn -> combatRoomId undefined");
       return undefined;
     }
     if (!timerKey) return;
@@ -289,9 +290,10 @@ export class GameService implements OnModuleInit {
         playerForce = player2;
 
     if (!player2) {
-      console.log(`[GameService]: No opponent for ${userId} - using player as placeholder`);
-      player2 = player;
+      console.log(`[GameService]: No opponent for ${userId}`);
+      return undefined;
     }
+
     let result: object | undefined
     const state = payload?.state
     console.log("STATE", state);
@@ -404,6 +406,14 @@ export class GameService implements OnModuleInit {
                 this.combatService.combatRooms.delete(combatRoomId!);
                 this.phaseTimer.clear(`combat: ${combatRoomId}`);
               }
+
+              // reinitialize winner
+              let winner_player = player.id === winner ? player : player2;
+              winner_player.text = "";
+              winner_player.forceChooseMonster = false;
+              winner_player.currentActions.actionType = undefined;
+              winner_player.currentActions.data = "";
+
               await this.eliminatePlayer(loser, roomId)
               //this.eventEmitter.emit('delete_user', { userId: loser });
             }
