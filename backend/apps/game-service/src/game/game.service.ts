@@ -7,7 +7,7 @@ import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
-import { PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
+import { FULL, PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
 import { RedisStateService } from '../redis/redis_state.service';
 
 @Injectable()
@@ -31,18 +31,18 @@ export class GameService implements OnModuleInit {
   // roomIds -> authorized players
   private readonly authorizedPlayers = new Map<string, Set<number>>();
   // roomId -> active players
-  private activePlayers = new Map<string, Set<number>>();
+  private activePlayersByRoom = new Map<string, Set<number>>();
 
   /*  INITIALIZATION with hardcoded values */
   onModuleInit(): void {
-    this.registerRoom('test-room', [1, 2, 3, 4]);
+    //this.registerRoom('test-room', [1, 2, 3, 4]);
   }
 
   /*  GAME ROOMS */
 
   registerRoom(roomId: string, userIds: number[]): void {
     this.authorizedPlayers.set(roomId, new Set(userIds));
-    this.activePlayers.set(roomId, new Set(userIds));
+    this.activePlayersByRoom.set(roomId, new Set(userIds));
   }
 
   isPlayerInRoom(userId: number, roomId: string): boolean {
@@ -50,13 +50,13 @@ export class GameService implements OnModuleInit {
   }
 
   private joinGameRoom(roomId: string, userId: number): Set<number> {
-    let rooms = this.gameRooms.get(roomId);
-    if (!rooms) {
-      rooms = new Set();
-      this.gameRooms.set(roomId, rooms);
+    let roomPlayers = this.gameRooms.get(roomId);
+    if (!roomPlayers) {
+      roomPlayers = new Set();
+      this.gameRooms.set(roomId, roomPlayers);
     }
-    rooms.add(userId);
-    return rooms;
+    roomPlayers.add(userId);
+    return roomPlayers;
   }
 
   private async leaveGameRoom(roomId: string, userId: number): Promise<void> {
@@ -75,27 +75,38 @@ export class GameService implements OnModuleInit {
     userId: number,
     roomId: string,
   ): Promise<void> {
-    const rooms = this.joinGameRoom(roomId, userId);
+
+    const roomPlayers = this.joinGameRoom(roomId, userId);
     this.roomIdByPlayer.set(userId, roomId);
-    console.log(`Size = ${rooms.size}, RoomId = ${roomId}`);
+    console.log(`Size = ${roomPlayers.size}, RoomId = ${roomId}`);
 
-
+    // Init or retrieve Player
     if (!this.playerService.getPlayer(userId))
       this.playerService.initPlayer(userId);
     const player = this.playerService.getPlayer(userId)!;
-    player.roundsRemaining = 2 //this.activePlayers.get(roomId)?.size! / 2;
+    
+    // change FULL for real room capacity
+    player.roundsRemaining = Math.log2(FULL); //this.activePlayersByRoom.get(roomId)?.size! / 2;
     console.log("ON GODOT CONNECTED ROUND REMAINING: ", player.roundsRemaining);
 
-    if (rooms.size === this.activePlayers.get(roomId)?.size) {
+    let activePlayers = this.activePlayersByRoom.get(roomId);
+    if (!activePlayers) {
+      activePlayers = new Set();
+      this.activePlayersByRoom.set(roomId, activePlayers);
+    }
+    activePlayers.add(userId);
+
+    // FULL need to be repalaced by the real capacity of the room retrieved from redis
+    if (roomPlayers.size === FULL /* this.activePlayersByRoom.get(roomId)?.size */) {
 	  /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
-	  for (const userId of rooms) {
-		  const playerState = this.playerService.getPlayer(userId)!;
-	  	await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
-	  }
+      for (const userId of roomPlayers) {
+        const playerState = this.playerService.getPlayer(userId)!;
+        await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
+	    }
 	  /////////////////////////////////* END */////////////////////////////////
-      this.combatService.matchmake(rooms);
+      this.combatService.matchmake(roomPlayers);
       // TEST MATCHMAKING //
-      for (const userId of rooms) {
+      for (const userId of roomPlayers) {
         const player = this.playerService.getPlayer(userId)!; 
         const opponentId = this.combatService.getOpponentId(userId);
         const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
@@ -107,7 +118,7 @@ export class GameService implements OnModuleInit {
         console.log('******************');
       }
 
-      await this.startMapPhase(roomId, rooms);
+      await this.startMapPhase(roomId, roomPlayers);
     }
   }
   
@@ -118,7 +129,7 @@ export class GameService implements OnModuleInit {
     await this.redisStateService.removePlayer(userId.toString());
 	/////////////////////////////////* END */////////////////////////////////
     this.leaveGameRoom(roomId, userId);
-    this.activePlayers.get(roomId)?.delete(userId);
+    this.activePlayersByRoom.get(roomId)?.delete(userId);
     this.startNextRound(roomId);
   }
 
@@ -134,11 +145,11 @@ export class GameService implements OnModuleInit {
   }
 
   startNextRound(roomId: string): void {
-    const active = this.activePlayers.get(roomId);
+    const active = this.activePlayersByRoom.get(roomId);
     const connected = this.gameRooms.get(roomId);
     if (!active || !connected) return;
 
-    console.log(`[GameService] activePlayers=${this.activePlayers.get(roomId)?.size}, connected=${this.gameRooms.get(roomId)?.size}`);
+    console.log(`[GameService] activePlayersByRoom=${this.activePlayersByRoom.get(roomId)?.size}, connected=${this.gameRooms.get(roomId)?.size}`);
     
     const allCombatsFinished = connected.size === active.size;
     const canPairEveryone = active.size >= 2 && active.size % 2 === 0;
@@ -147,27 +158,22 @@ export class GameService implements OnModuleInit {
       this.combatService.matchmake(connected);
       this.startMapPhase(roomId, connected, true);
     }
-    
-    // if (active.size >= 2 && connected.size == active.size && !(active.size % 2)) {
-    //   this.combatService.matchmake(connected);
-    //   this.startMapPhase(roomId, connected, "nextMap");
-    // }
   }
 
   private async startMapPhase(
     roomId: string,
-    room: Set<number>,
+    roomPlayers: Set<number>,
     nextRound = false,
   ): Promise<void> {
     this.phaseTimer.start(`game: ${roomId}`, 'map', () => {
       console.log(`Room ${roomId} map phase timeout`);
-      this.startTeamSetupPhase(roomId, room);
+      this.startTeamSetupPhase(roomId, roomPlayers);
     });
 
     const mapTimer = this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.map;
 
     const payloads = await Promise.all(
-      [...room].map(async (userId) => {
+      [...roomPlayers].map(async (userId) => {
         const player = this.playerService.getPlayer(userId)!;
         player.timer = mapTimer;
         if (nextRound) {
@@ -182,7 +188,7 @@ export class GameService implements OnModuleInit {
     );
 
     payloads.forEach(({ userId, payload }) => this.sendToPlayer(userId, payload));
-    console.log(`[GameService]: startMapPhase -> start_game sent to ${room.size} players of ${roomId}`,
+    console.log(`[GameService]: startMapPhase -> start_game sent to ${roomPlayers.size} players of ${roomId}`,
     );
   }
 

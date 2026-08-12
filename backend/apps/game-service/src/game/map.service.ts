@@ -206,15 +206,15 @@ export class MapService {
 	
 	  // RECEIVED REQUEST FOR ITEM, CALL DB GAME + CHOICE ONE RANDOM ITEM AND RETURN THIS
 	async received_request_item(player: Player){
-		let items = await this.itemsService.findAll();
+		const items = await this.itemsService.findAll();
 		if (!items) {
 		  console.log('[ERROR]: items is undefined')
 		  return undefined
 	}
 	
-		let result = Math.floor(Math.random() * 100);
+		const result = Math.floor(Math.random() * 100);
 		let gap = Math.floor(100 / items.length)
-		let step = gap
+		const step = gap
 		let i = 0
 		for (i; result > gap && i < items.length - 1; ++i)
 		  gap += step
@@ -225,10 +225,11 @@ export class MapService {
 		  if (player.inventory[i]["name"] === player.current_item) {
 			player.inventory[i]["current"] += 1;
 			add = true;
+			break;
 		  }
 		}
 		if (add === false) {
-		  for (let j = 0; i < player.inventory.length; j++) {
+		  for (let j = 0; j < player.inventory.length; j++) {
 			if (player.inventory[j]["name"] === ""){
 			  player.inventory[j]["name"] = player.current_item;
 			  player.inventory[j]["scene"] = items[i].scene;
@@ -372,12 +373,12 @@ export class MapService {
 			  player.inventory[i]["value"] = 0;
 			  player.inventory[i]["current"] = 0;
 			}
-			else 
+			else {
 			  player.inventory[i].current -= 1;
-	
 			}
 			break;
 		  }
+		}
 		return this.update_inventory(player);
 	}
 	
