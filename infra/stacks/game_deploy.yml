@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/08/07 15:50:00 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/12 12:20:09 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,7 @@ services:
           - db_game_db_name
           - db_game_username
           - db_game_password
+          - jwt_secret_key
           - redis_password
         command:
           - npm
@@ -136,6 +137,8 @@ secrets:
   db_game_password:
     external: true
   db_game_postgres_password:
+    external: true
+  jwt_secret_key:
     external: true
   redis_password:
     external: true
