@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { MonsterStat } from './types/monster_stat.enum';
+import { ItemType } from './types/item_type.enum';
 
 @Entity('items')
 export class Item {
@@ -18,9 +19,16 @@ export class Item {
     name: 'target',
     nullable: true,
   })
+  target!: MonsterStat;
 
   @Column()
   scene!: string;
 
-  target!: MonsterStat;
+  @Column({
+    type: 'enum',
+    enum: ItemType,
+    name: 'type',
+    nullable: true,
+  })
+  type!: string;
 }

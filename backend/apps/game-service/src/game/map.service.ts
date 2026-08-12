@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
 import { Player } from './player/player';
 import { MonstersService } from './entities/monsters.service';
 import { TilesService } from './entities/tiles.service';
@@ -234,6 +233,7 @@ export class MapService {
 			if (player.inventory[j]["name"] === ""){
 			  player.inventory[j]["name"] = player.current_item;
 			  player.inventory[j]["scene"] = items[i].scene;
+			  player.inventory[j].type = items[i].type;
 			  player.inventory[j]["current"] += 1;
 			  player.inventory[j]["value"] = items[i].value;
 			  player.inventory[j]["target"] = items[i].target;

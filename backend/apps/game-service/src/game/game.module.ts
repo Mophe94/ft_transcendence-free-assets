@@ -6,6 +6,7 @@ import { PlayerService } from './player/player.service';
 import { CombatService } from './combat.service';
 import { EntityModule } from './entities/entity.module';
 import { RedisService } from '../redis/redis.service';
+import { RedisStateService } from '../redis/redis_state.service';
 import { WsAuthModule } from 'libs/shared/src/auth/ws-auth.module';
 import { MapService } from './map.service';
 
@@ -17,6 +18,7 @@ import { MapService } from './map.service';
     MapService,
     CombatService,
     RedisService,
+    RedisStateService,
   ],
   imports: [SharedModule, EntityModule, WsAuthModule],
 })
