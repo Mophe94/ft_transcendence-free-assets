@@ -2,6 +2,19 @@ extends Control
 
 const REFERENCE_SIZE := Vector2(960, 640)
 
+@onready var finsh_png = {
+	"dinoBlue" = preload("res://Assets/Finish/finish_blue_dino.png"),
+	"dinoYellow" = preload("res://Assets/Finish/finish_dino_yellow.png"),
+	"dinoGreen" = preload("res://Assets/Finish/finish_green_dino.png"),
+	"dinoRed" = preload("res://Assets/Finish/finish_red_dino.png"),
+	"ghost" = preload("res://Assets/Finish/finish_ghost.png"),
+	"ghost02" = preload("res://Assets/Finish/finish_ghost_2.png"),
+	"ghost03" = preload("res://Assets/Finish/finish_ghost_3.png"),
+	"satyr01" = preload("res://Assets/Finish/finish_satyr.png"),
+	"satyr02" = preload("res://Assets/Finish/finish_satyr_2.png"),
+	"satyr03" = preload("res://Assets/Finish/finish_satyr_3.png")
+}
+
 @onready var nameBackGround = GeneralData.background_battle
 @onready var backGround = $CanvasLayer/BackGround
 
@@ -65,6 +78,22 @@ func _update_battle_positions() -> void:
 	enemy_monster_ref.scale = enemy_monster_base_scale * scale_ratio
 
 ###################################################################
+func _last_scene():
+	await transi_close()
+	var background = $CanvasLayer/BackGround
+	$Timer.hide()
+	$Charactere.hide()
+	$Effect.hide()
+	$CombatMenus.hide()
+	$EnemyMonsterUI.hide()
+	$PlayerMonsterUI.hide()
+	background.texture = finsh_png[GeneralData.player["asset"]]
+	await transi_open()
+
+func  _next_map():
+	await transi_close()
+	get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
+
 func _stop_timer():
 	stop_timer = true
 	
@@ -99,6 +128,11 @@ func _new_turn():
 	
 ###################################################################
 
+func transi_close():
+	var transi_scene = GeneralData.transi.instantiate()
+	add_child(transi_scene)
+	await transi_scene.get_node("CanvasLayer/ColorRect").close()
+#	transi_scene.queue_free()
 
 func generate_charactere():
 	var player_scene = assetPlayer.instantiate()
@@ -188,6 +222,8 @@ func transi_open():
 	transi_scene.queue_free()
 
 func _ready() -> void:
+	Received.next_map_scene.connect(_next_map)
+	$CombatMenus.last_scene.connect(_last_scene)
 	$CombatMenus.action_combat.connect(show_UI)
 	$CombatMenus.change_monster.connect(_new_current_monster)
 	$CombatMenus.enemy_change_monster.connect(_new_enemy_monster)

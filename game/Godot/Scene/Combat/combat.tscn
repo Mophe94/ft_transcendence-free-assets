@@ -38,7 +38,6 @@ inherit_velocity_ratio = 0.508
 direction = Vector3(45, 15, 0)
 initial_velocity_max = 239.29
 gravity = Vector3(40, 40, 0)
-scale_max = 2.0
 scale_over_velocity_max = 639.29
 color_ramp = SubResource("GradientTexture1D_exqle")
 
@@ -177,20 +176,20 @@ script = ExtResource("4_00rey")
 
 [node name="Comete" type="GPUParticles2D" parent="Effect" unique_id=1939011732]
 position = Vector2(480, 128)
-amount = 1
+amount = 2
 lifetime = 1.5
 trail_lifetime = 0.1
 process_material = SubResource("ParticleProcessMaterial_34ebb")
 
 [node name="Star" type="CPUParticles2D" parent="Effect" unique_id=644864512]
 position = Vector2(480, 128)
-amount = 15
+amount = 20
 lifetime = 5.0
 emission_shape = 3
 emission_rect_extents = Vector2(480, 128)
 gravity = Vector2(0, 0)
 scale_amount_min = 2.0
-scale_amount_max = 4.0
+scale_amount_max = 4.5
 color_ramp = SubResource("Gradient_odnam")
 
 [node name="Timer" parent="." unique_id=306374687 instance=ExtResource("6_6r0b8")]

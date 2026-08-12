@@ -19,22 +19,35 @@ signal change_monster
 signal enemy_change_monster
 signal stop_timer
 signal run_timer
+signal last_scene
+
+var result_scene = null
 
 ##############################################################
 func _finish():
-	text_show("You are the best take me <3")
-
+	await text_show("You are the best !", 1)
+	if is_instance_valid(result_scene):
+		result_scene.queue_free()
+		result_scene = null
+	last_scene.emit()
+	
 func _lose():
 	await text_show("YOU LOSE.")
-	var lose_scene = battle_result["lose"].instantiate()
-	get_tree().current_scene.add_child(lose_scene)
+	if is_instance_valid(result_scene):
+		result_scene.queue_free()
+		
+	result_scene = battle_result["lose"].instantiate()
+	get_tree().current_scene.add_child(result_scene)
 	stop_timer.emit()
 	Received.action_finished.emit()
 	
 func _win():
 	await text_show("YOU WIN !")
-	var victory_scene = battle_result["win"].instantiate()
-	get_tree().current_scene.add_child(victory_scene)
+	if is_instance_valid(result_scene):
+		result_scene.queue_free()
+		
+	result_scene = battle_result["win"].instantiate()
+	get_tree().current_scene.add_child(result_scene)
 	stop_timer.emit()
 	await get_tree().create_timer(2.0).timeout
 	Received.action_finished.emit()
@@ -50,20 +63,17 @@ func _change_monster():
 func _enemy_change_monster():
 	hide_selection()
 	await text_show(GeneralData.text, 1)
-	$Text.text = ""
 	print("signal enemy change send")
 	Received.action_finished.emit()
 
 func _new_current_monster():
 	stop_timer.emit()
 	await text_show(GeneralData.text, 1)
-	$Text.text = ""
 	emit_signal("change_monster")
 		
 func _new_enemy_monster():
 	stop_timer.emit()
 	await text_show(GeneralData.text, 1)
-	$Text.text = ""
 	emit_signal("enemy_change_monster")
 
 func waiting_player(send_func: Callable):
@@ -74,10 +84,10 @@ func waiting_player(send_func: Callable):
 	await text_show("Waiting action enemy.")
 
 func _received_action():
+	$Text.text = ""
 	stop_timer.emit()
 	emit_signal("action_combat")
 	await text_show(GeneralData.text, 1)
-	$Text.text = ""
 	Received.action_finished.emit()
 
 func _new_turn():
