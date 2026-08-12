@@ -30,10 +30,41 @@ if [ "$RESIZE_DISK" = "true" ]; then
     resize2fs /dev/sda3
 fi
 
+echo "[$SCRIPT_NAME] Waiting for network"
+
+TIMEOUT=60
+ELAPSED=0
+
+until ip route get 1.1.1.1 >/dev/null 2>&1; do
+    sleep 1
+    ELAPSED=$((ELAPSED + 1))
+
+    if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
+        echo "[$SCRIPT_NAME] Network failed to become ready"
+        exit 1
+    fi
+done
+
 echo "[$SCRIPT_NAME] Synchronizing system clock"
+
 rc-service ntpd stop
-ntpd -nq -p pool.ntp.org
+
+TIMEOUT=90
+ELAPSED=0
+
+until ntpd -nq -p pool.ntp.org; do
+    echo "[$SCRIPT_NAME] NTP synchronization failed, retrying..."
+    sleep 5
+    ELAPSED=$((ELAPSED + 5))
+
+    if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
+        echo "[$SCRIPT_NAME] Failed to synchronize system clock"
+        exit 1
+    fi
+done
+
 rc-service ntpd start
+
 date -u
 
 #Change for env procured password
