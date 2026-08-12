@@ -302,6 +302,7 @@ import { emptyCurrentMonster } from './player.interfaces';
 		  data: undefined
 	  };
 	  roundsRemaining: number = 0;
+	  teamReady: boolean = false;
 	  forceChooseMonster: boolean = false
 	  timer: number = 0
 	  current_map: string = ""

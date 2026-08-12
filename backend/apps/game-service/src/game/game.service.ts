@@ -134,8 +134,8 @@ export class GameService implements OnModuleInit {
   }
 
   private async eliminatePlayer(userId: number, roomId: string): Promise<void> {
-    //await this.onGodotDisconnected(userId, roomId);
     await new Promise(resolve => setTimeout(resolve, 11000)); // ! "temp fix to synchronizeke"
+    console.log(`[GameService] Eliminating player ${userId} from room ${roomId}`);
     this.eventEmitter.emit('close_player_socket', { userId });
   }
 
@@ -189,18 +189,21 @@ export class GameService implements OnModuleInit {
     );
   }
 
-  private startTeamSetupPhase(roomId: string, room: Set<number>) {
+  private startTeamSetupPhase(roomId: string, roomPlayers: Set<number>) {
     this.phaseTimer.start(`game: ${roomId}`, 'team_setup', () => {
       console.log(`Room ${roomId} team_setup phase timeout`);
-      this.startCombatPhase(roomId, room);
+
+      // move to handleMessage case "received_team_choice
+      //this.startCombatPhase(roomId, room);
 
     });
     const teamSetupTimer =
       this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.team_setup;
 
-    for (const userId of room) {
+    for (const userId of roomPlayers) {
       const player = this.playerService.getPlayer(userId)!;
       player.timer = teamSetupTimer;
+      player.teamReady = false;
 
       const opponentId = this.combatService.getOpponentId(userId);
       const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
@@ -218,18 +221,18 @@ export class GameService implements OnModuleInit {
     }
   }
 
-  private startCombatPhase(roomId: string, room: Set<number>) {
+  private startCombatPhase(roomId: string, roomPlayers: Set<number>) {
     const handled = new Set<number>();
 
-    for (const userId of room) {
+    for (const userId of roomPlayers) {
       if (handled.has(userId)) continue;
 
       const opponentId = this.combatService.getOpponentId(userId);
       const combatRoomId = this.combatService.playerCombatRoom.get(userId);
-      const timerKey = combatRoomId ? `combat: ${combatRoomId}` : `game: ${roomId}`;
+      const timerKey = `combat: ${combatRoomId}`;
 
       this.phaseTimer.start(timerKey, 'choose_action', () => {
-      console.log(`Duel ${roomId} choose_action timeout`);
+      console.log(`Combat ${roomId} choose_action timeout`);
     });
 
       const combatTimer = this.phaseTimer.startTimes.get(timerKey)! + PHASE_DURATIONS.choose_action;
@@ -333,7 +336,22 @@ export class GameService implements OnModuleInit {
         result = await this.mapService.received_delete_monster(player, payload.monster)
         break;
       case "team_choice":
-        result = await this.mapService.received_team_choice(player, payload.battle_team)
+        const error = await this.mapService.received_team_choice(player, payload.battle_team)
+        if (error) {
+          result = error;
+          break;
+        }
+        
+        player.teamReady = true;
+
+        if (player2.teamReady) {
+          const roomPlayers = this.activePlayersByRoom.get(roomId);
+          this.startCombatPhase(roomId, roomPlayers!);
+          this.sendToPlayer(userId, this.mapService.combat(player));
+          this.sendToPlayer(userId2, this.mapService.combat(player2));
+        }
+        else
+          result = {event: 'game', data: { state: 'waiting_for_opponent'}};
         break;
       case "change_current_monster":
       case "use_item_combat":

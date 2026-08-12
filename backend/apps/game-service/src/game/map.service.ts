@@ -164,7 +164,6 @@ export class MapService {
 		  }
 		}
 	
-	
 		for (const {name, slot} of monstersToLoad) {
 		  const monster = await this.monstersService.findOneByName(name, { skills: true });
 		  if (!monster) return {
@@ -199,8 +198,9 @@ export class MapService {
 			}))
 		  };
 		}
-		await new Promise(resolve => setTimeout(resolve, 1000)); // ! temp fix to synchronizeke with startCombatTimer
-		return this.combat(player);
+		//await new Promise(resolve => setTimeout(resolve, 1000)); // ! temp fix to synchronizeke with startCombatTimer
+		//return this.combat(player);
+		return undefined;
 	}
 	
 	
