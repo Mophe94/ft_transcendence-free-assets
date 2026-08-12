@@ -43,3 +43,12 @@ export interface CurrentActions {
 	actionType: "try_attack" | "use_item_combat" | "change_current_monster" | "pass" | undefined;
 	data: any;
   }
+
+export function emptyCurrentMonster(): CurrentMonster {
+	return {
+		name: "", slot: -1, life: { current: 0, max: 0 }, type: "",
+		attack: 0, attack_spe: 0, defense: 0, defense_spe: 0, speed: 0,
+		status: [], dodge: false, 
+		skill: [],
+	};
+}

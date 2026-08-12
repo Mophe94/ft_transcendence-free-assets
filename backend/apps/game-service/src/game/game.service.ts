@@ -278,7 +278,7 @@ export class GameService implements OnModuleInit {
   async handleMessage(userId: number, payload: any) : Promise<object | undefined> {
     let endOfBattle = false;
     const combatRoomId = this.combatService.playerCombatRoom.get(userId);
-    let loser;
+    let loserId;
     let player = this.playerService.getPlayer(userId)!;
     let userId2 = this.combatService.getOpponentId(userId);
     const roomId = this.roomIdByPlayer.get(userId)!;
@@ -365,12 +365,10 @@ export class GameService implements OnModuleInit {
             if (player.currentMonster.life.current <= 0){
                 if (!this.has_valid_monsters(player)){
                   endOfBattle = true;
-                  loser = player.id;
-                // Adapt rounds left + reset battle team
+                  loserId = player.id;
+                // Adapt rounds left
                 player.roundsRemaining -= 1
                 player2.roundsRemaining -= 1
-                player.battle_team = [];
-                player2.battle_team = [];
                 
                   this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
                   this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
@@ -385,12 +383,10 @@ export class GameService implements OnModuleInit {
             else if (player2.currentMonster.life.current <= 0){
               if (!this.has_valid_monsters(player2)){
                 endOfBattle = true;
-                loser = player2.id;
-                // Adapt rounds left + reset battle team
+                loserId = player2.id;
+                // Adapt rounds left
                 player.roundsRemaining -= 1
                 player2.roundsRemaining -= 1
-                player.battle_team = [];
-                player2.battle_team = [];
 
                 this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
                 this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
@@ -410,28 +406,26 @@ export class GameService implements OnModuleInit {
               // send new_turn(player, roundLeft)                                                                                                                                                            
             }
             if (endOfBattle) {
-              const winner = loser === userId ? userId2 : userId;
+              const winnerId = loserId === userId ? userId2 : userId;
 
 
-              this.combatService.playerCombatRoom.delete(loser);
-              this.combatService.playerCombatRoom.delete(winner);   
+              this.combatService.playerCombatRoom.delete(loserId);
+              this.combatService.playerCombatRoom.delete(winnerId);   
               this.combatService.combatRooms.delete(combatRoomId!);
               this.phaseTimer.clear(`combat: ${combatRoomId}`);
 
-              let winner_player = player.id === winner ? player : player2;
+              let winner = player.id === winnerId ? player : player2;
               
               console.log("END OF BATTLE: ROUNDS LEFT: ", player.roundsRemaining);
               // WINNER SCENE -END OF GAME
-              if (winner_player.roundsRemaining === 0)
-                this.sendToPlayer(winner_player.id, {event: 'game', data: {state: 'finish'}});
+              if (winner.roundsRemaining === 0)
+                this.sendToPlayer(winner.id, {event: 'game', data: {state: 'finish'}});
 
               // reinitialize winner
-              winner_player.forceChooseMonster = false;
-              winner_player.currentActions.actionType = undefined;
-              winner_player.currentActions.data = "";
-              winner_player.text = "";
+              winner.resetAfterRound();
 
-              await this.eliminatePlayer(loser, roomId)
+              // eliminate loser
+              await this.eliminatePlayer(loserId, roomId)
             }
           }
         break;

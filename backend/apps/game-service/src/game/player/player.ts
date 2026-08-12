@@ -5,7 +5,9 @@ import {
   CurrentMonster,
   CurrentActions,
 } from 'apps/game-service/src/game/player/player.interfaces';
-  
+import { emptyCurrentMonster } from './player.interfaces';
+
+
   export class Player {
 	  readonly id: number = -1;
 	  readonly name: string = "";
@@ -313,5 +315,14 @@ import {
 		  this.name = name;
 		  this.asset = asset
 		  this.team[0] = "pisciner"
+	  }
+
+	  resetAfterRound(): void {
+		this.forceChooseMonster = false;
+		this.currentActions.actionType = undefined;
+		this.currentActions.data = "";
+		this.text = "";
+		this.battle_team = [];
+		this.currentMonster = emptyCurrentMonster();
 	  }
   }
