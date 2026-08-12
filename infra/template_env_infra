@@ -59,19 +59,19 @@ s_redis_password=
 # user defined
 s_grafana_admin_user=
 s_grafana_admin_password=
-GRAFANA_UID=472
-GRAFANA_GID=472
+GRAFANA_UID=
+GRAFANA_GID=
 
 ###############################################################################
 # PROMETHEUS                                                                  #
 ###############################################################################
 # user defined
-PROMETHEUS_UID=nobody
-PROMETHEUS_GID=nobody
+PROMETHEUS_UID=
+PROMETHEUS_GID=
 
 ###############################################################################
 # LOKI                                                                        #
 ###############################################################################
 # user defined
-LOKI_UID=1001
-LOKI_GID=1001
+LOKI_UID=
+LOKI_GID=
