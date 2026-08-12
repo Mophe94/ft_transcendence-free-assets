@@ -73,6 +73,8 @@ game:
 
 observ:
 	@mkdir -p "/nfs-storage/grafana"
+	@mkdir -p "/nfs-storage/grafana/dashboards"
+	@doas cp $(CONTAINER_FILES)/grafana/dashboards/* "/nfs-storage/grafana/dashboards/"
 	@mkdir -p "/nfs-storage/prometheus"
 	@mkdir -p "/nfs-storage/loki"
 #	@make image TARGET=$@

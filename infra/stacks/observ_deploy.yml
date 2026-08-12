@@ -50,7 +50,6 @@ services:
         - grafana_admin_password
     volumes:
         - grafana_data:/var/lib/grafana
-        - ../containers/grafana/dashboards:/var/lib/grafana/dashboards
     networks:
         - obsrv_net
 
