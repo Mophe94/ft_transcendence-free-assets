@@ -299,6 +299,7 @@ import {
 		  actionType: undefined,
 		  data: undefined
 	  };
+	  roundsRemaining: number = 0;
 	  forceChooseMonster: boolean = false
 	  timer: number = 0
 	  current_map: string = ""

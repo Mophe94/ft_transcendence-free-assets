@@ -125,14 +125,11 @@ export class CombatService {
 		this.pushResult(map_result, first.id, this.action_battle(temp1, temp2,  1, 1, changeMonsterFirst));
 		this.pushResult(map_result, second.id, this.action_battle(temp2, temp1,  1, 1, changeMonsterFirst));
 		
-//		console.log("First: ", first.forceChooseMonster);
 		if ((second.currentMonster.name !== "" && second.currentMonster.life.current <= 0) || first.forceChooseMonster) {
 			if (first.forceChooseMonster) {
-//				console.log("ForceChooseMonster [combat1]", first.forceChooseMonster);			
 				first.forceChooseMonster = false;
 			}
-//			console.log("ForceChooseMonster [combat]", first.forceChooseMonster);			
-			return map_result
+                     			return map_result
 		}
 
 		// 2
@@ -219,13 +216,13 @@ export class CombatService {
     	return result
 	}
 
-	next_map(player: Player){
+	next_map(player: Player) {
 		return {
 			event: "game",
 			data: {
 				state: "next_map",
 				timer: player.timer,
-				current_map: player.current_map,
+				current_map: 'map_01', //player.current_map,
 				player: player,
 			}
 		}

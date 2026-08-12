@@ -93,8 +93,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private sendToClient(client: WebSocket, message: object | undefined) {
-    if (client.readyState === WebSocket.OPEN)
+    if (client.readyState === WebSocket.OPEN) {
+      //console.log("Send_Gateway: ", message);
       client.send(JSON.stringify(message));
+    }
   }
 
   @Interval(10000)
@@ -134,11 +136,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
       }
     }
+    this.sendToClient(client, response);
+
 	/////////////////////////////////* REDIS STATE : UPDATE STATE */////////////////////////////////
-	const playerState = this.playerService.getPlayer(userId)!;
+	  const playerState = this.playerService.getPlayer(userId)!;
     await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
 	/////////////////////////////////* END */////////////////////////////////
-    this.sendToClient(client, response);
   }
 
   /* ----------- EVENTS ----------- */
@@ -156,11 +159,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.broadcast(clients, payload);
   }
 
-  @OnEvent('delete_user')
+  @OnEvent('close_player_socket')
+  onClosePlayerSocket ({ userId }: { userId: number }): void {
+    const client = this.clientsById.get(userId);
+    if (client) client.close(); // trigger handleDisconnect -> cleanupClient
+  }
+  /* @OnEvent('delete_user')
   onDeleteUser({ userId }: {userId: number}): void {
     const client = this.clientsById.get(userId);
     if (client)
       client.close(); // call handleDisconnect -> cleanupClient
     // WHAT IF BOT ? 
-  }
+  } */
 }
