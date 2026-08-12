@@ -9,6 +9,7 @@ import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.serv
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { FULL, PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
 import { RedisStateService } from '../redis/redis_state.service';
+import { User } from 'apps/account-service/src/users/users.entity';
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -192,10 +193,6 @@ export class GameService implements OnModuleInit {
   private startTeamSetupPhase(roomId: string, roomPlayers: Set<number>) {
     this.phaseTimer.start(`game: ${roomId}`, 'team_setup', () => {
       console.log(`Room ${roomId} team_setup phase timeout`);
-
-      // move to handleMessage case "received_team_choice
-      //this.startCombatPhase(roomId, room);
-
     });
     const teamSetupTimer =
       this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.team_setup;
@@ -341,17 +338,16 @@ export class GameService implements OnModuleInit {
           result = error;
           break;
         }
-        
+
         player.teamReady = true;
 
         if (player2.teamReady) {
-          const roomPlayers = this.activePlayersByRoom.get(roomId);
-          this.startCombatPhase(roomId, roomPlayers!);
+          this.startCombatPhase(roomId, new Set([userId, userId2]));
           this.sendToPlayer(userId, this.mapService.combat(player));
           this.sendToPlayer(userId2, this.mapService.combat(player2));
         }
-        else
-          result = {event: 'game', data: { state: 'waiting_for_opponent'}};
+        // else
+        //   result = {event: 'game', data: { state: 'waiting_for_opponent'}};
         break;
       case "change_current_monster":
       case "use_item_combat":
