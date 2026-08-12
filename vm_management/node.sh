@@ -355,10 +355,14 @@ else
     wait_for_ssh
     declare -A PACK
     PACK[leader]="infra site backend database game_test redis"
-    PACK[worker]="Makefile"
+    PACK[worker]=""
     read -r -a files <<< "${PACK[$TYPE]}"
-    echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
-    set +e
-    scp -r -P "$SSH_PORT" -o IdentitiesOnly=yes -i "$SSH_KEY" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
-    set -e
+    if ((${#files[@]} == 0)); then
+	echo "[INFO][$SCRIPT_NAME] No files to copy"
+    else
+	echo "[INFO][$SCRIPT_NAME] Adding needed files"
+	set +e
+	scp -r -P "$SSH_PORT" -o IdentitiesOnly=yes -i "$SSH_KEY" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"
+	set -e
+    fi
 fi
