@@ -17,11 +17,11 @@ export class RoomService {
   async joinRoom(client: WebSocket, roomId: string): Promise<void> {
     this.rooms.get(roomId)?.add(client);
     const clientData = clientsMap.get(client);
-	/* await this.redis.addPlayerToRoom(clientsMap.get(client).userId.toString(), roomId) */
+    /* await this.redis.addPlayerToRoom(clientsMap.get(client).userId.toString(), roomId) */
     if (clientData) clientData.roomId = roomId;
   }
 
-/*   async createRoom(roomCapacity: number): Promise<string> {
+  /*   async createRoom(roomCapacity: number): Promise<string> {
     const id = await this.redis.getRandRoomId(); */
   // ROOMID HARDCODEE
   async createRoom(roomCapacity: number): Promise<string> {
@@ -38,7 +38,11 @@ export class RoomService {
     return null;
   }
 
-  async leaveRoom(client: WebSocket, roomId: string, userId: string): Promise<void> {
+  async leaveRoom(
+    client: WebSocket,
+    roomId: string,
+    userId: string,
+  ): Promise<void> {
     const clients = this.rooms.get(roomId);
     if (!clients) return;
     clients.delete(client);
@@ -46,7 +50,7 @@ export class RoomService {
     console.log(`Client left ${roomId}, ${clients.size} players remaining`);
 
     if (clients.size === 0) {
-	  /* await this.redis.deleteRoom(roomId); */
+      /* await this.redis.deleteRoom(roomId); */
       //this.phaseTimer.clear(`game: ${roomId}`);
       this.rooms.delete(roomId);
       console.log(`Room ${roomId} deleted (empty)`);

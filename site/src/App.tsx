@@ -16,6 +16,9 @@ import AboutUs from './page/AboutUs';
 import ErrorDisplay from './content/Error';
 import Readme from './page/Readme';
 import HowToPlay from './page/HowTo';
+import CookiesPolicy from './page/CookiesPolicy';
+import PrivacyPolity from './page/PrivacyPolity';
+import TermsConditions from './page/TermsConditions';
 
 function App() {
   const { isLoading } = useAuth();
@@ -45,6 +48,9 @@ function App() {
           <Route path='/loading' element={<Loading />} />
           <Route path='/readme' element={<Readme />} />
           <Route path='/aboutus' element={<AboutUs />} />
+		  <Route path='/cookies_policy' element={<CookiesPolicy />} />
+		  <Route path='/private_policy' element={<PrivacyPolity />} />
+		  <Route path='/terms_conditions' element={<TermsConditions />} />
         </Route>
         <Route element={<AppLayout />}>
           <Route path="*" element={<ErrorDisplay msg="Page not found" code={404} />} />

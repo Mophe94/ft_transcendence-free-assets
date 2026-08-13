@@ -7,37 +7,37 @@ import { STATE_PLAYER } from '../game/state_player.const';
 export class RedisStateService {
   constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
 
-/* ###################### PLAYER ###################### */
+  /* ###################### PLAYER ###################### */
 
-	async removePlayer(playerId: string): Promise<void> {
-		const playerKey = STATE_PLAYER.player(playerId);
-		const stateKey = STATE_PLAYER.state(playerId);
+  async removePlayer(playerId: string): Promise<void> {
+    const playerKey = STATE_PLAYER.player(playerId);
+    const stateKey = STATE_PLAYER.state(playerId);
 
-		await this.redis.del(stateKey);
-		await this.redis.del(playerKey);
-	}
+    await this.redis.del(stateKey);
+    await this.redis.del(playerKey);
+  }
 
-/* ###################### STATE ###################### */
+  /* ###################### STATE ###################### */
 
-	async getSatePlayer(playerId: string): Promise<Object | undefined> {
-		const key = STATE_PLAYER.state(playerId);
-		const data = await this.redis.get(key);
+  async getStatePlayer(playerId: string): Promise<Object | undefined> {
+    const key = STATE_PLAYER.state(playerId);
+    const data = await this.redis.get(key);
 
-		if (data)
-			return JSON.parse(data);
-		return undefined;
-	}
+    if (data) return JSON.parse(data);
+    return undefined;
+  }
 
-	async updateStatePlayer(playerId: string, state: Object): Promise<void> {
-		const key = STATE_PLAYER.state(playerId);
-		await this.redis.set(key, JSON.stringify(state));
-	}
+  async updateStatePlayer(playerId: string, state: Object): Promise<void> {
+    const key = STATE_PLAYER.state(playerId);
+    // Expire after 1h
+    await this.redis.set(key, JSON.stringify(state), 'EX', 3600);
+  }
 
-	async removeStatePlayer(playerId: string): Promise<void> {
-		const playerKey = STATE_PLAYER.player(playerId);
-		const stateKey = STATE_PLAYER.state(playerId);
-		
-		await this.redis.del(stateKey);
-		await this.redis.del(playerKey);
-	}
+  async removeStatePlayer(playerId: string): Promise<void> {
+    const playerKey = STATE_PLAYER.player(playerId);
+    const stateKey = STATE_PLAYER.state(playerId);
+
+    await this.redis.del(stateKey);
+    await this.redis.del(playerKey);
+  }
 }
