@@ -13,10 +13,8 @@ import { GameService } from './game.service';
 import { PlayerService } from './player/player.service';
 import { GamePayload, createMockUser } from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
-import { FULL } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
-import { ROOM_IDS } from '../lobby/lobby.const';
 import { RedisStateService } from '../redis/redis_state.service';
 
 @WebSocketGateway(8082, { cors: { origin: true }, path: '/game' })
@@ -179,11 +177,4 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const client = this.clientsById.get(userId);
     if (client) client.close(); // trigger handleDisconnect -> cleanupClient
   }
-  /* @OnEvent('delete_user')
-  onDeleteUser({ userId }: {userId: number}): void {
-    const client = this.clientsById.get(userId);
-    if (client)
-      client.close(); // call handleDisconnect -> cleanupClient
-    // WHAT IF BOT ? 
-  } */
 }

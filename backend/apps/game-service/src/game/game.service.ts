@@ -1,20 +1,17 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { WebSocket } from 'ws';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PlayerService } from './player/player.service';
 import { MapService } from './map.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
-import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisStateService } from '../redis/redis_state.service';
-import { User } from 'apps/account-service/src/users/users.entity';
 
 @Injectable()
 export class GameService implements OnModuleInit {
   constructor(
-    private roomService: RoomService,
     private eventEmitter: EventEmitter2,
     private phaseTimer: PhaseTimerService,
     private playerService: PlayerService,
@@ -33,6 +30,10 @@ export class GameService implements OnModuleInit {
   private readonly authorizedPlayers = new Map<string, Set<number>>();
   // roomId -> active players
   private activePlayersByRoom = new Map<string, Set<number>>();
+
+  getRoomById(userId: number) {
+    return this.roomIdByPlayer.get(userId);
+  }
 
   /*  INITIALIZATION with hardcoded values */
   onModuleInit(): void {
@@ -139,6 +140,7 @@ export class GameService implements OnModuleInit {
     /////////////////////////////////* END */////////////////////////////////
     this.leaveGameRoom(roomId, userId);
     this.activePlayersByRoom.get(roomId)?.delete(userId);
+
     this.startNextRound(roomId);
   }
 
@@ -147,6 +149,11 @@ export class GameService implements OnModuleInit {
     console.log(
       `[GameService] Eliminating player ${userId} from room ${roomId}`,
     );
+    // IF BOT? 
+    if (userId < 0) {
+      await this.onGodotDisconnected(userId, roomId);
+      return;
+    }
     this.eventEmitter.emit('close_player_socket', { userId });
   }
 
@@ -170,6 +177,11 @@ export class GameService implements OnModuleInit {
     if (allCombatsFinished && canPairEveryone) {
       this.combatService.matchmake(connected);
       this.startMapPhase(roomId, connected, true);
+    }
+    else if (allCombatsFinished && active.size === 1) {
+      //To do big cleaning of the winner / room etc
+      console.log(`End of game: everything should be cleanup at this point!`);
+      return;
     }
   }
 
@@ -516,7 +528,10 @@ export class GameService implements OnModuleInit {
             winner.resetAfterRound();
 
             // eliminate loser
+            // move this in handleMessage -> payload reception
             await this.eliminatePlayer(loserId, roomId);
+            // if (winner.roundsRemaining === 0)
+            //   await this.eliminatePlayer(winnerId, roomId);
           }
         }
         break;
