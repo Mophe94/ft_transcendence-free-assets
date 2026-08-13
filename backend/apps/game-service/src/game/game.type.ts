@@ -10,9 +10,15 @@ export const FULL = 4;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
+<<<<<<< Updated upstream
   map: 10,
   team_setup: 30,
   choose_action: 60,
+=======
+  map: 5,
+  team_setup: 5,
+  choose_action: 30,
+>>>>>>> Stashed changes
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;
