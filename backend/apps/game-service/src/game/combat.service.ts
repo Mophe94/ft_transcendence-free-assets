@@ -86,7 +86,7 @@ export class CombatService {
     return player1;
   }
 
-  private handle_action(
+  handle_action(
     player: Player,
     enemy: Player,
     actionPlayer: CurrentActions,
