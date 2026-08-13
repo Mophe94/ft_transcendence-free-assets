@@ -32,9 +32,8 @@ current_managers() {
 available_workers() {
     docker node ls \
         --filter role=worker \
-        --filter availability=active \
-        --format '{{.ID}}' |
-        wc -l
+        --format '{{.ID}} {{.Status}} {{.Availability}}' |
+        awk '$2 == "Ready" && $3 == "Active" { count++ } END { print count+0 }'
 }
 
 node_manager_status() {

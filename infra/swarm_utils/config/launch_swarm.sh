@@ -79,8 +79,17 @@ case "${answer,,}" in
 esac
 
 chmod +x "$CONFIG_DIR"/add_manager.sh
-bash "$CONFIG_DIR"/add_manager.sh "$MANAGER_NUMBER"
-
+if bash "$CONFIG_DIR"/add_manager.sh "$MANAGER_NUMBER"; then
+    read -p "[$SCRIPT_NAME] Do you wish to continue: " -t 15 answer || {
+	    echo
+	    answer="Yes"
+    }
+    case "${answer,,}" in
+	    y|yes)
+	       ;;
+	    *) exit 1;;
+    esac
+fi
 #Create secret
 if [ ! -f "$SECRET_FILE" ]; then
     echo "[$SCRIPT_NAME] Secret file: $SECRET_FILE not found"
