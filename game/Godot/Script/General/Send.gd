@@ -13,6 +13,7 @@ enum SEND_NAME {
 	TRY_ATTACK,
 	PASS,
 	USE_ITEM_COMBAT,
+	SAVE_TO_DISCONNECT
 }
 
 const SEND_TAB = {
@@ -27,7 +28,8 @@ const SEND_TAB = {
 	SEND_NAME.CHANGE_CURRENT_MONSTER: "change_current_monster",
 	SEND_NAME.TRY_ATTACK: "try_attack",
 	SEND_NAME.PASS: "pass",
-	SEND_NAME.USE_ITEM_COMBAT: "use_item_combat"
+	SEND_NAME.USE_ITEM_COMBAT: "use_item_combat",
+	SEND_NAME.SAVE_TO_DISCONNECT: "save_to_disconnect"
 }
 
 func send_message(event, value = null):
@@ -61,12 +63,19 @@ func send_message(event, value = null):
 			_use_item_combat(packet, value)
 		"pass":
 			_pass(packet)
+		"save_to_disconnect":
+			_save_to_disconnect(packet)
 	if Network.wsSate != WebSocketPeer.STATE_CLOSED:
 		print("-------- MSG SEND --------  :\n", JSON.stringify(packet))
 		Network.ws.send_text(JSON.stringify(packet))
 	else:
 		print("-------- WEBSOCKET CLOSE--------  :\n", JSON.stringify(packet))
 
+
+func _save_to_disconnect(packet):
+	packet["data"] = {
+		"state": "save_to_disconnect"
+	}
 
 func _pass(packet):
 	packet["data"] = {

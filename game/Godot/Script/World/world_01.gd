@@ -1,5 +1,10 @@
 extends Node2D
 
+func _stop_event():
+	$Player/CharacterBody2D.set_deferred("disabled", true)
+#	$Player/CharacterBody2D.collision_layer = 0
+#	$Player/CharacterBody2D.collision_mask = 0
+
 func _stop_player():
 	GeneralData.position_player = $Player/CharacterBody2D.global_position
 	$Player/CharacterBody2D.control = false
@@ -55,6 +60,7 @@ func _ready() -> void:
 	
 	Received.team_setup_scene.connect(_team_set_up_received)
 	$Timer.time_finish.connect(_signal_timer)
+	$Timer.stop_event.connect(_stop_event)
 	$Player/CharacterBody2D/Camera2D.enabled = true
 	$Player/CharacterBody2D.control = true
 	activate_random_collectibles()

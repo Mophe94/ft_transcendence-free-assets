@@ -40,6 +40,7 @@ func _lose():
 	get_tree().current_scene.add_child(result_scene)
 	stop_timer.emit()
 	Received.action_finished.emit()
+	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAVE_TO_DISCONNECT])
 	
 func _win():
 	await text_show("YOU WIN !")
@@ -51,6 +52,7 @@ func _win():
 	stop_timer.emit()
 	await get_tree().create_timer(2.0).timeout
 	Received.action_finished.emit()
+	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAVE_TO_DISCONNECT])
 
 func _change_monster():
 	await text_show(GeneralData.text, 1)
@@ -167,6 +169,7 @@ func set_menus_pass():
 
 func set_monster_choice(object):
 	hide_selection()
+	_back()
 	var send_func = func():
 		Send.send_message(Send.SEND_TAB[Send.SEND_NAME.CHANGE_CURRENT_MONSTER], object)
 	waiting_player(send_func)

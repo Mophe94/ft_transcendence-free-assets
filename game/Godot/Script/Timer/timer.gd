@@ -1,5 +1,6 @@
 extends CanvasLayer
 signal time_finish
+signal stop_event
 
 @onready var label = $NinePatchRect/Label
 @onready var nine_patch = $NinePatchRect
@@ -51,6 +52,8 @@ func _process(_delta):
 		_check_minute_change()
 		_update_flash(_delta)
 		_update_scale()
+		if time_remaining < 3:
+			stop_event.emit()
 	else:
 		if !send:
 			time_remaining = 0
