@@ -6,7 +6,6 @@ export class PlayerService {
   players = new Map<number, Player>();
   idsByPlayers = new Map<Player, number>();
 
-
   initPlayer(userId: number /* , payload: any */): void {
     const player = new Player(
       userId,
@@ -15,20 +14,19 @@ export class PlayerService {
     );
     this.players.set(userId, player);
     this.idsByPlayers.set(player, userId);
-
   }
 
   getPlayer(userId: number): Player | undefined {
     return this.players.get(userId);
   }
 
-  getUserId(player: Player): number | undefined{
+  getUserId(player: Player): number | undefined {
     const id = this.idsByPlayers.get(player);
     return id;
   }
 
   removePlayer(userId: number): void {
-    const player =this.players.get(userId);
+    const player = this.players.get(userId);
     this.players.delete(userId);
     this.idsByPlayers.delete(player!);
   }

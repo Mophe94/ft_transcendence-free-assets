@@ -25,8 +25,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   constructor(
-	private playerService: PlayerService,
-	private redisStateService: RedisStateService,
+    private playerService: PlayerService,
+    private redisStateService: RedisStateService,
     private gameService: GameService,
   ) {}
   private clients = new Map<WebSocket, ClientData>();
@@ -132,22 +132,31 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       response = {
         event: 'game',
         data: {
-          state: 'undefined payload'
-        }
-      }
+          state: 'undefined payload',
+        },
+      };
     }
     this.sendToClient(client, response);
 
-	/////////////////////////////////* REDIS STATE : UPDATE STATE */////////////////////////////////
-	  const playerState = this.playerService.getPlayer(userId)!;
-    await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
-	/////////////////////////////////* END */////////////////////////////////
+    /////////////////////////////////* REDIS STATE : UPDATE STATE */////////////////////////////////
+    const playerState = this.playerService.getPlayer(userId)!;
+    await this.redisStateService.updateStatePlayer(
+      userId.toString(),
+      playerState,
+    );
+    /////////////////////////////////* END */////////////////////////////////
   }
 
   /* ----------- EVENTS ----------- */
 
   @OnEvent('send_to_player')
-  onSendToPlayer({ userId, payload }: { userId: number; payload: object }): void {
+  onSendToPlayer({
+    userId,
+    payload,
+  }: {
+    userId: number;
+    payload: object;
+  }): void {
     const client = this.clientsById.get(userId);
     if (client) {
       this.sendToClient(client, payload);
@@ -155,12 +164,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @OnEvent('send_to_room')
-  onSendToRoom({ clients, payload }: { clients: Set<WebSocket>; payload: object }): void {
+  onSendToRoom({
+    clients,
+    payload,
+  }: {
+    clients: Set<WebSocket>;
+    payload: object;
+  }): void {
     this.broadcast(clients, payload);
   }
 
   @OnEvent('close_player_socket')
-  onClosePlayerSocket ({ userId }: { userId: number }): void {
+  onClosePlayerSocket({ userId }: { userId: number }): void {
     const client = this.clientsById.get(userId);
     if (client) client.close(); // trigger handleDisconnect -> cleanupClient
   }

@@ -51,28 +51,29 @@ export class RedisService {
   }
 
   async deleteRoomTimer(roomId: string): Promise<void> {
-	await this.redis.del(LOBBY_KEYS.ROOM_TIMER(roomId));
+    await this.redis.del(LOBBY_KEYS.ROOM_TIMER(roomId));
   }
   ///////////////////////////////* CAPACITY *///////////////////////////////
 
-  async setRoomCapacity(roomId: string, capacity: number = DEFAULT.CAPACITY): Promise<void> {
-	if (capacity <= 0)
-		capacity = DEFAULT.CAPACITY;
-	else{
-		let result = (capacity & (capacity - 1)) !== 0;
-		if (result)
-			capacity = DEFAULT.CAPACITY;
-	}
+  async setRoomCapacity(
+    roomId: string,
+    capacity: number = DEFAULT.CAPACITY,
+  ): Promise<void> {
+    if (capacity <= 0) capacity = DEFAULT.CAPACITY;
+    else {
+      let result = (capacity & (capacity - 1)) !== 0;
+      if (result) capacity = DEFAULT.CAPACITY;
+    }
     await this.redis.set(LOBBY_KEYS.ROOM_CAPACITY(roomId), capacity);
   }
 
   async getRoomCapacity(roomId: string): Promise<number> {
     const capacity = await this.redis.get(LOBBY_KEYS.ROOM_CAPACITY(roomId));
-	return capacity ? parseInt(capacity, 10) : DEFAULT.CAPACITY;
+    return capacity ? parseInt(capacity, 10) : DEFAULT.CAPACITY;
   }
 
   async deleteRoomCapacity(roomId: string): Promise<void> {
-	await this.redis.del(LOBBY_KEYS.ROOM_CAPACITY(roomId));
+    await this.redis.del(LOBBY_KEYS.ROOM_CAPACITY(roomId));
   }
 
   ///////////////////////////////* PLAYERS *///////////////////////////////
@@ -92,45 +93,44 @@ export class RedisService {
   }
 
   async deleteAllPlayerFromRoom(roomId: string): Promise<void> {
-	await this.redis.del(LOBBY_KEYS.ROOM_PLAYERS(roomId));
+    await this.redis.del(LOBBY_KEYS.ROOM_PLAYERS(roomId));
   }
 
   ///////////////////////////////* ROOM ID *///////////////////////////////
 
   async getRandRoomId(): Promise<string> {
     const id = await this.redis.spop(LOBBY_KEYS.FREE_IDS);
-	return id ? id : randomUUID();
+    return id ? id : randomUUID();
   }
 
   async freeRoomID(roomId: string): Promise<void> {
-	const data = ROOM_IDS.includes(roomId);
-	if (data) {
-    	await this.redis.smove(LOBBY_KEYS.USED_IDS, LOBBY_KEYS.FREE_IDS, roomId);
-	}
-	else {
-		await this.redis.srem(LOBBY_KEYS.USED_IDS, roomId);
-	}
+    const data = ROOM_IDS.includes(roomId);
+    if (data) {
+      await this.redis.smove(LOBBY_KEYS.USED_IDS, LOBBY_KEYS.FREE_IDS, roomId);
+    } else {
+      await this.redis.srem(LOBBY_KEYS.USED_IDS, roomId);
+    }
   }
 
   ///////////////////////////////* UTILITY *///////////////////////////////
 
-  async createRoom(capacity?: string): Promise<string>{
-	const id = await this.getRandRoomId();
-	await Promise.all ([
-	this.addInactiveRoom(id),
-	this.setRoomCapacity(id, capacity ? Number(capacity) : undefined),
-	this.setRoomTimer(id),
-	])
-	return id;
+  async createRoom(capacity?: string): Promise<string> {
+    const id = await this.getRandRoomId();
+    await Promise.all([
+      this.addInactiveRoom(id),
+      this.setRoomCapacity(id, capacity ? Number(capacity) : undefined),
+      this.setRoomTimer(id),
+    ]);
+    return id;
   }
 
   async deleteRoom(roomId: string): Promise<void> {
-	await Promise.all([
-	this.deleteRoomTimer(roomId),
-	this.deleteRoomCapacity(roomId),
-	this.deleteAllPlayerFromRoom(roomId),
-	this.freeRoomID(roomId),
-	])
+    await Promise.all([
+      this.deleteRoomTimer(roomId),
+      this.deleteRoomCapacity(roomId),
+      this.deleteAllPlayerFromRoom(roomId),
+      this.freeRoomID(roomId),
+    ]);
   }
 
   ///////////////////////////////* OTHER *///////////////////////////////

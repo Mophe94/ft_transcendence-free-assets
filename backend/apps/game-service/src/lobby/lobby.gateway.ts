@@ -100,7 +100,6 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private startGame(roomId: string, clients: Set<WebSocket>): void {
-
     this.broadcast(clients, {
       event: 'game',
       state: 'start_game',

@@ -7,7 +7,7 @@ import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
-import { FULL, PHASE_DURATIONS} from 'apps/game-service/src/game/game.type';
+import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisStateService } from '../redis/redis_state.service';
 import { User } from 'apps/account-service/src/users/users.entity';
 
@@ -20,7 +20,7 @@ export class GameService implements OnModuleInit {
     private playerService: PlayerService,
     private combatService: CombatService,
     private mapService: MapService,
-	private redisStateService: RedisStateService,
+    private redisStateService: RedisStateService,
   ) {}
 
   /*  ATTRIBUTES  */
@@ -28,7 +28,7 @@ export class GameService implements OnModuleInit {
   // roomId -> usersIds
   private gameRooms = new Map<string, Set<number>>();
   // userId -> roomId
-  private roomIdByPlayer= new Map<number, string>();
+  private roomIdByPlayer = new Map<number, string>();
   // roomIds -> authorized players
   private readonly authorizedPlayers = new Map<string, Set<number>>();
   // roomId -> active players
@@ -64,9 +64,9 @@ export class GameService implements OnModuleInit {
     const room = this.gameRooms.get(roomId);
     if (!room) return;
     room.delete(userId);
-    if (room.size === 0){
-		this.gameRooms.delete(roomId);
-	  }
+    if (room.size === 0) {
+      this.gameRooms.delete(roomId);
+    }
   }
 
   /*  GAME  */
@@ -76,7 +76,6 @@ export class GameService implements OnModuleInit {
     userId: number,
     roomId: string,
   ): Promise<void> {
-
     const roomPlayers = this.joinGameRoom(roomId, userId);
     this.roomIdByPlayer.set(userId, roomId);
     console.log(`Size = ${roomPlayers.size}, RoomId = ${roomId}`);
@@ -88,7 +87,7 @@ export class GameService implements OnModuleInit {
 
     // change FULL for real room capacity
     player.roundsRemaining = Math.log2(FULL); //this.activePlayersByRoom.get(roomId)?.size! / 2;
-    console.log("ON GODOT CONNECTED ROUND REMAINING: ", player.roundsRemaining);
+    console.log('ON GODOT CONNECTED ROUND REMAINING: ', player.roundsRemaining);
 
     let activePlayers = this.activePlayersByRoom.get(roomId);
     if (!activePlayers) {
@@ -98,21 +97,30 @@ export class GameService implements OnModuleInit {
     activePlayers.add(userId);
 
     // FULL need to be repalaced by the real capacity of the room retrieved from redis
-    if (roomPlayers.size === FULL /* this.activePlayersByRoom.get(roomId)?.size */) {
-	  /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
+    if (
+      roomPlayers.size === FULL /* this.activePlayersByRoom.get(roomId)?.size */
+    ) {
+      /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
       for (const userId of roomPlayers) {
         const playerState = this.playerService.getPlayer(userId)!;
-        await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
-	    }
-	  /////////////////////////////////* END */////////////////////////////////
+        await this.redisStateService.updateStatePlayer(
+          userId.toString(),
+          playerState,
+        );
+      }
+      /////////////////////////////////* END */////////////////////////////////
       this.combatService.matchmake(roomPlayers);
       // TEST MATCHMAKING //
       for (const userId of roomPlayers) {
-        const player = this.playerService.getPlayer(userId)!; 
+        const player = this.playerService.getPlayer(userId)!;
         const opponentId = this.combatService.getOpponentId(userId);
-        const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
+        const enemy = opponentId
+          ? this.playerService.getPlayer(opponentId)
+          : undefined;
         if (!enemy) {
-          console.log(`[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`);
+          console.log(
+            `[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`,
+          );
         }
         console.log('USER ID: ', userId);
         console.log('OPONNENT ID: ', opponentId);
@@ -122,21 +130,23 @@ export class GameService implements OnModuleInit {
       await this.startMapPhase(roomId, roomPlayers);
     }
   }
-  
+
   async onGodotDisconnected(userId: number, roomId: string): Promise<void> {
     const room = this.gameRooms.get(roomId);
     if (!room || !room.has(userId)) return;
-	/////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
+    /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
     await this.redisStateService.removePlayer(userId.toString());
-	/////////////////////////////////* END */////////////////////////////////
+    /////////////////////////////////* END */////////////////////////////////
     this.leaveGameRoom(roomId, userId);
     this.activePlayersByRoom.get(roomId)?.delete(userId);
     this.startNextRound(roomId);
   }
 
   private async eliminatePlayer(userId: number, roomId: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 11000)); // ! "temp fix to synchronizeke"
-    console.log(`[GameService] Eliminating player ${userId} from room ${roomId}`);
+    await new Promise((resolve) => setTimeout(resolve, 11000)); // ! "temp fix to synchronizeke"
+    console.log(
+      `[GameService] Eliminating player ${userId} from room ${roomId}`,
+    );
     this.eventEmitter.emit('close_player_socket', { userId });
   }
 
@@ -150,8 +160,10 @@ export class GameService implements OnModuleInit {
     const connected = this.gameRooms.get(roomId);
     if (!active || !connected) return;
 
-    console.log(`[GameService] activePlayersByRoom=${this.activePlayersByRoom.get(roomId)?.size}, connected=${this.gameRooms.get(roomId)?.size}`);
-    
+    console.log(
+      `[GameService] activePlayersByRoom=${this.activePlayersByRoom.get(roomId)?.size}, connected=${this.gameRooms.get(roomId)?.size}`,
+    );
+
     const allCombatsFinished = connected.size === active.size;
     const canPairEveryone = active.size >= 2 && active.size % 2 === 0;
 
@@ -171,22 +183,25 @@ export class GameService implements OnModuleInit {
       this.startTeamSetupPhase(roomId, roomPlayers);
     });
 
-    const mapTimer = this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.map;
+    const mapTimer =
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.map;
 
     const payloads = await Promise.all(
       [...roomPlayers].map(async (userId) => {
         const player = this.playerService.getPlayer(userId)!;
         player.timer = mapTimer;
         if (nextRound) {
-          return {userId, payload: this.combatService.next_map(player)};
-        }
-        else
-          return {userId, payload: await this.mapService.start_game(player)};
+          return { userId, payload: this.combatService.next_map(player) };
+        } else
+          return { userId, payload: await this.mapService.start_game(player) };
       }),
     );
 
-    payloads.forEach(({ userId, payload }) => this.sendToPlayer(userId, payload));
-    console.log(`[GameService]: startMapPhase -> start_game sent to ${roomPlayers.size} players of ${roomId}`,
+    payloads.forEach(({ userId, payload }) =>
+      this.sendToPlayer(userId, payload),
+    );
+    console.log(
+      `[GameService]: startMapPhase -> start_game sent to ${roomPlayers.size} players of ${roomId}`,
     );
   }
 
@@ -195,7 +210,8 @@ export class GameService implements OnModuleInit {
       console.log(`Room ${roomId} team_setup phase timeout`);
     });
     const teamSetupTimer =
-      this.phaseTimer.startTimes.get(`game: ${roomId}`)! + PHASE_DURATIONS.team_setup;
+      this.phaseTimer.startTimes.get(`game: ${roomId}`)! +
+      PHASE_DURATIONS.team_setup;
 
     for (const userId of roomPlayers) {
       const player = this.playerService.getPlayer(userId)!;
@@ -203,18 +219,28 @@ export class GameService implements OnModuleInit {
       player.teamReady = false;
 
       const opponentId = this.combatService.getOpponentId(userId);
-      const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
+      const enemy = opponentId
+        ? this.playerService.getPlayer(opponentId)
+        : undefined;
       if (!enemy) {
-        console.log(`[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`);
+        console.log(
+          `[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`,
+        );
       }
 
-		// TEST MATCHMAKING //
-		console.log('USER ID: ', userId, /* ': ', this.team_setup(player, enemy ?? player) */);
-		console.log('OPONNENT ID: ', opponentId);
-		console.log('******************');
-		//******************************//
+      // TEST MATCHMAKING //
+      console.log(
+        'USER ID: ',
+        userId /* ': ', this.team_setup(player, enemy ?? player) */,
+      );
+      console.log('OPONNENT ID: ', opponentId);
+      console.log('******************');
+      //******************************//
 
-      this.sendToPlayer(userId, this.mapService.team_setup(player, enemy ?? player));
+      this.sendToPlayer(
+        userId,
+        this.mapService.team_setup(player, enemy ?? player),
+      );
     }
   }
 
@@ -229,10 +255,12 @@ export class GameService implements OnModuleInit {
       const timerKey = `combat: ${combatRoomId}`;
 
       this.phaseTimer.start(timerKey, 'choose_action', () => {
-      console.log(`Combat ${roomId} choose_action timeout`);
-    });
+        console.log(`Combat ${roomId} choose_action timeout`);
+      });
 
-      const combatTimer = this.phaseTimer.startTimes.get(timerKey)! + PHASE_DURATIONS.choose_action;
+      const combatTimer =
+        this.phaseTimer.startTimes.get(timerKey)! +
+        PHASE_DURATIONS.choose_action;
 
       this.playerService.getPlayer(userId)!.timer = combatTimer;
       handled.add(userId);
@@ -247,14 +275,13 @@ export class GameService implements OnModuleInit {
   private startNewTurn(combatRoomId: string, room: Set<number>) {
     const timerKey = combatRoomId ? `combat: ${combatRoomId}` : undefined;
     if (!combatRoomId) {
-      console.log("[GameService] - StartNewTurn -> combatRoomId undefined");
+      console.log('[GameService] - StartNewTurn -> combatRoomId undefined');
       return undefined;
     }
     if (!timerKey) return;
 
     this.phaseTimer.start(timerKey, 'choose_action', () => {
       console.log(`Room ${combatRoomId} choose_action timeout`);
-
     });
 
     const actionTimer =
@@ -268,72 +295,90 @@ export class GameService implements OnModuleInit {
 
   private has_valid_monsters(player: Player): boolean {
     for (const monster of player.battle_team) {
-        if (monster.name !== "" && monster.life.current > 0) {
-            return true;
-        }
+      if (monster.name !== '' && monster.life.current > 0) {
+        return true;
+      }
     }
     return false;
   }
 
-  async handleMessage(userId: number, payload: any) : Promise<object | undefined> {
+  async handleMessage(
+    userId: number,
+    payload: any,
+  ): Promise<object | undefined> {
     let endOfBattle = false;
     const combatRoomId = this.combatService.playerCombatRoom.get(userId);
     let loserId;
     let player = this.playerService.getPlayer(userId)!;
     let userId2 = this.combatService.getOpponentId(userId);
     const roomId = this.roomIdByPlayer.get(userId)!;
-    
+
     if (!userId2) {
       console.log(`[GameService]: userId2 for ${userId} is missing`);
       return undefined;
     }
     if (!combatRoomId) {
-      console.log(`[GameService] Missing combat room at end of combat, userId=${userId}`);
+      console.log(
+        `[GameService] Missing combat room at end of combat, userId=${userId}`,
+      );
       return undefined;
     }
 
     let player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
 
-    let playerForce : Player | undefined = undefined;
-    if (player.forceChooseMonster)
-        playerForce = player;
-    else if (player2?.forceChooseMonster)
-        playerForce = player2;
+    let playerForce: Player | undefined = undefined;
+    if (player.forceChooseMonster) playerForce = player;
+    else if (player2?.forceChooseMonster) playerForce = player2;
 
     if (!player2) {
       console.log(`[GameService]: No opponent for ${userId}`);
       return undefined;
     }
 
-    let result: object | undefined
-    const state = payload?.state
-    console.log("STATE", state);
+    let result: object | undefined;
+    const state = payload?.state;
+    console.log('STATE', state);
     switch (state) {
-      case "add_item":
-        result = await this.mapService.received_add_item(player)
+      case 'add_item':
+        result = await this.mapService.received_add_item(player);
         break;
-      case "delete_item":
-        result = await this.mapService.received_delete_item(player, payload.item)
+      case 'delete_item':
+        result = await this.mapService.received_delete_item(
+          player,
+          payload.item,
+        );
         break;
-      case "item_request":
-        result = await this.mapService.received_request_item(player)
+      case 'item_request':
+        result = await this.mapService.received_request_item(player);
         break;
-      case "use_item": {
-		    this.sendToPlayer(userId, this.mapService.received_delete_item(player, payload.item));
-        result = await this.mapService.received_use_item(player, payload.item)
+      case 'use_item': {
+        this.sendToPlayer(
+          userId,
+          this.mapService.received_delete_item(player, payload.item),
+        );
+        result = await this.mapService.received_use_item(player, payload.item);
         break;
       }
-      case "new_encounter":
-        result = await this.mapService.received_new_encounter(player, payload.tile)
+      case 'new_encounter':
+        result = await this.mapService.received_new_encounter(
+          player,
+          payload.tile,
+        );
         break;
-      case "try_catch":
-        result = await this.mapService.received_try_catch(player)
+      case 'try_catch':
+        result = await this.mapService.received_try_catch(player);
         break;
-      case "delete_monster":
-        result = await this.mapService.received_delete_monster(player, payload.monster)
+      case 'delete_monster':
+        result = await this.mapService.received_delete_monster(
+          player,
+          payload.monster,
+        );
         break;
-      case "team_choice":
-        const error = await this.mapService.received_team_choice(player, payload.battle_team)
+      case 'team_choice':
+        const error = await this.mapService.received_team_choice(
+          player,
+          payload.battle_team,
+        );
         if (error) {
           result = error;
           break;
@@ -349,104 +394,136 @@ export class GameService implements OnModuleInit {
         // else
         //   result = {event: 'game', data: { state: 'waiting_for_opponent'}};
         break;
-      case "change_current_monster":
-      case "use_item_combat":
-      case "try_attack":
-      case "pass":
-          player.currentActions = { 
-            actionType: state,
-            data: payload
-          };
+      case 'change_current_monster':
+      case 'use_item_combat':
+      case 'try_attack':
+      case 'pass':
+        player.currentActions = {
+          actionType: state,
+          data: payload,
+        };
 
-          if ((player.currentActions.actionType && player2.currentActions.actionType) || playerForce?.forceChooseMonster) {
-            const mapResult = await this.combatService.resolving_battle_round(player, player2);
-            player.currentActions.actionType = undefined;
-            player2.currentActions.actionType = undefined;
-            if (mapResult && mapResult.get(player.id) !== undefined && mapResult.get(player2.id) !== undefined){
-              const currentMessagePlayer = mapResult.get(player.id);
-              const currentMessagePlayer2 = mapResult.get(player2.id);
+        if (
+          (player.currentActions.actionType &&
+            player2.currentActions.actionType) ||
+          playerForce?.forceChooseMonster
+        ) {
+          const mapResult = await this.combatService.resolving_battle_round(
+            player,
+            player2,
+          );
+          player.currentActions.actionType = undefined;
+          player2.currentActions.actionType = undefined;
+          if (
+            mapResult &&
+            mapResult.get(player.id) !== undefined &&
+            mapResult.get(player2.id) !== undefined
+          ) {
+            const currentMessagePlayer = mapResult.get(player.id);
+            const currentMessagePlayer2 = mapResult.get(player2.id);
 
-              for (let i = 0; i < currentMessagePlayer!.length; ++i){
-                this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
-                this.sendToPlayer(userId2, currentMessagePlayer2?.at(i)!);
-              }
+            for (let i = 0; i < currentMessagePlayer!.length; ++i) {
+              this.sendToPlayer(userId, currentMessagePlayer?.at(i)!);
+              this.sendToPlayer(userId2, currentMessagePlayer2?.at(i)!);
             }
-            else {
-              console.log("Waiting Player: ");
-              break;
-            }
-
-            if (player.currentMonster.life.current <= 0){
-                if (!this.has_valid_monsters(player)){
-                  endOfBattle = true;
-                  loserId = player.id;
-                // Adapt rounds left
-                player.roundsRemaining -= 1
-                player2.roundsRemaining -= 1
-                
-                  this.sendToPlayer(userId, this.combatService.result_battle(player, player2.id));
-                  this.sendToPlayer(userId2, this.combatService.result_battle(player2, player2.id));
-                  // waiting all combat finish
-                }
-                else{
-                  player.forceChooseMonster = true;
-                  this.sendToPlayer(userId, this.combatService.change_monster(player, player.id));
-                  this.sendToPlayer(userId2, this.combatService.change_monster(player2, player.id));
-                }
-            }
-            else if (player2.currentMonster.life.current <= 0){
-              if (!this.has_valid_monsters(player2)){
-                endOfBattle = true;
-                loserId = player2.id;
-                // Adapt rounds left
-                player.roundsRemaining -= 1
-                player2.roundsRemaining -= 1
-
-                this.sendToPlayer(userId, this.combatService.result_battle(player, player.id));
-                this.sendToPlayer(userId2, this.combatService.result_battle(player2, player.id));
-              }
-              else {
-                player2.forceChooseMonster = true;
-                this.sendToPlayer(userId, this.combatService.change_monster(player, player2.id));
-                this.sendToPlayer(userId2, this.combatService.change_monster(player2, player2.id));
-             }
-            }
-            else {
-              this.startNewTurn(combatRoomId, new Set([userId, userId2]));
-              this.sendToPlayer(userId, this.combatService.new_turn(player));
-              this.sendToPlayer(userId2, this.combatService.new_turn(player2));
-              // si un combat deja finish declenchement du roundLeft
-              // send new_turn(player, rounLeft)
-              // send new_turn(player, roundLeft)                                                                                                                                                            
-            }
-            if (endOfBattle) {
-              const winnerId = loserId === userId ? userId2 : userId;
-
-
-              this.combatService.playerCombatRoom.delete(loserId);
-              this.combatService.playerCombatRoom.delete(winnerId);   
-              this.combatService.combatRooms.delete(combatRoomId!);
-              this.phaseTimer.clear(`combat: ${combatRoomId}`);
-
-              let winner = player.id === winnerId ? player : player2;
-              
-              console.log("END OF BATTLE: ROUNDS LEFT: ", player.roundsRemaining);
-              // WINNER SCENE -END OF GAME
-              if (winner.roundsRemaining === 0)
-                this.sendToPlayer(winner.id, {event: 'game', data: {state: 'finish'}});
-
-              // reinitialize winner
-              winner.resetAfterRound();
-
-              // eliminate loser
-              await this.eliminatePlayer(loserId, roomId)
-            }
+          } else {
+            console.log('Waiting Player: ');
+            break;
           }
+
+          if (player.currentMonster.life.current <= 0) {
+            if (!this.has_valid_monsters(player)) {
+              endOfBattle = true;
+              loserId = player.id;
+              // Adapt rounds left
+              player.roundsRemaining -= 1;
+              player2.roundsRemaining -= 1;
+
+              this.sendToPlayer(
+                userId,
+                this.combatService.result_battle(player, player2.id),
+              );
+              this.sendToPlayer(
+                userId2,
+                this.combatService.result_battle(player2, player2.id),
+              );
+              // waiting all combat finish
+            } else {
+              player.forceChooseMonster = true;
+              this.sendToPlayer(
+                userId,
+                this.combatService.change_monster(player, player.id),
+              );
+              this.sendToPlayer(
+                userId2,
+                this.combatService.change_monster(player2, player.id),
+              );
+            }
+          } else if (player2.currentMonster.life.current <= 0) {
+            if (!this.has_valid_monsters(player2)) {
+              endOfBattle = true;
+              loserId = player2.id;
+              // Adapt rounds left
+              player.roundsRemaining -= 1;
+              player2.roundsRemaining -= 1;
+
+              this.sendToPlayer(
+                userId,
+                this.combatService.result_battle(player, player.id),
+              );
+              this.sendToPlayer(
+                userId2,
+                this.combatService.result_battle(player2, player.id),
+              );
+            } else {
+              player2.forceChooseMonster = true;
+              this.sendToPlayer(
+                userId,
+                this.combatService.change_monster(player, player2.id),
+              );
+              this.sendToPlayer(
+                userId2,
+                this.combatService.change_monster(player2, player2.id),
+              );
+            }
+          } else {
+            this.startNewTurn(combatRoomId, new Set([userId, userId2]));
+            this.sendToPlayer(userId, this.combatService.new_turn(player));
+            this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+            // si un combat deja finish declenchement du roundLeft
+            // send new_turn(player, rounLeft)
+            // send new_turn(player, roundLeft)
+          }
+          if (endOfBattle) {
+            const winnerId = loserId === userId ? userId2 : userId;
+
+            this.combatService.playerCombatRoom.delete(loserId);
+            this.combatService.playerCombatRoom.delete(winnerId);
+            this.combatService.combatRooms.delete(combatRoomId!);
+            this.phaseTimer.clear(`combat: ${combatRoomId}`);
+
+            let winner = player.id === winnerId ? player : player2;
+
+            console.log('END OF BATTLE: ROUNDS LEFT: ', player.roundsRemaining);
+            // WINNER SCENE -END OF GAME
+            if (winner.roundsRemaining === 0)
+              this.sendToPlayer(winner.id, {
+                event: 'game',
+                data: { state: 'finish' },
+              });
+
+            // reinitialize winner
+            winner.resetAfterRound();
+
+            // eliminate loser
+            await this.eliminatePlayer(loserId, roomId);
+          }
+        }
         break;
       default:
-          console.log("Unknow state:", state);
-          return undefined;
+        console.log('Unknow state:', state);
+        return undefined;
     }
-    return result
+    return result;
   }
-} 
+}
