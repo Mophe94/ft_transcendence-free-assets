@@ -84,7 +84,7 @@ wait_for_manager() {
 # Promoting
 start_time=$(date +%s)
 managers=$(current_managers)
-while [ "$managers" -ge "$TARGET_MANAGERS" ]; do
+while [ "$managers" -lt "$TARGET_MANAGERS" ]; do
     workers=$(available_workers)
     echo "[INFO][$SCRIPT_NAME] Managers: $managers, available workers: $workers, target: $TARGET_MANAGERS"
     if [ "$managers" -ge "$TARGET_MANAGERS" ]; then
