@@ -301,6 +301,7 @@ export class Player {
     data: undefined,
   };
   roundsRemaining: number = 0;
+  status: string = "default";
   teamReady: boolean = false;
   forceChooseMonster: boolean = false;
   timer: number = 0;

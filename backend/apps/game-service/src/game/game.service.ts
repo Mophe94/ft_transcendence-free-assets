@@ -37,17 +37,13 @@ export class GameService implements OnModuleInit {
 
   /*  INITIALIZATION with hardcoded values */
   onModuleInit(): void {
-<<<<<<< Updated upstream
-    //this.registerRoom('test-room', [1, 2, 3, 4]);
-=======
-    this.registerRoom('test-room', [1, 2]);
->>>>>>> Stashed changes
+    //this.registerRoom('test-room', [1, 2]);
   }
 
   /*  GAME ROOMS */
 
   registerRoom(roomId: string, userIds: number[]): void {
-    this.authorizedPlayers.set(roomId, new Set(userIds));
+    //this.authorizedPlayers.set(roomId, new Set(userIds));
     this.activePlayersByRoom.set(roomId, new Set(userIds));
   }
 
@@ -450,7 +446,7 @@ export class GameService implements OnModuleInit {
           if (player.currentMonster.life.current <= 0) {
             if (!this.has_valid_monsters(player)) {
               endOfBattle = true;
-              loserId = player.id;
+              player.status = "loser";
               // Adapt rounds left
               player.roundsRemaining -= 1;
               player2.roundsRemaining -= 1;
@@ -478,7 +474,7 @@ export class GameService implements OnModuleInit {
           } else if (player2.currentMonster.life.current <= 0) {
             if (!this.has_valid_monsters(player2)) {
               endOfBattle = true;
-              loserId = player2.id;
+              player2.status = "loser";
               // Adapt rounds left
               player.roundsRemaining -= 1;
               player2.roundsRemaining -= 1;
@@ -512,6 +508,8 @@ export class GameService implements OnModuleInit {
           }
           if (endOfBattle) {
             const winnerId = loserId === userId ? userId2 : userId;
+            if (player.id === winnerId)
+              player.status = "winner";
 
             this.combatService.playerCombatRoom.delete(loserId);
             this.combatService.playerCombatRoom.delete(winnerId);
@@ -530,15 +528,15 @@ export class GameService implements OnModuleInit {
 
             // reinitialize winner
             winner.resetAfterRound();
-
-            // eliminate loser
-            // move this in handleMessage -> payload reception
-            await this.eliminatePlayer(loserId, roomId);
-            // if (winner.roundsRemaining === 0)
-            //   await this.eliminatePlayer(winnerId, roomId);
           }
         }
         break;
+      case 'safe_to_disconnect':
+        if (player.status === "loser")
+          await this.eliminatePlayer(player.id, roomId);
+        if (player.status === "winner" && player.roundsRemaining === 0)
+          await this.eliminatePlayer(player.id, roomId);
+
       default:
         console.log('Unknow state:', state);
         return undefined;
