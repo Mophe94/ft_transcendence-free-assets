@@ -5,9 +5,13 @@ import SignUpPassword from "./SignUpPassword";
 import { useNotification } from "../../../../context/NotifContext";
 import { ButtonColor } from "../../../../constants/Colors";
 import ColoredButton from "../../../buttons/ColoredButton";
+import { useAuth } from "../../../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 
 export default function SignUpForm() {
+  const navigate = useNavigate();
+  const { setUser } = useAuth();
   const { showNotification } = useNotification();
   const [formData, setFormData] = useState({
     email: '',
@@ -23,7 +27,7 @@ export default function SignUpForm() {
 
   const handleSignUp = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    const { confirmPassword, ...payload } = formData;
+    const { confirmPassword, ...payload} = formData;
     await fetch(`${import.meta.env.VITE_USERS_SERVICE}/auth/signup`, {
       headers: {
         'Content-Type': 'application/json',
@@ -34,17 +38,24 @@ export default function SignUpForm() {
     })
     .then ((res) => {
       if (res.ok) {
-        showNotification('User creation success', 'success');
+        return res.json();
       } else {
-        showNotification('User creation failed', 'error');
+        throw new Error();
       }
     })
-    
+    .then ((data) => {
+      showNotification('User creation successful', 'success');
+      console.log(data);
+      setUser(data);
+      navigate('/home');
+    })
+    .catch (() => {
+      showNotification('User creation failed', 'error');
+    });
   };
 
   const isFormValid =
     validity.emailValid && validity.usernameValid && validity.passwordValid;
-
 
   return (
     <form id="signup" onSubmit={handleSignUp} className="flex flex-col px-3 w-full max-w-100 align-center">

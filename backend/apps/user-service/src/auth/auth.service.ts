@@ -1,14 +1,23 @@
-import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
 import bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entities/users.entity';
-import { FortyTwoCoal, FortyTwoProfile, FortyTwoTokenResponse } from './types/fortytwo-profile.interface';
+import {
+  FortyTwoCoal,
+  FortyTwoProfile,
+  FortyTwoTokenResponse,
+} from './types/fortytwo-profile.interface';
 import { ConfigService } from '@nestjs/config';
 import { getSecret } from 'libs/shared/src/utils/secret.utils';
 import axios from 'axios';
 import { CoalitionEnum } from './types/coalition.enum';
+import { UserResponseDto } from '../users/dto/user-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +29,7 @@ export class AuthService {
 
   async createUser(
     createUserDto: CreateUserDto,
-  ): Promise<{ user: User; token: string }> {
+  ): Promise<{ user: UserResponseDto; token: string }> {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
@@ -34,16 +43,27 @@ export class AuthService {
     });
 
     const token = this.generateJwt(user);
-
-    return { user, token };
+    const sanitizedUser = new UserResponseDto({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+      coalitionId: user.coalitionId,
+      settings: user.settings,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
+    return { user: sanitizedUser, token };
   }
 
   generateJwt(user: User): string {
     const payload = {
-      sub: user.id,
+      id: user.id,
       username: user.username,
       email: user.email,
       role: user.userRoles,
+      avatarUrl: user.avatarUrl,
+      skin: user.settings.skin,
     };
 
     return this.jwtService.sign(payload);
@@ -54,7 +74,6 @@ export class AuthService {
     password: string,
   ): Promise<{ user: User; token: string }> {
     const user = await this.usersService.findOneByEmail(email, true);
-    console.log("first", user);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -81,7 +100,9 @@ export class AuthService {
       const payload = {
         id: user.id,
         username: user.username,
+        email: user.email,
         role: user.userRoles,
+        avatarUrl: user.avatarUrl,
       };
       console.log(payload);
       const token = await this.jwtService.signAsync(payload);
@@ -97,11 +118,12 @@ export class AuthService {
     };
 
     const newUser = await this.usersService.createFortyTwoUser(userProfile);
-    console.log("newuser", newUser);
     const payload = {
       id: newUser.id,
       username: newUser.username,
+      email: newUser.email,
       role: newUser.userRoles,
+      avatarUrl: newUser.avatarUrl,
     };
     const token = await this.jwtService.signAsync(payload);
     return { token, newUser };

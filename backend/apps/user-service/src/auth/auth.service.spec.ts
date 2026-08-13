@@ -59,7 +59,9 @@ describe('AuthService', () => {
 
       // Configuration des retours de mocks
       mockUsersService.createUser.mockResolvedValue(mockCreatedUser);
-      jest.spyOn(bcrypt, 'hash').mockImplementation(async () => 'hashed_password');
+      jest
+        .spyOn(bcrypt, 'hash')
+        .mockImplementation(async () => 'hashed_password');
 
       // Exécution
       const result = await authService.createUser(createUserDto);

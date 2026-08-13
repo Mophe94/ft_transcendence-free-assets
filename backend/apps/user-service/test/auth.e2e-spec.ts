@@ -56,8 +56,6 @@ describe('AuthController (E2E) - Validation Cookies', () => {
   });
 
   it('GET /auth/me - doit rejeter (401) si aucun cookie n est fourni', async () => {
-    await request(app.getHttpServer())
-      .get('/auth/me')
-      .expect(401);
+    await request(app.getHttpServer()).get('/auth/me').expect(401);
   });
 });

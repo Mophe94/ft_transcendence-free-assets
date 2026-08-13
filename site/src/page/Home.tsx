@@ -8,9 +8,6 @@ export default function Home() {
       <div className='grid-cols-full'>
         <Lobby />
       </div>
-      <ChatProvider>
-        <Chat />
-      </ChatProvider>
     </div>
   );
 }

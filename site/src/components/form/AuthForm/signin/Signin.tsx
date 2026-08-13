@@ -1,5 +1,4 @@
 import { useState } from "react";
-import ColorButton from "../../../buttons/ColoredButton2";
 import { ButtonColor } from "../../../../constants/Colors";
 import { inputClassName, labelClassName } from "../signup/SignUpConst";
 import ColoredButton from "../../../buttons/ColoredButton";
@@ -23,7 +22,6 @@ export default function SignInForm () {
   const handleSignInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value} = e.target;
     setSignInData((prev) => ({...prev, [name]: value}));
-    console.log(signInData);
   }
   
   const handleSignIn = async () => {
@@ -45,8 +43,8 @@ export default function SignInForm () {
 
       setUser(userData);
       navigate('/home');
-    } catch (_e) {
-      showNotification('An error occurd', 'error');
+    } catch {
+        showNotification('An error occured', 'error');
     }
   }
 
@@ -55,7 +53,7 @@ export default function SignInForm () {
   }
 
   return (
-    <form id="signin" onSubmit={(e) => e.preventDefault()}className="flex flex-col p-3 w-full gap-3">
+    <form id="signin" onSubmit={(e) => e.preventDefault()} className="flex flex-col p-3 w-full gap-3">
       <label htmlFor="email" className={labelClassName}>Email</label>
       <input
         id="email"

@@ -58,32 +58,32 @@ export function MessagesWindow() {
   );
 }
 
-export default function NewChat() {
+export default function Chat() {
   const [visible, setVisible] = useState<boolean>(false);
 
   return (
     <>
       <div
-        className={`fixed bottom-0 left-0 h-full w-[97vw] md:h-[45vh] md:w-[min(50vw,800px)] gap-0 grid-cols-[98px_1fr_64px] grid-rows-[188px_1fr_172px] ${visible ? 'grid':'hidden'}`} style={prefStyles}>
-        <div className="bg-[image:var(--img-ul)] bg-no-repeat" />
-        <div className="bg-[image:var(--img-um)] bg-[round_no-repeat]">
+        className={`fixed bottom-0 left-0 h-full w-[97vw] md:h-[45vh] md:w-[min(50vw,800px)] gap-0 grid-cols-[98px_1fr_64px] grid-rows-[188px_1fr_172px] z-100 ${visible ? 'grid':'hidden'}`} style={prefStyles}>
+        <div className="bg-(image:--img-ul) bg-no-repeat" />
+        <div className="bg-(image:--img-um) bg-[round_no-repeat]">
           <div className='font-rocker text-[#700e0e] [-webkit-text-stroke:2px_#000000] justify-self-center text-[64px] pt-10 font-'>Chat</div>
         </div>
-        <div className="bg-[image:var(--img-ur)] bg-no-repeat bg-size[auto_100%]" />
-        <div className="bg-[image:var(--img-ml)] bg-[no-repeat_round]" />
-        <div className="bg-[image:var(--img-mm)] bg-auto bg-repeat-round">
+        <div className="bg-(image:--img-ur) bg-no-repeat bg-size[auto_100%]" />
+        <div className="bg-(image:--img-ml) bg-[no-repeat_round]" />
+        <div className="bg-(image:--img-mm) bg-auto bg-repeat-round">
           <MessagesWindow />
         </div>
-        <div className="bg-[image:var(--img-mr)] bg-[no-repeat_round]" />
-        <div className="bg-[image:var(--img-bl)] bg-no-repeat" />
-        <div className="bg-[image:var(--img-bm)] bg-[round_no-repeat]">
+        <div className="bg-(image:--img-mr) bg-[no-repeat_round]" />
+        <div className="bg-(image:--img-bl) bg-no-repeat" />
+        <div className="bg-(image:--img-bm) bg-[round_no-repeat]">
           <InputBar />
         </div>
-        <div className="bg-[image:var(--img-br)] bg-no-repeat" />
+        <div className="bg-(image:--img-br) bg-no-repeat" />
       </div>
       <button
         id='chat-icon'
-        className='fixed bottom-0 right-0 '
+        className='fixed bottom-0 right-0 z-200'
         onClick={() => setVisible(!visible)}>
         <img
           className='w-[min(10vw,10vh)]'

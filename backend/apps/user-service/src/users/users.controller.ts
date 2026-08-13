@@ -1,16 +1,21 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+
 import { JwtHttpGuard } from 'libs/shared/src/auth/guards/jwt-http.guard';
 
 @Controller()
 export class UsersController {
-  constructor(private usersService: UsersService) {}
-
-  @Post('/signup')
-  createUser(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
-  }
+  constructor(private readonly usersService: UsersService) {}
 
   @Get('profile/:username')
   @UseGuards(JwtHttpGuard)

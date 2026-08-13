@@ -1,7 +1,7 @@
-import { JwtService } from "@nestjs/jwt";
-import { JwtPayload } from "../types/jwt-payload.interface";
-import { IncomingMessage } from "http";
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from '../types/jwt-payload.interface';
+import { IncomingMessage } from 'http';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class SharedAuthService {

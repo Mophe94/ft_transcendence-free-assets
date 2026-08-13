@@ -23,7 +23,7 @@ describe('AppController (e2e)', () => {
       .expect((res) => {
         expect(res.body.status).toBe('OK');
         expect(res.body).toHaveProperty('timestamp');
-    });
+      });
   });
 
   afterEach(async () => {

@@ -6,10 +6,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './users/entities/users.entity';
 import { getSecret } from '../../../libs/shared/src/utils/secret.utils';
 import { Account } from './users/entities/accounts.entity';
-import { Relationship } from './users/entities/relationships.entity';
+import { Relationship } from './socials/entities/relationships.entity';
 import { SettingsModule } from './settings/settings.module';
 import { UserStats } from './stats/stats.entity';
 import { AuthModule } from './auth/auth.module';
+import { SocialsModule } from './socials/socials.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     SettingsModule,
     AuthModule,
+    SocialsModule,
   ],
   controllers: [AppController],
 })

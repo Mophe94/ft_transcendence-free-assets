@@ -83,7 +83,7 @@ export class UsersService {
       }
       throw error;
     }
-}
+  }
 
   async findOneByEmail(
     email: string,
@@ -131,7 +131,7 @@ export class UsersService {
     }
 
     return candidate;
-}
+  }
 
   async isEmailAvailable(email: string) {
     const exists = await this.userRepo.exists({
@@ -145,8 +145,22 @@ export class UsersService {
     const user = await this.userRepo
       .createQueryBuilder('user')
       .innerJoin('user.accounts', 'account')
-      .where('account.provider_account_id = :userId', { userId: String(fortyTwoId) })
+      .where('account.provider_account_id = :userId', {
+        userId: String(fortyTwoId),
+      })
       .getOne();
     return user;
+  }
+
+  async findByIdentifier(identifier: string): Promise<User | null> {
+    return await this.userRepo.findOne({
+      where: [{ email: identifier }, { username: identifier }],
+    });
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return await this.userRepo.findOne({
+      where: { id },
+    });
   }
 }

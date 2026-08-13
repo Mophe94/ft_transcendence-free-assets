@@ -6,10 +6,9 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
-  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './users.entity';
+import { User } from '../../users/entities/users.entity';
 
 export enum RelationshipStatus {
   PENDING = 'pending',

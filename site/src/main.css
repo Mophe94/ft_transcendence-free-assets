@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Agbalumo&family=IM+Fell+English:ital@0;1&family=New+Rocker&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Agbalumo&family=IM+Fell+English:ital@0;1&family=Merienda:wght@300..900&family=New+Rocker&family=Sour+Gummy:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -6,6 +6,17 @@
   --font-ubuntu: 'Ubuntu', sans-serif;
   --font-agba: 'Agbalumo', system-ui;
   --font-im-fell: "IM Fell English", serif;
+  --font-merienda: "Merienda", cursive;
+  --font-sour: "Sour Gummy", sans-serif;
+}
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE et Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
 }
 
 .nav-vars {
@@ -56,8 +67,6 @@
   background-image: var(--light-cloud-img);
 }
 
-
-
 .theme-light {
   --bg-image: var(--light-cloud-img);
   --bg-color: rgb(71, 171, 169);
@@ -73,7 +82,3 @@ body,
   font-family: 'Ubuntu', sans-serif;
   background-color: var(--bg-color);
 }
-
-
-
-

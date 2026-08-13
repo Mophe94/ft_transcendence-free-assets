@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { UserRole } from '../types/userRole.enum';
 import { Account } from './accounts.entity';
-import { Relationship } from './relationships.entity';
+import { Relationship } from '../../socials/entities/relationships.entity';
 import type { UserSettings } from '../types/userSettings.interface';
 import { UserStats } from '../../stats/stats.entity';
 

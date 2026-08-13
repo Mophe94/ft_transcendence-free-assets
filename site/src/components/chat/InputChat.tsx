@@ -59,9 +59,9 @@ export function InputBar() {
         className="grid gap-0 grid-cols-[21px_1fr_21px] grid-rows-[25px_1fr_25px]"
         style={isFocused? focusedInputStyles: defaultInputStyles}>
   
-        <div className="bg-[image:var(--corner-ul)] bg-no-repeat" />
+        <div className="bg-(image:--corner-ul) bg-no-repeat" />
         <div/>
-        <div className="bg-[image:var(--corner-ur)] bg-no-repeat bg-size[auto_100%]" />
+        <div className="bg-(image:--corner-ur) bg-no-repeat bg-size[auto_100%]" />
         <div/>
         <div>
           <input
@@ -76,9 +76,9 @@ export function InputBar() {
           />
         </div>
         <div/>
-        <div className="bg-[image:var(--corner-bl)] bg-no-repeat" />
+        <div className="bg-(image:--corner-bl) bg-no-repeat" />
         <div/>
-        <div className="bg-[image:var(--corner-br)] bg-no-repeat" />
+        <div className="bg-(image:--corner-br) bg-no-repeat" />
       </div>
       <div className='flex justify-center self-center h-16'>
         <SendButton />

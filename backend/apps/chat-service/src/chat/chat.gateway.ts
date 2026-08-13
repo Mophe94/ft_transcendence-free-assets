@@ -8,11 +8,10 @@ import {
 } from '@nestjs/websockets';
 import { IncomingMessage } from 'http';
 import type { AuthenticatedSocket } from 'libs/shared/src';
-import { ConfigService } from '@nestjs/config';
 import { Server, WebSocket } from 'ws';
-import { clientsMap } from '../shared/clients.map';
-import { UseGuards } from 'node_modules/@nestjs/common';
 import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
+import { ChatService } from './chat.service';
+import { randomUUID } from 'crypto';
 
 type HeartbeatSocket = AuthenticatedSocket & { isAlive?: boolean };
 
@@ -24,7 +23,10 @@ export class ChatGateway
   server!: Server;
   private heartbeatInterval!: NodeJS.Timeout;
 
-  constructor(private wsAuthService: SharedAuthService) {}
+  constructor(
+    private wsAuthService: SharedAuthService,
+    private readonly chatService: ChatService,
+  ) {}
   destroy() {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
@@ -53,8 +55,13 @@ export class ChatGateway
   ): Promise<void> {
     try {
       const user = await this.wsAuthService.verifyWsHandshake(request);
+      client.id = randomUUID();
+      if (!user.id) {
+        client.close(1008, 'Unauthorized');
+      }
+      console.log('hello');
       client.user = user;
-      clientsMap.set(client, user);
+      this.chatService.addConnection(client.user.id, client.id);
       client.isAlive = true;
       client.on('pong', () => {
         client.isAlive = true;
@@ -64,15 +71,15 @@ export class ChatGateway
     }
   }
 
-  handleDisconnect(client: AuthenticatedSocket) {
-    clientsMap.delete(client);
-    console.log(`disconnection: ${client.user.username}`);
+  handleDisconnect(client: HeartbeatSocket) {
+    if (!client?.user || client.id === undefined) return;
+    this.chatService.removeConnection(client.user.id, client.id);
   }
 
   @SubscribeMessage('message')
   handleMessage(client: AuthenticatedSocket, content: string) {
     const date = new Date();
-    const sender = client.user.username;
+    const sender = client.user?.username;
 
     const message = { time: date, username: sender, content };
     this.broadcast(message);

@@ -77,7 +77,8 @@ export default function ColoredButton({ color = ButtonColor.Black, func = () => 
     >
       <div
         data-text={text}
-        className={`relative ${color.textColor} self-center text-nowrap -m-1
+        className={`
+          relative ${color.textColor} self-center text-nowrap -m-1
           before:content-[attr(data-text)] 
           before:absolute before:inset-0 before:-z-10 
           ${color.borderColor} 

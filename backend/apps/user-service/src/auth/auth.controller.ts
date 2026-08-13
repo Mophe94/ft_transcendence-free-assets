@@ -58,7 +58,6 @@ export class AuthController {
       throw new UnauthorizedException('Code missing');
     }
     const { token, user } = await this.authService.handleFortyTwoAuth(code);
-
     res.cookie('access_token', token, {
       httpOnly: true,
       secure: true,
@@ -83,7 +82,7 @@ export class AuthController {
   @UseGuards(JwtHttpGuard)
   whoAmI(@Req() req: AuthenticatedRequest) {
     return {
-      user: req.user?.sub,
+      user: req.user?.id,
       email: req.user?.email,
       username: req.user?.username,
       avatarUrl: req.user?.avatarUrl,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import GameIframe from '../content/GameIframe';
 import GameRoom from '../content/GameRoom';
 
@@ -9,35 +9,42 @@ export default function Play() {
   const [timer, setTimer] = useState<number>(0);
   const [capacity, setCapacity] = useState<number>(0);
 
+  const gameStartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     const ws = new WebSocket(`${import.meta.env.VITE_LOBBY_SERVICE}`);
 
     ws.onopen = () => {
-      console.log('Connexion WebSocket établie');
       ws.send(JSON.stringify({ event: 'lobby' }));
     };
 
     ws.onmessage = (event) => {
       const newMsg = JSON.parse(event.data);
-      console.log(newMsg);
       if (newMsg.event === 'game') {
         setUserToken(newMsg.event);
-        setRoomToken('test-room');
+        setRoomToken(newMsg.data.roomToken ?? 'test-room');
 
-        setTimeout(() => {
+        if (gameStartTimeoutRef.current) {
+          clearTimeout(gameStartTimeoutRef.current);
+        }
+        gameStartTimeoutRef.current = setTimeout(() => {
           setGameStart(true);
         }, 3000);
       }
-      if (newMsg.event === 'lobby') {
-        if (newMsg.state === 'player_joined') {
+      if (newMsg.event === 'lobby' && newMsg.state === 'player_joined') {
           setTimer(newMsg.data.timer);
           setCapacity(newMsg.data.roomCapacity);
-        }
       }
     };
 
+     ws.onerror = (err) => {
+      console.error('Erreur WebSocket lobby :', err);
+    };
     return () => {
       ws.close();
+      if (gameStartTimeoutRef.current) {
+        clearTimeout(gameStartTimeoutRef.current);
+      }
     };
   }, []);
 

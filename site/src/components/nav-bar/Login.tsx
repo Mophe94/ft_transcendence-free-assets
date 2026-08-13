@@ -26,6 +26,11 @@ export function AuthSection() {
               </Link>
             </li>
             <li>
+              <Link to={'/friends'} className="auth-link">
+                Friends
+              </Link>
+            </li>
+            <li>
               <button onClick={handleSignout} className="auth-link">
                 Logout
               </button>
