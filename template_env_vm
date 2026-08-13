@@ -13,6 +13,7 @@ VM_DIR=
 ###############################################################################
 # Node Password                                                               #
 ###############################################################################
-# users defined
+# base_node image password 
 p_root_password=
+# users defined
 p_user_password=
