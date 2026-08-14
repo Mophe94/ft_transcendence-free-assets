@@ -117,9 +117,9 @@ CREATE TABLE public.users_stats (
     games_played integer DEFAULT 0 CONSTRAINT users_stat_games_played_not_null NOT NULL,
     games_won integer DEFAULT 0 CONSTRAINT users_stat_games_won_not_null NOT NULL,
     games_lost integer DEFAULT 0 CONSTRAINT users_stat_games_lost_not_null NOT NULL,
-    total_damage_dealt integer DEFAULT 0 CONSTRAINT users_stat_total_damage_dealt_not_null NOT NULL,
+    total_player_defeated integer DEFAULT 0 CONSTRAINT users_stat_total_player_defeated_not_null NOT NULL,
     nb_monsters_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_monsters_discovered_not_null NOT NULL,
-    nb_ending_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_objects_discovered_not_null NOT NULL,
+    nb_ending_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_ending_discovered_not_null NOT NULL,
     nb_achievements integer DEFAULT 0 CONSTRAINT users_stat_nb_achievements_not_null NOT NULL,
     created_at timestamp with time zone DEFAULT now() CONSTRAINT users_stat_created_at_not_null NOT NULL,
     updated_at time with time zone DEFAULT now() CONSTRAINT users_stat_updated_at_not_null NOT NULL
