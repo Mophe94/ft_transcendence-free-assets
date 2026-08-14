@@ -399,14 +399,14 @@ COPY public.maps_tiles (map_id, tile_id) FROM stdin;
 
 COPY public.monsters (id, name, hp_total, attack, attack_spe, defense, defense_spe, speed, type, rarity) FROM stdin;
 1	pisciner	50	10	10	5	5	50	neutral	not_foundable
-2	fishet	120	10	15	5	15	100	water	common
-3	burpy	100	20	30	0	20	80	water	uncommon
-4	sharky	150	20	30	0	20	150	water	rare
-5	squirel	100	20	20	5	10	110	neutral	common
-6	papate	180	10	15	5	10	80	earth	uncommon
-7	gigantomakia	200	20	30	15	25	50	earth	rare
-9	monkel	130	15	15	10	20	100	neutral	uncommon
-10	pigeonne	120	25	25	10	10	160	fly	rare
+2	fishet	100	20	25	5	15	100	water	common
+3	burpy	120	25	35	0	20	80	water	uncommon
+4	sharky	150	30	40	5	20	150	water	rare
+5	squirel	100	20	20	10	5	110	neutral	common
+6	papate	180	20	25	10	15	180	earth	uncommon
+7	gigantomakia	200	25	30	10	20	50	earth	rare
+9	monkel	130	25	25	10	10	100	neutral	uncommon
+10	pigeonne	140	25	35	10	10	160	fly	rare
 8	leafs	80	35	45	0	10	100	plant	common
 \.
 
@@ -464,18 +464,18 @@ COPY public.skills (id, name, power_point, effect, type, value, repetition, "pre
 2	claw	10	damage	neutral	1.2	1	100	\N
 3	slap	10	damage	neutral	1.5	1	100	\N
 4	bite	10	damage	neutral	2	1	90	\N
-5	multi-punch	5	damage	neutral	1	4	75	\N
-6	ultralaser	1	damage	neutral	4	1	75	\N
-7	splash	15	damage	water	1	1	100	\N
-8	bubulle	5	damage	water	1.5	3	75	\N
-9	tsunami	1	damage	water	4	1	75	\N
-10	tranche	10	damage	plant	1.5	1	100	\N
+5	multi-punch	5	damage	neutral	1	4	70	\N
+6	ultralaser	1	damage	neutral	4	1	90	\N
+7	splash	15	damage	water	1.2	1	100	\N
+8	bubulle	5	damage	water	1.5	3	78	\N
+9	tsunami	1	damage	water	3	1	90	\N
+10	tranche	10	damage	plant	1.7	1	100	\N
 11	whip-vine	5	damage	plant	2.5	1	100	\N
-12	rock	5	damage	earth	1.5	1	100	\N
+12	rock	5	damage	earth	2.0	1	100	\N
 13	pic	10	damage	fly	1.5	1	100	\N
 14	tornade	3	damage	fly	2.5	4	70	\N
 15	dodge	3	dodge	none	0	1	100	\N
-16	armor	3	up_stat	none	5	1	100	\N
+16	armor	3	up_stat	none	5	1	100	defense
 17	swimming	3	up_stat	none	10	1	100	speed
 18	grow	3	up_stat	none	5	1	100	attack
 19	kawai	3	down_stat	none	5	1	100	attack_spe

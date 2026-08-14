@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
-import './Profile.css'
 import Stats from '../content/Stats';
 import Preferences from '../content/Preferences';
 import ErrorDisplay from '../content/Error';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loading } from '../content/Loading';
-import type { User } from '../types/user';
+import type { UserStats, User } from '../types/user';
 import RegularBG from '../background/RegularBg';
 
 
 export default function Profile() {
   const { username } = useParams();
   const { user } = useAuth();
-  const [profileUser, setProfileUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<User | null>(null);
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [error, setError] = useState<{msg: string; code: number} | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,14 +26,14 @@ export default function Profile() {
       credentials: 'include',
     })
       .then((res) => {
-        // if (!res.ok) {
-        //   throw new Error("Utilisateur introuvable");
-        // }
         return res.json();
       })
       .then((data) => {
-        if (data && data.user) {
-          setProfileUser(data.user);
+        console.log(data);
+        if (data && data.user && data.stats) {
+          setUserProfile(data.user);
+          setUserStats(data.stats)
+
         } else {
           setError({ msg: "User not found", code: 404 });
         }
@@ -57,8 +57,8 @@ export default function Profile() {
 
   return (
     <RegularBG>
-      <div id='profile-layout'>
-        <Stats user={profileUser}/>
+      <div className='flex flex-col'>
+        <Stats user={ userProfile } stats={ userStats }/>
         <Preferences />
       </div>
     </RegularBG>

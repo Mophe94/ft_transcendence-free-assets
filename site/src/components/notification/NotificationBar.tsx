@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
 import type { NotificationType } from '../../context/NotifContext';
-import './NotificationBar.css';
 
 interface NotificationBarProps {
   message: string;
   type: NotificationType;
 }
+
+const typeStyles: Record<NotificationType, string> = {
+  success: 'bg-[#2ecc71] border-[#27ae60]',
+  error: 'bg-[#e74c3c] border-[#c0392b]',
+  warning: 'bg-[#f39c12] border-[#d35400]',
+};
 
 export default function NotificationBar({ message, type }: NotificationBarProps) {
   const [isLeaving, setIsLeaving] = useState(false);
@@ -19,8 +24,18 @@ export default function NotificationBar({ message, type }: NotificationBarProps)
   }, []);
 
   return (
-    <div className={`notification-bar ${type} ${isLeaving ? 'fade-out' : ''}`}>
-      {message}
+    <div className="fixed top-5 left-1/2 -translate-x-1/2 z-9999">
+      <div
+        className={`
+          px-6 py-3 rounded-md border text-white font-semibold font-sans
+          shadow-[0_4px_12px_rgba(0,0,0,0.15)]
+          ${isLeaving ? 'animate-[slideOutNotif_0.3s_ease-in_forwards]' : 'animate-[slideInNotif_0.3s_ease-out_forwards]'}
+          ${typeStyles[type] || typeStyles.success}
+        `}
+      >
+        {message}
+      </div>
+
     </div>
   );
 }

@@ -1,6 +1,51 @@
-@import url('https://fonts.googleapis.com/css2?family=New+Rocker&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Agbalumo&family=IM+Fell+English:ital@0;1&family=Merienda:wght@300..900&family=New+Rocker&family=Sour+Gummy:ital,wght@0,100..900;1,100..900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-rocker: 'New Rocker', system-ui;
+  --font-ubuntu: 'Ubuntu', sans-serif;
+  --font-agba: 'Agbalumo', system-ui;
+  --font-im-fell: "IM Fell English", serif;
+  --font-merienda: "Merienda", cursive;
+  --font-sour: "Sour Gummy", sans-serif;
+}
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE et Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+.nav-vars {
+  --nav-h: clamp(2rem, 6vw, 5rem);
+  --nav-font: clamp(0.8rem, 1.4vw, 1.1rem);
+}
+
+@media(min-width: 480px) {
+  .nav-vars {
+    --nav-h: 8vw;
+    --nav-font: 2.4vw;
+  }
+}
+
+@media(min-width: 768px) {
+  .nav-vars {
+    --nav-h: clamp(3rem, 7vw, 8rem);
+    --nav-font: clamp(1rem, 3vw, 3rem);
+  }
+    body {
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    font-size: 1.2rem;
+  }
+}
 
 #main {
   min-height: 100vh;
@@ -21,72 +66,21 @@
   background-color: rgb(71, 171, 169);
   background-image: var(--light-cloud-img);
 }
-.heading-small {
-  font-family: 'New Rocker';
-  font-size: clamp(2.2rem, 4vw, 5rem);
-  color: rgba(131, 6, 6, 0.691);
-  -webkit-text-stroke: 2px black;
-  text-align: center;
-}
-/* .heading-small {
-  font-family: 'Ubuntu';
-  color: rgba(29, 8, 103, 0.691);
-  -webkit-text-stroke: 2px black;
-  font-size: 2.25rem;
-  font-weight: 400;
-
-  margin-top: 25px;
-  margin-bottom: 25px;
-} */
-.heading-medium {
-  font-family: 'New Rocker';
-  color: rgba(103, 8, 8, 0.691);
-  -webkit-text-stroke: 2px black;
-  font-size: clamp(0.7rem, 10vw, 8rem);
-  font-weight: 400;
-
-  margin-top: 25px;
-  margin-bottom: 25px;
-}
-.heading-large {
-  font-family: 'New Rocker';
-  font-size: clamp(0.8rem, 15vw, 7rem);
-  color: rgb(112, 14, 14);
-  -webkit-text-stroke: 3px black;
-  text-align: center;
-}
-
-.text-medium {
-  font-size: 28px;
-}
-.bold {
-  font-weight: 500;
-}
-
-.centered {
-  justify-self: center;
-}
-
-/* .theme-dark {
-  --bg-image: var(--dark-cloud-img);
-  --bg-color: rgb(5, 1, 31);
-} */
 
 .theme-light {
   --bg-image: var(--light-cloud-img);
   --bg-color: rgb(71, 171, 169);
 }
 
-.clean-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-}
-hr {
-    border: solid 1px rgb(176, 96, 72);
-    width: 60%
+body,
+#root {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 1rem;
+  margin: 0px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: 'Ubuntu', sans-serif;
+  background-color: var(--bg-color);
 }
 
 @media (min-width: 768px) {

@@ -1,10 +1,16 @@
-import GameRoom from "../content/GameRoom";
+
+import ColoredButton from "../components/buttons/ColoredButton";
+import { ButtonColor } from "../constants/Colors";
 
 
 export default function Test() {
   return (
-    <>
-      <GameRoom {...{ roomName: "Test-room", players: ["kprist", "stempels", "bertrmar", "agaland"], size_game: 4, endTime: 1785247132000 } } />
-    </>
+    <div className="h-4">
+      <ColoredButton color={ButtonColor.Red} text="Enter"/>
+      <ColoredButton color={ButtonColor.Black} text="Enter"/>
+      <ColoredButton color={ButtonColor.Blue} text="Enter"/>
+      <ColoredButton color={ButtonColor.Green} text="Enter"/>
+      <ColoredButton color={ButtonColor.Purple} text="Enter"/>
+    </div>
   );
 }
