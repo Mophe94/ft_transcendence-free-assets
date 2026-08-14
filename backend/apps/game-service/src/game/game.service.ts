@@ -10,7 +10,7 @@ import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisStateService } from '../redis/redis_state.service';
 
 @Injectable()
-export class GameService implements OnModuleInit {
+export class GameService {
   constructor(
     private eventEmitter: EventEmitter2,
     private phaseTimer: PhaseTimerService,

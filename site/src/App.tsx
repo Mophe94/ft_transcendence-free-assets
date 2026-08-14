@@ -36,7 +36,7 @@ function App() {
             <Route path="/play" element={<Play />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:username" element={<Profile />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/friends" element={<Social/>} />
           </Route>
           <Route path="/" element={<Landing />} />

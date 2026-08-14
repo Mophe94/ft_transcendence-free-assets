@@ -80,7 +80,7 @@ esac
 
 chmod +x "$CONFIG_DIR"/add_manager.sh
 if ! bash "$CONFIG_DIR"/add_manager.sh "$MANAGER_NUMBER"; then
-    read -p "[$SCRIPT_NAME] Do you wish to continue: " -t 15 answer || {
+    read -p "[$SCRIPT_NAME] Do you wish to continue: " -t 1 answer || {
 	    echo
 	    answer="Yes"
     }
