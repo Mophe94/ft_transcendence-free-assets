@@ -561,7 +561,7 @@ export class CombatService {
     if (multi >= 2) effectiveness = ". It's super effective !";
     else if (multi <= 0.5) effectiveness = ". It's not very effective..";
     let result = Math.trunc(flatAttackDammage * multi);
-    if (monsterType == enemyType) result -= enemy.currentMonster.defense_spe;
+    if (attackType == enemyType) result -= enemy.currentMonster.defense_spe;
     else result -= enemy.currentMonster.defense;
     if (result <= 0) result = 0;
     return { result, effectiveness };
