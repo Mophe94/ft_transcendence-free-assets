@@ -305,7 +305,7 @@ export class CombatService {
         this.received_pass(player);
         return;
       } else {
-        player.text = player.currentMonster.name + ' fail to use ' + skillName;
+        player.text = player.currentMonster.name + ' fail to used ' + skillName;
         return;
       }
     }
@@ -320,7 +320,7 @@ export class CombatService {
         if (enemy.currentMonster.dodge === true) {
           player.text =
             player.currentMonster.name +
-            ' use ' +
+            ' used ' +
             skillName +
             ' on ' +
             enemy.currentMonster.name +
@@ -329,7 +329,7 @@ export class CombatService {
         } else {
           player.text =
             player.currentMonster.name +
-            ' use ' +
+            ' used ' +
             skillName +
             ' on ' +
             enemy.currentMonster.name;
@@ -360,28 +360,26 @@ export class CombatService {
             );
             if (resultAttack.result >= enemy.currentMonster.life.current)
               resultAttack.result = enemy.currentMonster.life.current;
-            if (effectiveness != '') effectiveness = resultAttack.effectiveness;
+            if (resultAttack.effectiveness != '') effectiveness = resultAttack.effectiveness;
             resultDamage += resultAttack.result;
             enemy.currentMonster.life.current -= resultAttack.result;
           }
           if (skill.repetition > 1) {
-            if (skill.repetition > 1) {
-              if (resultDamage > 0)
-                player.text +=
-                  ' and hit ' +
-                  touch +
-                  ' times for ' +
-                  resultDamage +
-                  ' damage';
-              else
-                player.text =
-                  enemy.currentMonster.name +
-                  ' dodge ' +
-                  skillName +
-                  ' ' +
-                  touch +
-                  ' times.';
-            }
+            if (resultDamage > 0)
+              player.text +=
+                ' and hit ' +
+                touch +
+                ' times for ' +
+                resultDamage +
+                ' damage';
+            else
+              player.text =
+                enemy.currentMonster.name +
+                ' dodge ' +
+                skillName +
+                ' ' +
+                touch +
+                ' times.';
           } else player.text += ' for ' + resultDamage + ' damage';
         }
         player.text += effectiveness;
@@ -407,9 +405,9 @@ export class CombatService {
         }
         player.text =
           player.currentMonster.name +
-          ' use ' +
+          ' used ' +
           skillName +
-          ' and up his ' +
+          ' to boost its ' +
           target_up;
         break;
 
@@ -420,19 +418,19 @@ export class CombatService {
             if (enemy.currentMonster.defense <= 0) {
               player.text =
                 player.currentMonster.name +
-                ' use ' +
+                ' used ' +
                 skillName +
                 ' but ' +
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
-                ' are already minimum.';
+                ' won\'t go any lower.';
             } else {
               player.text =
                 player.currentMonster.name +
-                ' use ' +
+                ' used ' +
                 skillName +
-                ' and down ' +
+                ' and decreased ' +
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
@@ -445,19 +443,19 @@ export class CombatService {
             if (enemy.currentMonster.speed <= 0) {
               player.text =
                 player.currentMonster.name +
-                ' use ' +
+                ' used ' +
                 skillName +
                 ' but ' +
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
-                ' are already minimum.';
+                ' won\'t go any lower.';
             } else {
               player.text =
                 player.currentMonster.name +
-                ' use ' +
+                ' used ' +
                 skillName +
-                ' and down ' +
+                ' and decreased ' +
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
@@ -470,19 +468,19 @@ export class CombatService {
             if (enemy.currentMonster.attack <= 0) {
               player.text =
                 player.currentMonster.name +
-                ' use ' +
+                ' used ' +
                 skillName +
                 ' but ' +
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
-                ' are already minimum.';
+                ' won\'t go any lower.';
             } else {
               player.text =
                 player.currentMonster.name +
-                ' use ' +
+                ' used ' +
                 skillName +
-                ' and down ' +
+                ' and decreased ' +
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
@@ -495,19 +493,19 @@ export class CombatService {
             if (enemy.currentMonster.attack_spe <= 0) {
               player.text =
                 player.currentMonster.name +
-                ' use ' +
+                ' used ' +
                 skillName +
                 ' but ' +
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
-                ' are already minimum.';
+                ' won\'t go any lower.';
             } else {
               player.text =
                 player.currentMonster.name +
-                ' use ' +
+                ' used ' +
                 skillName +
-                ' and down ' +
+                ' and decreased ' +
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
@@ -525,9 +523,9 @@ export class CombatService {
         player.currentMonster.dodge = true;
         player.text =
           player.currentMonster.name +
-          ' use ' +
+          ' used ' +
           skillName +
-          ' and are ready to dodge next attack.';
+          ' and are ready to dodge the next attack.';
         break;
       default:
         this.received_pass(player);
@@ -541,7 +539,7 @@ export class CombatService {
     enemyMonster: CurrentMonster,
   ): boolean {
     let result = Math.floor(Math.random() * 100);
-    result -= enemyMonster.speed / 10;
+    result += (enemyMonster.speed / 10);
     if (result > skill.precision) return false;
     return true;
   }
@@ -560,8 +558,8 @@ export class CombatService {
     let effectiveness: string = '.';
 
     let multi: number = this.typeChart[attackType]?.[enemyType] ?? 1;
-    if (multi >= 2) effectiveness = ". It's super effectiveness !";
-    else if (multi <= 0.5) effectiveness = ". It's not effectiveness.";
+    if (multi >= 2) effectiveness = ". It's super effective !";
+    else if (multi <= 0.5) effectiveness = ". It's not very effective..";
     let result = Math.trunc(flatAttackDammage * multi);
     if (monsterType == enemyType) result -= enemy.currentMonster.defense_spe;
     else result -= enemy.currentMonster.defense;
@@ -602,13 +600,13 @@ export class CombatService {
         }
         player.text =
           player.name +
-          ' use ' +
+          ' used ' +
           item +
-          ' for heal ' +
+          ' on ' +
           player.currentMonster.name +
-          ' of ' +
+          ' and restored ' +
           result_heal +
-          ' hp.';
+          ' HP.';
         break;
 
       case 'damage':
@@ -622,11 +620,11 @@ export class CombatService {
         }
         player.text =
           player.name +
-          ' use ' +
+          ' used ' +
           item +
           ' on ' +
           enemy.currentMonster.name +
-          ' and deal ' +
+          ' and dealt ' +
           result_damage +
           ' damage.';
         break;
@@ -655,13 +653,13 @@ export class CombatService {
         }
         player.text =
           player.name +
-          ' use ' +
+          ' used ' +
           item +
           ' on ' +
           enemy.currentMonster.name +
-          ', ' +
+          ' to lower ' +
           current_item.target +
-          ' stat down.';
+          '.';
         break;
 
       case 'stat_up':
@@ -688,13 +686,13 @@ export class CombatService {
         }
         player.text =
           player.name +
-          ' use ' +
+          ' used ' +
           item +
           ' on ' +
           player.currentMonster.name +
           ', ' +
           current_item.target +
-          ' stat up.';
+          ' increased.';
         break;
 
       default:
