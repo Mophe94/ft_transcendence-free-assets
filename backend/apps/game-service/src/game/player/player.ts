@@ -8,7 +8,7 @@ import {
 import { emptyCurrentMonster } from './player.interfaces';
 
 export class Player {
-  readonly id: number = -1;
+  readonly id: string = '';
   readonly name: string = '';
   readonly asset: string = '';
   currentMonster: CurrentMonster = {
@@ -311,7 +311,7 @@ export class Player {
   current_item: string = '';
   text: string = '';
 
-  constructor(new_id: number, name: string, asset: string) {
+  constructor(new_id: string, name: string, asset: string) {
     this.id = new_id;
     this.name = name;
     this.asset = asset;

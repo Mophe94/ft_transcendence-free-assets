@@ -3,10 +3,10 @@ import { Player } from './player';
 
 @Injectable()
 export class PlayerService {
-  players = new Map<number, Player>();
-  idsByPlayers = new Map<Player, number>();
+  players = new Map<string, Player>();
+  idsByPlayers = new Map<Player, string>();
 
-  initPlayer(userId: number /* , payload: any */): void {
+  initPlayer(userId: string /* , payload: any */): void {
     const player = new Player(
       userId,
       userId.toString(), //need to retrieve name from userDB
@@ -16,16 +16,16 @@ export class PlayerService {
     this.idsByPlayers.set(player, userId);
   }
 
-  getPlayer(userId: number): Player | undefined {
+  getPlayer(userId: string): Player | undefined {
     return this.players.get(userId);
   }
 
-  getUserId(player: Player): number | undefined {
+  getUserId(player: Player): string | undefined {
     const id = this.idsByPlayers.get(player);
     return id;
   }
 
-  removePlayer(userId: number): void {
+  removePlayer(userId: string): void {
     const player = this.players.get(userId);
     this.players.delete(userId);
     this.idsByPlayers.delete(player!);

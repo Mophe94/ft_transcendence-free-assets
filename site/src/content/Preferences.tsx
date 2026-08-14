@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import './Preferences.css';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { LeftArrowButton, RightArrowButton } from '../components/buttons/ArrowButtons';
@@ -22,24 +21,24 @@ import satyr03 from '../assets/avatars/Satyr03.gif';
 import sunTheme from '../assets/theme/sun_icon.png';
 import moonTheme from '../assets/theme/moon_icon.png';
 import pisciner from '../assets/starters/pisciner.gif';
-
+import Heading from '../components/heading/Heading';
 
 const THEMES = [
   ['light', sunTheme],
   ['dark', moonTheme],
 ];
 
-const AVATARS = [
-  ['DinoGreen', dinoGreen],
-  ['DinoBlue', dinoBlue],
-  ['DinoRed', dinoRed],
-  ['DinoYellow', dinoYellow],
-  ['Ghost', ghost],
-  ['Ghost02', ghost02],
-  ['Ghost03', ghost03],
-  ['Satyr01', satyr01],
-  ['Satyr02', satyr02],
-  ['Satyr03', satyr03],
+const SKINS = [
+  ['dinoGreen', dinoGreen],
+  ['dinoBlue', dinoBlue],
+  ['dinoRed', dinoRed],
+  ['dinoYellow', dinoYellow],
+  ['ghost', ghost],
+  ['ghost02', ghost02],
+  ['ghost03', ghost03],
+  ['satyr01', satyr01],
+  ['satyr02', satyr02],
+  ['satyr03', satyr03],
 ];
 
 const STARTERS = [
@@ -52,7 +51,7 @@ export default function Preferences() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [starter_id, setStarterId] = useState<number>(0);
   const [theme_id, setThemeId] = useState<number>(0);
-  const [avatar_id, setAvatarId] = useState<number>(0);
+  const [avatar_id, setSkinId] = useState<number>(0);
   const [_, setIsSaving] = useState(false);
   const { user } = useAuth();
   const { setTheme } = useTheme();
@@ -67,22 +66,24 @@ export default function Preferences() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("=>",data.settings);
-        setSettings(data.settings);
-        if (data.settings) {
-          if (data.settings.theme) {
-            const tIndex = THEMES.findIndex(([k]) => k === data.settings.theme);
+        setSettings(data);
+        if (data) {
+          if (data.theme) {
+            const tIndex = THEMES.findIndex(([k]) => k === data.theme);
             if (tIndex !== -1) {
               setThemeId(tIndex);
-              setTheme(data.settings.theme);
+              setTheme(data.theme);
             }
           }
-          if (data.settings.starter !== null) {
-            setStarterId(data.settings.starter);
+          if (data.starter !== null) {
+            const tIndex = STARTERS.findIndex(([k]) => k === data.starter);
+            if (tIndex !== -1) {
+              setStarterId(tIndex);
+            }
           }
-          if (data.settings.avatar !== null) {
-            const aIndex = AVATARS.findIndex(([k]) => k === data.settings.avatar);
-            if (aIndex !== -1) setAvatarId(aIndex);
+          if (data.skin !== null) {
+            const aIndex = SKINS.findIndex(([k]) => k === data.skin);
+            if (aIndex !== -1) setSkinId(aIndex);
           }
         }
       })
@@ -91,62 +92,59 @@ export default function Preferences() {
       });
   }, [user?.username, username, setTheme]);
 
-
-  if (username) return ;
+  if (username) return;
 
   if (!user) {
     return <div>Loading...</div>;
   }
 
   const incrAvatarId = () => {
-    if (avatar_id < AVATARS.length - 1) setAvatarId(avatar_id + 1); }
+    if (avatar_id < SKINS.length - 1) setSkinId(avatar_id + 1);
+  };
   const decrAvatarId = () => {
-    if (avatar_id > 0) setAvatarId(avatar_id - 1);}
+    if (avatar_id > 0) setSkinId(avatar_id - 1);
+  };
 
   const incrStarterId = () => {
-    if (starter_id < STARTERS.length - 1) setStarterId(starter_id + 1); }
+    if (starter_id < STARTERS.length - 1) setStarterId(starter_id + 1);
+  };
   const decrStarterId = () => {
-    if (starter_id > 0) setStarterId(starter_id - 1); }
+    if (starter_id > 0) setStarterId(starter_id - 1);
+  };
 
   const incrThemeId = () => {
-    if (theme_id < THEMES.length - 1){
+    if (theme_id < THEMES.length - 1) {
       const new_id = theme_id + 1;
       setThemeId(new_id);
       setTheme(THEMES[new_id][0]);
     }
-  }
+  };
   const decrThemeId = () => {
     if (theme_id > 0) {
       const new_id = theme_id - 1;
       setThemeId(new_id);
       setTheme(THEMES[new_id][0]);
     }
-  }
+  };
 
   const handleSubmit = async (
     event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>,
   ) => {
     event.preventDefault();
-    console.log("hello", settings);
     if (!settings) {
       return;
     }
     setIsSaving(true);
-
     const updatedSettingsPayload = {
-      settings: {
-        ...settings,
-        id: settings.id,
-        starter: starter_id,
-        avatar: AVATARS[avatar_id][0],
-        theme: THEMES[theme_id][0]
-      },
+      starter: STARTERS[starter_id][0],
+      skin: SKINS[avatar_id][0],
+      theme: THEMES[theme_id][0],
     };
     try {
       const response = await fetch(
         `${import.meta.env.VITE_USERS_SERVICE}/settings/update`,
         {
-          method: 'POST',
+          method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -158,10 +156,9 @@ export default function Preferences() {
       if (!response.ok) throw new Error('Update Failed');
 
       const data = await response.json();
-      setSettings(data.settings);
+      setSettings(data);
       showNotification('Saved Successfully', 'success');
-    } catch (error) {
-      console.error(error);
+    } catch {
       showNotification('Error: saving failed', 'error');
     } finally {
       setIsSaving(false);
@@ -169,51 +166,91 @@ export default function Preferences() {
   };
 
   const handleReset = () => {
-    setAvatarId(0);
+    setSkinId(0);
     setStarterId(0);
     setThemeId(0);
     setTheme('light');
-  }
+  };
 
   const starter_img = STARTERS[starter_id] ? STARTERS[starter_id][1] : STARTERS[0][1];
-  const avatar_img = AVATARS[avatar_id] ? AVATARS[avatar_id][1] : AVATARS[0][1];
+  const avatar_img = SKINS[avatar_id] ? SKINS[avatar_id][1] : SKINS[0][1];
   const theme_img = THEMES[theme_id] ? THEMES[theme_id][1] : THEMES[0][1];
+
   return (
     <div className="preferences-content-layout">
-      <form id="preferences-form" onSubmit={handleSubmit}>
-        
-        <div className='pref-header'>
-          <div className="preferences-title heading-large">
-            Settings
-          </div>
+      <form
+        id="preferences-form"
+        onSubmit={handleSubmit}
+        className="
+          grid justify-items-center mt-[clamp(2rem,10vw,5rem)]
+          xl:grid-cols-[1fr_3fr_1fr] xl:items-center
+        "
+      >
+        <div className="xl:col-start-2">
+          <Heading text="Settings" size="l"/>
         </div>
 
-        <div className="settings-grid">
-          
-          <div className="selection">
-            <div className="selection-label heading-medium">Avatar</div>
-            <LeftArrowButton onClick={decrAvatarId} disabled={avatar_id === 0}/>
-            <img className='selection-img' src={avatar_img} />
-            <RightArrowButton onClick={incrAvatarId} disabled={avatar_id === AVATARS.length - 1}/>
+        <div className="
+          justify-items-center
+          xl:col-span-3 xl:grid xl:grid-cols-3 xl:gap-20
+        ">
+          <div className="
+            w-full grid grid-cols-[1fr_3fr_1fr] gap-12 items-center justify-items-center
+            xl:gap-4
+          ">
+            <Heading text="Avatar" size="m" className="
+              row-start-1 col-span-3 my-8
+              xl:text-[clamp(4rem,10vw,5rem)]
+            "/>
+            <LeftArrowButton onClick={decrAvatarId} disabled={avatar_id === 0} />
+            <img
+              className="h-[clamp(2rem,20vw,200px)] xl:h-[clamp(100px,10vw,200px)]"
+              src={avatar_img}
+              alt="Avatar selection"
+            />
+            <RightArrowButton onClick={incrAvatarId} disabled={avatar_id === SKINS.length - 1} />
           </div>
 
-          <div className="selection">
-            <div className="selection-label heading-medium">Starter</div>
-            <LeftArrowButton onClick={decrStarterId} disabled={starter_id === 0}/>
-            <img className='selection-img' src={starter_img} />
-            <RightArrowButton onClick={incrStarterId} disabled={starter_id === STARTERS.length - 1}/>
+          <div className="
+            w-full grid grid-cols-[1fr_3fr_1fr] gap-12 items-center justify-items-center
+            xl:gap-4
+          ">
+            <Heading text="Starter" size="m" className="
+              row-start-1 col-span-3 my-8
+              xl:text-[clamp(4rem,10vw,5rem)]
+            "/>
+            <LeftArrowButton onClick={decrStarterId} disabled={starter_id === 0} />
+            <img
+              className="h-[clamp(2rem,20vw,200px)] xl:h-[clamp(100px,10vw,200px)]"
+              src={starter_img}
+              alt="Starter selection"
+            />
+            <RightArrowButton onClick={incrStarterId} disabled={starter_id === STARTERS.length - 1} />
           </div>
-          
-          <div className="selection">
-            <div className="selection-label heading-medium">Theme</div>
-            <LeftArrowButton onClick={decrThemeId} disabled={theme_id === 0}/>
-            <img className='selection-img' src={theme_img} />
-            <RightArrowButton onClick={incrThemeId} disabled={theme_id === THEMES.length - 1}/>
+
+          <div className="
+            w-full grid grid-cols-[1fr_3fr_1fr] gap-12 items-center justify-items-center
+            xl:gap-4
+          ">
+            <Heading text="Theme" size="m" className="
+              row-start-1 col-span-3 my-8
+              xl:text-[clamp(4rem,10vw,5rem)]
+            "/>
+            <LeftArrowButton onClick={decrThemeId} disabled={theme_id === 0} />
+            <img
+              className=" h-[clamp(2rem,20vw,200px)] xl:h-[clamp(100px,10vw,200px)]"
+              src={theme_img}
+              alt="Theme selection"
+            />
+            <RightArrowButton onClick={incrThemeId} disabled={theme_id === THEMES.length - 1} />
           </div>
         </div>
-        <div className='pref-buttons'>
+        <div className="
+          flex w-full h-[clamp(3rem,8vw,140px)] my-12 flex-row justify-center
+          xl:col-start-3 xl:row-start-1 xl:m-0 xl:h-[clamp(2rem,4vw,5rem)] xl:justify-around
+        ">
           <ResetButton onClick={handleReset} />
-          <SaveButton onClick={() => {}}/>
+          <SaveButton onClick={() => {}} />
         </div>
       </form>
     </div>

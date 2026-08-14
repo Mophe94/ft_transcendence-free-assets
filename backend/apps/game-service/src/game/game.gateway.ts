@@ -16,6 +16,7 @@ import { ClientData } from 'apps/game-service/src/shared/clients.map';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
 import { RedisStateService } from '../redis/redis_state.service';
+import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
 
 @WebSocketGateway(8082, { cors: { origin: true }, path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -23,14 +24,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   constructor(
+    private wsAuthService: SharedAuthService,
     private playerService: PlayerService,
     private redisStateService: RedisStateService,
     private gameService: GameService,
   ) {}
   private clients = new Map<WebSocket, ClientData>();
-  private clientsById = new Map<number, WebSocket>();
+  private clientsById = new Map<string, WebSocket>();
 
-  handleConnection(client: WebSocket, request: IncomingMessage): void {
+  async handleConnection(
+    client: WebSocket,
+    request: IncomingMessage,
+  ): Promise<void> {
     const url = request.url!;
     const params = new URLSearchParams(url.split('?')[1]);
     const token = params.get('token');
@@ -39,7 +44,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(token);
     console.log(roomId);
     // Add JWT token validation
-    const { userId } = createMockUser();
+
+    const user = await this.wsAuthService.verifyWsHandshake(request);
+    if (!user.username) {
+      client.close(1008, 'Unauthorized');
+    }
+    const userId = user.username;
     if (
       !token ||
       !roomId
@@ -152,7 +162,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     userId,
     payload,
   }: {
-    userId: number;
+    userId: string;
     payload: object;
   }): void {
     const client = this.clientsById.get(userId);
@@ -173,7 +183,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @OnEvent('close_player_socket')
-  onClosePlayerSocket({ userId }: { userId: number }): void {
+  onClosePlayerSocket({ userId }: { userId: string }): void {
     const client = this.clientsById.get(userId);
     if (client) client.close(); // trigger handleDisconnect -> cleanupClient
   }

@@ -11,8 +11,8 @@ import { getSecret } from 'libs/shared/src/utils/secret.utils';
 import { RedisModule } from './redis/redis.module';
 import { RedisService } from './redis/redis.service';
 import { LobbyController } from './lobby/lobby.controller';
-import { AuthModule } from 'apps/account-service/src/auth/auth.module';
 import { HealthModule } from 'libs/shared/src/health/health.module';
+import { SharedJwtModule } from 'libs/shared/src/auth/shared-auth.module';
 
 @Module({
   imports: [
@@ -38,6 +38,7 @@ import { HealthModule } from 'libs/shared/src/health/health.module';
     ScheduleModule.forRoot(),
     HealthModule,
     RedisModule,
+    SharedJwtModule,
   ],
   controllers: [AppController, LobbyController],
   providers: [AppService, RedisService],

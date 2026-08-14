@@ -20,12 +20,12 @@ export class LobbyService implements OnApplicationBootstrap {
     await this.redisService.addToSet(LOBBY_KEYS.FREE_IDS, ROOM_IDS);
   }
 
-  async joinLobby(client: WebSocket, userId: number): Promise<void> {
+  async joinLobby(client: WebSocket, userId: string): Promise<void> {
     const roomId =
       this.roomService.findAvailableRoom() ??
       (await this.roomService.createRoom(DEFAULT.CAPACITY));
 
-    this.roomService.joinRoom(client, roomId);
+    await this.roomService.joinRoom(client, roomId);
     await this.redisService.addPlayerToRoom(userId.toString(), roomId);
     console.log('room id: ', roomId);
 

@@ -265,7 +265,7 @@ export class MapService {
   }
 
   // JSON RESPONSE
-  async start_game(player: Player) {
+  start_game(player: Player) {
     // return {
     //   event: 'game',
     //   data: {
@@ -287,7 +287,7 @@ export class MapService {
         state: 'start_game',
         player: {
           id: player.id,
-          name: player.id.toString(),
+          name: player.id,
           asset: 'dinoBlue',
           team: player.team,
           //monster: player.currentMonster.name,

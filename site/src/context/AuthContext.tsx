@@ -3,6 +3,7 @@ import type { User } from '../types/user';
 
 export interface AuthContextType {
   user: User | null;
+  setUser: (user: User) => void;
   isLoading: boolean;
   handleSignout: () => Promise<void>;
   checkUserStatus: () => Promise<void>;

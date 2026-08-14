@@ -1,30 +1,25 @@
 export interface Settings {
-  id: number;
+  skin: string;
   theme: string;
-  starter: number;
+  starter: string;
 }
 
-export interface Stats {
-  id: number;
-  total_damage_given: number;
-  total_damage_received: number;
-  nb_victories: number;
-  nb_defeats: number;
-  nb_fights: number;
-  nb_monsters_discovered: number;
-  nb_objects_discovered: number;
-  nb_achievements: number;
+export interface UserStats {
+  totalDamageDealt: number;
+  totalDamageReceived: number;
+  gamesWon: number;
+  gamesLost: number;
+  gamesPlayed: number;
+  nbMonstersDiscovered: number;
+  nbObjectsDiscovered: number;
+  nbAchievements: number;
 }
 
 export interface User {
-  id: number;
   username: string;
   email: string;
-  avatarUrl: string;
-  created_at: Date;
+  avatarUrl?: string;
+  createdAt: Date;
   settings?: Settings;
-  stats?: Stats;
-  coalition_id?: number;
-  coalition_name?: string;
-  role: string;
+  coalitionId: number;
 }
