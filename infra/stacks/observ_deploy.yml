@@ -3,6 +3,8 @@ services:
   prometheus:
     image: prom/prometheus
     user: "${PROMETHEUS_UID}:${PROMETHEUS_GID}"
+    command:
+      - "--web.enable-remote-write-receiver"
     configs:
       - source: prometheus_config
         target: /etc/prometheus/prometheus.yml
@@ -114,7 +116,8 @@ services:
 
   alloy:
     image: grafana/alloy:latest
-    user: "alloy":"alloy"
+    privileged: true
+    user: "alloy:alloy"
     command:
       - run
       - /etc/alloy/config.alloy
@@ -124,7 +127,7 @@ services:
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
-      - /:/host:/root:ro
+      - /:/host/root:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - NODE_HOSTNAME="{{.Node.Hostname}}"
