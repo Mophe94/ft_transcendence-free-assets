@@ -20,8 +20,12 @@ var is_active: bool = false
 var mash_started: bool = false
 var already_used: bool = false
 
+var stop_event: bool = false
 
 #############################
+func _stop_event():
+	stop_event = true
+
 func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
@@ -29,6 +33,8 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _new_encounter():
+	if stop_event:
+		return
 	GeneralData.tile = "tree"
 	GeneralData.background_capture = "tree"
 	var send_func = func():
@@ -51,6 +57,9 @@ func _ready() -> void:
 	fireflies.visible = false
 	mash_bar.completed.connect(_on_mash_completed)
 	mash_bar.failed.connect(_on_mash_failed)
+	var game_node = get_node("../../Timer")
+	if game_node:
+		game_node.stop_event.connect(_stop_event)
 
 
 ## Appelé par le script de scène (World) au démarrage, pour n'activer

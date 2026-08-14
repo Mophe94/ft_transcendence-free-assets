@@ -9,9 +9,14 @@ var is_active: bool = false
 var fishing_started: bool = false
 var already_used: bool = false
 
+var stop_event: bool = false
+
 signal stop_player
 
 #############################
+func _stop_event():
+	stop_event = true
+
 func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
@@ -19,6 +24,8 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _new_encounter():
+	if stop_event:
+		return
 	GeneralData.tile = "water"
 	GeneralData.background_capture = "beach"
 	var send_func = func():
@@ -38,6 +45,9 @@ func _ready() -> void:
 	animated_sprite.play("idle")
 	fishing_bar.completed.connect(_on_fishing_completed)
 	fishing_bar.failed.connect(_on_fishing_failed)
+	var game_node = get_node("../../Timer")
+	if game_node:
+		game_node.stop_event.connect(_stop_event)
 
 
 func set_interactable(value: bool) -> void:

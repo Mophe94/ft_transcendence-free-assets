@@ -90,6 +90,9 @@ func _last_scene():
 	background.texture = finsh_png[GeneralData.player["asset"]]
 	await transi_open()
 
+func _hide_timer():
+	$Timer.hide()
+
 func  _next_map():
 	await transi_close()
 	get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
@@ -229,6 +232,7 @@ func _ready() -> void:
 	$CombatMenus.enemy_change_monster.connect(_new_enemy_monster)
 	$CombatMenus.stop_timer.connect(_stop_timer)
 	$CombatMenus.run_timer.connect(_run_timer)
+	$CombatMenus.hide_timer.connect(_hide_timer)
 	$CombatBanner.hide()
 	$Timer.time_finish.connect(_time_finish)
 	_capture_battle_ratios()
@@ -245,7 +249,7 @@ func _time_finish():
 	var send_func = func():
 		null
 	if !stop_timer:
-		var success = await GeneralProcess.wait_signal(send_func, Received.action)
+		var success = await GeneralProcess.wait_signal(send_func, Received.new_turn)
 		$Timer.send = false
 		if !success:
 			get_tree().change_scene_to_packed(GeneralData.wait)

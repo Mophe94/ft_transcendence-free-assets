@@ -17,6 +17,7 @@ var SPEED_TEXT = GeneralData.SPEED_TEXT
 signal action_combat
 signal change_monster
 signal enemy_change_monster
+signal hide_timer
 signal stop_timer
 signal run_timer
 signal last_scene
@@ -38,9 +39,9 @@ func _lose():
 		
 	result_scene = battle_result["lose"].instantiate()
 	get_tree().current_scene.add_child(result_scene)
-	stop_timer.emit()
+	hide_timer.emit()
 	Received.action_finished.emit()
-	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAVE_TO_DISCONNECT])
+	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAFE_TO_DISCONNECT])
 	
 func _win():
 	await text_show("YOU WIN !")
@@ -49,23 +50,21 @@ func _win():
 		
 	result_scene = battle_result["win"].instantiate()
 	get_tree().current_scene.add_child(result_scene)
-	stop_timer.emit()
+	hide_timer.emit()
 	await get_tree().create_timer(2.0).timeout
 	Received.action_finished.emit()
-	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAVE_TO_DISCONNECT])
+	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAFE_TO_DISCONNECT])
 
 func _change_monster():
 	await text_show(GeneralData.text, 1)
 	$Text.text = ""
 	set_menus_select_monster()
 	run_timer.emit()
-	print("signal player change send")
 	Received.action_finished.emit()
 
 func _enemy_change_monster():
 	hide_selection()
 	await text_show(GeneralData.text, 1)
-	print("signal enemy change send")
 	Received.action_finished.emit()
 
 func _new_current_monster():

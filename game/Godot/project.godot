@@ -13,7 +13,7 @@ config_version=5
 config/name="trans-refonte"
 run/main_scene="uid://dreahfyspdeh6"
 config/features=PackedStringArray("4.6", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://qahx6dbu2hoi"
 
 [autoload]
 

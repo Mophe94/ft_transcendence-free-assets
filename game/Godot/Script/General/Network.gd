@@ -22,7 +22,6 @@ func connect_server():
 	var url = "wss://" + domain + "/game?token=" + user + "&room=" + room
 	print("url : " + url)
 	var err = ws.connect_to_url(url)
-	print("response of connect fonction: " + str(err))
 	if err != OK:
 		emit_signal("fail_connection")
 		print("WebSocket connection failed")

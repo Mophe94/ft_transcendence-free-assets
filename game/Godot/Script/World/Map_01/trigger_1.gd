@@ -15,9 +15,14 @@ var can_roll: bool = true
 
 var danger_level: float = 0.0
 
+var stop_event: bool = false
+
 signal stop_player
 
 #############################
+func _stop_event():
+	stop_event = true
+
 func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
@@ -42,6 +47,9 @@ func _ready():
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	randomize()
+	var game_node = get_node("../../../Timer")
+	if game_node:
+		game_node.stop_event.connect(_stop_event)
 
 func _physics_process(_delta):
 	if not inside or player == null:

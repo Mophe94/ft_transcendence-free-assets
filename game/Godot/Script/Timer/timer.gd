@@ -13,7 +13,7 @@ var flash_timer: float = 0.0
 var flash_duration: float = 1.0
 
 func _ready():
-#	time_remaining = 50
+#	time_remaining = 10
 	_apply_scene_style()
 	_update_scale()
 	get_viewport().size_changed.connect(_update_scale)
