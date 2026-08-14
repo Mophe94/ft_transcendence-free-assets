@@ -8,7 +8,6 @@ import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisStateService } from '../redis/redis_state.service';
-import { resolve } from 'path';
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -148,7 +147,6 @@ export class GameService implements OnModuleInit {
   }
 
   private async eliminatePlayer(userId: number, roomId: string): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 11000)); // ! "temp fix to synchronizeke"
     console.log(
       `[GameService] Eliminating player ${userId} from room ${roomId}`,
     );
@@ -311,26 +309,7 @@ export class GameService implements OnModuleInit {
 
     this.phaseTimer.start(timerKey, 'choose_action', () => {
       console.log(`Room ${combatRoomId} choose_action timeout`);
-      // const room = this.combatService.combatRooms.get(combatRoomId);
-      // if (!room) {
-      //     console.log("Combat room not found");
-      //     return;
-      // }
-      // const [ userId, userId2 ] = room;
-      // let player = this.playerService.getPlayer(userId);
-      // let player2 = this.playerService.getPlayer(userId2);
-      // if (!player || !player2)
-      //   return;
-      // if (player.currentActions.actionType === undefined) {
-      //   player.currentActions.actionType = "pass";
-      //   // need to create a getter
-      //   this.combatService.handle_action(player, player2, player.currentActions, 1);
-      // }
-      // if (player2.currentActions.actionType === undefined) {
-      //   player2.currentActions.actionType = "pass";
-      //   // need to create a getter
-      //   this.combatService.handle_action(player2, player, player2.currentActions, 1);
-      // }
+      this.actionTimeout(combatRoomId);
     });
 
     const actionTimer =
@@ -340,6 +319,44 @@ export class GameService implements OnModuleInit {
       this.playerService.getPlayer(userId)!.timer = actionTimer;
     }
     console.log('New Turn timer started');
+  }
+
+  private actionTimeout(combatRoomId: string): void {
+    const room = this.combatService.combatRooms.get(combatRoomId);
+    if (!room) {
+      console.log( `[GameService] actionTimeout -> unknow combat room ${combatRoomId}`);
+      return;
+    }
+
+    const [userId, userId2] = room;
+    const player = this.playerService.getPlayer(userId);
+    const player2 = this.playerService.getPlayer(userId2);
+    if (!player || !player2) {
+      console.log(`[GameService]: actionTimeout -> missing player(s) for room ${combatRoomId}`);
+      return
+    }
+
+    console.log("player.currentActions BEFORE; ", player.currentActions.actionType);
+    console.log("player2.currentActions BEFORE; ", player2.currentActions.actionType);
+
+    // if (player.forceChooseMonster) -> if !currentMonster 
+
+    if (player.currentActions.actionType === undefined)
+      this.autoPass(userId, player);
+    if (player2.currentActions.actionType === undefined)
+      this.autoPass(userId2, player2);
+
+    this.resolveTurn(userId, player, player2, undefined!);
+  }
+
+  private autoPass(userId: number, player: Player): void {
+    if (player.currentActions.actionType !== undefined) return;
+
+    console.log(`[GameService]: Auto-pass for player ${userId} (timeout)`);
+    player.currentActions = {
+      actionType: 'pass',
+      data: {},
+    }
   }
 
   private has_valid_monsters(player: Player): boolean {
@@ -474,9 +491,12 @@ export class GameService implements OnModuleInit {
     const userId2 = this.combatService.getOpponentId(userId);
     if (!userId2) return;
 
+    console.log("player.currentActions; ", player.currentActions.actionType);
+    console.log("player2.currentActions; ", player2.currentActions.actionType);
+
     const bothPlayersActed =
       !!player.currentActions.actionType && !!player2.currentActions.actionType;
-    if (!bothPlayersActed && !playerForce.forceChooseMonster) return;
+    if (!bothPlayersActed && !playerForce?.forceChooseMonster) return;
 
     const roundResolved = this.applyBattleRound(
       player,
