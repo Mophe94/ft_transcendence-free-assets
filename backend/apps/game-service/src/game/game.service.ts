@@ -197,7 +197,7 @@ export class GameService implements OnModuleInit {
       console.log('Active Players last winner:  ', active);
       console.log('Connected Players last winner: ', connected);
       console.log('*********************************************');
-      console.log(`End of game: everything should be cleanup at this point!`);
+      //console.log(`End of game: everything should be cleanup at this point!`);
       return;
     }
   }
