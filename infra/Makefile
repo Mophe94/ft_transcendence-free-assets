@@ -75,20 +75,11 @@ observ:
 	@mkdir -p "/nfs-storage/grafana"
 	@mkdir -p "/nfs-storage/grafana/dashboards"
 	@doas cp $(CONTAINER_FILES)/grafana/dashboards/* "/nfs-storage/grafana/dashboards/"
-	@if [ "$$(stat -c '%u:%g' /nfs-storage/grafana)" != "$(GRAFANA_UID):$(GRAFANA_GID)" ]; then \
-	    echo "Fixing Grafana NFS ownership"; \
-	    doas chown -R $(GRAFANA_UID):$(GRAFANA_GID) /nfs-storage/grafana; \
-	fi
+	@doas chown -R $(GRAFANA_UID):$(GRAFANA_GID) /nfs-storage/grafana;
 	@mkdir -p "/nfs-storage/prometheus"
-	@if [ "$$(stat -c '%u:%g' /nfs-storage/grafana)" != "$(PROMETHEUS_UID):$(PROMETHEUS_GID)" ]; then \
-	    echo "Fixing Prometheus NFS ownership"; \
-	    doas chown -R $(PROMETHEUS_UID):$(PROMETHEUS_GID) /nfs-storage/prometheus; \
-	fi
+	@doas chown -R $(PROMETHEUS_UID):$(PROMETHEUS_GID) /nfs-storage/prometheus;
 	@mkdir -p "/nfs-storage/loki"
-	@if [ "$$(stat -c '%u:%g' /nfs-storage/grafana)" != "$(LOKI_UID):$(LOKI_GID)" ]; then \
-	    echo "Fixing Loki NFS ownership"; \
-	    doas chown -R $(LOKI_UID):$(LOKI_GID) /nfs-storage/loki; \
-	fi
+	@doas chown -R $(LOKI_UID):$(LOKI_GID) /nfs-storage/loki;
 #	@make image TARGET=$@
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 

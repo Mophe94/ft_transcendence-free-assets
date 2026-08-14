@@ -37,11 +37,7 @@ export class GameService implements OnModuleInit {
 
   /*  INITIALIZATION with hardcoded values */
   onModuleInit(): void {
-<<<<<<< Updated upstream
     //this.registerRoom('test-room', [1, 2, 3, 4]);
-=======
-    this.registerRoom('test-room', [1, 2]);
->>>>>>> Stashed changes
   }
 
   /*  GAME ROOMS */

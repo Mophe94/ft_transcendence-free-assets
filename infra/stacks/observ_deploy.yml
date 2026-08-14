@@ -55,17 +55,17 @@ services:
     networks:
         - obsrv_net
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    networks:
-      - obsrv_net
-    deploy:
-      mode: global
+#  cadvisor:
+#    image: gcr.io/cadvisor/cadvisor
+#    volumes:
+#      - /:/rootfs:ro
+#      - /var/run:/var/run:ro
+#      - /sys:/sys:ro
+#      - /var/lib/docker/:/var/lib/docker:ro
+#    networks:
+#      - obsrv_net
+#    deploy:
+#      mode: global
       
   loki:
     user: "${LOKI_UID}:${LOKI_GID}"
@@ -114,27 +114,26 @@ services:
 
   alloy:
     image: grafana/alloy:latest
-
+    user: "alloy":"alloy"
     command:
       - run
       - /etc/alloy/config.alloy
-
     configs:
       - source: alloy_config
         target: /etc/alloy/config.alloy
-
     volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host:/root:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-
     environment:
       - NODE_HOSTNAME="{{.Node.Hostname}}"
       - NODE_ID="{{.Node.ID}}"
-
-    deploy:
-      mode: global
-
     networks:
       - obsrv_net
+    deploy:
+      mode: global
+#      restart_policy:
 
 volumes:
     loki_data:
