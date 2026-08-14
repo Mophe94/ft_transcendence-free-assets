@@ -6,7 +6,7 @@ export class PlayerService {
   players = new Map<string, Player>();
   idsByPlayers = new Map<Player, string>();
 
-  initPlayer(userId: string /* , payload: any */): void {
+  initPlayer(userId: string): void {
     const player = new Player(
       userId,
       userId.toString(), //need to retrieve name from userDB
@@ -14,6 +14,15 @@ export class PlayerService {
     );
     this.players.set(userId, player);
     this.idsByPlayers.set(player, userId);
+  }
+
+  initDefaultPlayer(): Player {
+    const player = new Player(
+      '',
+      '',
+      'dino',
+    );
+    return player;
   }
 
   getPlayer(userId: string): Player | undefined {

@@ -354,7 +354,7 @@ export class CombatService {
             const resultAttack = this.attackResult(
               player,
               skill.type,
-			  skill.value,
+			        skill.value,
               enemy,
               enemy.currentMonster.type,
               player.currentMonster.type,
@@ -549,7 +549,7 @@ export class CombatService {
   private attackResult(
     player: Player,
     attackType: string,
-	skillValue: number,
+	  skillValue: number,
     enemy: Player,
     enemyType: string,
     monsterType: string,
@@ -563,7 +563,7 @@ export class CombatService {
     if (multi >= 2) effectiveness = ". It's super effective !";
     else if (multi <= 0.5) effectiveness = ". It's not very effective..";
     let result = Math.trunc(flatAttackDammage * multi);
-	result *= skillValue;
+	  result *= skillValue;
     if (attackType == enemyType) result -= enemy.currentMonster.defense_spe;
     else result -= enemy.currentMonster.defense;
     if (result <= 0) result = 0;

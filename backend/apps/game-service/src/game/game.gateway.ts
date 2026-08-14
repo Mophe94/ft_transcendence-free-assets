@@ -11,7 +11,7 @@ import { Interval } from '@nestjs/schedule';
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
 import { PlayerService } from './player/player.service';
-import { GamePayload, createMockUser } from './game.type';
+import { GamePayload } from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
@@ -48,6 +48,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const user = await this.wsAuthService.verifyWsHandshake(request);
     if (!user.username) {
       client.close(1008, 'Unauthorized');
+      return;
     }
     const userId = user.username;
     if (
@@ -61,7 +62,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     this.clients.set(client, { userId, roomId, isAlive: true });
-    this.clientsById.set(userId, client);
+    this.clientsById.set(userId!, client);
     console.log(`[GameGateway]: Client ${userId} connected in room ${roomId}`);
 
     client.on('pong', () => {
