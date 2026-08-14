@@ -1,53 +1,36 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Play.css';
 import GameIframe from '../content/GameIframe';
 import GameRoom from '../content/GameRoom';
+import { useLobbySocket } from '../context/LobbySocketContext';
 
 export default function Play() {
-  const [gameStart, setGameStart] = useState<boolean>(false);
-  const [userToken, setUserToken] = useState<string | null>(null);
-  const [roomToken, setRoomToken] = useState<string | null>(null);
-  const [timer, setTimer] = useState<number>(0);
-  const [capacity, setCapacity] = useState<number>(0);
+  const { roomId, players, roomCapacity, timer, gameStarted, reset } = useLobbySocket();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const ws = new WebSocket(`${import.meta.env.VITE_LOBBY_SERVICE}`);
+    if (!roomId) navigate('/home');
+  }, [roomId, navigate]);
 
-    ws.onopen = () => {
-      console.log('Connexion WebSocket établie');
-      ws.send(JSON.stringify({ event: 'lobby' }));
-    };
-
-    ws.onmessage = (event) => {
-      const newMsg = JSON.parse(event.data);
-      console.log(newMsg);
-      if (newMsg.event === 'game') {
-        setUserToken(newMsg.event);
-        setRoomToken('test-room');
-
-        setTimeout(() => {
-          setGameStart(true);
-        }, 3000);
-      }
-      if (newMsg.event === 'lobby') {
-        if (newMsg.state === 'player_joined') {
-          setTimer(newMsg.data.timer);
-          setCapacity(newMsg.data.roomCapacity);
-        }
-      }
-    };
-
+  useEffect(() => {
     return () => {
-      ws.close();
+      reset();
     };
-  }, [capacity]);
+  }, [reset]);
 
-  
-  if (gameStart && userToken && roomToken) {
-    return <GameIframe userToken={userToken} roomToken={roomToken} />
+  if (!roomId) return null;
+
+  if (gameStarted) {
+    return <GameIframe userToken="game" roomToken={roomId} />;
   }
 
   return (
-    <GameRoom {...{ roomName: "Test-room", players: ["kprist", "stempels", "bertrmar", "agaland"], roomCapacity: capacity, endTime: timer } } />
+    <GameRoom
+      roomName={roomId}
+      players={players}
+      roomCapacity={roomCapacity}
+      endTime={timer}
+    />
   );
 }

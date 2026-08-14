@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { WebSocket } from 'ws'; //!
-import {
-  clientsMap,
-  ClientData,
-} from 'apps/game-service/src/shared/clients.map';
-import { FULL } from 'apps/game-service/src/game/game.type';
+import { WebSocket } from 'ws';
+import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { RedisService } from '../redis/redis.service';
+
+interface Room {
+  clients: Set<WebSocket>;
+  capacity: number;
+}
 
 @Injectable()
 export class RoomService {
@@ -15,71 +16,61 @@ export class RoomService {
     private readonly redis: RedisService,
   ) {}
 
-  private rooms = new Map<string, Set<WebSocket>>();
+  private rooms = new Map<string, Room>();
 
-  async joinRoom(client: WebSocket, roomId: string): Promise<void> {
-    this.rooms.get(roomId)?.add(client);
-    const clientData = clientsMap.get(client);
-	/* await this.redis.addPlayerToRoom(clientsMap.get(client).userId.toString(), roomId) */
-    if (clientData) clientData.roomId = roomId;
-  }
-
-/*   async createRoom(roomCapacity: number): Promise<string> {
-    const id = await this.redis.getRandRoomId(); */
-  // ROOMID HARDCODEE
-  async createRoom(roomCapacity: number): Promise<string> {
-    const id = await this.redis.createRoom();
-    this.rooms.set(id, new Set());
-    console.log(`Room created: ${id}`);
+  async createRoom(capacity?: number): Promise<string> {
+    const id = await this.redis.createRoom(capacity);
+    const finalCapacity = await this.redis.getRoomCapacity(id);
+    this.rooms.set(id, { clients: new Set(), capacity: finalCapacity });
+    console.log(`Room created: ${id} (capacity ${finalCapacity})`);
     return id;
   }
 
+  async joinRoom(client: WebSocket, roomId: string): Promise<void> {
+    this.rooms.get(roomId)?.clients.add(client);
+    const clientData = clientsMap.get(client);
+    if (clientData) {
+      clientData.roomId = roomId;
+    }
+  }
+
   findAvailableRoom(): string | null {
-    for (const [roomId, clients] of this.rooms) {
-      if (clients.size < FULL) return roomId;
+    for (const [roomId, room] of this.rooms) {
+      if (room.clients.size < room.capacity) return roomId;
     }
     return null;
   }
 
-  async leaveRoom(client: WebSocket, roomId: string, userId: string): Promise<void> {
-    const clients = this.rooms.get(roomId);
-    if (!clients) return;
-    clients.delete(client);
-    /* await this.redis.removePlayerFromRoom(userId, roomId); */
-    console.log(`Client left ${roomId}, ${clients.size} players remaining`);
+  getRoomCapacity(roomId: string): number | undefined {
+    return this.rooms.get(roomId)?.capacity;
+  }
 
-    if (clients.size === 0) {
-	  /* await this.redis.deleteRoom(roomId); */
-      this.phaseTimer.clear(`game: ${roomId}`);
+  async leaveRoom(
+    client: WebSocket,
+    roomId: string,
+    userId: string,
+  ): Promise<Set<WebSocket> | null> {
+    const room = this.rooms.get(roomId);
+    if (!room) return null;
+    room.clients.delete(client);
+    await this.redis.removePlayerFromRoom(userId, roomId);
+    console.log(`Client left ${roomId}, ${room.clients.size} players remaining`);
+
+    if (room.clients.size === 0) {
+      this.phaseTimer.clear(`lobby:${roomId}`);
+      await this.redis.deleteRoom(roomId);
       this.rooms.delete(roomId);
       console.log(`Room ${roomId} deleted (empty)`);
+      return null;
     }
+    return room.clients;
   }
 
-  getRoomSize(roomId: string) {
-    return this.rooms.get(roomId)?.size;
-  }
-
-  async deleteRoom(roomId: string): Promise<void> {
-    await Promise.all([
-      this.redis.removeActiveRoom(roomId),
-      this.redis.removeInactiveRoom(roomId),
-    ]);
-    this.rooms.delete(roomId);
-  }
-
-  addClient(roomId: string, client: WebSocket): void {
-    this.rooms.get(roomId)?.add(client);
+  getRoomSize(roomId: string): number | undefined {
+    return this.rooms.get(roomId)?.clients.size;
   }
 
   getClients(roomId: string): Set<WebSocket> | undefined {
-    return this.rooms.get(roomId);
-  }
-
-  removeClient(roomId: string, client: WebSocket): void {
-    const clients = this.rooms.get(roomId);
-    if (!clients) return;
-    clients.delete(client);
-    if (clients.size === 0) void this.deleteRoom(roomId);
+    return this.rooms.get(roomId)?.clients;
   }
 }

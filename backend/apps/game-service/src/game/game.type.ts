@@ -10,7 +10,7 @@ export const FULL = 2;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  godot_fill: 5,
+  godot_fill: 20,
   map: 10,
   team_setup: 10,
   choose_monster: 23, // happend only if a monster die -> before choose action phase

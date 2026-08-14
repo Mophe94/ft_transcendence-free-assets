@@ -2,6 +2,7 @@ export interface Settings {
   id: number;
   theme: string;
   starter: number;
+  avatar: string 
 }
 
 export interface Stats {

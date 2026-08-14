@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthProvider.tsx';
 import { ThemeProvider } from './context/ThemeProvider.tsx';
 import { NotificationProvider } from './context/NotifProvider.tsx';
+import { LobbySocketProvider } from './context/LobbySocketContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
@@ -13,7 +14,9 @@ createRoot(document.getElementById('root')!).render(
     <NotificationProvider>
       <ThemeProvider>
         <BrowserRouter>
-          <App />
+          <LobbySocketProvider>
+            <App />
+          </LobbySocketProvider>
         </BrowserRouter>
       </ThemeProvider>
     </NotificationProvider>

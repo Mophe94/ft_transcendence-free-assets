@@ -29,7 +29,7 @@ const THEMES = [
   ['dark', moonTheme],
 ];
 
-const AVATARS = [
+export const AVATARS = [
   ['DinoGreen', dinoGreen],
   ['DinoBlue', dinoBlue],
   ['DinoRed', dinoRed],

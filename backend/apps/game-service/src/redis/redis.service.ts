@@ -8,7 +8,7 @@ import { randomUUID } from 'crypto';
 export class RedisService {
   constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
 
-  ///////////////////////////////* ROOM *///////////////////////////////
+  ///////////////////////////////* ROOM STATUS *///////////////////////////////
 
   async getActiveRooms(): Promise<Array<string>> {
     return await this.redis.smembers(LOBBY_KEYS.ACTIVE_ROOMS);
@@ -26,12 +26,19 @@ export class RedisService {
     await this.redis.sadd(LOBBY_KEYS.INACTIVE_ROOMS, roomId);
   }
 
+  async removeActiveRoom(roomId: string): Promise<void> {
+    await this.redis.srem(LOBBY_KEYS.ACTIVE_ROOMS, roomId);
+  }
+
   async removeInactiveRoom(roomId: string): Promise<void> {
     await this.redis.srem(LOBBY_KEYS.INACTIVE_ROOMS, roomId);
   }
 
-  async removeActiveRoom(roomId: string): Promise<void> {
-    await this.redis.srem(LOBBY_KEYS.ACTIVE_ROOMS, roomId);
+  async markRoomActive(roomId: string): Promise<void> {
+    await Promise.all([
+      this.addActiveRoom(roomId),
+      this.removeInactiveRoom(roomId),
+    ]);
   }
 
   ///////////////////////////////* TIMER *///////////////////////////////
@@ -46,94 +53,109 @@ export class RedisService {
 
   async getRoomTimer(roomId: string): Promise<number> {
     const timestamp = await this.redis.get(LOBBY_KEYS.ROOM_TIMER(roomId));
-    if (timestamp === null) return 0;
-    return parseInt(timestamp, 10);
+    return timestamp === null ? 0 : parseInt(timestamp, 10);
   }
 
   async deleteRoomTimer(roomId: string): Promise<void> {
-	await this.redis.del(LOBBY_KEYS.ROOM_TIMER(roomId));
+    await this.redis.del(LOBBY_KEYS.ROOM_TIMER(roomId));
   }
+
   ///////////////////////////////* CAPACITY *///////////////////////////////
 
-  async setRoomCapacity(roomId: string, capacity: number = DEFAULT.CAPACITY): Promise<void> {
-	if (capacity <= 0)
-		capacity = DEFAULT.CAPACITY;
-	else{
-		let result = (capacity & (capacity - 1)) !== 0;
-		if (result)
-			capacity = DEFAULT.CAPACITY;
-	}
+  async setRoomCapacity(
+    roomId: string,
+    capacity: number = DEFAULT.CAPACITY,
+  ): Promise<void> {
+    if (capacity <= 0 || (capacity & (capacity - 1)) !== 0) {
+      capacity = DEFAULT.CAPACITY;
+    }
     await this.redis.set(LOBBY_KEYS.ROOM_CAPACITY(roomId), capacity);
   }
 
   async getRoomCapacity(roomId: string): Promise<number> {
     const capacity = await this.redis.get(LOBBY_KEYS.ROOM_CAPACITY(roomId));
-	return capacity ? parseInt(capacity, 10) : DEFAULT.CAPACITY;
+    return capacity ? parseInt(capacity, 10) : DEFAULT.CAPACITY;
   }
 
   async deleteRoomCapacity(roomId: string): Promise<void> {
-	await this.redis.del(LOBBY_KEYS.ROOM_CAPACITY(roomId));
+    await this.redis.del(LOBBY_KEYS.ROOM_CAPACITY(roomId));
   }
 
-  ///////////////////////////////* PLAYERS *///////////////////////////////
+///////////////////////////////* PLAYERS *///////////////////////////////
 
-  async addPlayerToRoom(playerId: string, roomId: string): Promise<void> {
-    await this.redis.sadd(LOBBY_KEYS.ROOM_PLAYERS(roomId), playerId);
-  }
-  async removePlayerFromRoom(playerId: string, roomId: string): Promise<void> {
-    await this.redis.srem(LOBBY_KEYS.ROOM_PLAYERS(roomId), playerId);
-  }
-  async getPlayersFromRoom(roomId: string): Promise<Array<string>> {
-    return await this.redis.smembers(LOBBY_KEYS.ROOM_PLAYERS(roomId));
-  }
+async addPlayerToRoom(
+  playerId: string,
+  roomId: string,
+  username: string,
+  avatar: string,
+): Promise<void> {
+  await this.redis.hset(
+    LOBBY_KEYS.ROOM_PLAYERS(roomId),
+    playerId,
+    JSON.stringify({ username, avatar }),
+  );
+}
 
-  async countPlayersInRoom(roomId: string): Promise<number> {
-    return await this.redis.scard(LOBBY_KEYS.ROOM_PLAYERS(roomId));
-  }
+async removePlayerFromRoom(playerId: string, roomId: string): Promise<void> {
+  await this.redis.hdel(LOBBY_KEYS.ROOM_PLAYERS(roomId), playerId);
+}
 
-  async deleteAllPlayerFromRoom(roomId: string): Promise<void> {
-	await this.redis.del(LOBBY_KEYS.ROOM_PLAYERS(roomId));
-  }
+async getPlayersFromRoom(
+  roomId: string,
+): Promise<Array<{ username: string; avatar: string }>> {
+  const entries = await this.redis.hvals(LOBBY_KEYS.ROOM_PLAYERS(roomId));
+  return entries.map((entry) => JSON.parse(entry));
+}
 
-  ///////////////////////////////* ROOM ID *///////////////////////////////
+async countPlayersInRoom(roomId: string): Promise<number> {
+  return await this.redis.hlen(LOBBY_KEYS.ROOM_PLAYERS(roomId));
+}
+
+async deleteAllPlayersFromRoom(roomId: string): Promise<void> {
+  await this.redis.del(LOBBY_KEYS.ROOM_PLAYERS(roomId));
+}
+  ///////////////////////////////* ROOM ID POOL *///////////////////////////////
 
   async getRandRoomId(): Promise<string> {
     const id = await this.redis.spop(LOBBY_KEYS.FREE_IDS);
-	return id ? id : randomUUID();
+    if (id) {
+      await this.redis.sadd(LOBBY_KEYS.USED_IDS, id);
+      return id;
+    }
+    return randomUUID();
   }
 
-  async freeRoomID(roomId: string): Promise<void> {
-	const data = ROOM_IDS.includes(roomId);
-	if (data) {
-    	await this.redis.smove(LOBBY_KEYS.USED_IDS, LOBBY_KEYS.FREE_IDS, roomId);
-	}
-	else {
-		await this.redis.srem(LOBBY_KEYS.USED_IDS, roomId);
-	}
+  async freeRoomId(roomId: string): Promise<void> {
+    await this.redis.srem(LOBBY_KEYS.USED_IDS, roomId);
+    if (ROOM_IDS.includes(roomId)) {
+      await this.redis.sadd(LOBBY_KEYS.FREE_IDS, roomId);
+    }
   }
 
-  ///////////////////////////////* UTILITY *///////////////////////////////
+  ///////////////////////////////* ROOM LIFECYCLE *///////////////////////////////
 
-  async createRoom(capacity?: string): Promise<string>{
-	const id = await this.getRandRoomId();
-	await Promise.all ([
-	this.addInactiveRoom(id),
-	this.setRoomCapacity(id, capacity ? Number(capacity) : undefined),
-	this.setRoomTimer(id),
-	])
-	return id;
+  async createRoom(capacity?: number): Promise<string> {
+    const id = await this.getRandRoomId();
+    await Promise.all([
+      this.addInactiveRoom(id),
+      this.setRoomCapacity(id, capacity),
+      this.setRoomTimer(id),
+    ]);
+    return id;
   }
 
   async deleteRoom(roomId: string): Promise<void> {
-	await Promise.all([
-	this.deleteRoomTimer(roomId),
-	this.deleteRoomCapacity(roomId),
-	this.deleteAllPlayerFromRoom(roomId),
-	this.freeRoomID(roomId),
-	])
+    await Promise.all([
+      this.removeActiveRoom(roomId),
+      this.removeInactiveRoom(roomId),
+      this.deleteRoomTimer(roomId),
+      this.deleteRoomCapacity(roomId),
+      this.deleteAllPlayersFromRoom(roomId),
+      this.freeRoomId(roomId),
+    ]);
   }
 
-  ///////////////////////////////* OTHER *///////////////////////////////
+  ///////////////////////////////* GENERIC SET/LIST HELPERS *///////////////////////////////
 
   async setData(key: string, value: string): Promise<void> {
     await this.redis.set(key, value, 'EX', 3600);
@@ -144,30 +166,23 @@ export class RedisService {
   }
 
   async addToSet(key: string, elems: Array<string>): Promise<void> {
-    if (elems?.length !== 0) {
-      await this.redis.sadd(key, ...elems);
-    }
+    if (elems?.length !== 0) await this.redis.sadd(key, ...elems);
   }
 
   async removeFromSet(key: string, elems: Array<string>): Promise<void> {
-    if (elems?.length !== 0) {
-      await this.redis.srem(key, ...elems);
-    }
+    if (elems?.length !== 0) await this.redis.srem(key, ...elems);
   }
 
   async isInSet(key: string, elem: string): Promise<boolean> {
-    const isMember = await this.redis.sismember(key, elem);
-    return isMember === 1;
+    return (await this.redis.sismember(key, elem)) === 1;
   }
 
   async getSet(key: string): Promise<Array<string>> {
-    const members = await this.redis.smembers(key);
-    return members;
+    return await this.redis.smembers(key);
   }
 
   async getSetLen(key: string): Promise<number> {
-    const count = await this.redis.scard(key);
-    return count;
+    return await this.redis.scard(key);
   }
 
   async prependToList(key: string, elems: string): Promise<void> {
@@ -178,12 +193,7 @@ export class RedisService {
     await this.redis.rpush(key, ...elems);
   }
 
-  async getList(
-    key: string,
-    start: number,
-    end: number,
-  ): Promise<Array<string>> {
-    const members = await this.redis.lrange(key, start, end);
-    return members;
+  async getList(key: string, start: number, end: number): Promise<Array<string>> {
+    return await this.redis.lrange(key, start, end);
   }
 }
