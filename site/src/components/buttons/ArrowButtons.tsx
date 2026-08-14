@@ -1,5 +1,4 @@
 import { useState } from "react";
-import './ArrowButtons.css';
 
 import leftArrow from "../../assets/buttons/arrow_buttons/left_arrow.png";
 import leftArrowDisabled from "../../assets/buttons/arrow_buttons/left_arrow_disabled.png";
@@ -64,7 +63,7 @@ export const RightArrowButton = ({ onClick, disabled = false }: ArrowProps) => {
   return (
     <button
       type="button"
-      className="arrow-button clean-btn"
+      className="cursor-pointer"
       onClick={handleClick}
       disabled={disabled}
       aria-label="previous"

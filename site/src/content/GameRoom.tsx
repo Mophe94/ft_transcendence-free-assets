@@ -1,6 +1,7 @@
 import './GameRoom.css'
 import SpecialBG from '../background/SpecialBg'
 import { useEffect, useState } from 'react';
+import Heading from '../components/heading/Heading';
 
 interface RoomInfo {
   roomName: string;
@@ -26,12 +27,12 @@ export default function GameRoom( { roomName, players, roomCapacity=4, endTime}:
   }, [endTime]);
   return (
     <SpecialBG>
-      <div className='heading-medium centered'>{ roomName }</div>
+      <Heading text={roomName} size='m'/>
       <div className='table-players'>
         <div className='table-players-header'>
           <div className='table-players-col-templ'>
-            <div className='table-players-head centered'>Players</div>
-            <div className='table-players-head centered'>Avatar</div>
+            <div className='table-players-head justify-self-center'>Players</div>
+            <div className='table-players-head justify-self-center'>Avatar</div>
           </div>
         </div>
         <div className='table-players-content'>
@@ -39,19 +40,15 @@ export default function GameRoom( { roomName, players, roomCapacity=4, endTime}:
             players.length?
               (players.map((player) => (
                 <div className='table-players-col-templ' key={player}>
-                  <div className='table-data centered'>{player}</div>
+                  <div className='table-data justify-self-center'>{player}</div>
                 </div>
             ))):
-            <div className='centered'>No Players</div>
+            <div className='justify-self-center'>No Players</div>
           }
         </div>
         <div className='table-players-col-templ'>
-            <div className='heading-small centered'>
-                Players: { players.length }/{ roomCapacity == 0 ? '∞': roomCapacity}
-            </div>
-            <div className='heading-small centered'>
-                Time Left: {timeLeft >= 0 ? timeLeft: '∞'}
-            </div>
+          <Heading text={`Players: ${ players.length }/${ roomCapacity == 0 ? '∞': roomCapacity}`} size='sm'/>
+          <Heading text={`Time Left: ${timeLeft >= 0 ? timeLeft: '∞'}`} size='sm'/>
         </div>
       </div>
     </SpecialBG>

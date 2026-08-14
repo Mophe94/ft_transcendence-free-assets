@@ -18,6 +18,13 @@ export class RedisService {
     return await this.redis.smembers(LOBBY_KEYS.INACTIVE_ROOMS);
   }
 
+  async freeRoomId(roomId: string): Promise<void> {
+    await Promise.all([
+      this.redis.srem(LOBBY_KEYS.USED_IDS, roomId),
+      this.redis.sadd(LOBBY_KEYS.FREE_IDS, roomId),
+    ]);
+  }
+
   async addActiveRoom(roomId: string): Promise<void> {
     await this.redis.sadd(LOBBY_KEYS.ACTIVE_ROOMS, roomId);
   }
@@ -61,7 +68,7 @@ export class RedisService {
   ): Promise<void> {
     if (capacity <= 0) capacity = DEFAULT.CAPACITY;
     else {
-      let result = (capacity & (capacity - 1)) !== 0;
+      const result = (capacity & (capacity - 1)) !== 0;
       if (result) capacity = DEFAULT.CAPACITY;
     }
     await this.redis.set(LOBBY_KEYS.ROOM_CAPACITY(roomId), capacity);

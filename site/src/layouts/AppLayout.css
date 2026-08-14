@@ -1,9 +1,0 @@
-.body-layout {
-  width: min(95vw, 1500px);
-  margin-top: 2rem;
-  
-  margin-inline: auto;
-
-  display: flex;
-  flex-direction: column;
-}
