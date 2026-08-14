@@ -116,8 +116,8 @@ services:
 
   alloy:
     image: grafana/alloy:latest
-    privileged: true
-    user: "alloy:alloy"
+ #   privileged: true
+#    user: "alloy:alloy"
     command:
       - run
       - /etc/alloy/config.alloy
