@@ -1,1 +1,44 @@
+# Extracting metadata from dockerswarm
+discovery.dockerswarm "linux" {
+  host      = "unix:///var/run/docker.sock"
+}
 
+discovery.dockerswarm "swarm_tasks" {
+    host	= "unix:///var/run/docker.sock"
+    role	= "tasks"
+}
+
+discovery.relabel  "logs_integrations_dockerswarm" {
+  targets  = []
+  
+  rule {
+      source_labels    = [ "__meta_docker_container_name_" ] # find service metadata equivalent
+      regex            = "/(.*)"
+      target_label     = "container_name" # same, apply to service ?
+  }
+  rule {
+      target_label     = "instance"
+      replacement      = constants.hostname # does not work, dinf equivalent for dockerswarm
+  }
+}
+
+# Collecting logs from docker containers
+loki.source.docker "default" {
+      host             = "unix:///var/run/docker.sock"
+      targets          = discorvery.dockersarm.swarm_tasks.targets
+      relabel_rules    = discovery.relabel.logs_integrations_dockerswarm.rules
+      forward_to       = [loki.write.default.receiver]
+}
+
+logging {
+    level     = "info"
+    format    = "json"
+    write_to  = [loki.write.default.receiver]
+}
+
+
+loki.write  "default" {
+    endpoint {
+      url = "http://loki:3100/loki/api/v1/push"
+    }
+}
