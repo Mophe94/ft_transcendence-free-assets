@@ -1,8 +1,8 @@
+# Exporter
 prometheus.exporter.unix "host" {
     procfs_path = "/host/proc"
     sysfs_path  = "/host/sys"
     rootfs_path = "/host/root"
-
     enable_collectors = [
       "cpu", "meminfo", "filesystem", "loadavg", "netdev",
     ]
@@ -10,42 +10,52 @@ prometheus.exporter.unix "host" {
 
 prometheus.exporter.self "self" {}
 
-discovery.relabel "prom_integrations_dockerswarm" {
-    targets = prometheus.exporter.cadvisor.containers.targets
-
-    rule {
-        target_label = "job"
-        replacement  = "integrations/docker"
-    }
-
-    rule {
-        target_label = "instance"
-        replacement  = constants.hostname
-    }
-}
-
 prometheus.exporter.cadvisor "containers" {
     #docker_host = "unix:///var/run/docker.sock"
 	docker_only	= true
 }
 
-prometheus.scrape "host_metrics" {
-    targets     = prometheus.exporter.unix.host.targets
-
-    job_name    = "node"
-    
-    forward_to  = [ prometheus.remote_write.prometheus.receiver ]
+# Relabeller
+discovery.relabel "prom_integrations_dockerswarm" {
+    targets = prometheus.exporter.cadvisor.containers.targets
+    rule {
+        target_label = "job"
+        replacement  = "integrations/docker"
+    }
+    rule {
+        target_label = "instance"
+        replacement  = "${NODE_HOSTNAME}"
+    }
 }
 
-prometheus.scrape "container_metrics" {
-    targets     	= discovery.relabel.prom_integrations_dockerswarm.targets
+discovery.relabel "prom_host_metrics {
+	targets			= prometheus.exporter.unix.host.targets
+    rule {
+        target_label = "job"
+        replacement  = "integrations/node_exporter"
+    }
+    rule {
+        target_label = "instance"
+        replacement  = "${NODE_HOSTNAME}"
+    }
+}
 
-    job_name    	= "container"
-	scrape_interval	= "10s"
-	
+# Scraper
+prometheus.scrape "host_metrics" {
+	job_name    	= "node"
+	scrape_interval	= "15s"
+    targets     	= discovery.relable.prom_host_metrics.targets      
     forward_to  	= [ prometheus.remote_write.prometheus.receiver ]
 }
 
+prometheus.scrape "container_metrics" {
+    job_name    	= "container"
+	scrape_interval	= "10s"
+	targets     	= discovery.relabel.prom_integrations_dockerswarm.targets
+    forward_to  	= [ prometheus.remote_write.prometheus.receiver ]
+}
+
+# Writer
 prometheus.remote_write "prometheus" {
     endpoint {
       url = "http://prometheus:9090/api/v1/write"
