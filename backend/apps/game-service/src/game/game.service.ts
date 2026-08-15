@@ -460,8 +460,8 @@ export class GameService implements OnModuleInit {
           this.sendToPlayer(userId, this.mapService.combat(player));
           this.sendToPlayer(userId2, this.mapService.combat(player2));
         }
-        // else
-        //   result = {event: 'game', data: { state: 'waiting_for_opponent'}};
+        else
+          result = {event: 'game', data: { state: 'waiting_for_opponent'}};
         break;
       case 'change_current_monster':
       case 'use_item_combat':

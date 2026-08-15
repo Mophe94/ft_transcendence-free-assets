@@ -197,8 +197,6 @@ export class MapService {
         })),
       };
     }
-    //await new Promise(resolve => setTimeout(resolve, 1000)); // ! temp fix to synchronizeke with startCombatTimer
-    //return this.combat(player);
     return undefined;
   }
 
