@@ -1,0 +1,53 @@
+prometheus.exporter.unix "host" {
+    procfs_path = "/host/proc"
+    sysfs_path  = "/host/sys"
+    rootfs_path = "/host/root"
+
+    enable_collectors = [
+      "cpu", "meminfo", "filesystem", "loadavg", "netdev",
+    ]
+}
+
+prometheus.exporter.self "self" {}
+
+discovery.relabel "prom_integrations_dockerswarm" {
+    targets = prometheus.exporter.cadvisor.containers.targets
+
+    rule {
+        target_label = "job"
+        replacement  = "integrations/docker"
+    }
+
+    rule {
+        target_label = "instance"
+        replacement  = constants.hostname
+    }
+}
+
+prometheus.exporter.cadvisor "containers" {
+    #docker_host = "unix:///var/run/docker.sock"
+	docker_only	= true
+}
+
+prometheus.scrape "host_metrics" {
+    targets     = prometheus.exporter.unix.host.targets
+
+    job_name    = "node"
+    
+    forward_to  = [ prometheus.remote_write.prometheus.receiver ]
+}
+
+prometheus.scrape "container_metrics" {
+    targets     	= discovery.relabel.prom_integrations_dockerswarm.targets
+
+    job_name    	= "container"
+	scrape_interval	= "10s"
+	
+    forward_to  	= [ prometheus.remote_write.prometheus.receiver ]
+}
+
+prometheus.remote_write "prometheus" {
+    endpoint {
+      url = "http://prometheus:9090/api/v1/write"
+    }
+}
