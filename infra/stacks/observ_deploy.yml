@@ -120,6 +120,7 @@ services:
 #    user: "alloy:alloy"
     command:
       - run
+      - --storage.path=/var/lib/alloy/data
       - /etc/alloy/config.alloy
     configs:
       - source: alloy_config
@@ -136,7 +137,7 @@ services:
       - obsrv_net
     deploy:
       mode: global
-#      restart_policy:
+      restart_policy: unless-stopped
 
 volumes:
     loki_data:
