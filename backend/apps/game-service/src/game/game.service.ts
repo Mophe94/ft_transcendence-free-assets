@@ -193,13 +193,13 @@ export class GameService {
       console.log('Active Players last winner:  ', active);
       console.log('Connected Players last winner: ', connected);
       console.log('*********************************************');
-      //this.deleteRoom(roomId, active[0])
+      //this.deleteEndGame(roomId, active[0])
       //console.log(`End of game: everything should be cleanup at this point!`);
       return;
     }
   }
 
-  private deleteRoom(roomId: string, userId: string) : void {
+  private deleteEndGame(roomId: string, userId: string) : void {
     this.gameRooms.delete(roomId);
     this.activePlayersByRoom.delete(roomId);
     this.authorizedPlayers.delete(roomId);
