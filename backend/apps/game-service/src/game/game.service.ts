@@ -358,7 +358,7 @@ export class GameService implements OnModuleInit {
     if (player2.currentActions.actionType === undefined)
       this.autoPass(userId2, player2);
 
-    this.resolveTurn(userId, player, player2, undefined!);
+    this.resolveTurn(userId, player, player2);
   }
 
   private autoPass(userId: number, player: Player): void {
@@ -367,7 +367,7 @@ export class GameService implements OnModuleInit {
     console.log(`[GameService]: Auto-pass for player ${userId} (timeout)`);
     player.currentActions = {
       actionType: 'pass',
-      //data: {state: 'pass'},
+      data: {state: 'pass'},
     }
   }
 
@@ -394,10 +394,6 @@ export class GameService implements OnModuleInit {
     }
 
     let player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
-
-    let playerForce: Player | undefined = undefined;
-    if (player.forceChooseMonster) playerForce = player;
-    else if (player2?.forceChooseMonster) playerForce = player2;
 
     if (!player2) {
       console.log(`[GameService]: No opponent for ${userId}`);
@@ -471,7 +467,7 @@ export class GameService implements OnModuleInit {
           actionType: state,
           data: payload,
         };
-        this.resolveTurn(userId, player, player2, playerForce!);
+        this.resolveTurn(userId, player, player2);
         break;
       case 'safe_to_disconnect':
         if (player.status === 'loser')
@@ -490,7 +486,6 @@ export class GameService implements OnModuleInit {
     userId: number,
     player: Player,
     player2: Player,
-    playerForce: Player,
   ): void {
     const combatRoomId = this.combatService.playerCombatRoom.get(userId);
     if (!combatRoomId) {
@@ -500,6 +495,10 @@ export class GameService implements OnModuleInit {
       );
       return;
     }
+
+    let playerForce: Player | undefined = undefined;
+    if (player.forceChooseMonster) playerForce = player;
+    else if (player2?.forceChooseMonster) playerForce = player2;
 
     const userId2 = this.combatService.getOpponentId(userId);
     if (!userId2) return;
