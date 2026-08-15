@@ -6,14 +6,21 @@ export interface GamePayload {
   };
 }
 
-export const FULL = 4;
+export const FULL = 2;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 90,
-  team_setup: 20,
-  choose_action: 60,
+  map: 10,
+  team_setup: 10,
+  choose_action: 15,
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;
 
+let mockUserCounter = 0;
+export const createMockUser = () => {
+  mockUserCounter++;
+  return {
+    userId: mockUserCounter,
+  };
+};

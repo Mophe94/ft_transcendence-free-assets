@@ -7,6 +7,7 @@ import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
+import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class GameService {
     private playerService: PlayerService,
     private combatService: CombatService,
     private mapService: MapService,
+    private redisService: RedisService,
     private redisStateService: RedisStateService,
   ) {}
 
@@ -191,9 +193,24 @@ export class GameService {
       console.log('Active Players last winner:  ', active);
       console.log('Connected Players last winner: ', connected);
       console.log('*********************************************');
+      //this.deleteRoom(roomId, active[0])
       //console.log(`End of game: everything should be cleanup at this point!`);
       return;
     }
+  }
+
+  private deleteRoom(roomId: string, userId: string) : void {
+    this.gameRooms.delete(roomId);
+    this.activePlayersByRoom.delete(roomId);
+    this.authorizedPlayers.delete(roomId);
+    this.roomIdByPlayer.delete(userId);
+
+    Promise.all([
+      //this.redisStateService.removePlayer(userId),
+      this.redisService.deleteRoom(roomId),
+      this.redisService.removeActiveRoom(roomId),
+    ]).catch((err) => 
+      console.log([`GameService] deleteRoom: failed cleaning of ${roomId}`]));
   }
 
   private startMapPhase(
@@ -349,8 +366,17 @@ export class GameService {
     const player = this.playerService.getPlayer(userId)!;
     const userId2 = this.combatService.getOpponentId(userId);
     const roomId = this.roomIdByPlayer.get(userId)!;
+    const state = payload?.state;
+    console.log('STATE', state);
 
-    console.log("STATE 1: :", payload.state);
+    if (state === 'safe_to_disconnect') {
+      if (player.status === 'loser')
+        await this.eliminatePlayer(player.id, roomId);
+      if (player.status === 'winner' && player.roundsRemaining === 0)
+        await this.eliminatePlayer(player.id, roomId);
+      return undefined;
+    }
+
     if (!userId2) {
       console.log(`[GameService]: userId2 for ${userId} is missing`);
       return undefined;
@@ -364,8 +390,6 @@ export class GameService {
     }
 
     let result: object | undefined;
-    const state = payload?.state;
-    console.log('STATE', state);
     switch (state) {
       case 'add_item':
         result = this.mapService.received_add_item(player);
@@ -429,12 +453,12 @@ export class GameService {
         };
         this.resolveTurn(userId, player, player2);
         break;
-      case 'safe_to_disconnect':
-        if (player.status === 'loser')
-          await this.eliminatePlayer(player.id, roomId);
-        if (player.status === 'winner' && player.roundsRemaining === 0)
-          await this.eliminatePlayer(player.id, roomId);
-        break;
+      // case 'safe_to_disconnect':
+      //   if (player.status === 'loser')
+      //     await this.eliminatePlayer(player.id, roomId);
+      //   if (player.status === 'winner' && player.roundsRemaining === 0)
+      //     await this.eliminatePlayer(player.id, roomId);
+      //   break;
       default:
         console.log('Unknow state:', state);
         return undefined;
