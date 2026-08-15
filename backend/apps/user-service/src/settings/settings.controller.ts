@@ -34,12 +34,10 @@ export class SettingsController {
     @Req() req: AuthenticatedRequest,
     @Body() settings: UserSettings,
   ) {
-    console.log('hello', settings, req.user, req?.user?.id);
     if (!req.user || !req.user.id || !settings) {
       throw new UnauthorizedException('Missing JWT');
     }
 
-    console.log('goodbye');
     const updatedSettings = await this.settingsService.updateSettings(
       req.user.id,
       settings,

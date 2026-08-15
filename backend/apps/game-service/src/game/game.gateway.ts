@@ -48,6 +48,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const user = await this.wsAuthService.verifyWsHandshake(request);
     if (!user.username) {
       client.close(1008, 'Unauthorized');
+      return;
     }
     const userId = user.username;
     if (

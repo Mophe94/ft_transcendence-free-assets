@@ -56,14 +56,14 @@ export class Relationship {
   })
   updatedAt!: Date;
 
-  @AfterInsert()
-  logInsert() {
-    console.log(
-      `account:\n\t${this.requesterId}`,
-      `\n\t${this.accepterId}`,
-      `\n\t${this.status}`,
-      `\n\t${this.createdAt.toLocaleTimeString()}`,
-      `\n\t${this.updatedAt.toLocaleTimeString()}`,
-    );
-  }
+  // @AfterInsert()
+  // logInsert() {
+  //   console.log(
+  //     `account:\n\t${this.requesterId}`,
+  //     `\n\t${this.accepterId}`,
+  //     `\n\t${this.status}`,
+  //     `\n\t${this.createdAt.toLocaleTimeString()}`,
+  //     `\n\t${this.updatedAt.toLocaleTimeString()}`,
+  //   );
+  // }
 }

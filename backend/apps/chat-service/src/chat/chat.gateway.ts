@@ -12,6 +12,8 @@ import { Server, WebSocket } from 'ws';
 import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
 import { ChatService } from './chat.service';
 import { randomUUID } from 'crypto';
+import { MessageEvent } from './const/messageEvent';
+import { Logger } from '@nestjs/common';
 
 type HeartbeatSocket = AuthenticatedSocket & { isAlive?: boolean };
 
@@ -22,6 +24,8 @@ export class ChatGateway
   @WebSocketServer()
   server!: Server;
   private heartbeatInterval!: NodeJS.Timeout;
+
+  private readonly logger = new Logger(ChatGateway.name);
 
   constructor(
     private wsAuthService: SharedAuthService,
@@ -54,19 +58,25 @@ export class ChatGateway
     request: IncomingMessage,
   ): Promise<void> {
     try {
+      this.logger.log('Opening websocket connection. Verifying handshake...');
       const user = await this.wsAuthService.verifyWsHandshake(request);
-      client.id = randomUUID();
+
       if (!user.id) {
+        this.logger.error('Invalid Id. Closing connection.');
         client.close(1008, 'Unauthorized');
+        return;
       }
-      console.log('hello');
+      this.logger.log(`User identified: ${user.username}`);
+      client.id = randomUUID();
       client.user = user;
+      this.logger.log('Mapping connection...');
       this.chatService.addConnection(client.user.id, client.id);
       client.isAlive = true;
       client.on('pong', () => {
         client.isAlive = true;
       });
-    } catch {
+    } catch (error) {
+      this.logger.log(`Connection initiation failed: ${error}`);
       client.close(1008, 'Unauthorized');
     }
   }
@@ -81,7 +91,12 @@ export class ChatGateway
     const date = new Date();
     const sender = client.user?.username;
 
-    const message = { time: date, username: sender, content };
+    const message = {
+      type: MessageEvent.CHAT_MESSAGE,
+      time: date,
+      username: sender,
+      content,
+    };
     this.broadcast(message);
   }
 
@@ -89,8 +104,41 @@ export class ChatGateway
     this.server.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(message));
-        console.log('message sent');
       }
     });
+  }
+
+  sendNotifToUser(userId: string, type: MessageEvent, origin: object) {
+    this.logger.log(`Checking destinatory status...`);
+    const sockets = this.chatService.getUserSockets(userId);
+    if (!sockets || sockets.length === 0) {
+      this.logger.log(
+        'Destinatory not found in currently connected users. Aborting.',
+      );
+      return false;
+    }
+    this.logger.log(`Found ${sockets.length} sockets for destinatory.`);
+    const socketIds = new Set(sockets.map((c) => c.socketId));
+    const payload = JSON.stringify({
+      type,
+      origin,
+      time: new Date().toISOString(),
+    });
+
+    let sentCount = 0;
+
+    this.server.clients.forEach((client: HeartbeatSocket) => {
+      if (
+        client.id &&
+        socketIds.has(client.id) &&
+        client.readyState === WebSocket.OPEN
+      ) {
+        this.logger.log(`Sending notification to ${client.id}`);
+        client.send(payload);
+        sentCount++;
+      }
+    });
+
+    return sentCount > 0;
   }
 }

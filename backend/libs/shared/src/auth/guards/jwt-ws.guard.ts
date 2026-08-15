@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { JwtService } from '@nestjs/jwt';
 import { IncomingMessage } from 'http';
@@ -12,16 +12,21 @@ export interface AuthenticatedSocket extends WebSocket {
 
 @Injectable()
 export class JwtWsGuard implements CanActivate {
+  private readonly logger = new Logger(JwtWsGuard.name);
+
   constructor(private readonly jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client = context.switchToWs().getClient<AuthenticatedSocket>();
 
+    this.logger.log('Extracting request...');
     const request = this.extractRequest(context, client);
+    this.logger.log('Extracting token...');
     const token = this.extractToken(request);
 
     if (!token) {
-      throw new WsException('Jeton JWT absent');
+      this.logger.error('Missing JWT.');
+      throw new WsException('Missing JWT');
     }
 
     try {
@@ -29,7 +34,8 @@ export class JwtWsGuard implements CanActivate {
       client.user = payload;
       return true;
     } catch {
-      throw new WsException('Jeton JWT invalide ou expiré');
+      this.logger.error('Invalid JWT or expired');
+      throw new WsException('Invalid JWT or expired');
     }
   }
 
