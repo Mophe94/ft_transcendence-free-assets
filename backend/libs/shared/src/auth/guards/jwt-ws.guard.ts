@@ -18,23 +18,31 @@ export class JwtWsGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client = context.switchToWs().getClient<AuthenticatedSocket>();
-
-    this.logger.log('Extracting request...');
     const request = this.extractRequest(context, client);
-    this.logger.log('Extracting token...');
     const token = this.extractToken(request);
+    const event =
+      context.switchToWs().getPattern() ||
+      context.getHandler()?.name ||
+      'WS Event';
 
     if (!token) {
-      this.logger.error('Missing JWT.');
+      this.logger.warn(
+        `[WS 401] Event: "${event}" - Socket: ${client?.user?.id || 'N/A'} - Missing token`,
+      );
       throw new WsException('Missing JWT');
     }
 
     try {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
       client.user = payload;
+      this.logger.log(
+        `[WS AUTH SUCCESS] Event: "${event}" - Socket: ${client.user.id} - User: ${payload.username}`,
+      );
       return true;
     } catch {
-      this.logger.error('Invalid JWT or expired');
+      this.logger.warn(
+        `[WS 401] Event: "${event}" - Socket: ${client?.user?.id || 'N/A'} - Invalid or expired JWT`,
+      );
       throw new WsException('Invalid JWT or expired');
     }
   }

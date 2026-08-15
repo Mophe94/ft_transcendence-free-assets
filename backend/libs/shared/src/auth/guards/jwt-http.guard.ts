@@ -16,14 +16,21 @@ export class JwtHttpGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
+    const { method, url, ip } = request;
     const token = this.extractTokenFromCookie(request);
     if (!token) {
+      this.logger.warn(
+        `[AUTH FAIL] ${method} ${url} - IP: ${ip} - Missing or invalid token. Request Aborted.`,
+      );
       throw new UnauthorizedException('Missing JWT');
     }
 
     try {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
       request['user'] = payload;
+      this.logger.log(
+        `[AUTH SUCCESS] ${method} ${url} - User: ${payload.id} - IP: ${ip}`,
+      );
       return true;
     } catch {
       throw new UnauthorizedException('Invalid or expired JWT');
@@ -31,17 +38,12 @@ export class JwtHttpGuard implements CanActivate {
   }
 
   private extractTokenFromCookie(request: Request): string | undefined {
-    this.logger.log('Extracting JWT from cookie...');
     if (request.cookies && request.cookies['access_token']) {
       const token = request.cookies['access_token'] as unknown;
       if (typeof token === 'string') {
-        this.logger.log('JWT extracted');
         return token;
       }
     }
-    this.logger.error(
-      'Failed to extract Cookie: access_token cookie not found or empty.',
-    );
     return undefined;
   }
 }

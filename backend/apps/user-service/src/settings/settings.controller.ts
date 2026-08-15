@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   Patch,
   Req,
   UnauthorizedException,
@@ -10,21 +11,24 @@ import {
 import type { AuthenticatedRequest } from 'libs/shared/src';
 import { JwtHttpGuard } from 'libs/shared/src/auth/guards/jwt-http.guard';
 import { SettingsService } from './settings.service';
-import type { UserSettings } from '../users/types/userSettings.interface';
+import { UpdateUserSettingsDto } from './dto/update-user-settings.dto';
 
 @Controller('settings')
 export class SettingsController {
+  private readonly logger = new Logger(SettingsController.name);
   constructor(private readonly settingsService: SettingsService) {}
 
   @Get()
   @UseGuards(JwtHttpGuard)
   async getUserSettings(@Req() req: AuthenticatedRequest) {
-    if (!req.user || !req.user.id) {
+    if (!req?.user?.id) {
+      this.logger.warn('[GET /settings] Unauthorized access attempt');
       throw new UnauthorizedException('Missing JWT');
     }
+    const userId = req.user.id;
     const settings =
-      (await this.settingsService.findSettingsById(req.user.id)) ?? null;
-    console.log(settings);
+      (await this.settingsService.findSettingsById(userId)) ?? null;
+    this.logger.log(`[GET /settings] Retrieved settings for user ${userId}`);
     return settings;
   }
 
@@ -32,18 +36,20 @@ export class SettingsController {
   @UseGuards(JwtHttpGuard)
   async updateUserSettings(
     @Req() req: AuthenticatedRequest,
-    @Body() settings: UserSettings,
+    @Body() updateSettingsDto: UpdateUserSettingsDto,
   ) {
-    if (!req.user || !req.user.id || !settings) {
+    if (!req?.user?.id) {
+      this.logger.warn('[PATCH /update] Unauthorized access attempt');
       throw new UnauthorizedException('Missing JWT');
     }
 
+    const userId = req.user.id;
     const updatedSettings = await this.settingsService.updateSettings(
-      req.user.id,
-      settings,
+      userId,
+      updateSettingsDto,
     );
-    console.log(updatedSettings);
+    this.logger.log(`[PATCH /update] Updated settings for user ${userId}`);
 
-    return settings;
+    return updatedSettings;
   }
 }
