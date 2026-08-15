@@ -28,12 +28,6 @@ export class UserStats {
   totalDamageDealt!: number;
 
   @Column({
-    name: 'total_damage_received',
-    default: 0,
-  })
-  totalDamageReceived!: number;
-
-  @Column({
     name: 'games_won',
     default: 0,
   })
@@ -58,7 +52,7 @@ export class UserStats {
   nbMonstersDiscovered!: number;
 
   @Column({
-    name: 'nb_objects_discovered',
+    name: 'nb_ending_discovered',
     default: 0,
   })
   nbObjectsDiscovered!: number;

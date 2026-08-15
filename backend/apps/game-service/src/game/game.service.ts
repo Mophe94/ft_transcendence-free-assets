@@ -10,7 +10,7 @@ import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisStateService } from '../redis/redis_state.service';
 
 @Injectable()
-export class GameService implements OnModuleInit {
+export class GameService {
   constructor(
     private eventEmitter: EventEmitter2,
     private phaseTimer: PhaseTimerService,
@@ -33,11 +33,6 @@ export class GameService implements OnModuleInit {
 
   getRoomById(userId: string) {
     return this.roomIdByPlayer.get(userId);
-  }
-
-  /*  INITIALIZATION with hardcoded values */
-  onModuleInit(): void {
-    //this.registerRoom('test-room', [1, 2]);
   }
 
   /*  GAME ROOMS */
@@ -87,9 +82,6 @@ export class GameService implements OnModuleInit {
     const player = this.playerService.getPlayer(userId)!;
 
     // change FULL for real room capacity
-    console.log('Active Players at start: ', this.activePlayersByRoom);
-    console.log('*********************************************');
-    player.roundsRemaining = Math.log2(FULL); //this.activePlayersByRoom.get(roomId)?.size! / 2;
     console.log('ON GODOT CONNECTED ROUND REMAINING: ', player.roundsRemaining);
 
     let activePlayers = this.activePlayersByRoom.get(roomId);
@@ -98,6 +90,10 @@ export class GameService implements OnModuleInit {
       this.activePlayersByRoom.set(roomId, activePlayers);
     }
     activePlayers.add(userId);
+
+    console.log('Active Players at start: ', this.activePlayersByRoom);
+    console.log('*********************************************');
+    player.roundsRemaining = Math.log2(FULL); //this.activePlayersByRoom.get(roomId)?.size! / 2;
 
     // FULL need to be repalaced by the real capacity of the room retrieved from redis
     if (
@@ -354,16 +350,13 @@ export class GameService implements OnModuleInit {
     const userId2 = this.combatService.getOpponentId(userId);
     const roomId = this.roomIdByPlayer.get(userId)!;
 
+    console.log("STATE 1: :", payload.state);
     if (!userId2) {
       console.log(`[GameService]: userId2 for ${userId} is missing`);
       return undefined;
     }
 
     const player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
-
-    let playerForce: Player | undefined = undefined;
-    if (player.forceChooseMonster) playerForce = player;
-    else if (player2?.forceChooseMonster) playerForce = player2;
 
     if (!player2) {
       console.log(`[GameService]: No opponent for ${userId}`);
@@ -434,7 +427,7 @@ export class GameService implements OnModuleInit {
           actionType: state,
           data: payload,
         };
-        this.resolveTurn(userId, player, player2, playerForce!);
+        this.resolveTurn(userId, player, player2);
         break;
       case 'safe_to_disconnect':
         if (player.status === 'loser')
@@ -453,7 +446,6 @@ export class GameService implements OnModuleInit {
     userId: string,
     player: Player,
     player2: Player,
-    playerForce: Player,
   ): void {
     const combatRoomId = this.combatService.playerCombatRoom.get(userId);
     if (!combatRoomId) {
@@ -463,6 +455,10 @@ export class GameService implements OnModuleInit {
       );
       return;
     }
+
+    let playerForce: Player = this.playerService.initDefaultPlayer();
+    if (player.forceChooseMonster) playerForce = player;
+    else if (player2?.forceChooseMonster) playerForce = player2;
 
     const userId2 = this.combatService.getOpponentId(userId);
     if (!userId2) return;
@@ -508,6 +504,7 @@ export class GameService implements OnModuleInit {
       // send new_turn(player, roundLeft)
     }
     if (endOfBattle) {
+
       this.finalizeBattleEnd(player, player2, combatRoomId);
     }
   }
