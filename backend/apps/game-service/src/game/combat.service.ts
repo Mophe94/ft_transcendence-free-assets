@@ -15,8 +15,8 @@ export class CombatService {
   playerCombatRoom = new Map<number, string>();
 
   // Called when a room in GameService reaches FULL state
-  matchmake(rooms: Set<number>): void {
-    const players = [...rooms];
+  matchmake(roomPlayers: Set<number>): void {
+    const players = [...roomPlayers];
 
     while (players.length >= 2) {
       const indexA = Math.floor(Math.random() * players.length);
