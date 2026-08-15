@@ -85,6 +85,7 @@ func waiting_player(send_func: Callable):
 	await text_show("Waiting action enemy.")
 
 func _received_action():
+	hide_selection()
 	$Text.text = ""
 	stop_timer.emit()
 	emit_signal("action_combat")

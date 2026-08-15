@@ -243,13 +243,13 @@ func _ready() -> void:
 
 func _time_finish():
 	skip_intro = true
-	$CombatMenus.hide()
-	$CombatMenus.process_mode = Node.PROCESS_MODE_DISABLED
-	$Timer.send = true
-	var send_func = func():
-		null
-	if !stop_timer:
-		var success = await GeneralProcess.wait_signal(send_func, Received.new_turn)
-		$Timer.send = false
-		if !success:
-			get_tree().change_scene_to_packed(GeneralData.wait)
+#	$CombatMenus.hide()
+#	$CombatMenus.process_mode = Node.PROCESS_MODE_DISABLED
+#	$Timer.send = true
+#	if !stop_timer:
+#		var send_func = func():
+#			null
+#		var success = await GeneralProcess.wait_signal(send_func, Received.new_turn)
+#		$Timer.send = false
+#		if !success:
+#			get_tree().change_scene_to_packed(GeneralData.wait)

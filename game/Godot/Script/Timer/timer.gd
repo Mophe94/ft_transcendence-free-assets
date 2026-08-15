@@ -45,10 +45,10 @@ func _update_scale():
 	nine_patch.position.y = 10
 
 func _process(_delta):
+	time_remaining = GeneralData.timer - float(Time.get_unix_time_from_system())
+	time_remaining = max(time_remaining, 0)
 	if time_remaining > 0:
 #		time_remaining -= _delta
-		time_remaining = GeneralData.timer - float(Time.get_unix_time_from_system())
-		time_remaining = max(time_remaining, 0)
 		_check_minute_change()
 		_update_flash(_delta)
 		_update_scale()
