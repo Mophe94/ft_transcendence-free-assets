@@ -42,11 +42,11 @@ export function MessagesWindow() {
   }
 
   return (
-    <div className="message-container">
+    <div className="h-full w-full overflow-y-auto overflow-x-hidden min-w-0 scrollbar-none [&::-webkit-scrollbar]:hidden">
       {messages.length === 0 && <p>Start discussion...</p>}
       {messages.map((msg, index) => {
         return (
-            <div className='chat-msg' key={index}>
+            <div className='break-all min-w-0 w-full' key={index}>
               <span>[{msg.time}] </span>
               <span style={{ color: msg.color}}>{msg.username}: </span>
               <span>{msg.content}</span>
@@ -60,7 +60,12 @@ export function MessagesWindow() {
 
 export default function Chat() {
   const [visible, setVisible] = useState<boolean>(false);
-
+  const chat = useContext(ChatContext);
+  
+  useEffect(() => {
+    if (chat && visible && chat.isUnread)
+      chat.setIsUnread(false);
+  }, [chat, visible, chat?.isUnread])
   return (
     <>
       <div
@@ -71,12 +76,12 @@ export default function Chat() {
         </div>
         <div className="bg-(image:--img-ur) bg-no-repeat bg-size[auto_100%]" />
         <div className="bg-(image:--img-ml) bg-[no-repeat_round]" />
-        <div className="bg-(image:--img-mm) bg-auto bg-repeat-round">
+        <div className="bg-(image:--img-mm) bg-auto bg-repeat-round min-h-0 min-w-0 overflow-hidden pb-2">
           <MessagesWindow />
         </div>
         <div className="bg-(image:--img-mr) bg-[no-repeat_round]" />
         <div className="bg-(image:--img-bl) bg-no-repeat" />
-        <div className="bg-(image:--img-bm) bg-[round_no-repeat]">
+        <div className="bg-(image:--img-bm) bg-[round_no-repeat] flex items-center">
           <InputBar />
         </div>
         <div className="bg-(image:--img-br) bg-no-repeat" />
@@ -87,7 +92,7 @@ export default function Chat() {
         onClick={() => setVisible(!visible)}>
         <img
           className='w-[min(10vw,10vh)]'
-          src={chatIcon}/>
+          src={chat?.isUnread ? chatIconNew: chatIcon}/>
       </button>
     </>
   );

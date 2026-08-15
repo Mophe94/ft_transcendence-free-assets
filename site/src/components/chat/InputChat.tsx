@@ -51,12 +51,12 @@ export function InputBar() {
       onSubmit={handleSending}
       className="
         grid
-        justify-center w-full
+        justify-center items-center w-full
         min-[496px]:grid-cols-[1fr_135px]
         min-[768px]:grid-cols-[1fr]
         min-[1028px]:grid-cols-[1fr_135px]">
       <div
-        className="grid gap-0 grid-cols-[21px_1fr_21px] grid-rows-[25px_1fr_25px]"
+        className="grid gap-0 grid-cols-[21px_1fr_21px] grid-rows-[25px_1fr_25px] "
         style={isFocused? focusedInputStyles: defaultInputStyles}>
   
         <div className="bg-(image:--corner-ul) bg-no-repeat" />

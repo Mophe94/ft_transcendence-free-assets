@@ -9,6 +9,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const { showNotification } = useNotification();
   const [messages, setMessages] = useState<Array<Message>>([]);
+  const [isUnread, setIsUnread] = useState<boolean>(false);
   const wsRef = useRef<WebSocket | null>(null);
   const userColorsRef = useRef<Map<string, Color>>(new Map());
 
@@ -45,6 +46,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           }
           message.color = userColorsRef.current.get(message.username);
           setMessages((prev) => [...prev.slice(-99), message]);
+          setIsUnread(true);
           break;
         }
         case 'friend_request': 
@@ -67,6 +69,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Socket not connected.');
     }
   };
-  const chat: Chat = { messages, sendMessage };
+  const chat: Chat = { messages, sendMessage, isUnread, setIsUnread };
   return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;
 };
