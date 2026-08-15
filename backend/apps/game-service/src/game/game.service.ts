@@ -159,7 +159,7 @@ export class GameService implements OnModuleInit {
   }
 
   private sendToPlayer(userId: number, payload: object): void {
-    //console.log("Send_to_player: id: ", userId);
+    console.log("Send_to_player: id: ", userId);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
@@ -300,12 +300,24 @@ export class GameService implements OnModuleInit {
   }
 
   private startNewTurn(combatRoomId: string, room: Set<number>) {
+    
     const timerKey = combatRoomId ? `combat: ${combatRoomId}` : undefined;
     if (!combatRoomId) {
       console.log('[GameService] - StartNewTurn -> combatRoomId undefined');
       return;
     }
     if (!timerKey) return;
+    
+    // const [userId, userId2] = room;
+    // const player = this.playerService.getPlayer(userId);
+    // const player2 = this.playerService.getPlayer(userId2);
+    // if (!player || !player2) {
+    //   console.log(`[GameService]: actionTimeout -> missing player(s) for room ${combatRoomId}`);
+    //   return
+    // }
+    
+    // player.currentActions.actionType = undefined;
+    // player2.currentActions.actionType = undefined;
 
     this.phaseTimer.start(timerKey, 'choose_action', () => {
       console.log(`Room ${combatRoomId} choose_action timeout`);
@@ -355,7 +367,7 @@ export class GameService implements OnModuleInit {
     console.log(`[GameService]: Auto-pass for player ${userId} (timeout)`);
     player.currentActions = {
       actionType: 'pass',
-      data: {},
+      //data: {state: 'pass'},
     }
   }
 
@@ -437,6 +449,7 @@ export class GameService implements OnModuleInit {
           payload.battle_team,
         );
         if (error) {
+          console.log("TEAM CHOICE PAYLOAD ERROR", error);
           result = error;
           break;
         }
@@ -527,9 +540,12 @@ export class GameService implements OnModuleInit {
       );
     } else {
       endOfBattle = false;
+      console.log("PLAYER ACTION BEFORE NEW TURN", player.currentActions.actionType);
+      console.log("PLAYER2 ACTION BEFORE NEW TURN", player2.currentActions.actionType);
       this.startNewTurn(combatRoomId, new Set([userId, userId2]));
       this.sendToPlayer(userId, this.combatService.new_turn(player));
       this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+
       // si un combat deja finish declenchement du roundLeft
       // send new_turn(player, rounLeft)
       // send new_turn(player, roundLeft)
@@ -545,12 +561,12 @@ export class GameService implements OnModuleInit {
     userId: number,
     userId2: number,
   ): boolean {
+
     const mapResult = this.combatService.resolving_battle_round(
       player,
       player2,
     );
-    player.currentActions.actionType = undefined;
-    player2.currentActions.actionType = undefined;
+
 
     if (
       !mapResult ||
@@ -568,6 +584,10 @@ export class GameService implements OnModuleInit {
       this.sendToPlayer(userId, messagesForPlayer.at(i)!);
       this.sendToPlayer(userId2, messagesForPlayer2.at(i)!);
     }
+
+    player.currentActions.actionType = undefined;
+    player2.currentActions.actionType = undefined;
+
     return true;
   }
 

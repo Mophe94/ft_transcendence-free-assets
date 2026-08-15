@@ -142,10 +142,14 @@ export class CombatService {
     this.handle_action(first, second, actionFirst, 1);
 
     second.text = first.text;
-    let temp1 = new Player(first.id, first.name, first.asset);
-    Object.assign(temp1, first);
-    let temp2 = new Player(second.id, second.name, second.asset);
-    Object.assign(temp2, second);
+
+    // let temp1 = new Player(first.id, first.name, first.asset);
+    // Object.assign(temp1, first);
+    // let temp2 = new Player(second.id, second.name, second.asset);
+    // Object.assign(temp2, second); */
+
+    let temp1 = structuredClone(first);
+    let temp2 = structuredClone(second);
 
     this.pushResult(
       map_result,
@@ -756,6 +760,7 @@ export class CombatService {
   }
 
   private received_pass(player: Player) {
+    console.log("RECEIVED PASS");
     player.text = player.name + ' pass for this turn.';
   }
 }
