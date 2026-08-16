@@ -58,13 +58,7 @@ export class CombatService {
       return speed1 > speed2 ? player1 : player2;
     }
 
-    if (
-      player1.currentActions.actionType === 'pass' ||
-      player2.currentActions.actionType === 'pass'
-    ) {
-      return player1.currentActions.actionType === 'pass' ? player1 : player2;
-    }
-
+    // switch order change_current_monster > pass to see if it helps for autoChooseMonster
     if (
       player1.currentActions.actionType === 'change_current_monster' ||
       player2.currentActions.actionType === 'change_current_monster'
@@ -73,6 +67,22 @@ export class CombatService {
         ? player1
         : player2;
     }
+
+    if (
+      player1.currentActions.actionType === 'pass' ||
+      player2.currentActions.actionType === 'pass'
+    ) {
+      return player1.currentActions.actionType === 'pass' ? player1 : player2;
+    }
+
+    // if (
+    //   player1.currentActions.actionType === 'change_current_monster' ||
+    //   player2.currentActions.actionType === 'change_current_monster'
+    // ) {
+    //   return player1.currentActions.actionType === 'change_current_monster'
+    //     ? player1
+    //     : player2;
+    // }
 
     if (
       player1.currentActions.actionType === 'use_item_combat' ||
@@ -752,7 +762,7 @@ export class CombatService {
         ) {
           player.currentMonster = player.battle_team[i];
           player.text =
-            player.name + ' change ' + temp + ' for ' + player.currentMonster;
+            player.name + ' change ' + temp + ' for ' + player.currentMonster.name;
           break;
         }
       }
