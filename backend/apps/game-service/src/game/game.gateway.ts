@@ -103,7 +103,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private sendToClient(client: WebSocket, message: object | undefined) {
     if (client.readyState === WebSocket.OPEN) {
-      //console.log("Send_Gateway: ", message);
+      console.log("Send_Gateway: " , message);
       client.send(JSON.stringify(message));
     }
   }
