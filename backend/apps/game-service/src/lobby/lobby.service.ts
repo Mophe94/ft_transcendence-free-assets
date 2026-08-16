@@ -11,8 +11,8 @@ export class LobbyService implements OnApplicationBootstrap {
   constructor(
     private roomService: RoomService,
     private eventEmitter: EventEmitter2,
-    private phaseTimer: PhaseTimerService,
     private redisService: RedisService,
+    private phaseTimer: PhaseTimerService
   ) {}
 
   async onApplicationBootstrap() {
@@ -21,7 +21,7 @@ export class LobbyService implements OnApplicationBootstrap {
 
   async createRoomAndJoin(
     client: WebSocket,
-    userSub: number,
+    userSub: string,
     username: string,
     avatar: string,
   ): Promise<void> {
@@ -31,7 +31,7 @@ export class LobbyService implements OnApplicationBootstrap {
 
   async quickPairing(
     client: WebSocket,
-    userSub: number,
+    userSub: string,
     username: string,
     avatar: string,
   ): Promise<void> {
@@ -43,7 +43,7 @@ export class LobbyService implements OnApplicationBootstrap {
 
   async joinRoom(
     client: WebSocket,
-    userSub: number,
+    userSub: string,
     roomId: string,
     username: string,
     avatar: string,
@@ -69,7 +69,7 @@ export class LobbyService implements OnApplicationBootstrap {
 
   private async assignClientToRoom(
     client: WebSocket,
-    userSub: number,
+    userSub: string,
     roomId: string,
     username: string,
     avatar: string,

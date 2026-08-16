@@ -6,11 +6,8 @@ import { PlayerService } from './player/player.service';
 import { CombatService } from './combat.service';
 import { EntityModule } from './entities/entity.module';
 import { RedisService } from '../redis/redis.service';
-import { WsAuthModule } from 'libs/shared/src/auth/ws-auth.module';
+import { RedisStateService } from '../redis/redis_state.service';
 import { MapService } from './map.service';
-
-import { AiService } from './ai_service/ai.service';
-import { RedisStateService } from '../redis/redis_state_player.service';
 @Module({
   providers: [
     GameGateway,
@@ -20,8 +17,7 @@ import { RedisStateService } from '../redis/redis_state_player.service';
     CombatService,
     RedisService,
     RedisStateService,
-    AiService,
   ],
-  imports: [SharedModule, EntityModule, WsAuthModule],
+  imports: [SharedModule, EntityModule],
 })
 export class GameModule {}

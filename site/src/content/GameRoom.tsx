@@ -36,8 +36,8 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
       <div className='table-players'>
         <div className='table-players-header'>
           <div className='table-players-col-templ'>
-            <div className='table-players-head centered'>Players</div>
-            <div className='table-players-head centered'>Avatar</div>
+            <div className='table-players-head justify-self-center'>Players</div>
+            <div className='table-players-head justify-self-center'>Avatar</div>
           </div>
         </div>
         <div className='table-players-content'>

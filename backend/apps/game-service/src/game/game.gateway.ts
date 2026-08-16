@@ -11,14 +11,12 @@ import { Interval } from '@nestjs/schedule';
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
 import { PlayerService } from './player/player.service';
-import { GamePayload, createMockUser } from './game.type';
+import { GamePayload } from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
-import { FULL } from 'apps/game-service/src/game/game.type';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
-import { ROOM_IDS } from '../lobby/lobby.const';
-import { Player } from './player/player';
-import { RedisStateService } from '../redis/redis_state_player.service';
+import { RedisStateService } from '../redis/redis_state.service';
+import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
 
 @WebSocketGateway(8082, { cors: { origin: true }, path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -26,14 +24,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   constructor(
-	private playerService: PlayerService,
-	private redisStateService: RedisStateService,
+    private wsAuthService: SharedAuthService,
+    private playerService: PlayerService,
+    private redisStateService: RedisStateService,
     private gameService: GameService,
   ) {}
   private clients = new Map<WebSocket, ClientData>();
-  private clientsById = new Map<number, WebSocket>();
+  private clientsById = new Map<string, WebSocket>();
 
-  handleConnection(client: WebSocket, request: IncomingMessage): void {
+  async handleConnection(
+    client: WebSocket,
+    request: IncomingMessage,
+  ): Promise<void> {
     const url = request.url!;
     const params = new URLSearchParams(url.split('?')[1]);
     const token = params.get('token');
@@ -42,7 +44,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(token);
     console.log(roomId);
     // Add JWT token validation
-    const { userId } = createMockUser();
+
+    const user = await this.wsAuthService.verifyWsHandshake(request);
+    if (!user.username) {
+      client.close(1008, 'Unauthorized');
+      return;
+    }
+    const userId = user.username;
     if (
       !token ||
       !roomId
@@ -54,7 +62,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     this.clients.set(client, { userId, roomId, isAlive: true });
-    this.clientsById.set(userId, client);
+    this.clientsById.set(userId!, client);
     console.log(`[GameGateway]: Client ${userId} connected in room ${roomId}`);
 
     client.on('pong', () => {
@@ -79,6 +87,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!user) return;
 
     this.clientsById.delete(user.userId);
+
     if (user.roomId) {
       this.gameService.onGodotDisconnected(user.userId, user.roomId);
     }
@@ -93,8 +102,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private sendToClient(client: WebSocket, message: object | undefined) {
-    if (client.readyState === WebSocket.OPEN)
+    if (client.readyState === WebSocket.OPEN) {
+      console.log("Send_Gateway: " , message);
       client.send(JSON.stringify(message));
+    }
   }
 
   @Interval(10000)
@@ -130,22 +141,51 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       response = {
         event: 'game',
         data: {
-          state: 'undefined payload'
-        }
-      }
+          state: 'undefined payload',
+        },
+      };
     }
-	/////////////////////////////////* REDIS STATE : UPDATE STATE */////////////////////////////////
-	const playerState = this.playerService.getPlayer(userId)!;
-    await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
-	/////////////////////////////////* END */////////////////////////////////
     this.sendToClient(client, response);
+
+    /////////////////////////////////* REDIS STATE : UPDATE STATE */////////////////////////////////
+    const playerState = this.playerService.getPlayer(userId)!;
+    await this.redisStateService.updateStatePlayer(
+      userId.toString(),
+      playerState,
+    );
+    /////////////////////////////////* END */////////////////////////////////
   }
 
+  /* ----------- EVENTS ----------- */
+
   @OnEvent('send_to_player')
-  onStartGame({ userId, payload }: { userId: number; payload: object }): void {
+  onSendToPlayer({
+    userId,
+    payload,
+  }: {
+    userId: string;
+    payload: object;
+  }): void {
     const client = this.clientsById.get(userId);
     if (client) {
       this.sendToClient(client, payload);
     }
+  }
+
+  @OnEvent('send_to_room')
+  onSendToRoom({
+    clients,
+    payload,
+  }: {
+    clients: Set<WebSocket>;
+    payload: object;
+  }): void {
+    this.broadcast(clients, payload);
+  }
+
+  @OnEvent('close_player_socket')
+  onClosePlayerSocket({ userId }: { userId: string }): void {
+    const client = this.clientsById.get(userId);
+    if (client) client.close(); // trigger handleDisconnect -> cleanupClient
   }
 }

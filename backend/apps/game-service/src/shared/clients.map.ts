@@ -1,7 +1,8 @@
 import { WebSocket } from 'ws';
 
+// shared between LobbyService and RoomService
 export interface ClientData {
-  userId: number;
+  userId: string;
   roomId?: string;
   isAlive: boolean;
 }

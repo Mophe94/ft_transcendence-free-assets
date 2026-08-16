@@ -1,4 +1,3 @@
-import './Lobby.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SpecialBG from '../background/SpecialBg';
@@ -11,9 +10,9 @@ import { useAuth } from '../context/AuthContext';
 import { AVATARS } from '../content/Preferences';
 
 interface Room {
-  roomId: string,
-  status: string,
-  nb_player: number,
+  roomId: string;
+  status: string;
+  nb_player: number;
 }
 
 export function Lobby() {
@@ -63,7 +62,7 @@ export function Lobby() {
   const username = user?.username ?? 'Anonymous';
 
   return (
-    <div className='lobby-content'>
+    <div className="lobby-content">
       <SpecialBG>
         <div className='heading-medium centered'>Games</div>
         <div className='table-games'>

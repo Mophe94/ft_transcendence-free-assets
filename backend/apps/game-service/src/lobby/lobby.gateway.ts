@@ -13,20 +13,23 @@ import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { LobbyService } from 'apps/game-service/src/lobby/lobby.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { RedisService } from '../redis/redis.service';
-import { WsAuthService } from 'libs/shared/src/auth/ws-auth.service';
 import { IncomingMessage } from 'http';
+import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
+
 
 @WebSocketGateway(8081, { cors: { origin: true }, path: '/lobby' })
 export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   constructor(
     private lobbyService: LobbyService,
     private roomService: RoomService,
     private redisService: RedisService,
-    private readonly wsAuthService: WsAuthService,
+    //private readonly wsAuthService: WsAuthService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly wsAuthService: SharedAuthService,
+
   ) {}
 
   async handleConnection(
@@ -34,7 +37,8 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     request: IncomingMessage,
   ): Promise<void> {
     try {
-      const user = await this.wsAuthService.authenticateClient(client, request);
+      const user = await this.wsAuthService.verifyWsHandshake(request);
+      console.log(user);
       clientsMap.set(client, { userId: user.id, isAlive: true });
       console.log('[LobbyGateway]: Client connected');
     } catch {
@@ -42,7 +46,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  handleDisconnect(client: WebSocket): void {
+  async handleDisconnect(client: WebSocket): Promise<void> {
     const clientData = clientsMap.get(client);
     const userId = clientData?.userId.toString();
     if (clientData?.roomId && userId) {
@@ -167,6 +171,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       state: 'start_game',
       data: {
         roomId: roomId,
+        //startTime: serverTime,
       },
     });
   }

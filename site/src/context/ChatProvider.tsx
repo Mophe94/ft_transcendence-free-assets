@@ -1,80 +1,74 @@
 import type React from 'react';
 import { ChatContext, type Chat, type Message } from './ChatContext';
-import { useEffect, useState } from 'react';
-import { Color, type ColorType } from '../constants/Colors';
+import { useEffect, useRef, useState } from 'react';
+import { Color } from '../constants/Colors';
+import { useAuth } from './AuthContext';
+import { useNotification } from './NotifContext';
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
+  const { showNotification } = useNotification();
   const [messages, setMessages] = useState<Array<Message>>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
-  const [userColors, setUserColors] = useState<Map<string, ColorType>>(new Map());
+  const [isUnread, setIsUnread] = useState<boolean>(false);
+  const wsRef = useRef<WebSocket | null>(null);
+  const userColorsRef = useRef<Map<string, Color>>(new Map());
 
-  function getRandomColor(): ColorType {
+  function getRandomColor(): Color {
     const colorArray = Object.values(Color);
     const randomIndex = Math.floor(Math.random() * colorArray.length);
     return colorArray[randomIndex];
   }
-
-
   useEffect(() => {
     const socket = new WebSocket(`${import.meta.env.VITE_CHAT_SERVICE}`);
-
-    socket.onopen = () => {
-      setWs(socket);
-    };
-    // socket.onclose = () => {
-    //   const date = new Date();
-    //   const time = date.toLocaleTimeString('fr-FR', {
-    //     hour: '2-digit',
-    //     minute: '2-digit',
-    //     second: '2-digit',
-    //     hour12: false,
-    //   });
-    //   const disconnection =
-    //     { time: time,
-    //       msg : "Disconnected",
-    //       color: Color.RED};
-    //       setMessages([disconnection]);
-    // }
+    wsRef.current = socket;
+    socket.onopen = () => console.log('connection');
+    socket.onclose = () => {
+      return;
+    }
 
     socket.onmessage = (event) => {
-      console.log('receiving a message');
-      const data = JSON.parse(event.data, (key, value) => {
-        if (key === 'time') {
-          const date = new Date(value);
-          const time = date.toLocaleTimeString('fr-FR', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false,
-          });
-          return time;
+      console.log(event);
+      const data = JSON.parse(event.data);
+      switch (data.type) {
+      case 'message': {
+          const message = {
+            time: new Date(data.time).toLocaleTimeString('fr-FR', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false,
+              }),
+            content: data.content,
+            username: data.username,
+          } as Message;
+          if (!userColorsRef.current.has(message.username)) {
+            userColorsRef.current.set(message.username, getRandomColor());
+          }
+          message.color = userColorsRef.current.get(message.username);
+          setMessages((prev) => [...prev.slice(-99), message]);
+          setIsUnread(true);
+          break;
         }
-        return value;
-      }) as Message;
-      console.log(data);
-      if (data.username && userColors.get(data.username)) {
-        data.color = userColors.get(data.username);
+        case 'friend_request': 
+          showNotification('Got a new friend request', 'success');
+          break;
       }
-      else 
-      {
-        setUserColors((prev) => (prev.set(data.username, getRandomColor())))
-        userColors.set(data.username, getRandomColor());
-        data.color = userColors.get(data.username);
-      }
-      console.log(data)
-      setMessages((prev) => {
-        const lastMessages = prev.slice(-99);
-        return [...lastMessages, data]});
     };
-  }, [userColors]);
+
+    socket.onclose = () => wsRef.current = null;
+    return () => {
+      socket.close();
+    }
+  }, [user, showNotification]);
 
   const sendMessage = async (content: string) => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ event: 'message', data: content }));
+    console.log('message sent');
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ event: 'message', data: content }));
     } else {
       console.error('Socket not connected.');
     }
   };
-  const chat: Chat = { messages, sendMessage };
+  const chat: Chat = { messages, sendMessage, isUnread, setIsUnread };
   return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;
 };

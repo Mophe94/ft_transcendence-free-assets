@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Play.css';
 import GameIframe from '../content/GameIframe';
 import GameRoom from '../content/GameRoom';
 import { useLobbySocket } from '../context/LobbySocketContext';
@@ -8,6 +7,7 @@ import { useLobbySocket } from '../context/LobbySocketContext';
 export default function Play() {
   const { roomId, players, roomCapacity, timer, gameStarted, reset } = useLobbySocket();
   const navigate = useNavigate();
+
 
   useEffect(() => {
     if (!roomId) navigate('/home');

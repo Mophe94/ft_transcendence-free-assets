@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict xBuIy8fFcrzib0vMpb4CoZXAW2t6FGTmyIVu1h9RXVMh8ZZrRvvyyVXNzG7e2kf
+\restrict 4PqQ6dHDUHnBjVg3s1SGYQ4NKhgqkYisaTFBOjbk5yRRhpu3SMstjzvQn2wiKuH
 
 -- Dumped from database version 18.4 (Ubuntu 18.4-1.pgdg25.10+1)
 -- Dumped by pg_dump version 18.4 (Ubuntu 18.4-1.pgdg25.10+1)
 
--- Started on 2026-07-27 17:10:55 CEST
+-- Started on 2026-08-04 12:05:47 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -22,340 +22,229 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 870 (class 1247 OID 17216)
--- Name: user_role; Type: TYPE; Schema: public; Owner: postgres
+-- TOC entry 867 (class 1247 OID 17422)
+-- Name: relationship_status_type; Type: TYPE; Schema: public; Owner: postgres
 --
 
-CREATE TYPE public.user_role AS ENUM (
-    'user',
-    'admin'
+CREATE TYPE public.relationship_status_type AS ENUM (
+    'accepted',
+    'pending',
+    'blocked'
 );
 
 
-ALTER TYPE public.user_role OWNER TO postgres;
+ALTER TYPE public.relationship_status_type OWNER TO postgres;
+
+--
+-- TOC entry 864 (class 1247 OID 17413)
+-- Name: user_role_type; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.user_role_type AS ENUM (
+    'user',
+    'admin',
+    'beta-tester'
+);
+
+
+ALTER TYPE public.user_role_type OWNER TO postgres;
 
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- TOC entry 220 (class 1259 OID 16841)
--- Name: settings; Type: TABLE; Schema: public; Owner: postgres
+-- TOC entry 220 (class 1259 OID 17357)
+-- Name: accounts; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.settings (
-    id integer NOT NULL,
-    theme character varying DEFAULT 'dark'::character varying NOT NULL,
-    starter integer DEFAULT 0 NOT NULL,
-    "userId" integer,
-    avatar character varying(30) DEFAULT 'ghost02'::character varying
+CREATE TABLE public.accounts (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    provider character varying(50) NOT NULL,
+    provider_account_id integer NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
-ALTER TABLE public.settings OWNER TO postgres;
+ALTER TABLE public.accounts OWNER TO postgres;
 
 --
--- TOC entry 219 (class 1259 OID 16840)
--- Name: settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 222 (class 1259 OID 17432)
+-- Name: relationships; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.settings_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.settings_id_seq OWNER TO postgres;
-
---
--- TOC entry 3530 (class 0 OID 0)
--- Dependencies: 219
--- Name: settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.settings_id_seq OWNED BY public.settings.id;
-
-
---
--- TOC entry 225 (class 1259 OID 16998)
--- Name: typeorm_metadata; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.typeorm_metadata (
-    type character varying NOT NULL,
-    database character varying,
-    schema character varying,
-    "table" character varying,
-    name character varying,
-    value text
+CREATE TABLE public.relationships (
+    requester_id uuid NOT NULL,
+    accepter_id uuid NOT NULL,
+    status public.relationship_status_type DEFAULT 'pending'::public.relationship_status_type NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at time with time zone DEFAULT now() NOT NULL
 );
 
 
-ALTER TABLE public.typeorm_metadata OWNER TO postgres;
+ALTER TABLE public.relationships OWNER TO postgres;
 
 --
--- TOC entry 222 (class 1259 OID 16857)
--- Name: user; Type: TABLE; Schema: public; Owner: postgres
+-- TOC entry 219 (class 1259 OID 17337)
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public."user" (
-    id integer NOT NULL,
-    "fortyTwoId" integer NOT NULL,
-    username character varying NOT NULL,
-    email character varying NOT NULL,
-    "avatarUrl" character varying NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    role public.user_role DEFAULT 'user'::public.user_role NOT NULL,
-    "coalitionId" integer DEFAULT 0,
-    "coalitionName" character varying
+CREATE TABLE public.users (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    email character varying(255) NOT NULL,
+    username character varying(50) DEFAULT NULL::character varying,
+    password_hash character varying(255),
+    is_onboarded boolean DEFAULT false NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    avatar_url text,
+    coalition_id integer DEFAULT 0,
+    settings jsonb DEFAULT '{"theme": "dark", "avatar": "dinoGreen", "starter": "pisciner"}'::jsonb NOT NULL,
+    user_roles public.user_role_type[] DEFAULT ARRAY['user'::public.user_role_type] NOT NULL
 );
 
 
-ALTER TABLE public."user" OWNER TO postgres;
+ALTER TABLE public.users OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 16856)
--- Name: user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 221 (class 1259 OID 17381)
+-- Name: users_stats; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.user_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.user_id_seq OWNER TO postgres;
-
---
--- TOC entry 3531 (class 0 OID 0)
--- Dependencies: 221
--- Name: user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.user_id_seq OWNED BY public."user".id;
-
-
---
--- TOC entry 224 (class 1259 OID 16880)
--- Name: user_stats; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.user_stats (
-    id integer NOT NULL,
-    total_damage_given integer DEFAULT 0 NOT NULL,
-    total_damage_received integer DEFAULT 0 NOT NULL,
-    nb_victories integer DEFAULT 0 NOT NULL,
-    nb_defeats integer DEFAULT 0 NOT NULL,
-    nb_monsters_discovered integer DEFAULT 0 NOT NULL,
-    nb_objects_discovered integer DEFAULT 0 NOT NULL,
-    nb_achievements integer DEFAULT 0 NOT NULL,
-    "userId" integer,
-    nb_fights integer GENERATED ALWAYS AS ((nb_victories + nb_defeats)) STORED NOT NULL
+CREATE TABLE public.users_stats (
+    user_id uuid CONSTRAINT users_stat_user_id_not_null NOT NULL,
+    games_played integer DEFAULT 0 CONSTRAINT users_stat_games_played_not_null NOT NULL,
+    games_won integer DEFAULT 0 CONSTRAINT users_stat_games_won_not_null NOT NULL,
+    games_lost integer DEFAULT 0 CONSTRAINT users_stat_games_lost_not_null NOT NULL,
+    total_player_defeated integer DEFAULT 0 CONSTRAINT users_stat_total_player_defeated_not_null NOT NULL,
+    nb_monsters_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_monsters_discovered_not_null NOT NULL,
+    nb_endings_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_endings_discovered_not_null NOT NULL,
+    nb_achievements integer DEFAULT 0 CONSTRAINT users_stat_nb_achievements_not_null NOT NULL,
+    created_at timestamp with time zone DEFAULT now() CONSTRAINT users_stat_created_at_not_null NOT NULL,
+    updated_at time with time zone DEFAULT now() CONSTRAINT users_stat_updated_at_not_null NOT NULL
 );
 
 
-ALTER TABLE public.user_stats OWNER TO postgres;
+ALTER TABLE public.users_stats OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 16879)
--- Name: user_stats_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.user_stats_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.user_stats_id_seq OWNER TO postgres;
-
---
--- TOC entry 3532 (class 0 OID 0)
--- Dependencies: 223
--- Name: user_stats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.user_stats_id_seq OWNED BY public.user_stats.id;
-
-
---
--- TOC entry 3340 (class 2604 OID 16844)
--- Name: settings id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.settings ALTER COLUMN id SET DEFAULT nextval('public.settings_id_seq'::regclass);
-
-
---
--- TOC entry 3344 (class 2604 OID 16860)
--- Name: user id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public."user" ALTER COLUMN id SET DEFAULT nextval('public.user_id_seq'::regclass);
-
-
---
--- TOC entry 3348 (class 2604 OID 16883)
--- Name: user_stats id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.user_stats ALTER COLUMN id SET DEFAULT nextval('public.user_stats_id_seq'::regclass);
-
-
---
--- TOC entry 3519 (class 0 OID 16841)
+-- TOC entry 3525 (class 0 OID 17357)
 -- Dependencies: 220
--- Data for Name: settings; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: accounts; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.settings (id, theme, starter, "userId", avatar) FROM stdin;
+COPY public.accounts (id, user_id, provider, provider_account_id, created_at) FROM stdin;
 \.
 
 
 --
--- TOC entry 3524 (class 0 OID 16998)
--- Dependencies: 225
--- Data for Name: typeorm_metadata; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.typeorm_metadata (type, database, schema, "table", name, value) FROM stdin;
-GENERATED_COLUMN	test	public	user_stats	nb_fights	"nb_victories" + "nb_defeats"
-\.
-
-
---
--- TOC entry 3521 (class 0 OID 16857)
+-- TOC entry 3527 (class 0 OID 17432)
 -- Dependencies: 222
--- Data for Name: user; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: relationships; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public."user" (id, "fortyTwoId", username, email, "avatarUrl", created_at, role, "coalitionId", "coalitionName") FROM stdin;
+COPY public.relationships (requester_id, accepter_id, status, created_at, updated_at) FROM stdin;
 \.
 
 
 --
--- TOC entry 3523 (class 0 OID 16880)
--- Dependencies: 224
--- Data for Name: user_stats; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.user_stats (id, total_damage_given, total_damage_received, nb_victories, nb_defeats, nb_monsters_discovered, nb_objects_discovered, nb_achievements, "userId") FROM stdin;
-\.
-
-
---
--- TOC entry 3533 (class 0 OID 0)
+-- TOC entry 3524 (class 0 OID 17337)
 -- Dependencies: 219
--- Name: settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.settings_id_seq', 7, true);
+COPY public.users (id, email, username, password_hash, is_onboarded, created_at, updated_at, avatar_url, coalition_id, settings, user_roles) FROM stdin;
+\.
 
 
 --
--- TOC entry 3534 (class 0 OID 0)
+-- TOC entry 3526 (class 0 OID 17381)
 -- Dependencies: 221
--- Name: user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Data for Name: users_stats; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.user_id_seq', 7, true);
-
-
---
--- TOC entry 3535 (class 0 OID 0)
--- Dependencies: 223
--- Name: user_stats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.user_stats_id_seq', 6, true);
+COPY public.users_stats (user_id, games_played, games_won, games_lost, total_player_defeated, nb_monsters_discovered, nb_endings_discovered, nb_achievements, created_at, updated_at) FROM stdin;
+\.
 
 
 --
--- TOC entry 3358 (class 2606 OID 16853)
--- Name: settings PK_0669fe20e252eb692bf4d344975; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3370 (class 2606 OID 17368)
+-- Name: accounts accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.settings
-    ADD CONSTRAINT "PK_0669fe20e252eb692bf4d344975" PRIMARY KEY (id);
-
-
---
--- TOC entry 3362 (class 2606 OID 16871)
--- Name: user PK_cace4a159ff9f2512dd42373760; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public."user"
-    ADD CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY (id);
+ALTER TABLE ONLY public.accounts
+    ADD CONSTRAINT accounts_pkey PRIMARY KEY (id);
 
 
 --
--- TOC entry 3366 (class 2606 OID 16900)
--- Name: user_stats PK_f55fb5b508e96b05303efae93e5; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3374 (class 2606 OID 17444)
+-- Name: relationships pk_user_relationships; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.user_stats
-    ADD CONSTRAINT "PK_f55fb5b508e96b05303efae93e5" PRIMARY KEY (id);
-
-
---
--- TOC entry 3368 (class 2606 OID 16902)
--- Name: user_stats REL_1ef59671d5359ff63ae55ae4ef; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.user_stats
-    ADD CONSTRAINT "REL_1ef59671d5359ff63ae55ae4ef" UNIQUE ("userId");
+ALTER TABLE ONLY public.relationships
+    ADD CONSTRAINT pk_user_relationships PRIMARY KEY (requester_id, accepter_id);
 
 
 --
--- TOC entry 3360 (class 2606 OID 16855)
--- Name: settings REL_9175e059b0a720536f7726a88c; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3364 (class 2606 OID 17356)
+-- Name: users uq_username_users; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.settings
-    ADD CONSTRAINT "REL_9175e059b0a720536f7726a88c" UNIQUE ("userId");
-
-
---
--- TOC entry 3364 (class 2606 OID 16873)
--- Name: user UQ_e798808c3c0d30c91ea9bd6b80c; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public."user"
-    ADD CONSTRAINT "UQ_e798808c3c0d30c91ea9bd6b80c" UNIQUE ("fortyTwoId");
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT uq_username_users UNIQUE (username);
 
 
 --
--- TOC entry 3370 (class 2606 OID 16903)
--- Name: user_stats FK_1ef59671d5359ff63ae55ae4efa; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3366 (class 2606 OID 17354)
+-- Name: users uq_users_email; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.user_stats
-    ADD CONSTRAINT "FK_1ef59671d5359ff63ae55ae4efa" FOREIGN KEY ("userId") REFERENCES public."user"(id);
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT uq_users_email UNIQUE (email);
 
 
 --
--- TOC entry 3369 (class 2606 OID 17011)
--- Name: settings FK_9175e059b0a720536f7726a88c7; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3368 (class 2606 OID 17352)
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.settings
-    ADD CONSTRAINT "FK_9175e059b0a720536f7726a88c7" FOREIGN KEY ("userId") REFERENCES public."user"(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
--- Completed on 2026-07-27 17:10:55 CEST
+--
+-- TOC entry 3372 (class 2606 OID 17406)
+-- Name: users_stats users_stat_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_stats
+    ADD CONSTRAINT users_stat_pkey PRIMARY KEY (user_id);
+
+
+--
+-- TOC entry 3375 (class 2606 OID 17376)
+-- Name: accounts fk_accounts_users_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.accounts
+    ADD CONSTRAINT fk_accounts_users_id FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE NOT VALID;
+
+
+--
+-- TOC entry 3376 (class 2606 OID 17407)
+-- Name: users_stats fk_users_stats_users; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_stats
+    ADD CONSTRAINT fk_users_stats_users FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+-- Completed on 2026-08-04 12:05:47 CEST
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict xBuIy8fFcrzib0vMpb4CoZXAW2t6FGTmyIVu1h9RXVMh8ZZrRvvyyVXNzG7e2kf
+\unrestrict 4PqQ6dHDUHnBjVg3s1SGYQ4NKhgqkYisaTFBOjbk5yRRhpu3SMstjzvQn2wiKuH
 

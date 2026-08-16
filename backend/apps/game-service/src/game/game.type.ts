@@ -6,15 +6,13 @@ export interface GamePayload {
   };
 }
 
-export const FULL = 2;
+export const FULL = 4;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  godot_fill: 20,
-  map: 10,
+  map: 90,
   team_setup: 10,
-  choose_monster: 23, // happend only if a monster die -> before choose action phase
-  choose_action:  23,
+  choose_action: 20,
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;
