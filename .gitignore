@@ -12,3 +12,4 @@ host_ip.txt
 !infra/template.secrets.env
 .secrets/
 .vite/
+node_modules

@@ -52,7 +52,7 @@ export class UsersController {
         nbAchievements: user.stats.nbAchievements,
         nbMonstersDiscovered: user.stats.nbMonstersDiscovered,
         nbObjectsDiscovered: user.stats.nbEndingsDiscovered,
-        totalPlayerDefeated: user.stats.totalPlayerDefeated,
+        totalPlayerDefeated: user.stats.totalPlayersDefeated,
         // totalDamageReceived: user.stats.totalDamageReceived,
       },
     };
