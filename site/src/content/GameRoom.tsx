@@ -1,8 +1,8 @@
-import './GameRoom.css'
 import SpecialBG from '../background/SpecialBg'
 import { useEffect, useState } from 'react';
 import type { LobbyPlayer } from '../context/LobbySocketContext';
 import { AVATARS } from '../content/Preferences';
+import Heading from '../components/heading/Heading';
 
 interface RoomInfo {
   roomName: string;
@@ -32,39 +32,35 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
 
   return (
     <SpecialBG>
-      <div className='heading-medium centered'>{roomName}</div>
-      <div className='table-players'>
-        <div className='table-players-header'>
-          <div className='table-players-col-templ'>
-            <div className='table-players-head justify-self-center'>Players</div>
-            <div className='table-players-head justify-self-center'>Avatar</div>
+      <Heading size='m' text={roomName}/>
+      <div>
+        <div className=' bg-[#8f5407b9] rounded-4xl mb-5'>
+          <div className='grid grid-cols-2 w-full'>
+            <div className='text-2xl t-w justify-center font-semibold p-2.5'>Players</div>
+            <div className='text-2xl t-w justify-center font-semibold p-2.5'>Avatar</div>
           </div>
         </div>
-        <div className='table-players-content'>
+        <div className='max-h-100 overflow-y-scroll no-scrollbar'>
           {players.length ? (
             players.map((player) => (
-              <div className='table-players-col-templ' key={player.username}>
-                <div className='table-data centered'>{player.username}</div>
-                <div className='table-data centered'>
+              <div className='grid grid-cols-2 w-full' key={player.username}>
+                <div className='py-2.5 px-5 self-center'>{player.username}</div>
+                <div className='py-2.5 px-5 self-center'>
                   <img
                     src={getAvatarImg(player.avatar)}
                     alt={player.username}
-                    className='player-avatar'
+                    className='w-12 h-12 object-contain [image-rendering:pixelated]'
                   />
                 </div>
               </div>
             ))
           ) : (
-            <div className='centered'>No Players</div>
+            <div className='self-center'>No Players</div>
           )}
         </div>
-        <div className='table-players-col-templ'>
-          <div className='heading-small centered'>
-            Players: {players.length}/{roomCapacity == 0 ? '∞' : roomCapacity}
-          </div>
-          <div className='heading-small centered'>
-            Time Left: {timeLeft >= 0 ? timeLeft : '∞'}
-          </div>
+        <div className='grid grid-cols-2 w-full'>
+          <Heading size='sm' text={`Players: ${players.length}/${roomCapacity == 0 ? '∞' : roomCapacity}`} />
+          <Heading size='sm' text={`Time Left: ${timeLeft >= 0 ? timeLeft : '∞'}`} />
         </div>
       </div>
     </SpecialBG>
