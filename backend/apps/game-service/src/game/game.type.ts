@@ -1,26 +1,24 @@
-export interface GamePayload {
+export interface GameData {
   state: string;
-  data: {
-    state: string;
-    [key: string]: any;
-  };
+  [key: string]: any;
 }
 
-export const FULL = 4;
+export interface GamePayload {
+  data: GameData;
+}
+
+export interface GameMessage {
+  event: string;
+  data: GameData;
+}
+
+export const FULL = 2;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 90,
+  map: 15,
   team_setup: 10,
   choose_action: 20,
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;
-
-let mockUserCounter = 0;
-export const createMockUser = () => {
-  mockUserCounter++;
-  return {
-    userId: mockUserCounter,
-  };
-};
