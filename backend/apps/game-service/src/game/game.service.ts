@@ -356,16 +356,28 @@ export class GameService {
     console.log("player2.currentActions BEFORE; ", player2.currentActions.actionType);
 
     // if (player.forceChooseMonster) -> if !currentMonster 
-
-    if (player.currentActions.actionType === undefined)
-      if (this.needMonsterChoice(player))
-        this.autoChooseMonster(userId, player);
-      else
-        this.autoPass(userId, player);
-    if (player2.currentActions.actionType === undefined)
-      if (this.needMonsterChoice(player2))
+    const forcedMonster = player.forceChooseMonster || player2.forceChooseMonster;
+    if (forcedMonster) {
+      if (player.forceChooseMonster && player.currentActions.actionType === undefined) {
+          this.autoChooseMonster(userId, player);
+      }
+      if (player2.forceChooseMonster && player2.currentActions.actionType === undefined) {
         this.autoChooseMonster(userId2, player2);
-      else this.autoPass(userId2, player2);
+      }
+    }
+    else {
+      if (player.currentActions.actionType === undefined) {
+        if (this.needMonsterChoice(player))
+          this.autoChooseMonster(userId, player);
+        else
+          this.autoPass(userId, player);
+      }
+      if (player2.currentActions.actionType === undefined) {
+        if (this.needMonsterChoice(player2))
+          this.autoChooseMonster(userId2, player2);
+        else this.autoPass(userId2, player2);
+      }
+    }
 
     this.resolveTurn(userId, player, player2);
   }
