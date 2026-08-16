@@ -182,7 +182,7 @@ Je suis très fier du résultat final : il ressemble vraiment au genre de jeu su
           "
         >
           <div className="text-justify">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut porttitor pharetra accumsan. Etiam ipsum sapien, finibus at sagittis nec, sagittis in quam. Fusce eu facilisis augue. Mauris eleifend, lectus a ultrices luctus, dui dolor pharetra turpis, ac vehicula neque elit at dui. Donec accumsan diam sed ipsum pretium, non sollicitudin mi sagittis. Quisque laoreet lorem eu mi volutpat efficitur. Pellentesque a ipsum augue. Ut quis enim eu diam viverra pulvinar. Fusce mi quam, molestie non elit eget, faucibus accumsan mi. Phasellus neque massa, viverra vitae arcu non, dictum vehicula augue.
+            As a versatile teammate bridging the gap between front and back, I juggle database architecture, API integrations, and the messiest merge conflicts. With a knack for breaking down even the most baffling bugs, I always keep a clear bird’s-eye view of the project's big picture. Always ready for a peer-programming session or a quick emergency unblock, I like to think of myself as the engine keeping the machine running smoothly from day one to the final push.
           </div>
         </div>
       </div>
