@@ -337,7 +337,6 @@ else
     BUNDLE[leader]="vm_management/setup_leader.sh vm_management/cert_rootCA.sh vm_management/cert_info.env"
     BUNDLE[worker]="vm_management/setup_worker.sh vm_management/setup_for_swarm.sh"
     read -r -a files <<< "${BUNDLE[$TYPE]}"
-    #echo "[$SCRIPT_NAME] adding needed file: ${files[@]}"
     VM_TARGET_DIR="/"
     set +e
     scp -r -P "$SSH_PORT" -o IdentitiesOnly=yes -i "$SSH_KEY" -o StrictHostKeyChecking=no "${files[@]}" "$VM_USER"@"$SSH_HOST":"$VM_TARGET_DIR"

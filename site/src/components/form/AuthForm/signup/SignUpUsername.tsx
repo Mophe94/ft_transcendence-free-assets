@@ -23,7 +23,7 @@ export default function SignUpUsername({ value, onChange }: SignUpUsernameProps)
         `${import.meta.env.VITE_USERS_SERVICE}/check_username?username=${encodeURIComponent(username)}`
       );
       const data = await res.json();
-      const available = typeof data === 'boolean' ? data : data.available;
+      const { available } = data;
       
       lastChecked.current = username;
       setIsAvailable(available);

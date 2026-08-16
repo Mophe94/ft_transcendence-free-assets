@@ -7,6 +7,7 @@ import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
+import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class GameService {
     private playerService: PlayerService,
     private combatService: CombatService,
     private mapService: MapService,
+    private redisService: RedisService,
     private redisStateService: RedisStateService,
   ) {}
 
@@ -82,9 +84,6 @@ export class GameService {
     const player = this.playerService.getPlayer(userId)!;
 
     // change FULL for real room capacity
-    console.log('Active Players at start: ', this.activePlayersByRoom);
-    console.log('*********************************************');
-    player.roundsRemaining = Math.log2(FULL); //this.activePlayersByRoom.get(roomId)?.size! / 2;
     console.log('ON GODOT CONNECTED ROUND REMAINING: ', player.roundsRemaining);
 
     let activePlayers = this.activePlayersByRoom.get(roomId);
@@ -93,6 +92,10 @@ export class GameService {
       this.activePlayersByRoom.set(roomId, activePlayers);
     }
     activePlayers.add(userId);
+
+    console.log('Active Players at start: ', this.activePlayersByRoom);
+    console.log('*********************************************');
+    player.roundsRemaining = Math.log2(FULL); //this.activePlayersByRoom.get(roomId)?.size! / 2;
 
     // FULL need to be repalaced by the real capacity of the room retrieved from redis
     if (
@@ -190,9 +193,24 @@ export class GameService {
       console.log('Active Players last winner:  ', active);
       console.log('Connected Players last winner: ', connected);
       console.log('*********************************************');
+      //this.deleteEndGame(roomId, active[0])
       //console.log(`End of game: everything should be cleanup at this point!`);
       return;
     }
+  }
+
+  private deleteEndGame(roomId: string, userId: string) : void {
+    this.gameRooms.delete(roomId);
+    this.activePlayersByRoom.delete(roomId);
+    this.authorizedPlayers.delete(roomId);
+    this.roomIdByPlayer.delete(userId);
+
+    Promise.all([
+      //this.redisStateService.removePlayer(userId),
+      this.redisService.deleteRoom(roomId),
+      this.redisService.removeActiveRoom(roomId),
+    ]).catch((err) => 
+      console.log([`GameService] deleteRoom: failed cleaning of ${roomId}`]));
   }
 
   private startMapPhase(
@@ -348,6 +366,16 @@ export class GameService {
     const player = this.playerService.getPlayer(userId)!;
     const userId2 = this.combatService.getOpponentId(userId);
     const roomId = this.roomIdByPlayer.get(userId)!;
+    const state = payload?.state;
+    console.log('STATE', state);
+
+    if (state === 'safe_to_disconnect') {
+      if (player.status === 'loser')
+        await this.eliminatePlayer(player.id, roomId);
+      if (player.status === 'winner' && player.roundsRemaining === 0)
+        await this.eliminatePlayer(player.id, roomId);
+      return undefined;
+    }
 
     if (!userId2) {
       console.log(`[GameService]: userId2 for ${userId} is missing`);
@@ -356,18 +384,12 @@ export class GameService {
 
     const player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
 
-    let playerForce: Player | undefined = undefined;
-    if (player.forceChooseMonster) playerForce = player;
-    else if (player2?.forceChooseMonster) playerForce = player2;
-
     if (!player2) {
       console.log(`[GameService]: No opponent for ${userId}`);
       return undefined;
     }
 
     let result: object | undefined;
-    const state = payload?.state;
-    console.log('STATE', state);
     switch (state) {
       case 'add_item':
         result = this.mapService.received_add_item(player);
@@ -429,14 +451,14 @@ export class GameService {
           actionType: state,
           data: payload,
         };
-        this.resolveTurn(userId, player, player2, playerForce!);
+        this.resolveTurn(userId, player, player2);
         break;
-      case 'safe_to_disconnect':
-        if (player.status === 'loser')
-          await this.eliminatePlayer(player.id, roomId);
-        if (player.status === 'winner' && player.roundsRemaining === 0)
-          await this.eliminatePlayer(player.id, roomId);
-        break;
+      // case 'safe_to_disconnect':
+      //   if (player.status === 'loser')
+      //     await this.eliminatePlayer(player.id, roomId);
+      //   if (player.status === 'winner' && player.roundsRemaining === 0)
+      //     await this.eliminatePlayer(player.id, roomId);
+      //   break;
       default:
         console.log('Unknow state:', state);
         return undefined;
@@ -448,7 +470,6 @@ export class GameService {
     userId: string,
     player: Player,
     player2: Player,
-    playerForce: Player,
   ): void {
     const combatRoomId = this.combatService.playerCombatRoom.get(userId);
     if (!combatRoomId) {
@@ -458,6 +479,10 @@ export class GameService {
       );
       return;
     }
+
+    let playerForce: Player = this.playerService.initDefaultPlayer();
+    if (player.forceChooseMonster) playerForce = player;
+    else if (player2?.forceChooseMonster) playerForce = player2;
 
     const userId2 = this.combatService.getOpponentId(userId);
     if (!userId2) return;
@@ -503,6 +528,7 @@ export class GameService {
       // send new_turn(player, roundLeft)
     }
     if (endOfBattle) {
+
       this.finalizeBattleEnd(player, player2, combatRoomId);
     }
   }

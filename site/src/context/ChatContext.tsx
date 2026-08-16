@@ -11,6 +11,8 @@ export interface Message {
 export interface Chat {
   messages: Array<Message>;
   sendMessage: (text: string) => Promise<void>;
+  isUnread: boolean;
+  setIsUnread: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const ChatContext = createContext<Chat | null>(null);

@@ -41,15 +41,4 @@ export class Account {
     type: 'timestamptz',
   })
   createdAt!: Date;
-
-  @AfterInsert()
-  logInsert() {
-    console.log(
-      `account:\n\t${this.id}`,
-      `\n\t${this.userId}`,
-      `\n\t${this.provider}`,
-      `\n\t${this.providerAccountId}`,
-      `\n\t${this.createdAt.toLocaleTimeString()}`,
-    );
-  }
 }

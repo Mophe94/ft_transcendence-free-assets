@@ -1,6 +1,7 @@
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -21,6 +22,7 @@ import { UserResponseDto } from '../users/dto/user-response.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -41,6 +43,10 @@ export class AuthService {
       passwordHash: hashedPassword,
       username: createUserDto.username,
     });
+
+    this.logger.log(
+      `[AUTH REGISTER] New local account created: ${user.username} (${user.id})`,
+    );
 
     const token = this.generateJwt(user);
     const sanitizedUser = new UserResponseDto({
@@ -75,28 +81,43 @@ export class AuthService {
   ): Promise<{ user: User; token: string }> {
     const user = await this.usersService.findOneByEmail(email, true);
     if (!user) {
+      this.logger.warn(
+        `[AUTH VALIDATION FAILED] No account found with email: ${email}`,
+      );
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
+      this.logger.warn(
+        `[AUTH VALIDATION FAILED] Incorrect password for User: ${user.username} (${user.id})`,
+      );
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    this.logger.log(
+      `[AUTH VALIDATION SUCCESS] Credentials verified for User: ${user.username} (${user.id})`,
+    );
     const token = this.generateJwt(user);
-    console.log(token);
 
     return { user, token };
   }
 
   async handleFortyTwoAuth(code: string) {
+    this.logger.log(
+      '[OAUTH 42] Exchanging authorization code for access token...',
+    );
     const accessToken = await this.exchangeCodeForToken(code);
+    this.logger.log('[OAUTH 42] Fetching 42 profile and coalition data...');
     const profile = await this.getFortyTwoProfile(accessToken);
     const coal = await this.getFortyTwoCoal(accessToken, profile.id);
 
     const user = await this.usersService.findUserByFortyTwoId(profile.id);
 
     if (user) {
+      this.logger.log(
+        `[OAUTH 42 LOGIN] Existing user found: ${user.username} (${user.id}) - 42 ID: ${profile.id}`,
+      );
       const payload = {
         id: user.id,
         username: user.username,
@@ -104,11 +125,12 @@ export class AuthService {
         role: user.userRoles,
         avatarUrl: user.avatarUrl,
       };
-      console.log(payload);
       const token = await this.jwtService.signAsync(payload);
       return { token, user };
     }
-
+    this.logger.log(
+      `[OAUTH 42 REGISTER] Creating new account for 42 User: ${profile.login} (42 ID: ${profile.id})`,
+    );
     const userProfile = {
       email: profile.email,
       username: profile.login,
@@ -118,6 +140,9 @@ export class AuthService {
     };
 
     const newUser = await this.usersService.createFortyTwoUser(userProfile);
+    this.logger.log(
+      `[OAUTH 42 REGISTER SUCCESS] New user created: ${newUser.username} (${newUser.id})`,
+    );
     const payload = {
       id: newUser.id,
       username: newUser.username,
@@ -151,8 +176,25 @@ export class AuthService {
         },
       );
       return tokenResponse.data.access_token;
-    } catch (err) {
-      console.log(err);
+    } catch (err: unknown) {
+      let errorMessage = 'Unknown error';
+
+      if (
+        axios.isAxiosError<{ error_description?: string; message?: string }>(
+          err,
+        )
+      ) {
+        errorMessage =
+          err.response?.data?.error_description ||
+          err.response?.data?.message ||
+          err.message;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
+      this.logger.error(
+        `[OAUTH 42 API ERROR] Token exchange failed: ${errorMessage}`,
+      );
       throw new UnauthorizedException('Failed to authenticate.');
     }
   }
@@ -167,9 +209,22 @@ export class AuthService {
         },
       );
       return response.data;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException("Couldn't fetch users profile.");
+    } catch (err: unknown) {
+      let errorMessage = 'Unknown error';
+
+      if (axios.isAxiosError<{ message?: string; error?: string }>(err)) {
+        errorMessage =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.message;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
+      this.logger.error(
+        `[OAUTH 42 API ERROR] Profile fetch failed: ${errorMessage}`,
+      );
+      throw new InternalServerErrorException("Couldn't fetch user's profile.");
     }
   }
   async getFortyTwoCoal(
@@ -191,10 +246,23 @@ export class AuthService {
         (Object.values(CoalitionEnum) as number[]).includes(coal.id),
       );
       return current_coal;
-    } catch (error) {
-      console.log(error);
+    } catch (err: unknown) {
+      let errorMessage = 'Unknown error';
+
+      if (axios.isAxiosError<{ message?: string; error?: string }>(err)) {
+        errorMessage =
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.message;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
+      this.logger.error(
+        `[OAUTH 42 API ERROR] Coalition fetch failed for 42 User ${userId}: ${errorMessage}`,
+      );
       throw new InternalServerErrorException(
-        "Couldn't fetch users coalitions.",
+        "Couldn't fetch user's coalitions.",
       );
     }
   }

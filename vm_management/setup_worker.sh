@@ -72,6 +72,7 @@ NEW_USER_HOME="/home/$NEW_USER"
 
 echo "[$SCRIPT_NAME] Creating user: $NEW_USER"
 adduser -D -h "$NEW_USER_HOME" "$NEW_USER"
+IFS= read -r NEW_USER_PASSWORD
 echo "${NEW_USER}:${NEW_USER_PASSWORD}" | chpasswd
 
 echo "[$SCRIPT_NAME] Setting up ${NEW_USER} permissions"

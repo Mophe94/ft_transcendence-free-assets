@@ -137,7 +137,8 @@ services:
       - obsrv_net
     deploy:
       mode: global
-      restart_policy: unless-stopped
+      restart_policy:
+        condition: on-failure
 
 volumes:
     loki_data:

@@ -22,7 +22,7 @@ export default function SignUpEmail ({ value, onChange }: EmailSignUpProps) {
     const res = await fetch(
         `${import.meta.env.VITE_USERS_SERVICE}/check_email?email=${encodeURIComponent(email)}`
     );
-    const available = await res.json();
+    const { available } = await res.json();
     console.log(available)
     
     lastCheckedEmail.current = email;

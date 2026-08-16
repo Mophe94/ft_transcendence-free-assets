@@ -13,6 +13,7 @@ export class ChatService {
     currentConnections.push({ socketId, connectedAt: new Date() });
     this.onlineUsers.set(userId, currentConnections);
   }
+
   removeConnection(userId: string, socketId: string) {
     const connections = this.onlineUsers.get(userId);
     if (!connections) return;
@@ -27,6 +28,9 @@ export class ChatService {
     }
   }
 
+  getUserSockets(userId: string): Connection[] | undefined {
+    return this.onlineUsers.get(userId);
+  }
   isOnline(userId: string): boolean {
     return this.onlineUsers.has(userId);
   }

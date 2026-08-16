@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/12 15:00:13 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/16 17:30:14 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -222,7 +222,6 @@ for user in "${NODE_USERS[@]}"; do
     password_from_env=false
     if password="$(get_env_value "p_node_${user}")"; then
 	password_from_env=true
-	printf '%s' "$password"
     else
 	echo "[$SCRIPT_NAME] No password configured for $user." >&2
 	IFS= read -r -s -p "[$SCRIPT_NAME] Password for $user: " password
@@ -233,6 +232,7 @@ for user in "${NODE_USERS[@]}"; do
     while [ "$try" -lt 3 ]; do
 	if SSHPASS="$password" sshpass -e \
 	    ssh \
+	    - vvv \
 	    -i "$SSH_KEY" \
 	    -p "$SSH_PORT" \
 	    -o StrictHostKeyChecking=no \

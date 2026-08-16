@@ -107,15 +107,4 @@ export class User {
 
   @OneToMany(() => Relationship, (rel) => rel.accepter)
   receivedRelationships!: Relationship[];
-
-  @AfterInsert()
-  logInsert() {
-    console.log(
-      `User:\n\t${this.id}`,
-      `\n\t${this.username}`,
-      `\n\t${this.email}`,
-      `\n\t${this.avatarUrl}`,
-      `\n\t${this.createdAt.toLocaleTimeString()}`,
-    );
-  }
 }

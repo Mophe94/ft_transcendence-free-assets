@@ -27,7 +27,7 @@ export class Skill {
   })
   type!: SkillType;
 
-  @Column()
+  @Column({ type: 'double precision' })
   value!: number;
 
   @Column()
