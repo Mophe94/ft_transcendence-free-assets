@@ -1,59 +1,36 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GameIframe from '../content/GameIframe';
 import GameRoom from '../content/GameRoom';
+import { useLobbySocket } from '../context/LobbySocketContext';
 
 export default function Play() {
-  const [gameStart, setGameStart] = useState<boolean>(false);
-  const [userToken, setUserToken] = useState<string | null>(null);
-  const [roomToken, setRoomToken] = useState<string | null>(null);
-  const [timer, setTimer] = useState<number>(0);
-  const [capacity, setCapacity] = useState<number>(0);
+  const { roomId, players, roomCapacity, timer, gameStarted, reset } = useLobbySocket();
+  const navigate = useNavigate();
 
-  const gameStartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(`${import.meta.env.VITE_LOBBY_SERVICE}`);
+    if (!roomId) navigate('/home');
+  }, [roomId, navigate]);
 
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ event: 'lobby' }));
-    };
-
-    ws.onmessage = (event) => {
-      const newMsg = JSON.parse(event.data);
-      if (newMsg.event === 'game') {
-        setUserToken(newMsg.event);
-        setRoomToken(newMsg.data.roomToken ?? 'test-room');
-
-        if (gameStartTimeoutRef.current) {
-          clearTimeout(gameStartTimeoutRef.current);
-        }
-        gameStartTimeoutRef.current = setTimeout(() => {
-          setGameStart(true);
-        }, 3000);
-      }
-      if (newMsg.event === 'lobby' && newMsg.state === 'player_joined') {
-          setTimer(newMsg.data.timer);
-          setCapacity(newMsg.data.roomCapacity);
-      }
-    };
-
-     ws.onerror = (err) => {
-      console.error('Erreur WebSocket lobby :', err);
-    };
+  useEffect(() => {
     return () => {
-      ws.close();
-      if (gameStartTimeoutRef.current) {
-        clearTimeout(gameStartTimeoutRef.current);
-      }
+      reset();
     };
-  }, []);
+  }, [reset]);
 
-  
-  if (gameStart && userToken && roomToken) {
-    return <GameIframe userToken={userToken} roomToken={roomToken} />
+  if (!roomId) return null;
+
+  if (gameStarted) {
+    return <GameIframe userToken="game" roomToken={roomId} />;
   }
 
   return (
-    <GameRoom {...{ roomName: "Test-room", players: ["kprist", "stempels", "bertrmar", "agaland"], roomCapacity: capacity, endTime: timer } } />
+    <GameRoom
+      roomName={roomId}
+      players={players}
+      roomCapacity={roomCapacity}
+      endTime={timer}
+    />
   );
 }

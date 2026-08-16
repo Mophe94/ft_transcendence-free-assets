@@ -26,3 +26,10 @@
 .table-data {
   padding: 10px 20px 10px 20px;
 }
+
+.player-avatar {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}

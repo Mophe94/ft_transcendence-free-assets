@@ -19,10 +19,10 @@ const publicLinks = {
 
 const privateLinks = {
   Home: '/Home',
-  Play: '/play',
   'How to play': '/howto',
   Readme: '/readme',
   'About us': '/aboutus',
+  'admin': '/dashboard',
 };
 
 function NavMenu() {

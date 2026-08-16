@@ -2,6 +2,7 @@ export interface Settings {
   skin: string;
   theme: string;
   starter: string;
+  avatar: string 
 }
 
 export interface UserStats {

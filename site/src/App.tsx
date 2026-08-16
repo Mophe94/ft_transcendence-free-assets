@@ -49,6 +49,9 @@ function App() {
 		      <Route path='/private_policy' element={<PrivacyPolity />} />
 		      <Route path='/terms_conditions' element={<TermsConditions />} />
         </Route>
+    
+          <Route path="/dashboard" element={<Dashboard />} />
+        
         <Route element={<AppLayout />}>
           <Route path='/test' element={<Test />} />
           <Route path="*" element={<ErrorDisplay msg="Page not found" code={404} />} />

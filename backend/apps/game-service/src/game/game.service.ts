@@ -9,6 +9,7 @@ import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.serv
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
+import { RoomService } from 'apps/game-service/src/shared/room.service';
 
 @Injectable()
 export class GameService {
