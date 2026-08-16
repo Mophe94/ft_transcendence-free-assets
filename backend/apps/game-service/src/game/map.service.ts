@@ -203,9 +203,6 @@ export class MapService {
       if (skill[3])
         console.log(player.battle_team[slot].name, skill[2].name, skill[2].data, skill[2].value);
     }
-
-    //await new Promise(resolve => setTimeout(resolve, 1000)); // ! temp fix to synchronizeke with startCombatTimer
-    //return this.combat(player);
     return undefined;
   }
 

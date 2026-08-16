@@ -6,13 +6,13 @@ export interface GamePayload {
   };
 }
 
-export const FULL = 2;
+export const FULL = 4;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 10,
+  map: 90,
   team_setup: 10,
-  choose_action: 50,
+  choose_action: 20,
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;
