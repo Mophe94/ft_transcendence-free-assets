@@ -4,7 +4,8 @@ import unit from "../assets/Units/Unit_05.png"
 import online from '../assets/buttons/status_buttons/online.png';
 import offline from '../assets/buttons/status_buttons/offline.png';
 import remove from '../assets/buttons/close.png';
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFriends } from "../hooks/useFriends";
 
 export default function CurrentFriends() {
   const queryClient = useQueryClient();
@@ -20,18 +21,19 @@ export default function CurrentFriends() {
     });
   }
 
-  const { data: currentFriends = [], isLoading, isError } = useQuery({
-    queryKey: ['friends', 'currentFriends'],
-    queryFn: async () => {
-      return fetch(`${import.meta.env.VITE_USERS_SERVICE}/friends/`, {
-        method: 'GET',
-        credentials: 'include',
-      }).then((res) => {
-        if (!res.ok) throw new Error('error loading');
-        return res.json();
-      });
-    },
-  });
+  const { data: currentFriends = [], isLoading, isError } = useFriends();
+  // useQuery({
+  //   queryKey: ['friends', 'currentFriends'],
+  //   queryFn: async () => {
+  //     return fetch(`${import.meta.env.VITE_USERS_SERVICE}/friends/`, {
+  //       method: 'GET',
+  //       credentials: 'include',
+  //     }).then((res) => {
+  //       if (!res.ok) throw new Error('error loading');
+  //       return res.json();
+  //     });
+  //   },
+  // });
   if (isLoading) return <div>Loading...</div>;
   else console.log(currentFriends)
   if (isError) return <div>Error while Loading.</div>;
