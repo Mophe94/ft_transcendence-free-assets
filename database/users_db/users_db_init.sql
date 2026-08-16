@@ -119,7 +119,7 @@ CREATE TABLE public.users_stats (
     games_lost integer DEFAULT 0 CONSTRAINT users_stat_games_lost_not_null NOT NULL,
     total_player_defeated integer DEFAULT 0 CONSTRAINT users_stat_total_player_defeated_not_null NOT NULL,
     nb_monsters_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_monsters_discovered_not_null NOT NULL,
-    nb_ending_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_ending_discovered_not_null NOT NULL,
+    nb_endings_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_endings_discovered_not_null NOT NULL,
     nb_achievements integer DEFAULT 0 CONSTRAINT users_stat_nb_achievements_not_null NOT NULL,
     created_at timestamp with time zone DEFAULT now() CONSTRAINT users_stat_created_at_not_null NOT NULL,
     updated_at time with time zone DEFAULT now() CONSTRAINT users_stat_updated_at_not_null NOT NULL
@@ -164,7 +164,7 @@ COPY public.users (id, email, username, password_hash, is_onboarded, created_at,
 -- Data for Name: users_stats; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users_stats (user_id, games_played, games_won, games_lost, total_damage_dealt, total_damage_received, nb_monsters_discovered, nb_objects_discovered, nb_achievements, created_at, updated_at) FROM stdin;
+COPY public.users_stats (user_id, games_played, games_won, games_lost, total_player_defeated, nb_monsters_discovered, nb_endings_discovered, nb_achievements, created_at, updated_at) FROM stdin;
 \.
 
 
