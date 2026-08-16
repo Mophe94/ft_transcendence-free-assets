@@ -13,7 +13,7 @@ elif [ "$1" -lt 1 ]; then
     echo "[ERROR][$SCRIPT_NAME] TARGET_MANAGERS must be >= 1"
     exit 1
 elif [ "$(($1 % 2))" -eq 0 ]; then
-    echo "[ERROR][$SCRIPT_NAME] TARGET_MANAGERS must be odd: $TARGET_MANAGERS"
+    echo "[ERROR][$SCRIPT_NAME] TARGET_MANAGERS must be an odd number: "$1""
     exit 1
 else
     TARGET_MANAGERS="$1"
@@ -65,8 +65,8 @@ wait_for_manager() {
         fi
         reachability=$(docker node inspect "$node_id" \
             --format '{{.ManagerStatus.Reachability}}' 2>/dev/null)
-        case "$reachability" in
-            Reachable|Leader) return 0;;
+        case "${reachability,,}" in
+            reachable|leader) return 0;;
             "");;
             *) echo "[ERROR][$SCRIPT_NAME] Unexpected status for node $node_id: $reachability"
                return 1;;
@@ -112,11 +112,10 @@ while [ "$managers" -lt "$TARGET_MANAGERS" ]; do
         exit 1
     fi
     worker=$(
-        docker node ls \
-            --filter role=worker \
-            --filter availability=active \
-            --format '{{.ID}}' |
-        head -n 1
+	docker node ls \
+	    --filter role=worker \
+	    --format '{{.ID}} {{.Status}} {{.Availability}}' |
+	awk '$2 == "Ready" && $3 == "Active" { print $1; exit }'
     )
     if [ -z "$worker" ]; then
         echo "[WARNING][$SCRIPT_NAME] No available worker to promote"
