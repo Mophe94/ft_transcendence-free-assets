@@ -8,7 +8,6 @@ import { EntityModule } from './entities/entity.module';
 import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
 import { MapService } from './map.service';
-
 @Module({
   providers: [
     GameGateway,

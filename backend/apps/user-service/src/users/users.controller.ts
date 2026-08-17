@@ -51,8 +51,8 @@ export class UsersController {
         gamesPlayed: user.stats.gamesPlayed,
         nbAchievements: user.stats.nbAchievements,
         nbMonstersDiscovered: user.stats.nbMonstersDiscovered,
-        nbObjectsDiscovered: user.stats.nbObjectsDiscovered,
-        totalDamageDealt: user.stats.totalDamageDealt,
+        nbObjectsDiscovered: user.stats.nbEndingsDiscovered,
+        totalPlayerDefeated: user.stats.totalPlayersDefeated,
         // totalDamageReceived: user.stats.totalDamageReceived,
       },
     };

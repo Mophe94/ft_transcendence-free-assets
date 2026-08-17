@@ -9,6 +9,7 @@ import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.serv
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
+import { RoomService } from 'apps/game-service/src/shared/room.service';
 
 @Injectable()
 export class GameService {
@@ -144,7 +145,6 @@ export class GameService {
   }
 
   private async eliminatePlayer(userId: string, roomId: string): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 11000)); // ! "temp fix to synchronizeke"
     console.log(
       `[GameService] Eliminating player ${userId} from room ${roomId}`,
     );
@@ -157,7 +157,7 @@ export class GameService {
   }
 
   private sendToPlayer(userId: string, payload: object): void {
-    //console.log("Send_to_player: id: ", userId);
+    console.log("Send_to_player: id: ", userId);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
@@ -193,7 +193,8 @@ export class GameService {
       console.log('Active Players last winner:  ', active);
       console.log('Connected Players last winner: ', connected);
       console.log('*********************************************');
-      //this.deleteEndGame(roomId, active[0])
+      this.deleteEndGame(roomId, active[0])
+      console.log("Game rooms end game: ", this.gameRooms);
       //console.log(`End of game: everything should be cleanup at this point!`);
       return;
     }
@@ -310,6 +311,7 @@ export class GameService {
   }
 
   private startNewTurn(combatRoomId: string, room: Set<string>) {
+    
     const timerKey = combatRoomId ? `combat: ${combatRoomId}` : undefined;
     if (!combatRoomId) {
       console.log('[GameService] - StartNewTurn -> combatRoomId undefined');
@@ -319,26 +321,7 @@ export class GameService {
 
     this.phaseTimer.start(timerKey, 'choose_action', () => {
       console.log(`Room ${combatRoomId} choose_action timeout`);
-      // const room = this.combatService.combatRooms.get(combatRoomId);
-      // if (!room) {
-      //     console.log("Combat room not found");
-      //     return;
-      // }
-      // const [ userId, userId2 ] = room;
-      // let player = this.playerService.getPlayer(userId);
-      // let player2 = this.playerService.getPlayer(userId2);
-      // if (!player || !player2)
-      //   return;
-      // if (player.currentActions.actionType === undefined) {
-      //   player.currentActions.actionType = "pass";
-      //   // need to create a getter
-      //   this.combatService.handle_action(player, player2, player.currentActions, 1);
-      // }
-      // if (player2.currentActions.actionType === undefined) {
-      //   player2.currentActions.actionType = "pass";
-      //   // need to create a getter
-      //   this.combatService.handle_action(player2, player, player2.currentActions, 1);
-      // }
+      this.actionTimeout(combatRoomId);
     });
 
     const actionTimer =
@@ -348,6 +331,44 @@ export class GameService {
       this.playerService.getPlayer(userId)!.timer = actionTimer;
     }
     console.log('New Turn timer started');
+  }
+
+  private actionTimeout(combatRoomId: string): void {
+    const room = this.combatService.combatRooms.get(combatRoomId);
+    if (!room) {
+      console.log( `[GameService] actionTimeout -> unknow combat room ${combatRoomId}`);
+      return;
+    }
+
+    const [userId, userId2] = room;
+    const player = this.playerService.getPlayer(userId);
+    const player2 = this.playerService.getPlayer(userId2);
+    if (!player || !player2) {
+      console.log(`[GameService]: actionTimeout -> missing player(s) for room ${combatRoomId}`);
+      return
+    }
+
+    console.log("player.currentActions BEFORE; ", player.currentActions.actionType);
+    console.log("player2.currentActions BEFORE; ", player2.currentActions.actionType);
+
+    // if (player.forceChooseMonster) -> if !currentMonster 
+
+    if (player.currentActions.actionType === undefined)
+      this.autoPass(userId, player);
+    if (player2.currentActions.actionType === undefined)
+      this.autoPass(userId2, player2);
+
+    this.resolveTurn(userId, player, player2);
+  }
+
+  private autoPass(userId: string, player: Player): void {
+    if (player.currentActions.actionType !== undefined) return;
+
+    console.log(`[GameService]: Auto-pass for player ${userId} (timeout)`);
+    player.currentActions = {
+      actionType: 'pass',
+      data: {state: 'pass'},
+    }
   }
 
   private has_valid_monsters(player: Player): boolean {
@@ -370,6 +391,8 @@ export class GameService {
     console.log('STATE', state);
 
     if (state === 'safe_to_disconnect') {
+      //sleep
+      await new Promise<void>(resolve => setTimeout(resolve, 5000));
       if (player.status === 'loser')
         await this.eliminatePlayer(player.id, roomId);
       if (player.status === 'winner' && player.roundsRemaining === 0)
@@ -429,6 +452,7 @@ export class GameService {
           payload.battle_team,
         );
         if (error) {
+          console.log("TEAM CHOICE PAYLOAD ERROR", error);
           result = error;
           break;
         }
@@ -439,8 +463,8 @@ export class GameService {
           this.sendToPlayer(userId, this.mapService.combat(player));
           this.sendToPlayer(userId2, this.mapService.combat(player2));
         }
-        // else
-        //   result = {event: 'game', data: { state: 'waiting_for_opponent'}};
+        else
+        result = {event: 'game', data: { state: 'waiting_for_opponent'}};
         break;
     }
       case 'change_current_monster':
@@ -480,16 +504,19 @@ export class GameService {
       return;
     }
 
-    let playerForce: Player = this.playerService.initDefaultPlayer();
+    let playerForce: Player | undefined = undefined;
     if (player.forceChooseMonster) playerForce = player;
     else if (player2?.forceChooseMonster) playerForce = player2;
 
     const userId2 = this.combatService.getOpponentId(userId);
     if (!userId2) return;
 
+    console.log("player.currentActions; ", player.currentActions.actionType);
+    console.log("player2.currentActions; ", player2.currentActions.actionType);
+
     const bothPlayersActed =
       !!player.currentActions.actionType && !!player2.currentActions.actionType;
-    if (!bothPlayersActed && !playerForce.forceChooseMonster) return;
+    if (!bothPlayersActed && !playerForce?.forceChooseMonster) return;
 
     const roundResolved = this.applyBattleRound(
       player,
@@ -520,9 +547,12 @@ export class GameService {
       );
     } else {
       endOfBattle = false;
+      console.log("PLAYER ACTION BEFORE NEW TURN", player.currentActions.actionType);
+      console.log("PLAYER2 ACTION BEFORE NEW TURN", player2.currentActions.actionType);
       this.startNewTurn(combatRoomId, new Set([userId, userId2]));
       this.sendToPlayer(userId, this.combatService.new_turn(player));
       this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+
       // si un combat deja finish declenchement du roundLeft
       // send new_turn(player, rounLeft)
       // send new_turn(player, roundLeft)
@@ -539,12 +569,12 @@ export class GameService {
     userId: string,
     userId2: string,
   ): boolean {
+
     const mapResult = this.combatService.resolving_battle_round(
       player,
       player2,
     );
-    player.currentActions.actionType = undefined;
-    player2.currentActions.actionType = undefined;
+
 
     if (
       !mapResult ||
@@ -562,6 +592,10 @@ export class GameService {
       this.sendToPlayer(userId, messagesForPlayer.at(i)!);
       this.sendToPlayer(userId2, messagesForPlayer2.at(i)!);
     }
+
+    player.currentActions.actionType = undefined;
+    player2.currentActions.actionType = undefined;
+
     return true;
   }
 
@@ -606,11 +640,11 @@ export class GameService {
     return false;
   }
 
-  private finalizeBattleEnd(
+  private async finalizeBattleEnd(
     player: Player,
     player2: Player,
     combatRoomId: string,
-  ): void {
+  ): Promise<void> {
     const winner = player.status === 'loser' ? player2 : player;
     const loser = player.status === 'loser' ? player : player2;
 
@@ -621,6 +655,7 @@ export class GameService {
 
     console.log('END OF BATTLE: ROUNDS LEFT: ', player.roundsRemaining);
     // WINNER SCENE -END OF GAME
+    console.log("COUNT: ", winner.roundsRemaining);
     if (winner.roundsRemaining === 0)
       this.sendToPlayer(winner.id, {
         event: 'game',

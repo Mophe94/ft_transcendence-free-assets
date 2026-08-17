@@ -1,14 +1,12 @@
-import './RegularBg.css';
-
 import imgUL from '../assets/background/regular_paper/regular_paper_UL.png';
 import imgUM from '../assets/background/regular_paper/regular_paper_UM.png';
 import imgUR from '../assets/background/regular_paper/regular_paper_UR.png';
 import imgML from '../assets/background/regular_paper/regular_paper_ML.png';
 import imgMM from '../assets/background/regular_paper/regular_paper_MM.png';
 import imgMR from '../assets/background/regular_paper/regular_paper_MR.png';
-import imgDL from '../assets/background/regular_paper/regular_paper_DL.png';
-import imgDM from '../assets/background/regular_paper/regular_paper_DM.png';
-import imgDR from '../assets/background/regular_paper/regular_paper_DR.png';
+import imgBL from '../assets/background/regular_paper/regular_paper_DL.png';
+import imgBM from '../assets/background/regular_paper/regular_paper_DM.png';
+import imgBR from '../assets/background/regular_paper/regular_paper_DR.png';
 
 const regStyles = {
   '--img-ul': `url(${imgUL})`,
@@ -17,25 +15,25 @@ const regStyles = {
   '--img-ml': `url(${imgML})`,
   '--img-mm': `url(${imgMM})`,
   '--img-mr': `url(${imgMR})`,
-  '--img-dl': `url(${imgDL})`,
-  '--img-dm': `url(${imgDM})`,
-  '--img-dr': `url(${imgDR})`,
+  '--img-bl': `url(${imgBL})`,
+  '--img-bm': `url(${imgBM})`,
+  '--img-br': `url(${imgBR})`,
 } as React.CSSProperties;
 
 export default function RegularBG({ children }: { children: React.ReactNode }) {
   return (
-    <div className='regbg-layout' style={regStyles}>
-      <div className="regbg-upperLeft" />
-      <div className="regbg-upperMiddle" />
-      <div className="regbg-upperRight" />
-      <div className="regbg-middleLeft" />
-      <div className="regbg-middleMiddle">
+    <div className='grid grid-cols-[52px_1fr_52px] grid-rows-[44px_1fr_43px] gap-0' style={regStyles}>
+      <div className="bg-(image:--img-ul) bg-no-repeat" />
+      <div className="bg-(image:--img-um) bg-[round_no-repeat]" />
+      <div className="bg-(image:--img-ur) bg-no-repeat" />
+      <div className="bg-(image:--img-ml) bg-[no-repeat_round]" />
+      <div className="relative bg-(image:--img-mm)">
           { children }
       </div>
-      <div className="regbg-middleRight" />
-      <div className="regbg-bottomLeft" />
-      <div className="regbg-bottomMiddle" />
-      <div className="regbg-bottomRight" />
+      <div className="bg-(image:--img-mr) bg-[no-repeat_round]" />
+      <div className="bg-(image:--img-bl) bg-no-repeat" />
+      <div className="bg-(image:--img-bm) bg-[round_no-repeat]" />
+      <div className="bg-(image:--img-br) bg-no-repeat" />
     </div>
   );
 }

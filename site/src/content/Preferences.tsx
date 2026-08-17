@@ -28,17 +28,17 @@ const THEMES = [
   ['dark', moonTheme],
 ];
 
-const SKINS = [
-  ['dinoGreen', dinoGreen],
-  ['dinoBlue', dinoBlue],
-  ['dinoRed', dinoRed],
-  ['dinoYellow', dinoYellow],
-  ['ghost', ghost],
-  ['ghost02', ghost02],
-  ['ghost03', ghost03],
-  ['satyr01', satyr01],
-  ['satyr02', satyr02],
-  ['satyr03', satyr03],
+export const AVATARS = [
+  ['DinoGreen', dinoGreen],
+  ['DinoBlue', dinoBlue],
+  ['DinoRed', dinoRed],
+  ['DinoYellow', dinoYellow],
+  ['Ghost', ghost],
+  ['Ghost02', ghost02],
+  ['Ghost03', ghost03],
+  ['Satyr01', satyr01],
+  ['Satyr02', satyr02],
+  ['Satyr03', satyr03],
 ];
 
 const STARTERS = [
@@ -82,7 +82,7 @@ export default function Preferences() {
             }
           }
           if (data.skin !== null) {
-            const aIndex = SKINS.findIndex(([k]) => k === data.skin);
+            const aIndex = AVATARS.findIndex(([k]) => k === data.skin);
             if (aIndex !== -1) setSkinId(aIndex);
           }
         }
@@ -99,7 +99,7 @@ export default function Preferences() {
   }
 
   const incrAvatarId = () => {
-    if (avatar_id < SKINS.length - 1) setSkinId(avatar_id + 1);
+    if (avatar_id < AVATARS.length - 1) setSkinId(avatar_id + 1);
   };
   const decrAvatarId = () => {
     if (avatar_id > 0) setSkinId(avatar_id - 1);
@@ -137,7 +137,7 @@ export default function Preferences() {
     setIsSaving(true);
     const updatedSettingsPayload = {
       starter: STARTERS[starter_id][0],
-      skin: SKINS[avatar_id][0],
+      skin: AVATARS[avatar_id][0],
       theme: THEMES[theme_id][0],
     };
     try {

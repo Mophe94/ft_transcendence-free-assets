@@ -127,21 +127,10 @@ What I'm proudest of is exactly that: not settling for a minimum viable product,
           "
         >
           <div className="text-justify">
-            <b>en</b><br/><br/>
+            I got into programming in 2025 after a career path that was as varied as it was unpredictable, followed by a forced break that turned out to be beneficial. As a huge fan of video games and geek culture in general, this career change was a natural extension of my interests.
+            When we launched this project, we had only two rules: if we already knew how to use a technology, we wouldn’t use it, and we weren’t allowed to buy asset packs. Needless to say, we had a lot of fun!
+            I’m very proud of the final result: it really looks like the kind of game I’d love to spend my free time playing. The fact that we designed a scalable architecture is a real plus—which means, in a way, that the adventure will never end.
 
-I got into programming in 2025 after a career path that was as varied as it was unpredictable, followed by a forced break that turned out to be beneficial. As a huge fan of video games and geek culture in general, this career change was a natural extension of my interests.
-
-When we launched this project, we had only two rules: if we already knew how to use a technology, we wouldn’t use it, and we weren’t allowed to buy asset packs. Needless to say, we had a lot of fun!
-
-I’m very proud of the final result: it really looks like the kind of game I’d love to spend my free time playing. The fact that we designed a scalable architecture is a real plus—which means, in a way, that the adventure will never end.
-
-<br/><br/><b>fr</b><br/><br/>
-
-Je me suis lancé dans la programmation en 2025 après un parcours professionnel aussi varié qu’imprévisible, suivi d’une pause forcée qui s’est avérée salutaire. Grand passionné de jeux vidéo et de la culture geek en général, cette reconversion était le prolongement naturel de mes centres d’intérêt.
-
-En lançant ce projet, nous n’avions que deux consignes : si on maîtrise déjà une technologie, on ne l’utilise pas, et interdiction d’acheter des packs d’assets. Autant dire qu’on a bien rigolé!
-
-Je suis très fier du résultat final : il ressemble vraiment au genre de jeu sur lequel j’aimerais passer mon temps libre. Le fait d’avoir conçu une architecture scalable est un vrai plus, ce qui signifie, en quelque sorte, que l’aventure n’aura jamais de fin.
           </div>
         </div>
       </div>
@@ -182,7 +171,7 @@ Je suis très fier du résultat final : il ressemble vraiment au genre de jeu su
           "
         >
           <div className="text-justify">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut porttitor pharetra accumsan. Etiam ipsum sapien, finibus at sagittis nec, sagittis in quam. Fusce eu facilisis augue. Mauris eleifend, lectus a ultrices luctus, dui dolor pharetra turpis, ac vehicula neque elit at dui. Donec accumsan diam sed ipsum pretium, non sollicitudin mi sagittis. Quisque laoreet lorem eu mi volutpat efficitur. Pellentesque a ipsum augue. Ut quis enim eu diam viverra pulvinar. Fusce mi quam, molestie non elit eget, faucibus accumsan mi. Phasellus neque massa, viverra vitae arcu non, dictum vehicula augue.
+            As a developer bridging the gap between front and back end, I spend my time connecting frameworks, optimizing performance, and structuring our data flow. I really enjoy taking messy, complex logic and turning it into a clean, readable architecture that’s easy for everyone to build on. I naturally gravitate toward pragmatic design, making sure the codebase stays light, fast, and straightforward behind the scenes. Whether it’s solving a tricky bug, resolving a bad merge conflict, or jumping into a pair-programming session, I’m always ready to help keep the team moving forward smoothly.
           </div>
         </div>
       </div>

@@ -300,33 +300,42 @@ items
 
 | Feature | Description | Team Member(s) |
 |---------|-------------|----------------|
-| Authentication | Login, JWT-based sessions, token refresh | TBD |
-| User Profile | Avatar upload, stats display, match history | TBD |
-| Friends System | Add, remove, block users; see online status | TBD |
-| General Chat | Real-time messaging open to all connected users | TBD |
-| Map Selection | Vote-based map selection at the start of a game | TBD |
-| Starter Selection | Choose starting monster before exploration phase | TBD |
-| Map Exploration | Navigate the map, collect loot, fight wild encounters for XP | TBD |
-| Loot System | Items granting combat advantages, collectible on the map | TBD |
-| Monster XP & Evolution | Gain XP from battles/loot; monsters evolve at thresholds | TBD |
-| Matchmaking | Queue system, lobby creation, AI fill for missing players | TBD |
-| Turn-Based Combat | Attack, use item, switch monster; ends when one team is wiped | TBD |
-| AI Opponent | Bot player that fills missing slots or acts as a solo opponent | TBD |
-| Post-Match Stats | Automatic stats and history update after each match | TBD |
-| End-Game Chat | Temporary chat room opened between players after a match | TBD |
-| Notifications | Real-time push alerts (match found, your turn, friend request) | TBD |
-| Leaderboard | Global ranking display based on player stats | TBD |
-| Spectator Mode | Watch an ongoing match without participating | TBD |
-| Tournament System | Bracket-based tournaments with automated matchmaking | TBD |
-| Game Customization | Options to adjust game rules or visuals before starting | TBD |
-| Gamification | Rewards and achievements for player milestones | TBD |
-| PWA Support | Install the app, use it offline with cached assets | TBD |
-| WCAG 2.1 AA Accessibility | Screen reader support, full keyboard navigation | TBD |
-| Multi-browser Support | Tested and functional on ≥ 2 additional browsers | TBD |
-| GDPR Compliance | Data export, deletion requests, cookie consent | TBD |
-| ELK Log Management | Centralized logging, searchable via Kibana dashboard | TBD |
-| Public API | Secured API with key auth, rate limiting, and documentation | TBD |
+  Major: Use a framework for both the frontend and backend.
+◦ Use a frontend framework (React, Vue, Angular, Svelte, etc.).
+◦ Use a backend framework (Express, NestJS, Django, Flask, Ruby on Rails,
+etc.).
+◦ Full-stack frameworks (Next.js, Nuxt.js, SvelteKit) count as both if you use
+both their frontend and backend capabilities
 
+Major: Implement real-time features using WebSockets or similar technology.
+
+Minor: Use an ORM for the database.
+
+Minor: Custom-made design system with reusable components, including a proper
+color palette, typography, and icons (minimum: 10 reusable components).
+
+Minor: Support for additional browsers.
+
+Minor: Implement remote authentication with OAuth 2.0 (Google, GitHub, 42,
+etc.).
+
+Major: Introduce an AI Opponent for games.
+
+Major: Implement a complete web-based game where users can play against each
+other.
+
+Major: Multiplayer game (more than two players).
+◦ Support for three or more players simultaneously.
+◦ Fair gameplay mechanics for all participants.
+◦ Proper synchronization across all clients.
+
+Minor: Game customization options
+
+ Major: Backend as microservices
+
+ Major swarm 
+ major godot game engine  a check 
+ 
 ---
 
 ## Modules

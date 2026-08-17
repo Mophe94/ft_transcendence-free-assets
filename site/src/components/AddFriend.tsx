@@ -2,7 +2,7 @@ import { ButtonColor } from "../constants/Colors";
 import ColoredButton from "./buttons/ColoredButton";
 import Heading from "./heading/Heading";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PendingRequests from "../content/PendingRequests";
 
 

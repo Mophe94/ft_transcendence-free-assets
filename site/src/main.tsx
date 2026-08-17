@@ -6,10 +6,10 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthProvider.tsx';
 import { ThemeProvider } from './context/ThemeProvider.tsx';
 import { NotificationProvider } from './context/NotifProvider.tsx';
+import { LobbySocketProvider } from './context/LobbySocketContext.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
-
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
   <QueryClientProvider client={queryClient}>
@@ -17,11 +17,13 @@ createRoot(document.getElementById('root')!).render(
       <NotificationProvider>
         <ThemeProvider>
           <BrowserRouter>
-            <App />
+            <LobbySocketProvider>
+              <App />
+            </LobbySocketProvider>
           </BrowserRouter>
         </ThemeProvider>
       </NotificationProvider>
     </AuthProvider>
-   </QueryClientProvider>
+  </QueryClientProvider>
   /* </StrictMode> */
 );
