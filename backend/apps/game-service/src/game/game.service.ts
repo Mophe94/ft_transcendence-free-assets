@@ -189,9 +189,8 @@ export class GameService {
       this.combatService.matchmake(connected);
       this.startMapPhase(roomId, connected, true);
     } else if (allCombatsFinished && active.size === 1) {
-      //To do big cleaning of the winner / room etc
-      console.log('Active Players last winner:  ', active);
-      console.log('Connected Players last winner: ', connected);
+      //console.log('Active Players last winner:  ', active);
+      //console.log('Connected Players last winner: ', connected);
       console.log('*********************************************');
       this.deleteEndGame(roomId, active[0])
       console.log("Game rooms end game: ", this.gameRooms);
@@ -290,10 +289,16 @@ export class GameService {
 
       const opponentId = this.combatService.getOpponentId(userId);
       const combatRoomId = this.combatService.playerCombatRoom.get(userId);
+      if (!combatRoomId) {
+        console.log(`[GameService]: start CombatPhase -> missing combatRoomId for ${userId}`);
+        continue;
+      }
+      
       const timerKey = `combat: ${combatRoomId}`;
 
       this.phaseTimer.start(timerKey, 'choose_action', () => {
         console.log(`Combat ${roomId} choose_action timeout`);
+        this.actionTimeout(combatRoomId);
       });
 
       const combatTimer =
@@ -352,13 +357,43 @@ export class GameService {
     console.log("player2.currentActions BEFORE; ", player2.currentActions.actionType);
 
     // if (player.forceChooseMonster) -> if !currentMonster 
-
-    if (player.currentActions.actionType === undefined)
-      this.autoPass(userId, player);
-    if (player2.currentActions.actionType === undefined)
-      this.autoPass(userId2, player2);
+    const forcedMonster = player.forceChooseMonster || player2.forceChooseMonster;
+    if (forcedMonster) {
+      if (player.forceChooseMonster && player.currentActions.actionType === undefined) {
+          this.autoChooseMonster(userId, player);
+      }
+      if (player2.forceChooseMonster && player2.currentActions.actionType === undefined) {
+        this.autoChooseMonster(userId2, player2);
+      }
+    }
+    else {
+      if (player.currentActions.actionType === undefined) {
+        if (this.needMonsterChoice(player))
+          this.autoChooseMonster(userId, player);
+        else
+          this.autoPass(userId, player);
+      }
+      if (player2.currentActions.actionType === undefined) {
+        if (this.needMonsterChoice(player2))
+          this.autoChooseMonster(userId2, player2);
+        else this.autoPass(userId2, player2);
+      }
+    }
 
     this.resolveTurn(userId, player, player2);
+  }
+
+  private needMonsterChoice(player: Player): boolean {
+    return player.currentMonster.name === "" || player.currentMonster.life.current <= 0;
+  }
+
+  private autoChooseMonster(userId: string, player: Player): void {
+    if (player.currentActions.actionType !== undefined) return;
+    console.log(`[GameService]: Auto-choose monster for player ${userId} (timeout)`);
+    player.currentActions = { 
+      actionType: 'change_current_monster',
+      data: { slot: -1, state: 'change_current_monster'},
+    }
   }
 
   private autoPass(userId: string, player: Player): void {
@@ -391,8 +426,9 @@ export class GameService {
     console.log('STATE', state);
 
     if (state === 'safe_to_disconnect') {
-      //sleep
+
       await new Promise<void>(resolve => setTimeout(resolve, 5000));
+      
       if (player.status === 'loser')
         await this.eliminatePlayer(player.id, roomId);
       if (player.status === 'winner' && player.roundsRemaining === 0)
@@ -477,12 +513,6 @@ export class GameService {
         };
         this.resolveTurn(userId, player, player2);
         break;
-      // case 'safe_to_disconnect':
-      //   if (player.status === 'loser')
-      //     await this.eliminatePlayer(player.id, roomId);
-      //   if (player.status === 'winner' && player.roundsRemaining === 0)
-      //     await this.eliminatePlayer(player.id, roomId);
-      //   break;
       default:
         console.log('Unknow state:', state);
         return undefined;
@@ -628,6 +658,18 @@ export class GameService {
     }
 
     koPlayer.forceChooseMonster = true;
+
+    // AutoChooseMonster case
+    const combatRoomId = this.combatService.playerCombatRoom.get(userId);
+    if (combatRoomId) {
+      this.startNewTurn(combatRoomId, new Set([userId, userId2]));
+      this.sendToPlayer(userId, this.combatService.new_turn(player));
+      this.sendToPlayer(userId, this.combatService.new_turn(player));
+    }
+    else {
+      console.log(`[GameService]: resolveMonsterKO -> missing combatRoomIdfor ${userId}`);
+    }
+
     this.sendToPlayer(
       userId,
       this.combatService.change_monster(player, koPlayer.id),

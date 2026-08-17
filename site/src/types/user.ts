@@ -5,14 +5,17 @@ export interface Settings {
   avatar: string 
 }
 
-export interface UserStats {
-  totalDamageDealt: number;
-  totalDamageReceived: number;
+export interface UsersStats {
+  userId: string;
+  gamesPlayed: number;
   gamesWon: number;
   gamesLost: number;
-  gamesPlayed: number;
+  totalPlayerDefeated: number;
+  monstersDiscovered: string[];
   nbMonstersDiscovered: number;
-  nbObjectsDiscovered: number;
+  endingsDiscovered: string[];
+  nbEndingsDiscovered: number;
+  achievements: string[];
   nbAchievements: number;
 }
 
