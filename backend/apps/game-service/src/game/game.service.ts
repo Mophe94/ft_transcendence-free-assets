@@ -9,7 +9,6 @@ import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.serv
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
-import { RoomService } from 'apps/game-service/src/shared/room.service';
 
 @Injectable()
 export class GameService {
@@ -80,8 +79,8 @@ export class GameService {
     console.log(`Size = ${roomPlayers.size}, RoomId = ${roomId}`);
 
     // Init or retrieve Player
-    if (!this.playerService.getPlayer(userId))
-      this.playerService.initPlayer(userId);
+    //if (!this.playerService.getPlayer(userId))
+    this.playerService.initPlayer(userId);
     const player = this.playerService.getPlayer(userId)!;
 
     // change FULL for real room capacity
@@ -138,10 +137,44 @@ export class GameService {
     /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
     await this.redisStateService.removePlayer(userId.toString());
     /////////////////////////////////* END */////////////////////////////////
+
+    const player = this.playerService.getPlayer(userId);
+    const wasEliminated = player?.status === 'loser' || (player?.status === 'winner' && player.roundsRemaining === 0);
+
     this.leaveGameRoom(roomId, userId);
     this.activePlayersByRoom.get(roomId)?.delete(userId);
 
-    this.startNextRound(roomId);
+    if (wasEliminated)
+      this.startNextRound(roomId);
+    else
+      this.deleteAbortedGame(roomId, userId);
+  }
+
+  // Big cleaning -> see with IA
+  private deleteAbortedGame(roomId: string, disconnectedUserId: string): void {
+    const remaining = this.gameRooms.get(roomId);
+    const allInvolved = new Set(remaining ?? []);
+    allInvolved.add(disconnectedUserId);
+
+    for (const id of allInvolved) {
+      const combatRoomId = this.combatService.playerCombatRoom.get(id);
+      if (combatRoomId) {
+        this.combatService.combatRooms.delete(combatRoomId);
+        this.phaseTimer.clear(`combat: ${combatRoomId}`);
+      }
+      this.combatService.playerCombatRoom.delete(id);
+      this.roomIdByPlayer.delete(id);
+      if (id !== disconnectedUserId)
+       this.eventEmitter.emit('close_player_socket', { userId: id });
+    }
+    this.combatService.playerCombatRoom.delete(disconnectedUserId);
+    this.roomIdByPlayer.delete(disconnectedUserId);
+
+    this.phaseTimer.clear(`game: ${roomId}`);
+
+    this.gameRooms.delete(roomId);
+    this.activePlayersByRoom.delete(roomId);
+    this.authorizedPlayers.delete(roomId);
   }
 
   private async eliminatePlayer(userId: string, roomId: string): Promise<void> {
@@ -157,7 +190,7 @@ export class GameService {
   }
 
   private sendToPlayer(userId: string, payload: object): void {
-    console.log("Send_to_player: id: ", userId);
+    //console.log("Send_to_player: id: ", userId);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
@@ -192,18 +225,24 @@ export class GameService {
       //console.log('Active Players last winner:  ', active);
       //console.log('Connected Players last winner: ', connected);
       console.log('*********************************************');
-      this.deleteEndGame(roomId, active[0])
+      const winnerId = [...active][0];
+      if (winnerId) {
+        this.deleteEndGame(roomId, winnerId);
+        this.combatService.playerCombatRoom.delete(winnerId);
+      }
       console.log("Game rooms end game: ", this.gameRooms);
       //console.log(`End of game: everything should be cleanup at this point!`);
       return;
     }
   }
 
-  private deleteEndGame(roomId: string, userId: string) : void {
+  private deleteEndGame(roomId: string, winnerId: string) : void {
+    this.phaseTimer.clear(`game: ${roomId}`);
     this.gameRooms.delete(roomId);
     this.activePlayersByRoom.delete(roomId);
     this.authorizedPlayers.delete(roomId);
-    this.roomIdByPlayer.delete(userId);
+    this.roomIdByPlayer.delete(winnerId);
+    this.combatService.playerCombatRoom.delete(winnerId);
 
     Promise.all([
       //this.redisStateService.removePlayer(userId),
@@ -695,9 +734,7 @@ export class GameService {
     this.combatService.combatRooms.delete(combatRoomId);
     this.phaseTimer.clear(`combat: ${combatRoomId}`);
 
-    console.log('END OF BATTLE: ROUNDS LEFT: ', player.roundsRemaining);
     // WINNER SCENE -END OF GAME
-    console.log("COUNT: ", winner.roundsRemaining);
     if (winner.roundsRemaining === 0)
       this.sendToPlayer(winner.id, {
         event: 'game',
