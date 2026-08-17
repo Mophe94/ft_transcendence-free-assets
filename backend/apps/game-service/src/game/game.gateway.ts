@@ -102,13 +102,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private sendToClient(client: WebSocket, message: object | undefined) {
+    if (!message) {
+      console.log('[GameGateway] sendToclient called with undefined payload (skipping)');
+      return
+    }
     if (client.readyState === WebSocket.OPEN) {
-      console.log("Send_Gateway: " , message);
+      //console.log("Send_Gateway: " , message);
       client.send(JSON.stringify(message));
     }
   }
 
-  @Interval(10000)
+  @Interval(30000)
   private heartbeat() {
     this.clients.forEach((data, socket) => {
       if (!data.isAlive) {
@@ -136,14 +140,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const userId = clientData.userId;
 
-    let response = await this.gameService.handleMessage(userId, payload);
-    if (!response) {
-      response = {
-        event: 'game',
-        data: {
-          state: 'undefined payload',
-        },
-      };
+    let response;
+    try {
+      response = await this.gameService.handleMessage(userId, payload);
+    }
+    catch (err) {
+      console.log('[GameGateway] handleMessage error: ', err);
+      response = { event: 'game', data: { state: 'error', message: 'internal error'} };
     }
     this.sendToClient(client, response);
 
