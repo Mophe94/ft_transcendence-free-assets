@@ -7,8 +7,14 @@ export interface Notification {
   type: NotificationType;
 }
 
+export interface Invite {
+  username: string;
+  roomId: string;
+}
+
 interface NotificationContextType {
   showNotification: (message: string, type: NotificationType, duration?: number) => void;
+  showInvite: (username: string, roomId: string, duration?: number) => void;
 }
 
 export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
