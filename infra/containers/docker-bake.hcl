@@ -12,7 +12,7 @@ group "databases" {
 }
 
 group "observ" {
-    targets = ["fluent-bit"]
+    targets = []
 }
 
 group "website" {
