@@ -9,7 +9,6 @@ using_defaults=false
 
 #Base image -->Default value, overide in CONFIG_FILE
 DEFAULT_BASE_DIR="$HOME/sgoinfre/students/stempels/"
-BASE_IMG="vm_node_base.vdi"
 BASE_IMG_SIZE=10240
 
 SSH_KEY_NAME="transcendence_node"
