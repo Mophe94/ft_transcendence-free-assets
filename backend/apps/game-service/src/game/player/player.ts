@@ -11,6 +11,7 @@ export class Player {
   readonly id: string = '';
   readonly name: string = '';
   readonly asset: string = '';
+  isBot: boolean = false; // permet de detecter si ses un bot ou pas 
   currentMonster: CurrentMonster = {
     name: '',
     slot: -1,

@@ -173,7 +173,7 @@ export default function Preferences() {
   };
 
   const starter_img = STARTERS[starter_id] ? STARTERS[starter_id][1] : STARTERS[0][1];
-  const avatar_img = SKINS[avatar_id] ? SKINS[avatar_id][1] : SKINS[0][1];
+  const avatar_img = AVATARS[avatar_id] ? AVATARS[avatar_id][1] : AVATARS[0][1];
   const theme_img = THEMES[theme_id] ? THEMES[theme_id][1] : THEMES[0][1];
 
   return (
@@ -208,7 +208,7 @@ export default function Preferences() {
               src={avatar_img}
               alt="Avatar selection"
             />
-            <RightArrowButton onClick={incrAvatarId} disabled={avatar_id === SKINS.length - 1} />
+            <RightArrowButton onClick={incrAvatarId} disabled={avatar_id === AVATARS.length - 1} />
           </div>
 
           <div className="

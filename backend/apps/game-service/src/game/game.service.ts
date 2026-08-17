@@ -10,6 +10,7 @@ import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
 import { RoomService } from 'apps/game-service/src/shared/room.service';
+import { AiOrchestratorService } from './ai_service/ai.orchestrator.service';
 
 @Injectable()
 export class GameService {
@@ -21,6 +22,7 @@ export class GameService {
     private mapService: MapService,
     private redisService: RedisService,
     private redisStateService: RedisStateService,
+    private aiOrchestrator: AiOrchestratorService,
   ) {}
 
   /*  ATTRIBUTES  */
@@ -93,7 +95,12 @@ export class GameService {
       this.activePlayersByRoom.set(roomId, activePlayers);
     }
     activePlayers.add(userId);
-
+    if (roomPlayers.size === 1) {
+      this.phaseTimer.start(`fill: ${roomId}`, 'lobby', () => {
+        console.log(`[GameService] Room ${roomId} pas remplie à temps -> ajout de bots`);
+        this.fillRoomWithBots(roomId, roomPlayers);
+  });
+}
     console.log('Active Players at start: ', this.activePlayersByRoom);
     console.log('*********************************************');
     player.roundsRemaining = Math.log2(FULL); //this.activePlayersByRoom.get(roomId)?.size! / 2;
@@ -102,6 +109,7 @@ export class GameService {
     if (
       roomPlayers.size === FULL /* this.activePlayersByRoom.get(roomId)?.size */
     ) {
+      this.phaseTimer.clear(`fill: ${roomId}`); // clear
       /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
       for (const userId of roomPlayers) {
         const playerState = this.playerService.getPlayer(userId)!;
@@ -135,6 +143,37 @@ export class GameService {
   async onGodotDisconnected(userId: string, roomId: string): Promise<void> {
     const room = this.gameRooms.get(roomId);
     if (!room || !room.has(userId)) return;
+
+    // --- AI takeover (feature 2) ---
+    // Un bot ne remplace un joueur QUE s'il reste au moins un humain
+    // dans la room pour qui ça a un intérêt. S'il n'en reste aucun,
+    // inutile de laisser des bots jouer entre eux : on nettoie tout à
+    // la place, plus bas.
+    const player = this.playerService.getPlayer(userId);
+    const tournamentOver = player?.status === 'winner' && player.roundsRemaining === 0;
+    const stillInTheRunning = !!player && player.status !== 'loser' && !tournamentOver;
+ 
+    if (stillInTheRunning) {
+      const roomHasOtherHumans = this.hasHumanPlayers(roomId, userId);
+ 
+      if (!roomHasOtherHumans) {
+        console.log(
+          `[GameService] No human players left in room ${roomId} -> deleting room instead of AI takeover`,
+        );
+        await this.cleanupAbandonedRoom(roomId);
+        return;
+      }
+ 
+      const totalRounds = Math.log2(FULL);
+      const round = totalRounds - player.roundsRemaining + 1;
+      this.aiOrchestrator.takeoverPlayer(round, totalRounds, player);
+ 
+      console.log(
+        `[GameService] Player ${userId} disconnected while still in the running -> replaced by AI`,
+      );
+      return;
+    }
+    // --- end AI takeover ---
     /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
     await this.redisStateService.removePlayer(userId.toString());
     /////////////////////////////////* END */////////////////////////////////
@@ -664,5 +703,101 @@ export class GameService {
 
     // reinitialize winner
     winner.resetAfterRound();
+  }
+
+  /* AI Function */
+  private async fillRoomWithBots(
+    roomId: string,
+    roomPlayers: Set<string>,
+  ): Promise<void> {
+    const missing = FULL - roomPlayers.size;
+    if (missing <= 0) return; // la room s'est remplie normalement entre-temps
+    const totalRounds = Math.log2(FULL);
+    const round = 1; // toujours le round 1 : fillRoomWithBots ne tourne qu'une fois, à la création de la room
+
+    // Toute la fabrique de bots (équipe, nom, id) est déléguée ici.
+    const bots = await this.aiOrchestrator.spawnBotsForRoom(round, totalRounds, missing);
+
+    // GameService reste responsable de sa propre gestion de room.
+    for (const bot of bots) {
+      this.roomIdByPlayer.set(bot.id, roomId);
+      roomPlayers.add(bot.id);
+
+      let activePlayers = this.activePlayersByRoom.get(roomId);
+      if (!activePlayers) {
+        activePlayers = new Set();
+        this.activePlayersByRoom.set(roomId, activePlayers);
+      }
+      activePlayers.add(bot.id);
+   }
+
+    for (const userId of roomPlayers) {
+      const playerState = this.playerService.getPlayer(userId)!;
+      await this.redisStateService.updateStatePlayer(userId.toString(), playerState);
+    }
+
+    console.log(`[GameService] Room ${roomId} complétée avec ${bots.length} bot(s)`);
+    this.combatService.matchmake(roomPlayers);
+    this.startMapPhase(roomId, roomPlayers);
+  } 
+
+  /**
+   * Est-ce qu'il reste au moins un joueur humain (pas un bot) dans cette
+   * room, en excluant `excludingUserId` (typiquement celui qui vient de
+   * se déconnecter et qu'on ne veut pas compter).
+   */
+  private hasHumanPlayers(roomId: string, excludingUserId?: string): boolean {
+    const roomPlayers = this.gameRooms.get(roomId);
+    if (!roomPlayers) return false;
+ 
+    for (const id of roomPlayers) {
+      if (id === excludingUserId) continue;
+      const player = this.playerService.getPlayer(id);
+      if (player && !player.isBot) return true;
+    }
+    return false;
+  }
+ 
+  /**
+   * Supprime entièrement une room qui n'a plus aucun joueur humain
+   * (uniquement des bots restants). Contrairement à deleteEndGame
+   * (utilisée pour une fin de tournoi normale avec un vainqueur), on
+   * nettoie ici TOUS les joueurs de la room, humains ou bots.
+   */
+  private async cleanupAbandonedRoom(roomId: string): Promise<void> {
+    const roomPlayers = this.gameRooms.get(roomId);
+    const userIds = roomPlayers ? [...roomPlayers] : [];
+ 
+    // Cancel any timer tied to this room, so a leftover callback can't
+    // fire later and try to act on a room that no longer exists.
+    this.phaseTimer.clear(`fill: ${roomId}`);
+    this.phaseTimer.clear(`game: ${roomId}`);
+ 
+    for (const id of userIds) {
+      // Also cancel a pending combat timer / pairing this player was part of.
+      const combatRoomId = this.combatService.playerCombatRoom.get(id);
+      if (combatRoomId) {
+        this.phaseTimer.clear(`combat: ${combatRoomId}`);
+        this.combatService.combatRooms.delete(combatRoomId);
+      }
+      this.combatService.playerCombatRoom.delete(id);
+ 
+      await this.redisStateService.removePlayer(id.toString());
+      this.playerService.removePlayer(id);
+      this.roomIdByPlayer.delete(id);
+    }
+ 
+    this.gameRooms.delete(roomId);
+    this.activePlayersByRoom.delete(roomId);
+    this.authorizedPlayers.delete(roomId);
+ 
+    await Promise.all([
+      this.redisService.deleteRoom(roomId),
+      this.redisService.removeActiveRoom(roomId),
+    ]).catch((err) =>
+      console.log(`[GameService] cleanupAbandonedRoom: failed cleaning of ${roomId}`, err),
+    );
+ 
+    console.log(`[GameService] Room ${roomId} abandoned (no human players left) -> deleted`);
   }
 }
