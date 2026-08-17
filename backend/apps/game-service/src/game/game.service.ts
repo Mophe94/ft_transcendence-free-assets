@@ -662,11 +662,12 @@ export class GameService {
     const combatRoomId = this.combatService.playerCombatRoom.get(userId);
     if (combatRoomId) {
       this.startNewTurn(combatRoomId, new Set([userId, userId2]));
+      this.sendToPlayer(userId, this.combatService.new_turn(player));
+      this.sendToPlayer(userId, this.combatService.new_turn(player));
     }
     else {
       console.log(`[GameService]: resolveMonsterKO -> missing combatRoomIdfor ${userId}`);
     }
-
 
     this.sendToPlayer(
       userId,
