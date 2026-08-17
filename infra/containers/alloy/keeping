@@ -1,0 +1,20 @@
+prometheus.relabel "container_metrics" {
+    forward_to = [prometheus.remote_write.prometheus.receiver]
+
+    // Extract stack name: everything before the first "_"
+    rule {
+        source_labels = ["container_label_com_docker_swarm_service_name"]
+        regex         = "([^_]+)_.+"
+        target_label  = "stack"
+        replacement   = "$1"
+    }
+
+    // Extract service name: everything after the first "_"
+    rule {
+        source_labels = ["container_label_com_docker_swarm_service_name"]
+        regex         = "[^_]+_(.+)"
+        target_label  = "app"
+        replacement   = "$1"
+    }
+}
+
