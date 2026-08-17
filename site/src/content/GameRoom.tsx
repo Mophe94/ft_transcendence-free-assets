@@ -1,8 +1,8 @@
 import SpecialBG from '../background/SpecialBg'
 import { useEffect, useState } from 'react';
 import type { LobbyPlayer } from '../context/LobbySocketContext';
-import { AVATARS } from '../content/Preferences';
 import Heading from '../components/heading/Heading';
+import { SKINS } from '../assets/avatars';
 
 interface RoomInfo {
   roomName: string;
@@ -11,9 +11,9 @@ interface RoomInfo {
   endTime: number;
 }
 
-function getAvatarImg(key: string): string {
-  const entry = AVATARS.find(([k]) => k === key);
-  return entry ? entry[1] : AVATARS[0][1];
+function getSkinImg(key: string): string {
+  const entry = SKINS.find(([k]) => k === key);
+  return entry ? entry[1] : SKINS[0][1];
 }
 
 export default function GameRoom({ roomName, players, roomCapacity = 4, endTime }: RoomInfo) {
@@ -37,7 +37,7 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
         <div className=' bg-[#8f5407b9] rounded-4xl mb-5'>
           <div className='grid grid-cols-2 w-full'>
             <div className='text-2xl t-w justify-center font-semibold p-2.5'>Players</div>
-            <div className='text-2xl t-w justify-center font-semibold p-2.5'>Avatar</div>
+            <div className='text-2xl t-w justify-center font-semibold p-2.5'>Skin</div>
           </div>
         </div>
         <div className='max-h-100 overflow-y-scroll no-scrollbar'>
@@ -47,7 +47,7 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
                 <div className='py-2.5 px-5 self-center'>{player.username}</div>
                 <div className='py-2.5 px-5 self-center'>
                   <img
-                    src={getAvatarImg(player.avatar)}
+                    src={getSkinImg(player.avatar)}
                     alt={player.username}
                     className='w-12 h-12 object-contain [image-rendering:pixelated]'
                   />
