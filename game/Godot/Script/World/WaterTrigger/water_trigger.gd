@@ -69,6 +69,7 @@ func interact(_player: Node2D) -> void:
 
 
 func _on_fishing_completed() -> void:
+#	get_tree().change_scene_to_packed(GeneralData.capture_scene)
 	fishing_started = false
 	emit_signal("stop_player")
 	_new_encounter()

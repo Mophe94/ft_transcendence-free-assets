@@ -33,6 +33,7 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _new_encounter():
+#	get_tree().change_scene_to_packed(GeneralData.capture_scene)
 	if stop_event:
 		return
 	GeneralData.tile = "tree"

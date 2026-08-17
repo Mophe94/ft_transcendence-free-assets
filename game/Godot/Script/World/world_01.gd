@@ -57,6 +57,8 @@ func _ready() -> void:
 	$Timer.time_finish.connect(_signal_timer)
 	$Player/CharacterBody2D/Camera2D.enabled = true
 	$Player/CharacterBody2D.control = true
+#	if GeneralProcess.trigger_send == false:
+#		GeneralProcess.trigger_activation()
 	activate_random_collectibles()
 	activate_random_trees()
 	activate_random_fishing_spots()
@@ -106,7 +108,7 @@ func activate_random_fishing_spots() -> void:
 
 	for i in range(count):
 		spots[i].set_interactable(true)
-		
+	
 
 #func _unhandled_input(event: InputEvent) -> void:
 #	if event is InputEventMouseButton and event.pressed:

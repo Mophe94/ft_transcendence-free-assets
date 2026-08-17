@@ -69,6 +69,7 @@ func _ready() -> void:
 	await instanciate_monster_enemy()
 
 func _signal_timer():
+	$Timer.hide()
 	$Timer.send = true
 	$CurrentTeam.process_mode = Node.PROCESS_MODE_DISABLED
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED

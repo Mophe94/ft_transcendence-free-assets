@@ -215,7 +215,7 @@ var enemy: Dictionary = {
 const SPEED_TEXT = 0.02
 const WAIT_TEXT = 0.2
 
-var position_player = Vector2(4929.0, 1064.0)
+var position_player = Vector2(4937.0, 1105.0)
 var player_speed = 0.0
 var timer = 0
 

@@ -230,19 +230,19 @@ func _ready() -> void:
 	$CombatMenus.action_combat.connect(show_UI)
 	$CombatMenus.change_monster.connect(_new_current_monster)
 	$CombatMenus.enemy_change_monster.connect(_new_enemy_monster)
-	$CombatMenus.stop_timer.connect(_stop_timer)
-	$CombatMenus.run_timer.connect(_run_timer)
+#	$CombatMenus.stop_timer.connect(_stop_timer)
+#	$CombatMenus.run_timer.connect(_run_timer)
 	$CombatMenus.hide_timer.connect(_hide_timer)
 	$CombatBanner.hide()
-	$Timer.time_finish.connect(_time_finish)
+#	$Timer.time_finish.connect(_time_finish)
 	_capture_battle_ratios()
 	_update_battle_positions()
 	get_viewport().size_changed.connect(_update_battle_positions)
 	await start_intro()
 	show_UI()
 
-func _time_finish():
-	skip_intro = true
+#func _time_finish():
+#	skip_intro = true
 #	$CombatMenus.hide()
 #	$CombatMenus.process_mode = Node.PROCESS_MODE_DISABLED
 #	$Timer.send = true

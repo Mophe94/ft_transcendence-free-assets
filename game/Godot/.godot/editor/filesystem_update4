@@ -10,7 +10,6 @@ res://Scene/PlayerCharacter/Skin/Ghost03/ghost03SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr01/satyr01SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr02/satyr02SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr03/satyr03SpriteSheet.tres
-res://Script/Combat/combat_script.gd
-res://Script/General/Received.gd
-res://Script/Timer/timer.gd
 res://Script/Combat/Menus/combat_menus_script.gd
+res://Script/Combat/combat_script.gd
+res://Script/Timer/timer.gd

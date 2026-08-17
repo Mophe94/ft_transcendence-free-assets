@@ -54,8 +54,11 @@ func _win():
 	await get_tree().create_timer(2.0).timeout
 	Received.action_finished.emit()
 	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAFE_TO_DISCONNECT])
+	await get_tree().create_timer(10.0).timeout
+	text_show("Until all the other matches are over")
 
 func _change_monster():
+	hide_selection()
 	await text_show(GeneralData.text, 1)
 	$Text.text = ""
 	set_menus_select_monster()
@@ -68,17 +71,19 @@ func _enemy_change_monster():
 	Received.action_finished.emit()
 
 func _new_current_monster():
-	stop_timer.emit()
+	hide_selection()
+#	stop_timer.emit()
 	await text_show(GeneralData.text, 1)
 	emit_signal("change_monster")
 		
 func _new_enemy_monster():
-	stop_timer.emit()
+	hide_selection()
+#	stop_timer.emit()
 	await text_show(GeneralData.text, 1)
 	emit_signal("enemy_change_monster")
 
 func waiting_player(send_func: Callable):
-	stop_timer.emit()
+#	stop_timer.emit()
 	hide_selection()
 	lock_button()
 	send_func.call()
@@ -87,7 +92,7 @@ func waiting_player(send_func: Callable):
 func _received_action():
 	hide_selection()
 	$Text.text = ""
-	stop_timer.emit()
+#	stop_timer.emit()
 	emit_signal("action_combat")
 	await text_show(GeneralData.text, 1)
 	Received.action_finished.emit()
@@ -95,7 +100,7 @@ func _received_action():
 func _new_turn():
 	await text_show(GeneralData.text)
 	$Text.text = ""
-	run_timer.emit()
+#	run_timer.emit()
 	_back()
 ##############################################################
 

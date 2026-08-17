@@ -1,5 +1,5 @@
 extends Label
-@export_range(0.1, 1.0, 0.01) var font_ratio: float = 0.45
+@export_range(0.1, 1.0, 0.01) var font_ratio: float = 0.42
 @export var min_font_size: int = 4
 @export var max_font_size: int = 96
 var last_size: Vector2 = Vector2(-1, -1)
