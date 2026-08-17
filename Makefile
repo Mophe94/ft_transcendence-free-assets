@@ -32,14 +32,20 @@ vm :
 	@chmod +x $(VM_SCRIPTS)/vm.sh
 	@bash $(VM_SCRIPTS)/vm.sh
 
-setup_worker:
+install_deps:
+	@echo "[INFO] Installing site dependencies..."
+	@cd site && npm install
+	@echo "[INFO] Installing backend dependencies..."
+	@cd backend && npm install
+
+setup_worker: install_deps
 	@ssh-keygen -f "/home/$(USER)/.ssh/known_hosts" -R "[localhost]:2222"
 	@if [ ! -f $(VM_SCRIPTS)/node.sh ]; then \
 		echo "node.sh file missing"; \
 		exit 1; \
 	fi
-	@chmod +x $(VM_SCRIPTS)/node.sh;
-	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4);
+	@chmod +x $(VM_SCRIPTS)/node.sh
+	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4)
 
 leader:
 	@$(MAKE) setup_worker TYPE="leader"
@@ -72,4 +78,4 @@ $(ENV_FILE):
 		exit 1; \
 	fi
 	
-.PHONY: all vm setup_worker leader worker vm_erase
+.PHONY: all vm install_deps setup_worker leader worker vm_erase

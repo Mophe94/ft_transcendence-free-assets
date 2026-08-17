@@ -36,7 +36,9 @@ all: node_launch
 node_launch: wait_tailscale
 	$(MAKE) swarm_setup
 	$(MAKE) core
-	$(MAKE) push website observ game
+	$(MAKE) base
+	$(MAKE) -f push
+	$(MAKE) -f website observ game
 
 swarm_setup:
 	@chmod +x $(CONFIG_SCRIPTS)/launch_swarm.sh
@@ -44,9 +46,8 @@ swarm_setup:
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
 push:
-	$(BAKE_ARG) LOCAL=true docker buildx bake base databases website game -f $(CONTAINER_FILES)/docker-bake.hcl --push >> /home/stempels/infra/build.log
-#	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
-#	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake observ --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl --push
+	$(BAKE_ARG) LOCAL=false docker buildx bake databases website game -f $(CONTAINER_FILES)/docker-bake.hcl --push >> /home/stempels/infra/build.log
+
 test:
 	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake fluent-bit --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl
 
@@ -56,6 +57,9 @@ core:
 	@if ! bash $(TOOLS_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \
           exit 1; \
         fi
+
+base:
+	@make image TARGET=$@
 
 website:
 	@doas mkdir -p "/var/lib/postgresql/data"
@@ -80,7 +84,7 @@ observ:
 	@doas chown -R $(PROMETHEUS_UID):$(PROMETHEUS_GID) /nfs-storage/prometheus;
 	@mkdir -p "/nfs-storage/loki"
 	@doas chown -R $(LOKI_UID):$(LOKI_GID) /nfs-storage/loki;
-#	@make image TARGET=$@
+#	@make image TARGET=$@ --> need adding them in bake.hcl
 	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 up: build
@@ -115,6 +119,7 @@ addnode:
 
 image:
 	@case "$(TARGET)" in \
+	    base) IMAGES="node-base postgress-base";; \
 	    website) IMAGES="frontend backend ";; \
 	    databases) IMAGES="users_db game_db";; \
 	    game) IMAGES="game redis";; \
@@ -172,4 +177,7 @@ $(ENV_FILE):
 		exit 1; \
 	fi
 
-PHONY: all node_launch swarm_setup swarm_status push test core website game observ up down swarm-status image wait_tailscale
+fclean:
+	docker stack rm core website game observ && docker system prune -af --volumes
+
+PHONY: all node_launch swarm_setup swarm_status push test core website game observ up down swarm-status image wait_tailscale fclean

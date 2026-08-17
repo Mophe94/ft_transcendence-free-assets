@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useRef, useState, ReactNode } from 'react';
+import { createContext, useCallback, useContext, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 
 export interface LobbyPlayer {
   username: string;

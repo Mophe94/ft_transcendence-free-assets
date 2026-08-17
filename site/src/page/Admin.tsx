@@ -192,7 +192,7 @@ function StatCard({ label, value, color }: { label: string; value: string; color
   );
 }
 
-export default function Dashboard() {
+export default function Admin() {
   const context = useAuth();
   const navigate = useNavigate();
   const { data, isLoading, error } = useDashboardData();
