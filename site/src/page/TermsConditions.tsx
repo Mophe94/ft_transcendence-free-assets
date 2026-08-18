@@ -5,8 +5,6 @@ export default function TermsConditions() {
     <RegularBG>
       <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-8">
-          
-          {/* En-tête */}
           <header className="border-b border-slate-900/10 pb-6">
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 uppercase">
               Terms & Conditions
@@ -42,11 +40,7 @@ export default function TermsConditions() {
 		      <li><strong className="text-slate-900">Services:</strong> Refers to our website, APIs, and the entire 42 Belgium Free Assets platform.</li>
 		    </ul>
 		  </div>
-
-          {/* Contenu principal */}
           <div className="space-y-6 text-base leading-relaxed text-slate-800">
-            
-            {/* Agreement Section */}
             <section className="space-y-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-wide">
                 Agreement to Our Legal Terms
@@ -93,7 +87,6 @@ export default function TermsConditions() {
 
             <hr className="border-slate-900/10 my-8" />
 
-            {/* TABLE OF CONTENTS */}
             <section className="space-y-4 bg-slate-50/50 p-6 rounded-xl border border-slate-900/5">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-wide">
                 Table of Contents
@@ -123,7 +116,6 @@ export default function TermsConditions() {
 
             <hr className="border-slate-900/10 my-8" />
 
-            {/* SECTION 1 */}
             <section id="section-1" className="space-y-3 pt-2">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 1. OUR SERVICES
@@ -133,7 +125,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 2 */}
             <section id="section-2" className="space-y-4 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 2. INTELLECTUAL PROPERTY RIGHTS
@@ -192,7 +183,6 @@ export default function TermsConditions() {
               </div>
             </section>
 
-            {/* SECTION 3 */}
             <section id="section-3" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 3. USER REPRESENTATIONS
@@ -202,7 +192,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 4 */}
             <section id="section-4" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 4. PROHIBITED ACTIVITIES
@@ -226,7 +215,6 @@ export default function TermsConditions() {
               </ul>
             </section>
 
-            {/* SECTION 5 */}
             <section id="section-5" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 5. USER GENERATED CONTRIBUTIONS
@@ -236,7 +224,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 6 */}
             <section id="section-6" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 6. CONTRIBUTION LICENSE
@@ -249,7 +236,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 7 */}
             <section id="section-7" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 7. SERVICES MANAGEMENT
@@ -259,7 +245,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 8 */}
             <section id="section-8" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 8. TERM AND TERMINATION
@@ -269,7 +254,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 9 */}
             <section id="section-9" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 9. MODIFICATIONS AND INTERRUPTIONS
@@ -279,7 +263,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 10 */}
             <section id="section-10" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 10. GOVERNING LAW
@@ -289,7 +272,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 11 */}
             <section id="section-11" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 11. DISPUTE RESOLUTION
@@ -302,7 +284,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 12 */}
             <section id="section-12" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 12. CORRECTIONS
@@ -312,7 +293,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 13 */}
             <section id="section-13" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 13. DISCLAIMER
@@ -322,7 +302,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 14 */}
             <section id="section-14" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 14. LIMITATIONS OF LIABILITY
@@ -332,7 +311,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 15 */}
             <section id="section-15" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 15. INDEMNIFICATION
@@ -342,7 +320,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 16 */}
             <section id="section-16" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 16. USER DATA
@@ -352,7 +329,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 17 */}
             <section id="section-17" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 17. ELECTRONIC COMMUNICATIONS, TRANSACTIONS, AND SIGNATURES
@@ -362,7 +338,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 18 */}
             <section id="section-18" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 18. MISCELLANEOUS
@@ -372,7 +347,6 @@ export default function TermsConditions() {
               </p>
             </section>
 
-            {/* SECTION 19 */}
             <section id="section-19" className="space-y-3 pt-4 border-t border-slate-900/10">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 19. CONTACT US
