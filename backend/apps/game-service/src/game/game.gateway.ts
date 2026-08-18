@@ -163,7 +163,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     payload,
   }: {
     userId: string;
-    payload: object;
+    payload: GamePayload;
   }): void {
     const client = this.clientsById.get(userId);
     if (client) {
@@ -177,7 +177,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     payload,
   }: {
     clients: Set<WebSocket>;
-    payload: object;
+    payload: GamePayload;
   }): void {
     this.broadcast(clients, payload);
   }

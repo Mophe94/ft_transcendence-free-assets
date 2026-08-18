@@ -6,7 +6,7 @@ import { MapService } from './map.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
-import { GamePayload, GameMessage } from 'apps/game-service/src/game/game.type';
+import { GamePayload } from 'apps/game-service/src/game/game.type';
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
@@ -190,7 +190,7 @@ export class GameService {
     this.eventEmitter.emit('close_player_socket', { userId });
   }
 
-  private sendToPlayer(userId: string, payload: object): void {
+  private sendToPlayer(userId: string, payload: GamePayload): void {
     //console.log("Send_to_player: id: ", userId);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }

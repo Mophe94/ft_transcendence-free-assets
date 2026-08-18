@@ -7,11 +7,6 @@ export interface GamePayload {
   data: GameData;
 }
 
-export interface GameMessage {
-  event: string;
-  data: GameData;
-}
-
 export const FULL = 2;
 
 export const PHASE_DURATIONS = {
