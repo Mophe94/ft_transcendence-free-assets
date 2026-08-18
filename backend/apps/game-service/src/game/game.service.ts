@@ -488,7 +488,7 @@ export class GameService {
       return undefined;
     }
 
-    let result: object | undefined;
+    let result: GamePayload | undefined;
     switch (state) {
       case 'add_item':
         result = this.mapService.received_add_item(player);
