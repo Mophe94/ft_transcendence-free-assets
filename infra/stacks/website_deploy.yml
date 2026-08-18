@@ -1,38 +1,5 @@
 services:
 
-    frontend:
-        image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/frontend:latest
-        environment:
-          - VITE_DOMAIN_NAME=${HOST_IP}:8443
-          - VITE_USERS_SERVICE=https://${HOST_IP}:8443/users
-          - VITE_CHAT_SERVICE=wss://${HOST_IP}:8443/chat
-          - VITE_GAME_SERVICE=wss://${HOST_IP}:8443/game
-          - VITE_ROOM_SERVICE=https://${HOST_IP}:8443/rooms
-          - VITE_LOBBY_SERVICE=wss://${HOST_IP}:8443/lobby
-          - VITE_42_OAUTH_CLIENT_ID=u-s4t2ud-e487562dd07b366dee9b3b29a8fd298cbcc4c96048e03e72a17e2de8e5211d57
-          - VITE_42_OAUTH_REDIRECT_URI=https://${HOST_IP}:8443/auth/callback
-          - VITE_42_OAUTH_API_LINK=https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-e487562dd07b366dee9b3b29a8fd298cbcc4c96048e03e72a17e2de8e5211d57&redirect_uri=https://${HOST_IP}:8443/auth/callback&response_type=code
-          - VITE_42_OAUTH_API=http://nginx:420/fortytwoapi/oauth/token
-          - VITE_IFRAME_SERVICE=https://${HOST_IP}:8443/iframe
-        secrets:
-          - fortytwo_client_id
-        networks:
-            - site_net
-        deploy:
-            labels:
-                prometheus_scrape: "false"
-                prometheus_port: "${PROM_SCRAPE_PORT}"
-            replicas: 1
-#            placement:
-#              constraints:
-#                - node.role == worker
-        healthcheck:
-          test: ["CMD", "node", "/app/healthcheck.js"]
-          interval: 15s
-          timeout: 3s
-          retries: 3
-          start_period: 15s
-
     chat_service:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/backend:latest
         networks:

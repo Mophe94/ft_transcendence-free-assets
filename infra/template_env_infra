@@ -22,6 +22,7 @@ p_node_<login>=
 # API 42 defined
 s_fortytwo_client_id=
 s_fortytwo_client_secret=
+API_42_CLIENT_ID=
 
 ###############################################################################
 # JSON_WEB_TOKEN                                                              #
