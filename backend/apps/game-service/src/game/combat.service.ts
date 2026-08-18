@@ -247,6 +247,7 @@ export class CombatService {
       event: 'game',
       data: {
         state: '',
+        timer: player.timer,
         player: player,
         time: 0,
       },
