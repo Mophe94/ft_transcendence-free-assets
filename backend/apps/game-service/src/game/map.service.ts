@@ -21,9 +21,9 @@ export class MapService {
   // RECEIVED REQUEST FOR MONSTER IN THIS TILE, CALL DB GAME + CHOICE ONE RANDOM MONSTER BASED ON THERE RARITY VALUE AND RETURN THIS
   async received_new_encounter(player: Player, tile: string) {
     const table_encounter = {
-      common: 65,
-      uncommon: 25,
-      rare: 10,
+      common: 100,
+      uncommon: 20,
+      rare: 7,
     };
     // Retrieve list monsters by tile
     const tileObject = await this.tilesService.findOneByType(tile);
@@ -93,9 +93,9 @@ export class MapService {
   // CHECK MATCH OF MONSTER WITH RANDOM VALUE AND RETURN TRUE IF OK OR FALSE
   received_try_catch(player: Player, item?: string) {
     const table_catch = {
-      common: 75,
-      uncommon: 45,
-      rare: 20,
+      common: 70,
+      uncommon: 40,
+      rare: 15,
     };
     let result: number = 0;
 
