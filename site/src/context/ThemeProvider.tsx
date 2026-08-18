@@ -1,43 +1,38 @@
-import { useState, useEffect } from 'react';
-import type { PropsWithChildren } from 'react';
-import { ThemeContext } from './ThemeContext';
+import { useState, useEffect, type PropsWithChildren } from 'react';
 import { useAuth } from './AuthContext';
+import { DEFAULT_THEME_KEY, Theme, type ThemeKey } from '../constants/Theme';
+import { ThemeContext } from './ThemeContext';
 
-import lightCloudsBg from '../assets/background/light_clouds.png'
-import darkCloudsBg from '../assets/background/dark_clouds.png'
-
-const themeStyles = {
-  '--light-cloud-img': `url(${lightCloudsBg})`,
-  '--dark-cloud-img': `url(${darkCloudsBg})`,
-}  as React.CSSProperties;
+const STORAGE_KEY = 'app-theme';
 
 export function ThemeProvider({ children }: PropsWithChildren) {
   const { user } = useAuth();
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('app-theme') || 'light';
+
+  const [activeThemeKey, setActiveThemeKey] = useState<ThemeKey>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY) as ThemeKey | null;
+    if (saved && saved in Theme) return saved;
+    return DEFAULT_THEME_KEY;
   });
 
-  const [prevUserTheme, setPrevUserTheme] = useState<string | undefined>(
-    undefined,
-  );
+  const [prevUserTheme, setPrevUserTheme] = useState(user?.settings?.theme);
 
-  if (user?.settings?.theme && user.settings.theme !== prevUserTheme) {
-    setPrevUserTheme(user.settings.theme);
-    setTheme(user.settings.theme);
+  if (user?.settings?.theme !== prevUserTheme) {
+    setPrevUserTheme(user?.settings?.theme);
+    const userTheme = user?.settings?.theme as ThemeKey | undefined;
+    if (userTheme && userTheme in Theme) {
+      setActiveThemeKey(userTheme);
+    }
   }
 
   useEffect(() => {
-    const classesToRemove = Array.from(document.body.classList).filter((c) =>
-      c.startsWith('theme-'),
-    );
-    document.body.classList.remove(...classesToRemove);
-    document.body.classList.add(`theme-${theme}`);
+    localStorage.setItem(STORAGE_KEY, activeThemeKey);
+  }, [activeThemeKey]);
 
-    localStorage.setItem('app-theme', theme);
-  }, [theme]);
+  const activeTheme = Theme[activeThemeKey];
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      <div id='main' className={`theme-${theme}`} style={themeStyles}>{children}</div>
+    <ThemeContext.Provider value={{ theme: activeTheme, setThemeKey: setActiveThemeKey }}>
+      {children}
     </ThemeContext.Provider>
   );
 }

@@ -1,9 +1,9 @@
-.auth-section {
+/* .auth-section {
   flex: 0 0 auto;
   height: var(--nav-h);
-}
+} */
 
-.login-container {
+/* .login-container {
   position: relative;
   height: 100%;
   display: flex;
@@ -26,9 +26,9 @@
     gap: 0.6vw;
     padding-inline: 0.6vw;
   }
-}
+} */
 
-#profile-pic {
+/* #profile-pic {
   height: 100%;
   width: auto;
   aspect-ratio: 1 / 1;
@@ -36,20 +36,20 @@
   object-fit: cover;
   display: block;
   flex: 0 0 auto;
-}
-
+} */
+/* 
 .username-container {
   display: block;
   font-family: 'Ubuntu', system-ui;
   font-weight: bold;
-  color: rgb(121, 121, 121);
+  color: #797979;
   font-size: var(--nav-font);
   white-space: nowrap;
   
   max-width: 10ch;
-}
+} */
 
-#dropdown-menu {
+/* #dropdown-menu {
   position: absolute;
   top: 100%;
   right: 0;
@@ -65,48 +65,48 @@
   transform: translateY(-6px);
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
   z-index: 1000;
-}
+} */
 
-.login-container:hover #dropdown-menu {
+/* .login-container:hover #dropdown-menu {
   visibility: visible;
   opacity: 1;
   transform: translateY(0);
-}
+} */
 
-#dropdown-menu li {
+/* #dropdown-menu li {
   padding: 0;
-}
+} */
 
-.auth-link {
+/* .auth-link {
   display: block;
   padding: 0.5rem 1rem;
   font-family: 'Ubuntu', system-ui;
   font-weight: bold;
   font-size: var(--nav-font);
   text-decoration: none;
-}
-
+} */
+/* 
 .theme-dark #dropdown-menu {
-  background: rgba(20, 10, 50, 0.95);
+  background: #140a32f2;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
 }
 .theme-dark .auth-link {
-  color: rgb(121, 121, 121);
+  color: #797979;
 }
 .theme-dark .auth-link:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: #ffffff14;
 }
 
 .theme-light #dropdown-menu {
-  background: rgba(28, 187, 179, 0.95);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  background: #1cbbb3f2;
+  box-shadow: 0 4px 10px #00000026;
 }
 .theme-light .auth-link {
   color: rgb(121, 121, 121);
 }
 .theme-light .auth-link:hover {
-  background: rgba(0, 0, 0, 0.06);
-}
+  background: #0000000f;
+} */
 
 a.login-link {
   text-decoration-line: none;
