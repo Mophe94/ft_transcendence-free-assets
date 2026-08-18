@@ -121,8 +121,7 @@ func _ready() -> void:
 
 func _team_set_up_received():
 	$Player.process_mode = Node.PROCESS_MODE_DISABLED
-	$CanvasLayer/Inventory_UI.hide()
-	$CanvasLayer/Inventory_UI.process_mode = Node.PROCESS_MODE_DISABLED 
+	$CaptureMenus.hide()
 	await transi_close()
 	get_tree().change_scene_to_packed(GeneralData.team_setup_scene)
 

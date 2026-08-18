@@ -204,6 +204,11 @@ func _action_battle(data):
 	
 	if data.has("max"):
 		max_action = int(data["max"])
+		
+	if data.has("timer"):
+		var timer = data["timer"]
+		if timer > 0:
+			GeneralData.timer = timer
 	
 	if data.has("order"):
 		order_action = int(data["order"])

@@ -33,7 +33,6 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _new_encounter():
-#	get_tree().change_scene_to_packed(GeneralData.capture_scene)
 	if stop_event:
 		return
 	GeneralData.tile = "tree"
@@ -91,9 +90,7 @@ func interact(_player: Node2D) -> void:
 	fireflies.stop()
 	mash_started = true
 	already_used = true
-	print("\nthree erase")
-	print(name)
-	get_tree().change_scene_to_packed(GeneralData.capture_scene)
+	GeneralProcess.threesList.erase(name)
 	mash_bar.start()
 
 

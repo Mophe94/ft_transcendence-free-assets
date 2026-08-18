@@ -64,8 +64,8 @@ func _ready() -> void:
 	activate_random_collectibles()
 	activate_random_trees()
 	activate_random_fishing_spots()
-#	if GeneralData.position_player != Vector2(0.0, 0.0):
-#		$Player.position = GeneralData.position_player
+	if GeneralData.position_player != Vector2(0.0, 0.0):
+		$Player.position = GeneralData.position_player
 
 func _close_game():
 	if Input.is_action_just_pressed("quit"):
@@ -78,7 +78,7 @@ func activate_random_collectibles() -> void:
 	for i in range(half):
 		collectibles[i].set_interactable(true)
 	
-@export var trees_to_activate: int = 20
+@export var trees_to_activate: int = 65
 
 func activate_random_trees() -> void:
 	var trees = get_tree().get_nodes_in_group("tree")
@@ -92,11 +92,10 @@ func activate_random_trees() -> void:
 		tree.set_interactable(false)
 
 	for i in range(count):
-		print(trees[i])
 		trees[i].set_interactable(true)
 
 
-@export var fishing_spots_to_activate: int = 1
+@export var fishing_spots_to_activate: int = 55
 
 func activate_random_fishing_spots() -> void:
 	var spots = get_tree().get_nodes_in_group("fishing_spot")

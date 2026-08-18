@@ -30,7 +30,8 @@ func transi_close():
 	transi_scene.queue_free()
 
 func _new_encounter():
-#	get_tree().change_scene_to_packed(GeneralData.capture_scene)
+	if stop_event == true:
+		return
 	GeneralData.tile = "grass"
 	GeneralData.background_capture = "plains_day"
 	var send_func = func():

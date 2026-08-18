@@ -47,8 +47,8 @@ func wait_signal_return(send_func: Callable, signal_to_wait: Signal) -> int:
 
 #############################################################################################################################################
 
-var trees_to_activate: int = 55
-var fishing_spots_to_activate: int = 45
+var trees_to_activate: int = 65
+var fishing_spots_to_activate: int = 55
 
 var threesList: Array[String] = []
 var fishingList: Array[String]= []
