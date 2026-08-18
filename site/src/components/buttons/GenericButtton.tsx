@@ -13,6 +13,8 @@ const colorLoader = {
   Blue: () => import("../../assets/buttons/colored_buttons/blue"),
   Red: () => import("../../assets/buttons/colored_buttons/red"),
   Black: () => import("../../assets/buttons/colored_buttons/black"),
+  Green: () => import("../../assets/buttons/colored_buttons/green"),
+  Purple: () => import("../../assets/buttons/colored_buttons/purple"),
 } as const;
 
 export default function GenericButton({color=ButtonColor.Black, func = () => {}, text, className=''}: ButtonProps) {
@@ -71,11 +73,11 @@ export default function GenericButton({color=ButtonColor.Black, func = () => {},
         <div className="isolate bg-stretch -m-px font-im-fell font-bold" style={{backgroundImage: `url(${sprites.pressed_MM})`}}>
           <div
             data-text={text}
-            className="relative text-black text-nowrap
+            className={`relative text-black text-nowrap
               before:content-[attr(data-text)] 
               before:absolute before:inset-0 before:-z-10 
               before:[-webkit-text-stroke:3px_white] 
-              before:text-transparent ">{text}</div>
+              before:text-transparent ${className}`}>{text}</div>
         </div>
         <div className="bg-[no-repeat_round] -my-px " style={{backgroundImage: `url(${sprites.pressed_MR})`}}/>
         <div className="bg-no-repeat -mr-px -mb-px" style={{backgroundImage: `url(${sprites.pressed_BL})`}}/>

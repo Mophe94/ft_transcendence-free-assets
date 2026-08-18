@@ -1,6 +1,6 @@
 import { type CSSProperties, type ReactNode } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+// import { useAuth } from '../context/AuthContext';
+// import { useNavigate } from 'react-router-dom';
 
 // ---------------------------------------------------------------------------
 // Types — le contrat de données. Le mate raccorde ses fetch sur ces formes,

@@ -5,6 +5,7 @@ import unit from '../assets/Units/Unit_05.png';
 import woodBg from '../assets/background/wood/wood_bg.png';
 import Heading from "../components/heading/Heading";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Friend } from "../types/friend";
 
 export default function PendingRequests () {
   const queryClient = useQueryClient();
@@ -61,7 +62,7 @@ export default function PendingRequests () {
             className='flex flex-col sm:grid sm:grid-cols-2 gap-3 xl:grid-cols-3'
             style={{ '--bg-img': `url(${woodBg})` } as React.CSSProperties}>
             {
-              requests.map((friend) => {
+              requests.map((friend: Friend) => {
                 return (
                   <div
                     key={friend.username}

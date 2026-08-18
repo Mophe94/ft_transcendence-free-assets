@@ -5,7 +5,7 @@ export interface Settings {
   avatar: string 
 }
 
-export interface UsersStats {
+export interface UserStats {
   userId: string;
   gamesPlayed: number;
   gamesWon: number;

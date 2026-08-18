@@ -32,7 +32,7 @@ export default function Preferences() {
   const [starter_id, setStarterId] = useState<number>(0);
   const [theme_id, setThemeId] = useState<number>(0);
   const [avatar_id, setSkinId] = useState<number>(0);
-  const [_, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuth();
   const { setTheme } = useTheme();
 
@@ -111,7 +111,7 @@ export default function Preferences() {
     event: React.SyntheticEvent<HTMLFormElement, SubmitEvent>,
   ) => {
     event.preventDefault();
-    if (!settings) {
+    if (!settings || isSaving) {
       return;
     }
     setIsSaving(true);
