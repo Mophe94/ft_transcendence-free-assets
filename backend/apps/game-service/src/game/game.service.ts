@@ -6,6 +6,7 @@ import { MapService } from './map.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
+import { GamePayload, GameMessage } from 'apps/game-service/src/game/game.type';
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
@@ -457,7 +458,7 @@ export class GameService {
   async handleMessage(
     userId: string,
     payload: any,
-  ): Promise<object | undefined> {
+  ): Promise<GamePayload | undefined> {
     const player = this.playerService.getPlayer(userId)!;
     const userId2 = this.combatService.getOpponentId(userId);
     const roomId = this.roomIdByPlayer.get(userId)!;
@@ -616,8 +617,6 @@ export class GameService {
       );
     } else {
       endOfBattle = false;
-      console.log("PLAYER ACTION BEFORE NEW TURN", player.currentActions.actionType);
-      console.log("PLAYER2 ACTION BEFORE NEW TURN", player2.currentActions.actionType);
       this.startNewTurn(combatRoomId, new Set([userId, userId2]));
       this.sendToPlayer(userId, this.combatService.new_turn(player));
       this.sendToPlayer(userId2, this.combatService.new_turn(player2));

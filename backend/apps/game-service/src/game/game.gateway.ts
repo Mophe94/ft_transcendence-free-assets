@@ -11,7 +11,7 @@ import { Interval } from '@nestjs/schedule';
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
 import { PlayerService } from './player/player.service';
-import { GamePayload } from './game.type';
+import type { GamePayload } from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
@@ -41,9 +41,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const token = params.get('token');
     const roomId = params.get('room');
     console.log(url);
-    console.log(token);
-    console.log(roomId);
-    // Add JWT token validation
 
     const user = await this.wsAuthService.verifyWsHandshake(request);
     if (!user.username) {
@@ -54,7 +51,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (
       !token ||
       !roomId
-      //|| !this.gameService.isPlayerInRoom(user.sub, roomId)
     ) {
       console.log('[GameGateway]: Missing token to authenticate');
       client.close();
@@ -129,7 +125,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('game')
   async handleGame(
     @ConnectedSocket() client: WebSocket,
-    @MessageBody() payload: any,
+    @MessageBody() payload: GamePayload,
   ): Promise<void> {
     // create a GamePayload interface to avoid 'any'?
     const clientData = this.clients.get(client);

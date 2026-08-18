@@ -406,14 +406,14 @@ export class CombatService {
         switch (target_up) {
           case 'defense':
             player.currentMonster.defense += skill.value;
-			player.currentMonster.defense_spe += skill.value;
+			      player.currentMonster.defense_spe += skill.value;
             break;
           case 'speed':
             player.currentMonster.speed += skill.value;
             break;
           case 'attack':
             player.currentMonster.attack += skill.value;
-			player.currentMonster.attack_spe += skill.value;
+			      player.currentMonster.attack_spe += skill.value;
             break;
           default:
             this.received_pass(player);
@@ -452,11 +452,11 @@ export class CombatService {
                 '.';
               enemy.currentMonster.defense -= skill.value;
 			  if (enemy.currentMonster.defense < 0) {
-				enemy.currentMonster.defense = 0;
+				  enemy.currentMonster.defense = 0;
 			  }
 			  enemy.currentMonster.defense_spe -= skill.value;
 			  if (enemy.currentMonster.defense_spe < 0) {
-				enemy.currentMonster.defense_spe = 0;
+				  enemy.currentMonster.defense_spe = 0;
 			  }
             }
             break;
@@ -509,11 +509,11 @@ export class CombatService {
                 '.';
               enemy.currentMonster.attack -= skill.value;
 			  if (enemy.currentMonster.attack < 0) {
-				enemy.currentMonster.attack = 0
+				  enemy.currentMonster.attack = 0
 			  }
 			  enemy.currentMonster.attack_spe -= skill.value;
 			  if (enemy.currentMonster.attack_spe < 0) {
-				enemy.currentMonster.attack_spe = 0
+				  enemy.currentMonster.attack_spe = 0
 			  }
             }
             break;
@@ -565,8 +565,8 @@ export class CombatService {
     let multi: number = this.typeChart[attackType]?.[enemyType] ?? 1;
     if (multi >= 2) effectiveness = ". It's super effective !";
     else if (multi <= 0.5) effectiveness = ". It's not very effective..";
-    let result = Math.trunc(flatAttackDammage * multi);
-	  result *= skillValue;
+      let result = Math.trunc(flatAttackDammage * multi);
+	  result = Math.trunc(result * skillValue);
     if (attackType == enemyType) result -= enemy.currentMonster.defense_spe;
     else result -= enemy.currentMonster.defense;
     if (result <= 0) result = 0;
