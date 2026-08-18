@@ -1,5 +1,38 @@
 services:
 
+    nginx:
+        image: nginx:alpine
+        ports:
+            - "80:80"
+            - "443:443"
+            - "5050:5050"
+        configs:
+            - source: nginx_conf
+              target: /etc/nginx/nginx.conf
+            - source: nginx_log
+              target: /etc/nginx/conf.d/logging.conf
+        secrets:
+          - nginx_crt
+          - nginx_key
+          - registry_crt
+          - registry_key
+          - ca_crt
+        networks:
+          - swarm_net
+          - obsrv_net
+          - games_net
+          - site_net
+        volumes:
+          - frontend:/usr/share/nginx/html:ro
+        deploy:
+            labels:
+                prometheus_scrape: "false"
+                prometheus_port: "${PROM_SCRAPE_PORT}"
+            replicas: 1
+            placement:
+                constraints:
+                    - node.labels.leader == true
+
     registry:
       image: registry:2
       environment:
@@ -21,44 +54,13 @@ services:
       networks:
         - swarm_net
 
-    nginx:
-        image: nginx:alpine
-        ports:
-            - "80:80"
-            - "443:443"
-            - "5050:5050"
-        configs:
-            - source: nginx_conf
-              target: /etc/nginx/nginx.conf
-            - source: nginx_log
-              target: /etc/nginx/conf.d/logging.conf
-        secrets:
-          - nginx_crt
-          - nginx_key
-          - registry_crt
-          - registry_key
-          - ca_crt
-        networks:
-            - swarm_net
-            - obsrv_net
-            - games_net
-            - site_net
-        deploy:
-            labels:
-                prometheus_scrape: "false"
-                prometheus_port: "${PROM_SCRAPE_PORT}"
-            replicas: 1
-            placement:
-                constraints:
-                    - node.labels.leader == true
-
 volumes:
-#  registry_data:
-#    driver: local
-#    driver_opts:
-#      type: nfs
-#      o: "addr=${IP},nfsvers=4,rw,soft"
-#      device: ":/nfs-storage/registry"
+  frontend:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: "addr=${IP},nfsvers=4,rw"
+      device: ":/nfs-storage/frontend"
   registry_data:
     driver: local
 
