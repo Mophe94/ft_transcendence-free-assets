@@ -48,10 +48,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     const userId = user.username;
-    if (
-      !token ||
-      !roomId
-    ) {
+    if (!token || !roomId) {
       console.log('[GameGateway]: Missing token to authenticate');
       client.close();
       return;
@@ -99,8 +96,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private sendToClient(client: WebSocket, message: GameMessage | undefined) {
     if (!message) {
-      console.log('[GameGateway] sendToclient called with undefined payload (skipping)');
-      return
+      console.log(
+        '[GameGateway] sendToclient called with undefined payload (skipping)',
+      );
+      return;
     }
     if (client.readyState === WebSocket.OPEN) {
       //console.log("Send_Gateway: " , message);
@@ -138,8 +137,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     try {
       await this.gameService.handleMessage(userId, payload);
-    }
-    catch (err) {
+    } catch (err) {
       console.log('[GameGateway] handleMessage error: ', err);
     }
 

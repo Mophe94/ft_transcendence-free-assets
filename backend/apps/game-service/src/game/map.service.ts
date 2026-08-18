@@ -3,9 +3,7 @@ import { Player } from './player/player';
 import { MonstersService } from './entities/monsters.service';
 import { TilesService } from './entities/tiles.service';
 import { ItemsService } from './entities/items.service';
-import {
-  Skill as PlayerSkill,
-} from './player/player.interfaces';
+import { Skill as PlayerSkill } from './player/player.interfaces';
 import { GameMessage } from './game.type';
 
 @Injectable()
@@ -197,11 +195,26 @@ export class MapService {
         })),
       };
       let skill = player.battle_team[slot].skill;
-      console.log("TESTS SKILLS");
-      console.log(player.battle_team[slot].name, skill[0].name, skill[0].data, skill[0].value);
-      console.log(player.battle_team[slot].name, skill[1].name, skill[1].data, skill[1].value);
+      console.log('TESTS SKILLS');
+      console.log(
+        player.battle_team[slot].name,
+        skill[0].name,
+        skill[0].data,
+        skill[0].value,
+      );
+      console.log(
+        player.battle_team[slot].name,
+        skill[1].name,
+        skill[1].data,
+        skill[1].value,
+      );
       if (skill[3])
-        console.log(player.battle_team[slot].name, skill[2].name, skill[2].data, skill[2].value);
+        console.log(
+          player.battle_team[slot].name,
+          skill[2].name,
+          skill[2].data,
+          skill[2].value,
+        );
     }
     return undefined;
   }
@@ -209,8 +222,8 @@ export class MapService {
   // RECEIVED REQUEST FOR ITEM, CALL DB GAME + CHOICE ONE RANDOM ITEM AND RETURN THIS
   async received_request_item(player: Player) {
     const items = await this.itemsService.findAll();
-    if (!items) {
-      console.log('[ERROR]: items is undefined');
+    if (!items || items.length === 0) {
+      console.log('[ERROR]: items is empty or undefined');
       return undefined;
     }
 
@@ -253,12 +266,6 @@ export class MapService {
 
   // CALL REMOVE ITEM + ADD MONSTER IN TEAM + SEND RESULT_CATCH WITH UPDATE_TEAM
   received_use_item(player: Player, item: string) {
-    // moved in gameService
-    // const userId = this.playerService.getUserId(player);
-    // if (!userId)
-    //   return undefined;
-    // this.sendToPlayer(userId, this.received_delete_item(player, item));
-
     for (let i = 0; i < player.team.length; ++i) {
       if (player.team[i] === '') {
         player.team[i] = player.current_monster;
@@ -294,7 +301,6 @@ export class MapService {
           name: player.id,
           asset: 'dinoBlue',
           team: player.team,
-          //monster: player.currentMonster.name,
         },
         timer: player.timer,
         current_map: 'map_01',

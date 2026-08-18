@@ -57,7 +57,10 @@ export class LobbyService implements OnApplicationBootstrap {
           JSON.stringify({
             event: 'lobby',
             state: 'join_failed',
-            data: { roomId, reason: capacity === undefined ? 'not_found' : 'full' },
+            data: {
+              roomId,
+              reason: capacity === undefined ? 'not_found' : 'full',
+            },
           }),
         );
       }
@@ -75,7 +78,12 @@ export class LobbyService implements OnApplicationBootstrap {
     skin: string,
   ): Promise<void> {
     await this.roomService.joinRoom(client, roomId);
-    await this.redisService.addPlayerToRoom(userSub.toString(), roomId, username, skin);
+    await this.redisService.addPlayerToRoom(
+      userSub.toString(),
+      roomId,
+      username,
+      skin,
+    );
 
     const clients = this.roomService.getClients(roomId)!;
     const capacity = this.roomService.getRoomCapacity(roomId)!;

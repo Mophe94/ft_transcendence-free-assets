@@ -54,7 +54,9 @@ export class RoomService {
     if (!room) return null;
     room.clients.delete(client);
     await this.redis.removePlayerFromRoom(userId, roomId);
-    console.log(`Client left ${roomId}, ${room.clients.size} players remaining`);
+    console.log(
+      `Client left ${roomId}, ${room.clients.size} players remaining`,
+    );
 
     if (room.clients.size === 0) {
       this.phaseTimer.clear(`lobby:${roomId}`);

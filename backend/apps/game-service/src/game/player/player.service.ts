@@ -15,17 +15,13 @@ export class PlayerService {
     this.players.set(userId, player);
     this.idsByPlayers.set(player, userId);
   }
-  
+
   injectPlayer(userId: string, player: Player): void {
     this.players.set(userId, player);
   }
 
   initDefaultPlayer(): Player {
-    const player = new Player(
-      '',
-      '',
-      'dino',
-    );
+    const player = new Player('', '', 'dino');
     return player;
   }
 
