@@ -10,13 +10,15 @@ if [ ! $# -eq 3 ]; then
 elif [ -z "$1" ]; then
     echo "Usage: ${SCRIPT_NAME} <node new username> <host ip> <flag resize>"
     exit 1
+else
+    NEW_USER="$1"
+    HOST_IP="$2"
+    RESIZE_DISK="$3"
 fi
 
 #Setup
 TYPE="worker"
-NEW_USER="$1"
 IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
-HOST_IP="$2"
 CERT_DIR="/etc/certs/"
 SSH_CONFIG="/etc/ssh/sshd_config"
 
@@ -132,7 +134,73 @@ apk add nfs-utils
 rc-update add rpcbind
 rc-update add nfs
 
-echo "[${SCRIPT_NAME}] VM ip: ${IP}"
+echo "[$SCRIPT_NAME] Configuring login welcome message"
+
+cat > /etc/motd <<EOF
+
+============================================================
+             WELCOME TO A SWARM WORKER NODE
+============================================================
+
+  Hostname       : swarmnode.${NEW_USER}
+  Local IP       : ${IP}
+  Swarm role     : WORKER
+  SSH user       : ${NEW_USER}
+
+  Leader         : ${HOST_IP}
+
+------------------------------------------------------------
+  Services
+------------------------------------------------------------
+
+  Docker         : docker ps
+  Tailscale      : tailscale status
+  NFS            : exportfs -v
+
+------------------------------------------------------------
+  Useful commands
+------------------------------------------------------------
+
+  Check Tailscale:
+      tailscale status
+
+  Check Tailscale IP:
+      tailscale ip -4
+
+  Check Docker:
+      docker ps
+
+  Check Docker logs:
+      docker logs <container>
+
+  Check Docker service:
+      rc-service docker status
+
+  Check Tailscale service:
+      rc-service tailscale status
+
+  Check NFS:
+      rc-service nfs status
+
+------------------------------------------------------------
+  Important paths
+------------------------------------------------------------
+
+  Docker config  : /etc/docker/daemon.json
+  Certificates    : ${CERT_DIR}
+
+------------------------------------------------------------
+  Swarm
+------------------------------------------------------------
+
+  This machine is configured as a WORKER node.
+  The swarm leader is reachable at:
+
+      ${HOST_IP}
+
+============================================================
+
+EOF
 
 echo "[$SCRIPT_NAME] Restarting VM"
 reboot

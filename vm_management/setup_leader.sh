@@ -309,7 +309,73 @@ cat /etc/tailscale_ip
 echo
 echo "Headscale auth key:"
 cat /etc/headscale_authkey
+echo "--------------------------------"o
+echo "--------------------------------"
+echo "Tailscale IP:"
+cat /etc/tailscale_ip
+echo
+echo "Headscale auth key:"
+cat /etc/headscale_authkey
 echo "--------------------------------"
 
+echo "[$SCRIPT_NAME] Configuring login welcome message"
+
+cat > /etc/motd <<EOF
+
+============================================================
+          WELCOME TO THE LEADER OF THE SWARM
+============================================================
+
+  Hostname       : swarmnode.${NEW_USER}
+  Local IP       : ${IP}
+  Tailscale IP   : ${TAILSCALE_IP}
+  Headscale      : http://${HOST_IP}:9090
+
+  Swarm role     : LEADER
+  SSH user       : ${NEW_USER}
+
+------------------------------------------------------------
+  Services
+------------------------------------------------------------
+
+  Docker         : docker ps
+  Headscale      : docker logs headscale
+  Tailscale      : tailscale status
+  NFS exports    : exportfs -v
+
+------------------------------------------------------------
+  Important files
+------------------------------------------------------------
+
+  Tailscale IP   : ${TAILSCALE_IP_FILE}
+  Headscale key  : /etc/headscale_authkey
+  Certificates   : ${CERT_DIR}
+  Headscale      : ${HEADSCALE_DIR}
+  NFS storage    : /nfs-storage
+
+------------------------------------------------------------
+  Useful commands
+------------------------------------------------------------
+
+  Check Tailscale IP:
+      tailscale ip -4
+
+  Check Tailscale status:
+      tailscale status
+
+  Check Docker containers:
+      docker ps
+
+  Check Headscale:
+      docker exec headscale headscale users list
+
+  Check NFS exports:
+      exportfs -v
+
+============================================================
+
+EOF
+
+echo "[$SCRIPT_NAME] Setup complete"
 echo "[$SCRIPT_NAME] Restarting VM"
 reboot
