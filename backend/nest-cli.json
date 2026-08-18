@@ -10,7 +10,7 @@
   "monorepo": true,
   "root": "apps/user-service",
   "projects": {
-    "account-service": {
+    "user-service": {
       "type": "application",
       "root": "apps/user-service",
       "entryFile": "main",

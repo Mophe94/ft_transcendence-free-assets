@@ -56,7 +56,7 @@ target "frontend" {
           WSS_ADDR                    ="wss://${HOST_IP}:8443"
           API_42_CLIENT_ID            ="${API_42_CLIENT_ID}"
           API_42_OUTBOUND             ="http_://nginx:420/fortytwoapi"
-          VITE_DOMAIN_NAME            ="${HOST_IP}:8443"
+          DOMAIN_NAME		      ="${HOST_IP}:8443"
     }
     output      = [ "type=local,dest=/nfs-storage/frontend" ]
 }
