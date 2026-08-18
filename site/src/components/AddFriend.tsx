@@ -28,7 +28,6 @@ export default function AddFriend() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value} = e.target;
     setIdentifier(value);
-    console.log(value);
   }
 
   return (

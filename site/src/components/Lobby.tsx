@@ -19,7 +19,7 @@ interface Room {
 
 export function Lobby() {
   const [listGames, setListGames] = useState<Array<Room>>([]);
-  const [avatar, setSkin] = useState<string>(SKINS[0][0]);
+  const [skin, setSkin] = useState<string>(SKINS[0][0]);
   const { roomId, createRoom, quickPairing, joinRoom, joinError } = useLobbySocket();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ export function Lobby() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data?.settings?.avatar) setSkin(data.settings.avatar);
+        if (data?.skin) setSkin(data.skin);
       })
       .catch((e) => console.log(e));
   }, [user?.username]);
@@ -84,7 +84,7 @@ export function Lobby() {
                         <div className='room-status t-[clamp(0.6rem,2.5vw,2rem)] text-center border-l-2 border-[#adadad]'>{room.status}</div>
                         {room.status == 'Waiting for players' &&
                           <div className='join-button-container flex justify-center h-[min(4rem,8vw)] mt-2'>
-                            <JoinButton onClick={() => joinRoom(room.roomId, username, avatar)} />
+                            <JoinButton onClick={() => joinRoom(room.roomId, username, skin)} />
                           </div>}
                       </div>
                     </div>
@@ -103,10 +103,10 @@ export function Lobby() {
         )}
         <div className='room-button-container mt-5 grid grid-cols-2 justify-items-center'>
           <div id='quick-btn-container' className='w-[clamp(6rem,30vw,18rem)]'>
-            <QuickPairingButton onClick={() => quickPairing(username, avatar)} />
+            <QuickPairingButton onClick={() => quickPairing(username, skin)} />
           </div>
           <div id='create-btn-container' className='w-[clamp(6rem,30vw,18rem)] self-center'>
-            <CreateRoomButton onClick={() => createRoom(username, avatar)} />
+            <CreateRoomButton onClick={() => createRoom(username, skin)} />
           </div>
         </div>
       </SpecialBG>

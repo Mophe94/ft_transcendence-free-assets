@@ -27,7 +27,6 @@ export default function GenericButton({color=ButtonColor.Black, func = () => {},
   useLayoutEffect(() => {
     if (divRef.current) {
       const rect = divRef.current.getBoundingClientRect();
-      console.log(`scale-[${Math.floor(rect.height * 100 / 68)}]`)
       setScale(rect.height / 68);
     }
   }, [sprites])

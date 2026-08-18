@@ -44,7 +44,6 @@ export default function PendingRequests () {
   });
 
   if (isLoading) return <div>Chargement...</div>;
-  else console.log(requests)
   if (isError) return <div>Erreur de chargement.</div>;
   return (
     <>
@@ -63,7 +62,6 @@ export default function PendingRequests () {
             style={{ '--bg-img': `url(${woodBg})` } as React.CSSProperties}>
             {
               requests.map((friend) => {
-                console.log(friend);
                 return (
                   <div
                     key={friend.username}

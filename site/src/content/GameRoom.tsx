@@ -25,7 +25,6 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
   const avatar = unit;
 
   const sendInvite = async (identifier: string, roomId: string) => {
-    console.log({ destinatory: identifier, roomId});
     try {
       await fetch(`${import.meta.env.VITE_USERS_SERVICE}/friends/send_game_invite`, {
       headers: {
@@ -54,7 +53,6 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
   }, [endTime]);
   
   if (isLoading) return <div>Loading...</div>;
-  else console.log(currentFriends)
   if (isError) return <div>Error while Loading.</div>;
 
   return (
@@ -75,18 +73,19 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
           </div>
           <div className='min-h-50 overflow-y-scroll no-scrollbar p-2'>
             {players.length ? (
-              players.map((player) => (
+              players.map((player) => {
+                return (
                 <div className='grid grid-cols-2 w-full' key={player.username}>
                   <div className='flex py-2.5 px-5 self-center justify-center font-semibold'>{player.username}</div>
                   <div className='flex py-2.5 px-5 self-center justify-center'>
                     <img
-                      src={getSkinImg(player.avatar)}
+                      src={getSkinImg(player.skin)}
                       alt={player.username}
                       className='w-12 h-12 object-contain [image-rendering:pixelated]'
                     />
                   </div>
-                </div>
-              ))
+                </div>)
+})
             ) : (
               <div className='self-center'>No Players</div>
             )}

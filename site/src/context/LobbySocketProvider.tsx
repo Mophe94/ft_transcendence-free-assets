@@ -16,7 +16,7 @@ export function LobbySocketProvider({ children }: { children: ReactNode }) {
     (
       action: 'create_room' | 'quick_pairing' | 'join_room',
       username: string,
-      avatar: string,
+      skin: string,
       targetRoomId?: string,
     ) => {
       if (wsRef.current, !username) return;
@@ -30,8 +30,8 @@ export function LobbySocketProvider({ children }: { children: ReactNode }) {
         ws.send(
           JSON.stringify(
             action === 'join_room'
-              ? { event: action, data: { roomId: targetRoomId, username, avatar } }
-              : { event: action, data: { username, avatar } },
+              ? { event: action, data: { roomId: targetRoomId, username, skin } }
+              : { event: action, data: { username, skin } },
           ),
         );
       };
@@ -70,16 +70,16 @@ export function LobbySocketProvider({ children }: { children: ReactNode }) {
   );
 
   const createRoom = useCallback(
-    (username: string, avatar: string) => connect('create_room', username, avatar),
+    (username: string, skin: string) => connect('create_room', username, skin),
     [connect],
   );
   const quickPairing = useCallback(
-    (username: string, avatar: string) => connect('quick_pairing', username, avatar),
+    (username: string, skin: string) => connect('quick_pairing', username, skin),
     [connect],
   );
   const joinRoom = useCallback(
-    (targetRoomId: string, username: string, avatar: string) =>
-      connect('join_room', username, avatar, targetRoomId),
+    (targetRoomId: string, username: string, skin: string) =>
+      connect('join_room', username, skin, targetRoomId),
     [connect],
   );
 
