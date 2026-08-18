@@ -91,6 +91,9 @@ func interact(_player: Node2D) -> void:
 	fireflies.stop()
 	mash_started = true
 	already_used = true
+	print("\nthree erase")
+	print(name)
+	get_tree().change_scene_to_packed(GeneralData.capture_scene)
 	mash_bar.start()
 
 

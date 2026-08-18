@@ -94,9 +94,8 @@ func set_menus_flee_choice(object):
 		var tween = create_tween()
 		tween.tween_property(self, "modulate:a", 0.0, 1.0)
 		await tween.finished
-		hide()
-		await transi_close()
 		if stop_event == false:
+			await transi_close()
 			get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
 	else:
 		_back()
@@ -147,8 +146,8 @@ func set_menus_catch(object):
 			if success == 0:
 				emit_signal("catch_ok")
 				await text_show("You success to capture " + GeneralData.monster_encounter + " !")
-				await transi_close()
 				if stop_event == false:
+					await transi_close()
 					get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
 			# Cacth fail
 			elif success == 1:
@@ -160,8 +159,8 @@ func set_menus_catch(object):
 				await text_show("You fail to capture " + GeneralData.monster_encounter)
 				emit_signal("monster_flee")
 				await text_show(GeneralData.monster_encounter + " flee")
-				await transi_close()
 				if stop_event == false:
+					await transi_close()
 					get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
 				
 		elif stop_event == false:
@@ -179,8 +178,8 @@ func set_menus_use(object):
 	if success >= 0:
 		emit_signal("catch_ok")
 		await text_show("You success to capture " + GeneralData.monster_encounter + " !")
-		await transi_close()
 		if stop_event == false:
+			await transi_close()
 			get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
 	else:
 		emit_signal("catch_fail")

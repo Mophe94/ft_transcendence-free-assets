@@ -47,52 +47,77 @@ func wait_signal_return(send_func: Callable, signal_to_wait: Signal) -> int:
 
 #############################################################################################################################################
 
+var trees_to_activate: int = 55
+var fishing_spots_to_activate: int = 45
 
-#var trigger_send = false
-#	
-#func trigger_activation():	
-#	activate_random_collectibles()
-#	activate_random_trees()
-#	activate_random_fishing_spots()
-#	trigger_send = true
-#	
-#func activate_random_collectibles() -> void:
-#	var collectibles = get_tree().get_nodes_in_group("collectible")
-#	collectibles.shuffle()
-#	var half = int(collectibles.size() / 2)
-#	for i in range(half):
-#		collectibles[i].set_interactable(true)
-#
-#@export var trees_to_activate: int = 40
-#
-#func activate_random_trees() -> void:
-#	var trees = get_tree().get_nodes_in_group("tree")
-#	trees.shuffle()
-#
-#	var count = min(trees_to_activate, trees.size())
-#	if trees_to_activate > trees.size():
-#		push_warning("trees_to_activate (%d) dépasse le nombre d'arbres présents (%d)" % [trees_to_activate, trees.size()])
-#
-#	for tree in trees:
-#		tree.set_interactable(false)
-#
-#	for i in range(count):
-#		trees[i].set_interactable(true)
-#
-#
-#@export var fishing_spots_to_activate: int = 30
-#
-#func activate_random_fishing_spots() -> void:
-#	var spots = get_tree().get_nodes_in_group("fishing_spot")
-#	spots.shuffle()
-#
-#	var count = min(fishing_spots_to_activate, spots.size())
-#	if fishing_spots_to_activate > spots.size():
-#		push_warning("fishing_spots_to_activate (%d) dépasse le nombre de spots présents (%d)" % [fishing_spots_to_activate, spots.size()])
-#
-#	for spot in spots:
-#		spot.set_interactable(false)
-#
-#	for i in range(count):
-#		spots[i].set_interactable(true)
-#
+var threesList: Array[String] = []
+var fishingList: Array[String]= []
+var objectList: Array[String] = []
+
+var trigger_send = false
+	
+func trigger_activation():	
+	activate_random_collectibles()
+	activate_random_trees()
+	activate_random_fishing_spots()
+	trigger_send = true
+
+func realloc_node():
+	realloc_object()
+	realloc_three()
+	realloc_fishing()
+
+func activate_random_collectibles() -> void:
+	var collectibles = get_tree().get_nodes_in_group("collectible")
+	collectibles.shuffle()
+	var half = int(collectibles.size() / 2)
+	for i in range(half):
+		objectList.append(collectibles[i].name)
+		collectibles[i].set_interactable(true)
+
+func realloc_object() -> void:
+	var collectibles = get_tree().get_nodes_in_group("collectible")
+	for activeC in collectibles:
+		activeC.set_interactable(activeC.name in objectList)
+
+
+func activate_random_trees() -> void:
+	var trees = get_tree().get_nodes_in_group("tree")
+	trees.shuffle()
+
+	var count = min(trees_to_activate, trees.size())
+	if trees_to_activate > trees.size():
+		push_warning("trees_to_activate (%d) dépasse le nombre d'arbres présents (%d)" % [trees_to_activate, trees.size()])
+
+	for tree in trees:
+		tree.set_interactable(false)
+
+	for i in range(count):
+		threesList.append(trees[i].name)
+		trees[i].set_interactable(true)
+		
+func realloc_three() -> void:
+	var trees = get_tree().get_nodes_in_group("tree")
+	for activeT in trees:
+			activeT.set_interactable(activeT.name in threesList)
+
+
+func activate_random_fishing_spots() -> void:
+	var spots = get_tree().get_nodes_in_group("fishing_spot")
+	spots.shuffle()
+
+	var count = min(fishing_spots_to_activate, spots.size())
+	if fishing_spots_to_activate > spots.size():
+		push_warning("fishing_spots_to_activate (%d) dépasse le nombre de spots présents (%d)" % [fishing_spots_to_activate, spots.size()])
+
+	for spot in spots:
+		spot.set_interactable(false)
+
+	for i in range(count):
+		fishingList.append(spots[i].name)
+		spots[i].set_interactable(true)
+
+func realloc_fishing() -> void:
+	var spots = get_tree().get_nodes_in_group("fishing_spot")
+	for activeF in spots:
+			activeF.set_interactable(activeF.name in fishingList)

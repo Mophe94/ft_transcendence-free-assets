@@ -56,6 +56,7 @@ func interact(_player: Node2D) -> void:
 	emit_signal("stop_inventory")
 	sprite.stop()
 	collected = true
+	GeneralProcess.objectList.erase(name)
 	await _request_item()
 	await _add_item()
 	emit_signal("update_slots")

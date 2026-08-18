@@ -65,6 +65,7 @@ func on_exit_range(_player: Node2D) -> void:
 func interact(_player: Node2D) -> void:
 	fishing_started = true
 	already_used = true
+	GeneralProcess.fishingList.erase(name)
 	fishing_bar.start()
 
 

@@ -59,11 +59,13 @@ func _ready() -> void:
 	$Player/CharacterBody2D.control = true
 #	if GeneralProcess.trigger_send == false:
 #		GeneralProcess.trigger_activation()
+#	else:
+#		GeneralProcess.realloc_node()
 	activate_random_collectibles()
 	activate_random_trees()
 	activate_random_fishing_spots()
-	if GeneralData.position_player != Vector2(0.0, 0.0):
-		$Player.position = GeneralData.position_player
+#	if GeneralData.position_player != Vector2(0.0, 0.0):
+#		$Player.position = GeneralData.position_player
 
 func _close_game():
 	if Input.is_action_just_pressed("quit"):
@@ -90,6 +92,7 @@ func activate_random_trees() -> void:
 		tree.set_interactable(false)
 
 	for i in range(count):
+		print(trees[i])
 		trees[i].set_interactable(true)
 
 

@@ -2573,6 +2573,21 @@ tile_size = Vector2i(64, 64)
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_ex8hr")
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_pxtuh"]
+texture = ExtResource("116_37vv6")
+texture_region_size = Vector2i(192, 192)
+0:0/animation_columns = 4
+0:0/animation_speed = 10.0
+0:0/animation_frame_0/duration = 1.0
+0:0/animation_frame_1/duration = 1.0
+0:0/animation_frame_2/duration = 1.0
+0:0/animation_frame_3/duration = 1.0
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_8toim"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_pxtuh")
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_orvgc"]
 texture = ExtResource("114_jt2n1")
 texture_region_size = Vector2i(192, 192)
@@ -2667,6 +2682,21 @@ texture_region_size = Vector2i(320, 320)
 tile_size = Vector2i(64, 64)
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_nv6pa")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_oicr7"]
+texture = ExtResource("122_gjy7x")
+texture_region_size = Vector2i(192, 192)
+0:0/animation_columns = 4
+0:0/animation_speed = 10.0
+0:0/animation_frame_0/duration = 1.0
+0:0/animation_frame_1/duration = 1.0
+0:0/animation_frame_2/duration = 1.0
+0:0/animation_frame_3/duration = 1.0
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_pxtuh"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_oicr7")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fop3w"]
 texture = ExtResource("129_q8jj8")
@@ -3012,8 +3042,6 @@ animations = [{
 
 [node name="world1" type="Node2D" unique_id=1653227762]
 script = ExtResource("1_xrrma")
-trees_to_activate = 40
-fishing_spots_to_activate = 30
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1232063011]
 
@@ -3723,7 +3751,7 @@ tile_set = SubResource("TileSet_4khdf")
 
 [node name="warriorAttac2" type="TileMapLayer" parent="Deco_pnj_layer/yellowPnjLayer" unique_id=1585785068]
 z_index = 8
-tile_map_data = PackedByteArray("AAA+ABYAAAAAAAAAAAAyABgAAAAAAAAAAAA2ACAAAAAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAAyABgAAAAAAAAAAAA2ACAAAAAAAAAAAAA=")
 tile_set = SubResource("TileSet_5hrnt")
 
 [node name="runWarrior" type="TileMapLayer" parent="Deco_pnj_layer/yellowPnjLayer" unique_id=571562541]
@@ -3751,6 +3779,11 @@ z_index = 7
 tile_map_data = PackedByteArray("AABPABsAAAAAAAAAAAA=")
 tile_set = SubResource("TileSet_benk5")
 
+[node name="warriorNoCollision" type="TileMapLayer" parent="Deco_pnj_layer/yellowPnjLayer" unique_id=464408185]
+z_index = 8
+tile_map_data = PackedByteArray("AAA+ABYAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_8toim")
+
 [node name="blackPnjLayer" type="Node" parent="Deco_pnj_layer" unique_id=804718935]
 
 [node name="archerShoot" type="TileMapLayer" parent="Deco_pnj_layer/blackPnjLayer" unique_id=115886403]
@@ -3765,12 +3798,12 @@ tile_set = SubResource("TileSet_wifq7")
 [node name="warriorAttack" type="TileMapLayer" parent="Deco_pnj_layer/blackPnjLayer" unique_id=603287851]
 z_index = 8
 position = Vector2(1, 0)
-tile_map_data = PackedByteArray("AAA/ABYAAAAAAAAAABAuABwAAAAAAAAAABAzABgAAAAAAAAAABA3ACAAAAAAAAAAABA=")
+tile_map_data = PackedByteArray("AAAuABwAAAAAAAAAABAzABgAAAAAAAAAABA3ACAAAAAAAAAAABA=")
 tile_set = SubResource("TileSet_kueic")
 
 [node name="warriorAttack2" type="TileMapLayer" parent="Deco_pnj_layer/blackPnjLayer" unique_id=1229056667]
 z_index = 8
-tile_map_data = PackedByteArray("AAA/ABYAAAAAAAAAABAuABwAAAAAAAAAABAzABgAAAAAAAAAABA3ACAAAAAAAAAAABA=")
+tile_map_data = PackedByteArray("AAAuABwAAAAAAAAAABAzABgAAAAAAAAAABA3ACAAAAAAAAAAABA=")
 tile_set = SubResource("TileSet_kueic")
 
 [node name="lancerRun" type="TileMapLayer" parent="Deco_pnj_layer/blackPnjLayer" unique_id=874424025]
@@ -3782,6 +3815,11 @@ tile_set = SubResource("TileSet_vnluw")
 z_index = 7
 tile_map_data = PackedByteArray("AAA+ABsAAAAAAAAAABA+ABwAAAAAAAAAABA9ABwAAAAAAAAAABA=")
 tile_set = SubResource("TileSet_xoxx5")
+
+[node name="warrioNoCollision" type="TileMapLayer" parent="Deco_pnj_layer/blackPnjLayer" unique_id=1816521801]
+z_index = 8
+tile_map_data = PackedByteArray("AAA/ABYAAAAAAAAAABA=")
+tile_set = SubResource("TileSet_pxtuh")
 
 [node name="purplePnjLayer" type="Node" parent="Deco_pnj_layer" unique_id=1078948826]
 
@@ -3811,7 +3849,7 @@ tile_set = SubResource("TileSet_277l5")
 
 [node name="Player" parent="." unique_id=622233450 instance=ExtResource("72_benk5")]
 z_index = 4
-position = Vector2(4937, 1105)
+position = Vector2(5069, 1559)
 
 [node name="Collision" type="StaticBody2D" parent="." unique_id=828704952]
 
