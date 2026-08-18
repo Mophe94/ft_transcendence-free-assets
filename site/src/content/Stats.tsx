@@ -39,11 +39,10 @@ export default function Stats({ user, stats }: StatsProps) {
     'Games played': stats.gamesPlayed,
     'PvP win': stats.gamesWon,
     'PvPlost': stats.gamesLost,
-    'Total Damage Inflicted': stats.totalDamageDealt,
-    'Total Damage Receievd': stats.totalDamageReceived,
-    'Discovered monsters': `${stats.nbMonstersDiscovered} / ??`,
-    'Discovered objects': `${stats.nbObjectsDiscovered} / ??`,
-    'Achievements': `${stats.nbAchievements} / ??`,
+    'Total players defeated': stats.totalPlayerDefeated,
+    'Discovered monsters': stats.nbMonstersDiscovered,
+    'Discovered endings': stats.nbEndingsDiscovered,
+    'Achievements': stats.nbAchievements,
   };
 
   const coalitionName = getCoalition(user.coalitionId);

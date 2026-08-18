@@ -117,10 +117,13 @@ CREATE TABLE public.users_stats (
     games_played integer DEFAULT 0 CONSTRAINT users_stat_games_played_not_null NOT NULL,
     games_won integer DEFAULT 0 CONSTRAINT users_stat_games_won_not_null NOT NULL,
     games_lost integer DEFAULT 0 CONSTRAINT users_stat_games_lost_not_null NOT NULL,
-    total_players_defeated integer DEFAULT 0 CONSTRAINT users_stat_total_players_defeated_not_null NOT NULL,
-    nb_monsters_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_monsters_discovered_not_null NOT NULL,
-    nb_endings_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_endings_discovered_not_null NOT NULL,
-    nb_achievements integer DEFAULT 0 CONSTRAINT users_stat_nb_achievements_not_null NOT NULL,
+    total_player_defeated integer DEFAULT 0 CONSTRAINT users_stat_total_player_defeated_not_null NOT NULL,
+    monsters_discovered text[] DEFAULT ARRAY[]::text[] CONSTRAINT users_stat_monsters_discovered_not_null NOT NULL,
+	nb_monsters_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_monsters_discovered_not_null NOT NULL,
+    endings_discovered text[] DEFAULT ARRAY[]::text[] CONSTRAINT users_stat_endings_discovered_not_null NOT NULL,
+	nb_endings_discovered integer DEFAULT 0 CONSTRAINT users_stat_nb_endings_discovered_not_null NOT NULL,
+    achievements text[] DEFAULT ARRAY[]::text[] CONSTRAINT users_stat_achievements_not_null NOT NULL,
+	nb_achievements integer DEFAULT 0 CONSTRAINT users_stat_nb_achievements_not_null NOT NULL,
     created_at timestamp with time zone DEFAULT now() CONSTRAINT users_stat_created_at_not_null NOT NULL,
     updated_at time with time zone DEFAULT now() CONSTRAINT users_stat_updated_at_not_null NOT NULL
 );
@@ -164,7 +167,7 @@ COPY public.users (id, email, username, password_hash, is_onboarded, created_at,
 -- Data for Name: users_stats; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users_stats (user_id, games_played, games_won, games_lost, total_players_defeated, nb_monsters_discovered, nb_endings_discovered, nb_achievements, created_at, updated_at) FROM stdin;
+COPY public.users_stats (user_id, games_played, games_won, games_lost, total_player_defeated, monsters_discovered, nb_monsters_discovered, endings_discovered, nb_endings_discovered, achievements, nb_achievements, created_at, updated_at) FROM stdin;
 \.
 
 

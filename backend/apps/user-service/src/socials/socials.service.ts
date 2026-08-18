@@ -54,6 +54,26 @@ export class SocialService {
     });
   }
 
+  async checkExistingFriendship(
+    userId1: string,
+    userId2: string,
+  ): Promise<Relationship | null> {
+    return await this.repo.findOne({
+      where: [
+        {
+          requesterId: userId1,
+          accepterId: userId2,
+          status: RelationshipStatus.ACCEPTED,
+        },
+        {
+          requesterId: userId2,
+          accepterId: userId1,
+          status: RelationshipStatus.ACCEPTED,
+        },
+      ],
+    });
+  }
+
   async getReceivedRequest(userId: string): Promise<Array<Partial<User>>> {
     return await this.repo
       .createQueryBuilder('relationship')

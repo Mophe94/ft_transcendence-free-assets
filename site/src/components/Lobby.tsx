@@ -7,8 +7,9 @@ import SlotBg from '../background/SlotBg';
 import JoinButton from './buttons/JoinButton';
 import { useLobbySocket } from '../context/LobbySocketContext';
 import { useAuth } from '../context/AuthContext';
-import { AVATARS } from '../content/Preferences';
 import Heading from './heading/Heading';
+import { SKINS } from '../assets/avatars';
+
 
 interface Room {
   roomId: string;
@@ -18,7 +19,7 @@ interface Room {
 
 export function Lobby() {
   const [listGames, setListGames] = useState<Array<Room>>([]);
-  const [avatar, setAvatar] = useState<string>(AVATARS[0][0]);
+  const [avatar, setSkin] = useState<string>(SKINS[0][0]);
   const { roomId, createRoom, quickPairing, joinRoom, joinError } = useLobbySocket();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ export function Lobby() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data?.settings?.avatar) setAvatar(data.settings.avatar);
+        if (data?.settings?.avatar) setSkin(data.settings.avatar);
       })
       .catch((e) => console.log(e));
   }, [user?.username]);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import GameIframe from '../content/GameIframe';
 import GameRoom from '../content/GameRoom';
 import { useLobbySocket } from '../context/LobbySocketContext';
+import Heading from '../components/heading/Heading';
 
 export default function Play() {
   const { roomId, players, roomCapacity, timer, gameStarted, reset } = useLobbySocket();
@@ -26,11 +27,13 @@ export default function Play() {
   }
 
   return (
-    <GameRoom
-      roomName={roomId}
-      players={players}
-      roomCapacity={roomCapacity}
-      endTime={timer}
-    />
+    <>
+      <GameRoom
+        roomName={roomId}
+        players={players}
+        roomCapacity={roomCapacity}
+        endTime={timer}
+      />
+    </>
   );
 }
