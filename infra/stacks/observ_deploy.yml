@@ -27,7 +27,7 @@ services:
       - games_net
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:13.2
     user: "${GRAFANA_UID}:${GRAFANA_GID}"
     configs:
         - source: grafana_datasources
@@ -127,10 +127,21 @@ services:
       - source: alloy_config
         target: /etc/alloy/config.alloy
     volumes:
+      # Unix exporter
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/host/root:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+      # cAdvisor
+      - /sys:/sys:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /var/lib/docker:/var/lib/docker:ro
+
+      # Docker API
+      - /var/run/docker.sock:/var/run/docker.sock
+
+      - /dev:/dev:ro
     environment:
       - NODE_HOSTNAME="{{.Node.Hostname}}"
       - NODE_ID="{{.Node.ID}}"
