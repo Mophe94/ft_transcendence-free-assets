@@ -6,10 +6,11 @@ import { MapService } from './map.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
-import { GamePayload } from 'apps/game-service/src/game/game.type';
+import { GameMessage, GameData } from 'apps/game-service/src/game/game.type';
 import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
+import { response } from 'node_modules/@types/express';
 
 @Injectable()
 export class GameService {
@@ -190,7 +191,7 @@ export class GameService {
     this.eventEmitter.emit('close_player_socket', { userId });
   }
 
-  private sendToPlayer(userId: string, payload: GamePayload): void {
+  private sendToPlayer(userId: string, payload: GameMessage): void {
     //console.log("Send_to_player: id: ", userId);
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
@@ -457,8 +458,8 @@ export class GameService {
 
   async handleMessage(
     userId: string,
-    payload: any,
-  ): Promise<GamePayload | undefined> {
+    payload: GameData,
+  ): Promise<void> {
     const player = this.playerService.getPlayer(userId)!;
     const userId2 = this.combatService.getOpponentId(userId);
     const roomId = this.roomIdByPlayer.get(userId)!;
@@ -473,22 +474,22 @@ export class GameService {
         await this.eliminatePlayer(player.id, roomId);
       if (player.status === 'winner' && player.roundsRemaining === 0)
         await this.eliminatePlayer(player.id, roomId);
-      return undefined;
+      return;
     }
 
     if (!userId2) {
       console.log(`[GameService]: userId2 for ${userId} is missing`);
-      return undefined;
+      return;
     }
 
     const player2 = userId2 ? this.playerService.getPlayer(userId2) : undefined;
 
     if (!player2) {
       console.log(`[GameService]: No opponent for ${userId}`);
-      return undefined;
+      return;
     }
 
-    let result: GamePayload | undefined;
+    let result: GameMessage | undefined;
     switch (state) {
       case 'add_item':
         result = this.mapService.received_add_item(player);
@@ -555,9 +556,9 @@ export class GameService {
         break;
       default:
         console.log('Unknow state:', state);
-        return undefined;
     }
-    return result;
+    if (result)
+      this.sendToPlayer(userId, result);
   }
 
   private resolveTurn(

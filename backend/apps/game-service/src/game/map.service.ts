@@ -4,9 +4,9 @@ import { MonstersService } from './entities/monsters.service';
 import { TilesService } from './entities/tiles.service';
 import { ItemsService } from './entities/items.service';
 import {
-  CurrentActions,
   Skill as PlayerSkill,
 } from './player/player.interfaces';
+import { GameMessage } from './game.type';
 
 @Injectable()
 export class MapService {
@@ -122,7 +122,7 @@ export class MapService {
   async received_team_choice(
     player: Player,
     monsters: string[],
-  ): Promise<object | undefined> {
+  ): Promise<GameMessage | undefined> {
     const monstersToLoad: { name: string; slot: number }[] = []; //arr objects
     let count = 0;
 

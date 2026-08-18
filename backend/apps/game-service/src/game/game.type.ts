@@ -3,7 +3,8 @@ export interface GameData {
   [key: string]: any;
 }
 
-export interface GamePayload {
+export interface GameMessage {
+  event: string;
   data: GameData;
 }
 

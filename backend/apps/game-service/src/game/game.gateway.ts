@@ -11,7 +11,7 @@ import { Interval } from '@nestjs/schedule';
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
 import { PlayerService } from './player/player.service';
-import type { GamePayload } from './game.type';
+import type { GameMessage, GameData } from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
@@ -97,7 +97,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  private sendToClient(client: WebSocket, message: object | undefined) {
+  private sendToClient(client: WebSocket, message: GameMessage | undefined) {
     if (!message) {
       console.log('[GameGateway] sendToclient called with undefined payload (skipping)');
       return
@@ -125,7 +125,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('game')
   async handleGame(
     @ConnectedSocket() client: WebSocket,
-    @MessageBody() payload: GamePayload,
+    @MessageBody() payload: GameData,
   ): Promise<void> {
     // create a GamePayload interface to avoid 'any'?
     const clientData = this.clients.get(client);
@@ -136,15 +136,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const userId = clientData.userId;
 
-    let response;
     try {
-      response = await this.gameService.handleMessage(userId, payload);
+      await this.gameService.handleMessage(userId, payload);
     }
     catch (err) {
       console.log('[GameGateway] handleMessage error: ', err);
-      response = { event: 'game', data: { state: 'error', message: 'internal error'} };
     }
-    this.sendToClient(client, response);
 
     /////////////////////////////////* REDIS STATE : UPDATE STATE */////////////////////////////////
     const playerState = this.playerService.getPlayer(userId)!;
@@ -163,7 +160,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     payload,
   }: {
     userId: string;
-    payload: GamePayload;
+    payload: GameMessage;
   }): void {
     const client = this.clientsById.get(userId);
     if (client) {
@@ -177,7 +174,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     payload,
   }: {
     clients: Set<WebSocket>;
-    payload: GamePayload;
+    payload: GameMessage;
   }): void {
     this.broadcast(clients, payload);
   }

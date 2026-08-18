@@ -6,6 +6,7 @@ import {
   CurrentMonster,
   Skill,
 } from './player/player.interfaces';
+import { GameMessage } from './game.type';
 
 @Injectable()
 export class CombatService {
@@ -122,9 +123,9 @@ export class CombatService {
 
   // Helper
   private pushResult(
-    map: Map<string, Array<Object>>,
+    map: Map<string, GameMessage[]>,
     playerId: string,
-    result: Object,
+    result: GameMessage,
   ): void {
     const arr = map.get(playerId);
     if (arr) arr.push(result);
@@ -134,8 +135,8 @@ export class CombatService {
   resolving_battle_round(
     player1: Player,
     player2: Player,
-  ): Map<string, Array<Object>> {
-    let map_result = new Map<string, Array<Object>>();
+  ): Map<string, GameMessage[]> {
+    let map_result = new Map<string, GameMessage[]>();
     let first: Player = this.resolve_first(player1, player2);
     let second: Player = first === player1 ? player2 : player1;
 
