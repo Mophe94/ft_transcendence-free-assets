@@ -8,7 +8,10 @@ export interface GameMessage {
   data: GameData;
 }
 
-export const FULL = 2;
+export interface RoomAcces {
+  capacity: number;
+  skin: string;
+}
 
 export const PHASE_DURATIONS = {
   lobby: 10,

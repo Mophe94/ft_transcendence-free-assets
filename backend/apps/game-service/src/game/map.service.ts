@@ -277,21 +277,6 @@ export class MapService {
 
   // JSON RESPONSE
   start_game(player: Player) {
-    // return {
-    //   event: 'game',
-    //   data: {
-    //     state: 'start_game',
-    //     player: {
-    //       id: player.id,
-    //       name: player.name,
-    //       asset: player.asset,
-    //       team: player.team,
-    //     },
-    //     timer: player.timer,
-    //     current_map: player.current_map,
-    //   },
-    // };
-    //const monster = await this.initMonster(player, 2/* payload.data.monsterId */);
     return {
       event: 'game',
       data: {
@@ -299,7 +284,7 @@ export class MapService {
         player: {
           id: player.id,
           name: player.id,
-          asset: 'dinoBlue',
+          asset: player.asset,
           team: player.team,
         },
         timer: player.timer,

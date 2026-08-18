@@ -6,11 +6,12 @@ export class PlayerService {
   players = new Map<string, Player>();
   idsByPlayers = new Map<Player, string>();
 
-  initPlayer(userId: string): void {
+  initPlayer(userId: string, skin: string): void {
+    console.log("SKIN: ", skin);
     const player = new Player(
       userId,
-      userId.toString(), //need to retrieve name from userDB
-      'dino',
+      userId,
+      skin,
     );
     this.players.set(userId, player);
     this.idsByPlayers.set(player, userId);
@@ -18,11 +19,6 @@ export class PlayerService {
 
   injectPlayer(userId: string, player: Player): void {
     this.players.set(userId, player);
-  }
-
-  initDefaultPlayer(): Player {
-    const player = new Player('', '', 'dino');
-    return player;
   }
 
   getPlayer(userId: string): Player | undefined {

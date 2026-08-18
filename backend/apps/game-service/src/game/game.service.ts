@@ -6,11 +6,12 @@ import { MapService } from './map.service';
 import { Player } from './player/player';
 import { CombatService } from './combat.service';
 import { PhaseTimerService } from 'apps/game-service/src/shared/phase-timer.service';
-import { GameMessage, GameData } from 'apps/game-service/src/game/game.type';
-import { FULL, PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
+import { GameMessage, GameData, RoomAcces } from 'apps/game-service/src/game/game.type';
+import { PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
-import { response } from 'node_modules/@types/express';
+import { LOBBY_KEYS } from '../lobby/lobby.const';
+
 
 @Injectable()
 export class GameService {
@@ -30,8 +31,6 @@ export class GameService {
   private gameRooms = new Map<string, Set<string>>();
   // userId -> roomId
   private roomIdByPlayer = new Map<string, string>();
-  // roomIds -> authorized players
-  private readonly authorizedPlayers = new Map<string, Set<number>>();
   // roomId -> active players
   private activePlayersByRoom = new Map<string, Set<string>>();
 
@@ -41,13 +40,26 @@ export class GameService {
 
   /*  GAME ROOMS */
 
-  registerRoom(roomId: string, userIds: string[]): void {
-    //this.authorizedPlayers.set(roomId, new Set(userIds));
-    this.activePlayersByRoom.set(roomId, new Set(userIds));
-  }
+  async  verifyRoomAccess(userId: string, roomId: string): Promise<RoomAcces | null> {
+    const [isActive, players, capacity] = await Promise.all([
+      this.redisService.isInSet(LOBBY_KEYS.ACTIVE_ROOMS, roomId),
+      this.redisService.getPlayersFromRoom(roomId),
+      this.redisService.getRoomCapacity(roomId),
+    ]);
 
-  isPlayerInRoom(userId: number, roomId: string): boolean {
-    return this.authorizedPlayers.get(roomId)?.has(userId) ?? false;
+    if (!isActive) {
+      console.log(`[GameGateway]: Room ${roomId} not found or not active`);
+      return null;
+    }
+
+    // is authorize? 
+    const player = players.find((p) => p.username === userId);
+    if (!player) {
+      console.log(`[GameGateway]: User ${userId} not authorized in room ${roomId}`);
+      return null
+    }
+
+    return {capacity, skin: player.skin };
   }
 
   private joinGameRoom(roomId: string, userId: string): Set<string> {
@@ -72,9 +84,9 @@ export class GameService {
   /*  GAME  */
 
   async onGodotConnected(
-    client: WebSocket,
     userId: string,
     roomId: string,
+    access: RoomAcces,
   ): Promise<void> {
     const roomPlayers = this.joinGameRoom(roomId, userId);
     this.roomIdByPlayer.set(userId, roomId);
@@ -82,11 +94,8 @@ export class GameService {
 
     // Init or retrieve Player
     //if (!this.playerService.getPlayer(userId))
-    this.playerService.initPlayer(userId);
+    this.playerService.initPlayer(userId, access.skin);
     const player = this.playerService.getPlayer(userId)!;
-
-    // change FULL for real room capacity
-    console.log('ON GODOT CONNECTED ROUND REMAINING: ', player.roundsRemaining);
 
     let activePlayers = this.activePlayersByRoom.get(roomId);
     if (!activePlayers) {
@@ -94,41 +103,23 @@ export class GameService {
       this.activePlayersByRoom.set(roomId, activePlayers);
     }
     activePlayers.add(userId);
-
     console.log('Active Players at start: ', this.activePlayersByRoom);
     console.log('*********************************************');
-    player.roundsRemaining = Math.log2(FULL); //this.activePlayersByRoom.get(roomId)?.size! / 2;
+    player.roundsRemaining = Math.log2(access.capacity);
 
-    // FULL need to be repalaced by the real capacity of the room retrieved from redis
     if (
-      roomPlayers.size === FULL /* this.activePlayersByRoom.get(roomId)?.size */
-    ) {
+      roomPlayers.size === access.capacity ) {
       /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
       for (const userId of roomPlayers) {
         const playerState = this.playerService.getPlayer(userId)!;
         await this.redisStateService.updateStatePlayer(
-          userId.toString(),
+          userId,
           playerState,
         );
       }
       /////////////////////////////////* END */////////////////////////////////
       this.combatService.matchmake(roomPlayers);
-      // TEST MATCHMAKING //
-      for (const userId of roomPlayers) {
-        const opponentId = this.combatService.getOpponentId(userId);
-        const enemy = opponentId
-          ? this.playerService.getPlayer(opponentId)
-          : undefined;
-        if (!enemy) {
-          console.log(
-            `[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`,
-          );
-        }
-        console.log('USER ID: ', userId);
-        console.log('OPONNENT ID: ', opponentId);
-        console.log('******************');
-      }
-
+      console.log("PLAYER SKIN: ", player.asset);
       this.startMapPhase(roomId, roomPlayers);
     }
   }
@@ -137,7 +128,7 @@ export class GameService {
     const room = this.gameRooms.get(roomId);
     if (!room || !room.has(userId)) return;
     /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
-    await this.redisStateService.removePlayer(userId.toString());
+    await this.redisStateService.removePlayer(userId);
     /////////////////////////////////* END */////////////////////////////////
 
     const player = this.playerService.getPlayer(userId);
@@ -150,45 +141,6 @@ export class GameService {
 
     if (wasEliminated) this.startNextRound(roomId);
     else this.deleteAbortedGame(roomId, userId);
-  }
-
-  // Big cleaning -> see with IA
-  private deleteAbortedGame(roomId: string, disconnectedUserId: string): void {
-    const remaining = this.gameRooms.get(roomId);
-    const allInvolved = new Set(remaining ?? []);
-    allInvolved.add(disconnectedUserId);
-
-    for (const id of allInvolved) {
-      const combatRoomId = this.combatService.playerCombatRoom.get(id);
-      if (combatRoomId) {
-        this.combatService.combatRooms.delete(combatRoomId);
-        this.phaseTimer.clear(`combat: ${combatRoomId}`);
-      }
-      this.combatService.playerCombatRoom.delete(id);
-      this.roomIdByPlayer.delete(id);
-      if (id !== disconnectedUserId)
-        this.eventEmitter.emit('close_player_socket', { userId: id });
-    }
-    this.combatService.playerCombatRoom.delete(disconnectedUserId);
-    this.roomIdByPlayer.delete(disconnectedUserId);
-
-    this.phaseTimer.clear(`game: ${roomId}`);
-
-    this.gameRooms.delete(roomId);
-    this.activePlayersByRoom.delete(roomId);
-    this.authorizedPlayers.delete(roomId);
-  }
-
-  private async eliminatePlayer(userId: string, roomId: string): Promise<void> {
-    console.log(
-      `[GameService] Eliminating player ${userId} from room ${roomId}`,
-    );
-    // IF BOT?
-    if (userId === '') {
-      await this.onGodotDisconnected(userId, roomId);
-      return;
-    }
-    this.eventEmitter.emit('close_player_socket', { userId });
   }
 
   private sendToPlayer(userId: string, payload: GameMessage): void {
@@ -224,8 +176,6 @@ export class GameService {
       this.combatService.matchmake(connected);
       this.startMapPhase(roomId, connected, true);
     } else if (allCombatsFinished && active.size === 1) {
-      //console.log('Active Players last winner:  ', active);
-      //console.log('Connected Players last winner: ', connected);
       console.log('*********************************************');
       const winnerId = [...active][0];
       if (winnerId) {
@@ -238,11 +188,50 @@ export class GameService {
     }
   }
 
+  /* Cleaning */
+
+  private async eliminatePlayer(userId: string, roomId: string): Promise<void> {
+    console.log(
+      `[GameService] Eliminating player ${userId} from room ${roomId}`,
+    );
+    // IF BOT?
+    if (userId === '') {
+      await this.onGodotDisconnected(userId, roomId);
+      return;
+    }
+    this.eventEmitter.emit('close_player_socket', { userId });
+  }
+
+  // Big cleaning -> see with IA
+  private deleteAbortedGame(roomId: string, disconnectedUserId: string): void {
+    const remaining = this.gameRooms.get(roomId);
+    const allInvolved = new Set(remaining ?? []);
+    allInvolved.add(disconnectedUserId);
+
+    for (const id of allInvolved) {
+      const combatRoomId = this.combatService.playerCombatRoom.get(id);
+      if (combatRoomId) {
+        this.combatService.combatRooms.delete(combatRoomId);
+        this.phaseTimer.clear(`combat: ${combatRoomId}`);
+      }
+      this.combatService.playerCombatRoom.delete(id);
+      this.roomIdByPlayer.delete(id);
+      if (id !== disconnectedUserId)
+        this.eventEmitter.emit('close_player_socket', { userId: id });
+    }
+    this.combatService.playerCombatRoom.delete(disconnectedUserId);
+    this.roomIdByPlayer.delete(disconnectedUserId);
+
+    this.phaseTimer.clear(`game: ${roomId}`);
+
+    this.gameRooms.delete(roomId);
+    this.activePlayersByRoom.delete(roomId);
+  }
+
   private deleteEndGame(roomId: string, winnerId: string): void {
     this.phaseTimer.clear(`game: ${roomId}`);
     this.gameRooms.delete(roomId);
     this.activePlayersByRoom.delete(roomId);
-    this.authorizedPlayers.delete(roomId);
     this.roomIdByPlayer.delete(winnerId);
     this.combatService.playerCombatRoom.delete(winnerId);
 
@@ -254,6 +243,8 @@ export class GameService {
       console.log([`GameService] deleteRoom: failed cleaning of ${roomId}`]),
     );
   }
+
+  /* Start Phases */
 
   private startMapPhase(
     roomId: string,
@@ -477,6 +468,8 @@ export class GameService {
     }
     return false;
   }
+
+  /* HANDLE MESSAGE */
 
   async handleMessage(userId: string, payload: GameData): Promise<void> {
     const player = this.playerService.getPlayer(userId)!;

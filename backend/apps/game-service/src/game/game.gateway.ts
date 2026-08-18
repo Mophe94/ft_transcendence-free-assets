@@ -15,6 +15,7 @@ import type { GameMessage, GameData } from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
+import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
 import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
 
@@ -25,9 +26,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
     private wsAuthService: SharedAuthService,
+    private gameService: GameService,
     private playerService: PlayerService,
     private redisStateService: RedisStateService,
-    private gameService: GameService,
   ) {}
   private clients = new Map<WebSocket, ClientData>();
   private clientsById = new Map<string, WebSocket>();
@@ -38,19 +39,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): Promise<void> {
     const url = request.url!;
     const params = new URLSearchParams(url.split('?')[1]);
-    const token = params.get('token');
     const roomId = params.get('room');
-    console.log(url);
 
     const user = await this.wsAuthService.verifyWsHandshake(request);
-    if (!user.username) {
+    if (!user.username || !user.id) {
       client.close(1008, 'Unauthorized');
       return;
     }
     const userId = user.username;
-    if (!token || !roomId) {
-      console.log('[GameGateway]: Missing token to authenticate');
-      client.close();
+
+    if (!roomId) {
+      console.log('[GameGateway]: Missing roomId');
+      client.close(4000, 'Missing roomId');
+      return;
+    }
+
+    const access = await this.gameService.verifyRoomAccess(userId, roomId);
+    if (access === null) {
+      client.close(4003, 'Room not found or not authorized');
       return;
     }
 
@@ -61,10 +67,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.on('pong', () => {
       console.log('pong received');
       const data = this.clients.get(client);
-      if (data) data.isAlive = true; //
+      if (data) data.isAlive = true;
     });
 
-    this.gameService.onGodotConnected(client, userId, roomId).catch((err) => {
+    this.gameService.onGodotConnected(userId, roomId, access).catch((err) => {
       console.log('[GameGateway]: handleConnection error');
       client.close();
     });
