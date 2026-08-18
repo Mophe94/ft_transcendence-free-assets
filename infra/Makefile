@@ -37,8 +37,8 @@ swarm_launch: wait_tailscale
 	$(MAKE) swarm_setup
 	$(MAKE) core
 	$(MAKE) base
-	$(MAKE) -f push
-	$(MAKE) -f website observ game
+	$(MAKE) -j4 push
+	$(MAKE) -j4 website observ game
 
 swarm_setup:
 	@chmod +x $(CONFIG_SCRIPTS)/launch_swarm.sh

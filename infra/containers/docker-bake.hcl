@@ -2,6 +2,8 @@ variable "LOCAL" { default = false }
 variable "REGISTRY" { default = "127.0.0.1:5050" }
 variable "TAG" { default = "latest" }
 variable "BAKE_ROOT" { default = "." }
+variable "HOST_IP" { default = "127.0.0.1" }
+variable "API_42_CLIENT_ID" { default = "" }
 
 group "base" {
     targets = ["node-base", "postgress-base"]
