@@ -22,9 +22,9 @@ export default function Play() {
 
   if (!roomId) return null;
 
-  // if (gameStarted) {
-  //   return <GameIframe userToken="game" roomToken={roomId} />;
-  // }
+  if (gameStarted) {
+    return <GameIframe userToken="game" roomToken={roomId} />;
+  }
 
   return (
     <>
