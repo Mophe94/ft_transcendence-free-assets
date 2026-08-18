@@ -22,6 +22,7 @@ import { SocialService } from './socials.service';
 import { CheckOnlineUsersDto } from 'apps/chat-service/src/chat/dto/checkOnlineUsers.dto';
 import { AcceptFriendRequestDto } from './dto/accept-friend-request.dto';
 import { RemoveRelationDto } from './dto/remove-relation.dto';
+import { SendGameInviteDto } from './dto/send-game-invite.dto';
 
 @Controller('friends')
 export class SocialsController {
@@ -261,5 +262,63 @@ export class SocialsController {
     );
 
     return result;
+  }
+
+  @Post('send_game_invite')
+  @UseGuards(JwtHttpGuard)
+  async sendGameInvite(
+    @Req() req: AuthenticatedRequest,
+    @Body() sendGameInviteDto: SendGameInviteDto,
+  ) {
+    if (!req?.user?.id) {
+      this.logger.warn('[POST /send_game_invite] Unauthorized access attempt');
+      throw new UnauthorizedException('Unauthorized call');
+    }
+
+    const senderId = req.user.id;
+    const senderUsername = req.user.username;
+    const roomId = sendGameInviteDto.roomId;
+    const destinatoryId = sendGameInviteDto.destinatory;
+    const existingFriendship =
+      await this.socialsService.checkExistingFriendship(
+        senderId,
+        destinatoryId,
+      );
+    if (!existingFriendship) {
+      this.logger.warn(
+        `[POST /send_game_invite] No Friendship relation between ${senderId} and ${destinatoryId}`,
+      );
+      throw new UnauthorizedException('Target user not found');
+    }
+
+    const response = await fetch(`http://chat_service:3000/send_game_invite`, {
+      headers: { 'Content-type': 'application/json' },
+      method: 'POST',
+      body: JSON.stringify({
+        senderId,
+        senderUsername,
+        destinatoryId,
+        roomId,
+      }),
+    }).catch((error: unknown) => {
+      this.logger.error(
+        `[POST /send_game_invite] Error contacting chat service: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    });
+
+    if (response && response.ok) {
+      this.logger.log(
+        `[POST /send_game_invite] Notification sent to chat service for recipient ${destinatoryId}`,
+      );
+      return { send: true };
+    } else {
+      this.logger.warn(
+        `[POST /send_game_invite] Chat service returned status ${response?.status} for game invitation`,
+      );
+    }
+
+    return { send: false };
   }
 }

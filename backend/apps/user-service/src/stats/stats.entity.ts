@@ -22,10 +22,10 @@ export class UserStats {
   user!: User;
 
   @Column({
-    name: 'total_players_defeated',
+    name: 'total_player_defeated',
     default: 0,
   })
-  totalPlayersDefeated!: number;
+  totalPlayerDefeated!: number;
 
   @Column({
     name: 'games_won',
@@ -46,22 +46,46 @@ export class UserStats {
   gamesPlayed!: number;
 
   @Column({
+    name: 'monsters_discovered',
+    type: 'text',
+	array: true,
+    default: '{}',
+  })
+  MonstersDiscovered!: string[];
+
+  @Column({
     name: 'nb_monsters_discovered',
     default: 0,
   })
-  nbMonstersDiscovered!: number;
+  NbMonstersDiscovered!: number;
+
+  @Column({
+    name: 'endings_discovered',
+    type: 'text',
+	array: true,
+   default: '{}',
+  })
+  EndingsDiscovered!: string[];
 
   @Column({
     name: 'nb_endings_discovered',
     default: 0,
   })
-  nbEndingsDiscovered!: number;
+  NbEndingsDiscovered!: number;
+
+  @Column({
+    name: 'achievements',
+	type: 'text',
+	array: true,
+    default: '{}',
+  })
+  Achievements!: string[];
 
   @Column({
     name: 'nb_achievements',
     default: 0,
   })
-  nbAchievements!: number;
+  NbAchievements!: number;
 
   @CreateDateColumn({
     name: 'created_at',

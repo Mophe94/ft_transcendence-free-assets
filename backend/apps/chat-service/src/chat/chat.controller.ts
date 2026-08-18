@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -80,6 +81,38 @@ export class ChatController {
 
     this.logger.log(
       `[INTERNAL POST /send_request_notif] Friend request notification from Sender: ${body.senderId} -> Target: ${body.destinatoryId} (Delivered: ${isSent})`,
+    );
+    return { success: true, delivered: isSent };
+  }
+
+  @Post('/send_game_invite')
+  sendGameInvite(
+    @Body()
+    body: {
+      senderId: string;
+      senderUsername: string;
+      destinatoryId: string;
+      roomId: string;
+    },
+  ) {
+    this.logger.log(
+      `Receiving request for sending game_invite: ${body.destinatoryId}`,
+    );
+
+    if (body.senderId === body.destinatoryId) {
+      this.logger.warn(
+        `[INTERNAL POST /send_game_invite] User ${body.senderId} attempted to add themselves`,
+      );
+      throw new BadRequestException('Cannot invite yourself');
+    }
+    const isSent = this.chatGateway.sendNotifToUser(
+      body.destinatoryId,
+      MessageEvent.GAME_INVITE,
+      { from: body.senderUsername, roomId: body.roomId },
+    );
+
+    this.logger.log(
+      `[INTERNAL POST /send_game_invite] Game invite for room ${body.roomId} from Sender: ${body.senderId} -> Target: ${body.destinatoryId} (Delivered: ${isSent})`,
     );
     return { success: true, delivered: isSent };
   }

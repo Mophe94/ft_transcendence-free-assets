@@ -8,38 +8,18 @@ import { useNotification } from '../context/NotifContext';
 import { useParams } from 'react-router-dom';
 import type { Settings } from '../types/user';
 
-import dinoBlue from '../assets/avatars/DinoBlue.gif';
-import dinoGreen from '../assets/avatars/DinoGreen.gif';
-import dinoRed from '../assets/avatars/DinoRed.gif';
-import dinoYellow from '../assets/avatars/DinoYellow.gif';
-import ghost from '../assets/avatars/Ghost.gif';
-import ghost02 from '../assets/avatars/Ghost02.gif';
-import ghost03 from '../assets/avatars/Ghost03.gif';
-import satyr01 from '../assets/avatars/Satyr01.gif';
-import satyr02 from '../assets/avatars/Satyr02.gif';
-import satyr03 from '../assets/avatars/Satyr03.gif';
+
 import sunTheme from '../assets/theme/sun_icon.png';
 import moonTheme from '../assets/theme/moon_icon.png';
 import pisciner from '../assets/starters/pisciner.gif';
 import Heading from '../components/heading/Heading';
+import { SKINS } from '../assets/avatars';
 
 const THEMES = [
   ['light', sunTheme],
   ['dark', moonTheme],
 ];
 
-export const AVATARS = [
-  ['DinoGreen', dinoGreen],
-  ['DinoBlue', dinoBlue],
-  ['DinoRed', dinoRed],
-  ['DinoYellow', dinoYellow],
-  ['Ghost', ghost],
-  ['Ghost02', ghost02],
-  ['Ghost03', ghost03],
-  ['Satyr01', satyr01],
-  ['Satyr02', satyr02],
-  ['Satyr03', satyr03],
-];
 
 const STARTERS = [
   ['pisciner', pisciner]
@@ -82,7 +62,7 @@ export default function Preferences() {
             }
           }
           if (data.skin !== null) {
-            const aIndex = AVATARS.findIndex(([k]) => k === data.skin);
+            const aIndex = SKINS.findIndex(([k]) => k === data.skin);
             if (aIndex !== -1) setSkinId(aIndex);
           }
         }
@@ -98,10 +78,10 @@ export default function Preferences() {
     return <div>Loading...</div>;
   }
 
-  const incrAvatarId = () => {
-    if (avatar_id < AVATARS.length - 1) setSkinId(avatar_id + 1);
+  const incrSkinId = () => {
+    if (avatar_id < SKINS.length - 1) setSkinId(avatar_id + 1);
   };
-  const decrAvatarId = () => {
+  const decrSkinId = () => {
     if (avatar_id > 0) setSkinId(avatar_id - 1);
   };
 
@@ -137,7 +117,7 @@ export default function Preferences() {
     setIsSaving(true);
     const updatedSettingsPayload = {
       starter: STARTERS[starter_id][0],
-      skin: AVATARS[avatar_id][0],
+      skin: SKINS[avatar_id][0],
       theme: THEMES[theme_id][0],
     };
     try {
@@ -198,17 +178,17 @@ export default function Preferences() {
             w-full grid grid-cols-[1fr_3fr_1fr] gap-12 items-center justify-items-center
             xl:gap-4
           ">
-            <Heading text="Avatar" size="m" className="
+            <Heading text="Skin" size="m" className="
               row-start-1 col-span-3 my-8
               xl:text-[clamp(4rem,10vw,5rem)]
             "/>
-            <LeftArrowButton onClick={decrAvatarId} disabled={avatar_id === 0} />
+            <LeftArrowButton onClick={decrSkinId} disabled={avatar_id === 0} />
             <img
               className="h-[clamp(2rem,20vw,200px)] xl:h-[clamp(100px,10vw,200px)]"
               src={avatar_img}
-              alt="Avatar selection"
+              alt="Skin selection"
             />
-            <RightArrowButton onClick={incrAvatarId} disabled={avatar_id === SKINS.length - 1} />
+            <RightArrowButton onClick={incrSkinId} disabled={avatar_id === SKINS.length - 1} />
           </div>
 
           <div className="

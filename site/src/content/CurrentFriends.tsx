@@ -6,6 +6,7 @@ import offline from '../assets/buttons/status_buttons/offline.png';
 import remove from '../assets/buttons/close.png';
 import { useQueryClient } from "@tanstack/react-query";
 import { useFriends } from "../hooks/useFriends";
+import type { Friend } from "../types/friend";
 
 export default function CurrentFriends() {
   const queryClient = useQueryClient();
@@ -21,7 +22,7 @@ export default function CurrentFriends() {
     });
   }
 
-  const { data: currentFriends = [], isLoading, isError } = useFriends();
+  const { data: currentFriends, isLoading, isError } = useFriends();
   // useQuery({
   //   queryKey: ['friends', 'currentFriends'],
   //   queryFn: async () => {
@@ -35,8 +36,7 @@ export default function CurrentFriends() {
   //   },
   // });
   if (isLoading) return <div>Loading...</div>;
-  else console.log(currentFriends)
-  if (isError) return <div>Error while Loading.</div>;
+  if (isError || !currentFriends) return <div>Error while Loading.</div>;
   return (
     <>
       <Heading
@@ -45,7 +45,7 @@ export default function CurrentFriends() {
         className="sm:text-start"/>
       <div className="flex flex-col gap-3 border p-5 max-h-100 overflow-y-auto no-scrollbar"> 
       {
-        currentFriends.users.map((friend) => {
+        currentFriends.users.map((friend: Friend) => {
           return(
             <div key={friend.username} 
               className="grid grid-cols-[30%_auto] relative border rounded-2xl p-2">

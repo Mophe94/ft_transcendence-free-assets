@@ -7,7 +7,7 @@ import { useNotification } from './NotifContext';
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
-  const { showNotification } = useNotification();
+  const { showNotification, showInvite } = useNotification();
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [isUnread, setIsUnread] = useState<boolean>(false);
   const wsRef = useRef<WebSocket | null>(null);
@@ -50,7 +50,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
           break;
         }
         case 'friend_request': 
-          showNotification('Got a new friend request', 'success');
+          showNotification('You got a friend request', 'success');
+          break;
+        case 'game_invite':
+          showInvite(data.origin.from, data.origin.roomId)
           break;
       }
     };
@@ -59,7 +62,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       socket.close();
     }
-  }, [user, showNotification]);
+  }, [user, showNotification, showInvite]);
 
   const sendMessage = async (content: string) => {
     console.log('message sent');
