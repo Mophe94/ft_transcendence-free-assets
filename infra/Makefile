@@ -27,7 +27,7 @@ USER_NAME="$(USER)"
 # Miscellanious
 TAG ?= latest
 REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
-BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) REGISTRY=$(REGISTRY) TAG=$(TAG)
+BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) HOST_IP=$(HOST_IP) REGISTRY=$(REGISTRY) TAG=$(TAG)
 DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=$(PROM_SCRAPE_PORT) NFS_IP=$(HOST_TAILSCALE_IP)
 TARGET=""
 
@@ -67,7 +67,7 @@ website:
 	@doas mkdir -p "/var/lib/game/data"
 	@mkdir -p "/nfs-storage/users_data"
 	@make image TARGET=$@
-	$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
+	$(DEPLOY_ARG) API_42_CLIENT_ID=$(API_42_CLIENT_ID) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 game:
 	@doas mkdir -p "/var/lib/postgresql/data"
@@ -121,7 +121,7 @@ addnode:
 image:
 	@case "$(TARGET)" in \
 	    base) IMAGES="node-base postgress-base";; \
-	    website) IMAGES="frontend backend ";; \
+	    website) IMAGES="backend ";; \
 	    databases) IMAGES="users_db game_db";; \
 	    game) IMAGES="game redis";; \
 	    *) echo "Unknown target $(TARGET)"; exit 1;; \
