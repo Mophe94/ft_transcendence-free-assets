@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 
 export interface LobbyPlayer {
   username: string;
-  avatar: string;
+  skin: string;
 }
 
 interface LobbySocketState {
@@ -14,9 +14,9 @@ interface LobbySocketState {
   gameStarted: boolean;
   isConnecting: boolean;
   joinError: string | null;
-  createRoom: (username: string, avatar: string) => void;
-  quickPairing: (username: string, avatar: string) => void;
-  joinRoom: (targetRoomId: string, username: string, avatar: string) => void;
+  createRoom: (username: string, skin: string) => void;
+  quickPairing: (username: string, skin: string) => void;
+  joinRoom: (targetRoomId: string, username: string, skin: string) => void;
   reset: () => void;
 }
 

@@ -26,10 +26,8 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private lobbyService: LobbyService,
     private roomService: RoomService,
     private redisService: RedisService,
-    //private readonly wsAuthService: WsAuthService,
     private readonly eventEmitter: EventEmitter2,
     private readonly wsAuthService: SharedAuthService,
-
   ) {}
 
   async handleConnection(
@@ -46,7 +44,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  async handleDisconnect(client: WebSocket): Promise<void> {
+  handleDisconnect(client: WebSocket): void {
     const clientData = clientsMap.get(client);
     const userId = clientData?.userId.toString();
     if (clientData?.roomId && userId) {
@@ -62,7 +60,11 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     roomId: string,
     userId: string,
   ): Promise<void> {
-    const remainingClients = await this.roomService.leaveRoom(client, roomId, userId);
+    const remainingClients = await this.roomService.leaveRoom(
+      client,
+      roomId,
+      userId,
+    );
     if (remainingClients) {
       this.eventEmitter.emit('lobby.player_joined', {
         clients: remainingClients,
@@ -79,10 +81,10 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
- @SubscribeMessage('create_room')
+  @SubscribeMessage('create_room')
   async handleCreateRoom(
     @ConnectedSocket() client: WebSocket,
-    @MessageBody() payload: { username: string; avatar: string },
+    @MessageBody() payload: { username: string; skin: string },
   ): Promise<void> {
     const clientData = clientsMap.get(client);
     if (!clientData) {
@@ -93,14 +95,14 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client,
       clientData.userId,
       payload.username,
-      payload.avatar,
+      payload.skin,
     );
   }
 
   @SubscribeMessage('quick_pairing')
   async handleQuickPairing(
     @ConnectedSocket() client: WebSocket,
-    @MessageBody() payload: { username: string; avatar: string },
+    @MessageBody() payload: { username: string; skin: string },
   ): Promise<void> {
     const clientData = clientsMap.get(client);
     if (!clientData) {
@@ -111,14 +113,15 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client,
       clientData.userId,
       payload.username,
-      payload.avatar,
+      payload.skin,
     );
   }
 
   @SubscribeMessage('join_room')
   async handleJoinRoom(
     @ConnectedSocket() client: WebSocket,
-    @MessageBody() payload: { roomId: string; username: string; avatar: string },
+    @MessageBody()
+    payload: { roomId: string; username: string; skin: string },
   ): Promise<void> {
     const clientData = clientsMap.get(client);
     if (!clientData) {
@@ -130,7 +133,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       clientData.userId,
       payload.roomId,
       payload.username,
-      payload.avatar,
+      payload.skin,
     );
   }
 

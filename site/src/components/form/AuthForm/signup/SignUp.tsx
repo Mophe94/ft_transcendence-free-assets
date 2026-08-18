@@ -25,9 +25,18 @@ export default function SignUpForm() {
     passwordValid: false,
   });
 
+  const isFormValid =
+    validity.emailValid && validity.usernameValid && validity.passwordValid;
+
   const handleSignUp = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    const { confirmPassword, ...payload} = formData;
+    if (!isFormValid) return;
+    const payload = {
+      email: formData.email,
+      username: formData.username,
+      password: formData.password,
+    };
+
     await fetch(`${import.meta.env.VITE_USERS_SERVICE}/auth/signup`, {
       headers: {
         'Content-Type': 'application/json',
@@ -54,8 +63,7 @@ export default function SignUpForm() {
     });
   };
 
-  const isFormValid =
-    validity.emailValid && validity.usernameValid && validity.passwordValid;
+
 
   return (
     <form id="signup" onSubmit={handleSignUp} className="flex flex-col px-3 w-full max-w-100 align-center">

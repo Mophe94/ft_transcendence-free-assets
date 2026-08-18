@@ -29,7 +29,6 @@ export default function Profile() {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         if (data && data.user && data.stats) {
           setUserProfile(data.user);
           setUserStats(data.stats)

@@ -247,6 +247,7 @@ export class CombatService {
       event: 'game',
       data: {
         state: '',
+        timer: player.timer,
         player: player,
         time: 0,
       },
@@ -405,15 +406,14 @@ export class CombatService {
         switch (target_up) {
           case 'defense':
             player.currentMonster.defense += skill.value;
+			player.currentMonster.defense_spe += skill.value;
             break;
           case 'speed':
             player.currentMonster.speed += skill.value;
             break;
           case 'attack':
             player.currentMonster.attack += skill.value;
-            break;
-          case 'attack_spe':
-            player.currentMonster.attack_spe += skill.value;
+			player.currentMonster.attack_spe += skill.value;
             break;
           default:
             this.received_pass(player);
@@ -430,7 +430,7 @@ export class CombatService {
         const target_down = skill.data;
         switch (target_down) {
           case 'defense':
-            if (enemy.currentMonster.defense <= 0) {
+            if (enemy.currentMonster.defense <= 0 && enemy.currentMonster.defense_spe <= 0) {
               player.text =
                 player.currentMonster.name +
                 ' used ' +
@@ -451,6 +451,13 @@ export class CombatService {
                 target_down +
                 '.';
               enemy.currentMonster.defense -= skill.value;
+			  if (enemy.currentMonster.defense < 0) {
+				enemy.currentMonster.defense = 0;
+			  }
+			  enemy.currentMonster.defense_spe -= skill.value;
+			  if (enemy.currentMonster.defense_spe < 0) {
+				enemy.currentMonster.defense_spe = 0;
+			  }
             }
             break;
 
@@ -480,7 +487,7 @@ export class CombatService {
             break;
 
           case 'attack':
-            if (enemy.currentMonster.attack <= 0) {
+            if (enemy.currentMonster.attack <= 0 && enemy.currentMonster.attack_spe <= 0) {
               player.text =
                 player.currentMonster.name +
                 ' used ' +
@@ -501,31 +508,13 @@ export class CombatService {
                 target_down +
                 '.';
               enemy.currentMonster.attack -= skill.value;
-            }
-            break;
-
-          case 'attack_spe':
-            if (enemy.currentMonster.attack_spe <= 0) {
-              player.text =
-                player.currentMonster.name +
-                ' used ' +
-                skillName +
-                ' but ' +
-                enemy.currentMonster.name +
-                ' ' +
-                target_down +
-                ' won\'t go any lower.';
-            } else {
-              player.text =
-                player.currentMonster.name +
-                ' used ' +
-                skillName +
-                ' and decreased ' +
-                enemy.currentMonster.name +
-                ' ' +
-                target_down +
-                '.';
-              enemy.currentMonster.attack_spe -= skill.value;
+			  if (enemy.currentMonster.attack < 0) {
+				enemy.currentMonster.attack = 0
+			  }
+			  enemy.currentMonster.attack_spe -= skill.value;
+			  if (enemy.currentMonster.attack_spe < 0) {
+				enemy.currentMonster.attack_spe = 0
+			  }
             }
             break;
           default:
@@ -651,14 +640,10 @@ export class CombatService {
         switch (current_item.target) {
           case 'attack':
             enemy.currentMonster.attack -= current_item.value;
-            break;
-          case 'attack_spe':
-            enemy.currentMonster.attack_spe -= current_item.value;
+			enemy.currentMonster.attack_spe -= current_item.value;
             break;
           case 'defense':
             enemy.currentMonster.defense -= current_item.value;
-            break;
-          case 'defense_spe':
             enemy.currentMonster.defense_spe -= current_item.value;
             break;
           case 'speed':
@@ -684,14 +669,10 @@ export class CombatService {
         switch (current_item.target) {
           case 'attack':
             player.currentMonster.attack += current_item.value;
-            break;
-          case 'attack_spe':
-            player.currentMonster.attack_spe += current_item.value;
+			player.currentMonster.attack_spe += current_item.value;
             break;
           case 'defense':
             player.currentMonster.defense += current_item.value;
-            break;
-          case 'defense_spe':
             player.currentMonster.defense_spe += current_item.value;
             break;
           case 'speed':
