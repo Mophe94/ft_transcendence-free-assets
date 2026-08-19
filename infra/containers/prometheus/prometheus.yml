@@ -1,23 +1,11 @@
 global:
   scrape_interval: 15s
 
+# Alloy is the sole collector of container metrics.
+# Prometheus receives them through remote_write.
+
 scrape_configs:
 
-  # Container metrics
-  - job_name: "cadvisor"
-
-    dns_sd_configs:
-      - names:
-          - tasks.observ_cadvisor
-        type: A
-        port: 8080
-
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: instance
-
-
-  # Application metrics
   - job_name: "swarm-services"
 
     dockerswarm_sd_configs:
@@ -26,22 +14,17 @@ scrape_configs:
 
     relabel_configs:
 
-      # Keep only services that expose metrics
       - source_labels:
           [__meta_dockerswarm_service_label_prometheus_scrape]
         regex: "true"
         action: keep
 
-
-      # Build address:port
       - source_labels:
           [__address__, __meta_dockerswarm_service_label_prometheus_port]
         regex: "([^:]+)(?::\\d+)?;(\\d+)"
         replacement: "$1:$2"
         target_label: __address__
 
-
-      # Add service name as label
       - source_labels:
           [__meta_dockerswarm_service_name]
         target_label: service
