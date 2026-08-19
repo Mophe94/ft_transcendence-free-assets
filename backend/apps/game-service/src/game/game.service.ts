@@ -84,6 +84,57 @@ export class GameService {
 
   /*  GAME  */
 
+//   async onGodotConnected(
+//     userId: string,
+//     roomId: string,
+//     access: RoomAcces,
+//   ): Promise<void> {
+//     const roomPlayers = this.joinGameRoom(roomId, userId);
+//     this.roomIdByPlayer.set(userId, roomId);
+//     console.log(`Size = ${roomPlayers.size}, RoomId = ${roomId}`);
+
+//     // Init or retrieve Player
+//     //if (!this.playerService.getPlayer(userId))
+//     this.playerService.initPlayer(userId, access.skin);
+//     const player = this.playerService.getPlayer(userId)!;
+
+//     let activePlayers = this.activePlayersByRoom.get(roomId);
+//     if (!activePlayers) {
+//       activePlayers = new Set();
+//       this.activePlayersByRoom.set(roomId, activePlayers);
+//     }
+//     activePlayers.add(userId);
+//     if (roomPlayers.size === 1) {
+//       this.phaseTimer.start(`fill: ${roomId}`, 'lobby', () => {
+//         console.log(`[GameService] Room ${roomId} pas remplie à temps -> ajout de bots`);
+//         this.fillRoomWithBots(roomId, roomPlayers,access.capacity);
+//   });
+// }
+
+//     console.log('Active Players at start: ', this.activePlayersByRoom);
+//     console.log('*********************************************');
+//     player.roundsRemaining = Math.log2(access.capacity);
+
+//     if (
+//       roomPlayers.size === access.capacity /* this.activePlayersByRoom.get(roomId)?.size */
+//     ) {
+//       this.phaseTimer.clear(`fill: ${roomId}`); // clear
+
+//       /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
+//       for (const userId of roomPlayers) {
+//         const playerState = this.playerService.getPlayer(userId)!;
+//         await this.redisStateService.updateStatePlayer(
+//           userId,
+//           playerState,
+//         );
+//       }
+//       /////////////////////////////////* END */////////////////////////////////
+//       this.combatService.matchmake(roomPlayers);
+//       console.log("PLAYER SKIN: ", player.asset);
+//       this.startMapPhase(roomId, roomPlayers);
+//     }
+//   }
+
   async onGodotConnected(
     userId: string,
     roomId: string,
@@ -92,45 +143,47 @@ export class GameService {
     const roomPlayers = this.joinGameRoom(roomId, userId);
     this.roomIdByPlayer.set(userId, roomId);
     console.log(`Size = ${roomPlayers.size}, RoomId = ${roomId}`);
-
-    // Init or retrieve Player
-    //if (!this.playerService.getPlayer(userId))
+ 
     this.playerService.initPlayer(userId, access.skin);
     const player = this.playerService.getPlayer(userId)!;
-
+ 
     let activePlayers = this.activePlayersByRoom.get(roomId);
     if (!activePlayers) {
       activePlayers = new Set();
       this.activePlayersByRoom.set(roomId, activePlayers);
     }
     activePlayers.add(userId);
-    if (roomPlayers.size === 1) {
-      this.phaseTimer.start(`fill: ${roomId}`, 'lobby', () => {
-        console.log(`[GameService] Room ${roomId} pas remplie à temps -> ajout de bots`);
-        this.fillRoomWithBots(roomId, roomPlayers,access.capacity);
-  });
-}
-
+ 
+    // --- AI (feature 1, lobby-level fill) ---
+    // Les bots manquants (s'il y en a) ont déjà été créés par
+    // LobbyService au moment du timeout du lobby, et enregistrés à la
+    // fois dans PlayerService (injectPlayer) et dans Redis
+    // (room:{roomId}:bots). On les "attache" ici à cette room côté
+    // GameService — pas besoin de les recréer, ni du timer `fill:` /
+    // de fillRoomWithBots qui existaient avant (à supprimer, voir
+    // plus bas).
+    const botIds = await this.redisService.getRoomBots(roomId);
+    for (const botId of botIds) {
+      if (roomPlayers.has(botId)) continue; // déjà attaché par une connexion précédente
+      roomPlayers.add(botId);
+      this.roomIdByPlayer.set(botId, roomId);
+      activePlayers.add(botId);
+    }
+    // --- end AI ---
+ 
     console.log('Active Players at start: ', this.activePlayersByRoom);
     console.log('*********************************************');
     player.roundsRemaining = Math.log2(access.capacity);
-
-    if (
-      roomPlayers.size === access.capacity /* this.activePlayersByRoom.get(roomId)?.size */
-    ) {
-      this.phaseTimer.clear(`fill: ${roomId}`); // clear
-
+ 
+    if (roomPlayers.size === access.capacity) {
       /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
-      for (const userId of roomPlayers) {
-        const playerState = this.playerService.getPlayer(userId)!;
-        await this.redisStateService.updateStatePlayer(
-          userId,
-          playerState,
-        );
+      for (const uid of roomPlayers) {
+        const playerState = this.playerService.getPlayer(uid)!;
+        await this.redisStateService.updateStatePlayer(uid, playerState);
       }
       /////////////////////////////////* END */////////////////////////////////
       this.combatService.matchmake(roomPlayers);
-      console.log("PLAYER SKIN: ", player.asset);
+      console.log('PLAYER SKIN: ', player.asset);
       this.startMapPhase(roomId, roomPlayers);
     }
   }

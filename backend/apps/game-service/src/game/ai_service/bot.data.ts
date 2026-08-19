@@ -23,16 +23,16 @@ export const BOT_TEAM_TIERS = {
 
   // Round(s) intermédiaires : 2 rares
   moyen: [
-    ['sharky', 'gigantomakia', 'leafs', 'burpy', 'papate', 'monkel'],
-    ['sharky', 'pigeonne', 'fishet', 'leafs', 'papate', 'monkel'],
-    ['gigantomakia', 'pigeonne', 'fishet', 'squirel', 'burpy', 'monkel'],
+    ['pisciner',], // full uncommon+rare
+    ['pisciner',], // full common+rare
+    ['pisciner',],
   ],
 
   // Round(s) de fin : les 3 rares
   fort: [
-    ['sharky', 'gigantomakia', 'pigeonne', 'burpy', 'papate', 'monkel'], // full uncommon+rare
-    ['sharky', 'gigantomakia', 'pigeonne', 'fishet', 'squirel', 'leafs'], // full common+rare
-    ['sharky', 'gigantomakia', 'pigeonne', 'burpy', 'squirel', 'leafs'], // mix
+    ['pisciner',], // full uncommon+rare
+    ['pisciner',], // full common+rare
+    ['pisciner',], // mix
   ],
 } as const;
 
@@ -98,15 +98,15 @@ export const BOT_NAMES = [
  * pioche un au hasard à sa création, pour ne pas toujours afficher le
  * même sprite.
  */
-export const BOT_SKINS = [
-  'dinogreen',
-  'dinoblue',
-  'dinored',
-  'dinoyellow',
-  'ghost',
-  'ghost02',
-  'ghost03',
-  'satyr01',
-  'satyr02',
-  'satyr03',
-] as const;
+export const BOT_SKIN_PAIRS: ReadonlyArray<{ lobby: string; game: string }> = [
+  { lobby: 'DinoGreen', game: 'dinogreen' },
+  { lobby: 'DinoBlue', game: 'dinoblue' },
+  { lobby: 'DinoRed', game: 'dinored' },
+  { lobby: 'DinoYellow', game: 'dinoyellow' },
+  { lobby: 'Ghost', game: 'ghost' },
+  { lobby: 'Ghost02', game: 'ghost02' },
+  { lobby: 'Ghost03', game: 'ghost03' },
+  { lobby: 'Satyr01', game: 'satyr01' },
+  { lobby: 'Satyr02', game: 'satyr02' },
+  { lobby: 'Satyr03', game: 'satyr03' },
+];
