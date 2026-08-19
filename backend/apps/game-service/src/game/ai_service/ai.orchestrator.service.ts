@@ -54,10 +54,28 @@ export class AiOrchestratorService {
     return bots;
   }
 
-  /*    Turn a disconnected human player into a bot
-        the player keeps their id, inventory, and whatever battle is already
-        in progress, only their team gets refreshed to be competitive */
+  /**
+   * Turns a disconnected human player into a bot, in place (feature 2).
+   * The player keeps their id, inventory, and whatever battle is already
+   * in progress — only their team pool gets refreshed to match the
+   * current round so they stay competitive (feature 3).
+   */
   takeoverPlayer(round: number, totalRounds: number, player: Player): void {
-    this.aiService.createBotPlayer('takeover' , round, totalRounds, undefined, player);
+    this.aiService.createBotPlayer('takeover', round, totalRounds, undefined, player);
+  }
+
+  /**
+   * Décide de l'équipe de combat (3 monstres) d'un bot pour le
+   * team_setup, en fonction de l'équipe visible de l'adversaire.
+   */
+  decideBattleTeam(bot: Player, enemy: Player): string[] {
+    return this.aiService.chooseBattleTeam(bot.team, enemy.team);
+  }
+
+  /**
+   * Décide de l'action de combat d'un bot pour ce tour.
+   */
+  decideCombatAction(bot: Player, enemy: Player): Record<string, any> {
+    return this.aiService.decideCombatAction(bot, enemy);
   }
 }

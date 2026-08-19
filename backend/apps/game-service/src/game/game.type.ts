@@ -12,12 +12,12 @@ export interface GameMessage {
   data: GameData;
 }
 
-export const FULL = 2;
+export const FULL = 4;
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 15,
-  team_setup: 10,
+  map: 5,
+  team_setup: 15,
   choose_action: 20,
 };
 

@@ -1,5 +1,5 @@
 export const DEFAULT = {
-  COUNTDOWN: 10,
+  COUNTDOWN: 2,
   CAPACITY: 4,
 };
 

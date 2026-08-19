@@ -39,6 +39,43 @@ export const BOT_TEAM_TIERS = {
 export type BotTeamTier = keyof typeof BOT_TEAM_TIERS;
 
 /**
+ * Type de chaque monstre, tel que défini en DB. Fixe, donc pas besoin
+ * d'interroger MonstersService depuis l'IA juste pour ça.
+ */
+export const MONSTER_TYPES: Record<string, string> = {
+  pisciner: 'neutral',
+  fishet: 'water',
+  burpy: 'water',
+  sharky: 'water',
+  squirel: 'neutral',
+  papate: 'earth',
+  gigantomakia: 'earth',
+  monkel: 'neutral',
+  pigeonne: 'fly',
+  leafs: 'plant',
+};
+
+/**
+ * Métadonnées des seuls objets que le bot sait utiliser (potion = soin,
+ * bomb = dégâts). golden ticket (capture, phase map uniquement) et rage
+ * (bonus de stat) ne sont pas pertinents pour une IA de combat simple.
+ */
+export const BOT_ITEMS: Record<string, { scene: string; type: string; value: number }> = {
+  potion: { scene: 'combat', type: 'heal', value: 50 },
+  bomb: { scene: 'combat', type: 'damage', value: 50 },
+};
+
+/**
+ * Quantité de chaque objet selon le palier du round (feature 3 étendue
+ * aux objets) : plus on avance dans le bracket, plus le bot est équipé.
+ */
+export const BOT_ITEM_COUNTS: Record<BotTeamTier, { potion: number; bomb: number }> = {
+  faible: { potion: 1, bomb: 1 },
+  moyen: { potion: 2, bomb: 2 },
+  fort: { potion: 3, bomb: 3 },
+};
+
+/**
  * Pool of names for hardcoded bots. There will never be more bots in a
  * single room than there are names here (a room caps at FULL players,
  * and a bot only fills the missing slots) — so 7 is comfortably enough,
@@ -50,6 +87,26 @@ export const BOT_NAMES = [
   'Bernard',
   'Gérard',
   'Roger',
-  'Jean-Michel',
-  'Kevin',
+  'Ginette',
+  'Josiane',
+  'Chantal',
+  'Monique',
+] as const;
+
+/**
+ * Skins disponibles côté Godot (voir SKINS dans le front). Un bot en
+ * pioche un au hasard à sa création, pour ne pas toujours afficher le
+ * même sprite.
+ */
+export const BOT_SKINS = [
+  'dinogreen',
+  'dinoblue',
+  'dinored',
+  'dinoyellow',
+  'ghost',
+  'ghost02',
+  'ghost03',
+  'satyr01',
+  'satyr02',
+  'satyr03',
 ] as const;

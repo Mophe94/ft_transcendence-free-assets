@@ -358,6 +358,16 @@ export class GameService {
         userId,
         this.mapService.team_setup(player, enemy ?? player),
       );
+      // --- AI team_setup (feature 4a) ---
+      // Un bot ne peut pas répondre lui-même à ce payload (pas de
+      // websocket), donc on déclenche sa décision tout de suite en
+      // rappelant handleMessage exactement comme si le message venait
+      // du client — aucune logique dupliquée.
+      if (player.isBot) {
+        const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy ?? player);
+        void this.handleMessage(userId, { state: 'team_choice', battle_team: chosenTeam });
+      }
+      // --- end AI team_setup ---
     }
   }
 
@@ -578,6 +588,10 @@ export class GameService {
           this.startCombatPhase(roomId, new Set([userId, userId2]));
           this.sendToPlayer(userId, this.mapService.combat(player));
           this.sendToPlayer(userId2, this.mapService.combat(player2));
+          // --- AI combat ---
+          this.triggerBotCombatTurn(userId, player, player2);
+          this.triggerBotCombatTurn(userId2, player2, player);
+          // --- end AI combat ---
         }
         else
         result = {event: 'game', data: { state: 'waiting_for_opponent'}};
@@ -662,6 +676,10 @@ export class GameService {
       this.startNewTurn(combatRoomId, new Set([userId, userId2]));
       this.sendToPlayer(userId, this.combatService.new_turn(player));
       this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+      // --- AI combat ---
+      this.triggerBotCombatTurn(userId, player, player2);
+      this.triggerBotCombatTurn(userId2, player2, player);
+      // --- end AI combat ---
 
       // si un combat deja finish declenchement du roundLeft
       // send new_turn(player, rounLeft)
@@ -734,6 +752,11 @@ export class GameService {
         this.combatService.result_battle(player2, otherPlayer.id),
       );
 
+    // --- AI combat ---
+    const koUserId = koPlayer.id === player.id ? userId : userId2;
+    this.triggerBotCombatTurn(koUserId, koPlayer, otherPlayer);
+    // --- end AI combat ---
+
       return true;
     }
 
@@ -759,6 +782,11 @@ export class GameService {
       this.combatService.change_monster(player2, koPlayer.id),
     );
 
+    // --- AI combat ---
+    const koUserId = koPlayer.id === player.id ? userId : userId2;
+    this.triggerBotCombatTurn(koUserId, koPlayer, otherPlayer);
+    // --- end AI combat ---
+
     return false;
   }
 
@@ -775,6 +803,11 @@ export class GameService {
     this.combatService.combatRooms.delete(combatRoomId);
     this.phaseTimer.clear(`combat: ${combatRoomId}`);
 
+    // --- AI combat ---
+    this.clearPendingBotAction(winner.id);
+    this.clearPendingBotAction(loser.id);
+    // --- end AI combat ---
+
     // WINNER SCENE -END OF GAME
     if (winner.roundsRemaining === 0)
       this.sendToPlayer(winner.id, {
@@ -787,6 +820,10 @@ export class GameService {
   }
 
   /* AI Function */
+
+  // userId (bot) -> timer de sa prochaine action programmée
+  private pendingBotActions = new Map<string, NodeJS.Timeout>();
+
   private async fillRoomWithBots(
     roomId: string,
     roomPlayers: Set<string>,
@@ -862,6 +899,7 @@ export class GameService {
         this.combatService.combatRooms.delete(combatRoomId);
       }
       this.combatService.playerCombatRoom.delete(id);
+      this.clearPendingBotAction(id); // idem pour un éventuel timer de décision IA en attente
  
       await this.redisStateService.removePlayer(id.toString());
       this.playerService.removePlayer(id);
@@ -880,5 +918,47 @@ export class GameService {
     );
  
     console.log(`[GameService] Room ${roomId} abandoned (no human players left) -> deleted`);
+  }
+
+  /**
+   * Annule un timer de bot en attente, s'il y en a un. À appeler aussi
+   * bien avant de reprogrammer (triggerBotCombatTurn) qu'à la fin d'un
+   * combat / suppression de room, pour ne jamais laisser un timer
+   * fantôme se déclencher plus tard sur un état déjà terminé.
+   */
+  private clearPendingBotAction(userId: string): void {
+    const existing = this.pendingBotActions.get(userId);
+    if (existing) {
+      clearTimeout(existing);
+      this.pendingBotActions.delete(userId);
+    }
+  }
+
+  /**
+   * Si le joueur est un bot, déclenche sa décision de combat pour ce
+   * tour, après un petit délai (1.5s au lieu d'un queueMicrotask quasi
+   * instantané) : le client Godot a besoin d'un peu de temps pour
+   * charger/transitionner la scène de combat avant de recevoir la mise
+   * à jour du monstre.
+   *
+   * Important : on annule d'abord tout timer déjà programmé pour ce
+   * bot. Sans ça, en combat bot-vs-bot (pas de rythme humain pour
+   * naturellement espacer les tours), un ancien timer laissé en
+   * attente peut se déclencher en retard sur le mauvais tour et
+   * désynchroniser le combat (symptôme observé : un bot qui semble
+   * "attaquer deux fois", un combat bot-vs-bot qui ne se termine jamais).
+   */
+  private triggerBotCombatTurn(userId: string, player: Player, enemy: Player): void {
+    if (!player.isBot) return;
+ 
+    this.clearPendingBotAction(userId);
+ 
+    const timer = setTimeout(() => {
+      this.pendingBotActions.delete(userId);
+      const action = this.aiOrchestrator.decideCombatAction(player, enemy);
+      void this.handleMessage(userId, action);
+    }, 1500);
+ 
+    this.pendingBotActions.set(userId, timer);
   }
 }
