@@ -53,6 +53,7 @@ test:
 
 core:
 	@mkdir -p "/nfs-storage/frontend"
+	@doas chown "$(USER):$(USER)" "/nfs-storage/frontend"
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 	@chmod +x $(TOOLS_SCRIPTS)/registry_check.sh
 	@if ! bash $(TOOLS_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \
