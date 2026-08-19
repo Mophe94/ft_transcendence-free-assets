@@ -3,20 +3,19 @@ export interface GameData {
   [key: string]: any;
 }
 
-export interface GamePayload {
-  data: GameData;
-}
-
 export interface GameMessage {
   event: string;
   data: GameData;
 }
 
-export const FULL = 4;
+export interface RoomAcces {
+  capacity: number;
+  skin: string;
+}
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 5,
+  map: 60,
   team_setup: 15,
   choose_action: 20,
 };

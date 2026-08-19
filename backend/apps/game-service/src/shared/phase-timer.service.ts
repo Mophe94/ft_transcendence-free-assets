@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import {
-  FULL,
   PHASE_DURATIONS,
   PhaseName,
 } from 'apps/game-service/src/game/game.type';

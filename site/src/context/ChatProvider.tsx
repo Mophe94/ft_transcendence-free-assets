@@ -65,7 +65,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   }, [user, showNotification, showInvite]);
 
   const sendMessage = async (content: string) => {
-    console.log('message sent');
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ event: 'message', data: content }));
     } else {

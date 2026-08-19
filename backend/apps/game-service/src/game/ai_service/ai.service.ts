@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Player } from '../player/player';
 import { BOT_TEAM_TIERS, BOT_NAMES, BOT_SKINS, MONSTER_TYPES, BOT_ITEMS, BOT_ITEM_COUNTS, BotTeamTier } from './bot.data';
+import { GameData } from '../game.type';
 
 export type BotMode = 'hardcoded' | 'takeover';
 
@@ -88,7 +89,7 @@ export class AiService {
    * - sinon : il attaque avec la meilleure compétence dispo contre le
    *   monstre adverse actuel, ou passe s'il n'a plus rien d'utilisable
    */
-  decideCombatAction(bot: Player, enemy: Player): Record<string, any> {
+  decideCombatAction(bot: Player, enemy: Player): GameData {
     if (bot.currentMonster.name === '' || bot.currentMonster.life.current <= 0) {
       const slot = this.pickBestMonsterSlot(bot, enemy);
       const chosen = bot.battle_team[slot];
@@ -112,7 +113,7 @@ export class AiService {
    * - une bombe si elle suffit à achever le monstre adverse actuel
    * (rien d'autre : golden ticket et rage ne sont pas gérés par l'IA)
    */
-  private pickUsefulItem(bot: Player, enemy: Player): Record<string, any> | undefined {
+  private pickUsefulItem(bot: Player, enemy: Player): GameData | undefined {
     const lifeRatio = bot.currentMonster.life.current / bot.currentMonster.life.max;
     const potion = bot.inventory.find((item) => item.name === 'potion' && item.current > 0);
     if (lifeRatio < 0.5 && potion) {

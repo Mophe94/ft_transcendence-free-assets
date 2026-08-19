@@ -18,8 +18,7 @@ import type { AuthenticatedRequest } from 'libs/shared/src';
 @Controller()
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
-  constructor(private readonly usersService: UsersService
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Get('profile/:username')
   @UseGuards(JwtHttpGuard)
@@ -50,11 +49,11 @@ export class UsersController {
         gamesLost: user.stats ? user.stats.gamesLost : 0,
         gamesWon: user.stats ? user.stats.gamesWon : 0,
         gamesPlayed: user.stats ? user.stats.gamesPlayed : 0,
-		achievements: user.stats ? user.stats.Achievements : [],
+        achievements: user.stats ? user.stats.Achievements : [],
         nbAchievements: user.stats ? user.stats.NbAchievements : 0,
-		monsterDiscovered: user.stats ? user.stats.MonstersDiscovered : [],
-    	nbMonstersDiscovered: user.stats ? user.stats.NbMonstersDiscovered : 0,
-		endingsDiscovered: user.stats ? user.stats.EndingsDiscovered : [],
+        monsterDiscovered: user.stats ? user.stats.MonstersDiscovered : [],
+        nbMonstersDiscovered: user.stats ? user.stats.NbMonstersDiscovered : 0,
+        endingsDiscovered: user.stats ? user.stats.EndingsDiscovered : [],
         nbEndingsDiscovered: user.stats ? user.stats.NbEndingsDiscovered : 0,
         totalPlayerDefeated: user.stats ? user.stats.totalPlayerDefeated : 0,
       },

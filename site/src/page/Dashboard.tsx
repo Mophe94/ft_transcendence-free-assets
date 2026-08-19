@@ -1,6 +1,6 @@
-import { useEffect, type CSSProperties, type ReactNode } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { type CSSProperties, type ReactNode } from 'react';
+// import { useAuth } from '../context/AuthContext';
+// import { useNavigate } from 'react-router-dom';
 
 // ---------------------------------------------------------------------------
 // Types — le contrat de données. Le mate raccorde ses fetch sur ces formes,
@@ -193,8 +193,8 @@ function StatCard({ label, value, color }: { label: string; value: string; color
 }
 
 export default function Dashboard() {
-  const context = useAuth();
-  const navigate = useNavigate();
+  // const context = useAuth();
+  // const navigate = useNavigate();
   const { data, isLoading, error } = useDashboardData();
 
   // useEffect(() => {
