@@ -16,7 +16,6 @@ import { RedisService } from '../redis/redis.service';
 import { IncomingMessage } from 'http';
 import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
 
-
 @WebSocketGateway(8081, { cors: { origin: true }, path: '/lobby' })
 export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()

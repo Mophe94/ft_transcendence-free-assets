@@ -88,7 +88,7 @@ export class RedisService {
     await this.redis.del(LOBBY_KEYS.ROOM_CAPACITY(roomId));
   }
 
-///////////////////////////////* PLAYERS *///////////////////////////////
+  ///////////////////////////////* PLAYERS *///////////////////////////////
 
   async addPlayerToRoom(
     playerId: string,
@@ -200,7 +200,11 @@ export class RedisService {
     await this.redis.rpush(key, ...elems);
   }
 
-  async getList(key: string, start: number, end: number): Promise<Array<string>> {
+  async getList(
+    key: string,
+    start: number,
+    end: number,
+  ): Promise<Array<string>> {
     return await this.redis.lrange(key, start, end);
   }
 }

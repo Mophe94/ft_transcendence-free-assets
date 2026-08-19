@@ -10,9 +10,7 @@ import { UserStatService } from '../stats/stats.services';
 @Module({
   imports: [TypeOrmModule.forFeature([User, UserStats, Account])],
   controllers: [UsersController],
-  providers: [UsersService,
-			  UserStatService,
-  ],
+  providers: [UsersService, UserStatService],
   exports: [UsersService, TypeOrmModule],
 })
 export class UsersModule {}

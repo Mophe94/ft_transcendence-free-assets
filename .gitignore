@@ -14,3 +14,6 @@ host_ip.txt
 .vite/
 **/**/node_modules
 **/**/package-lock.json
+node_modules
+tatusq
+wiq
