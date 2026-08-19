@@ -302,14 +302,6 @@ fi
 echo "[${SCRIPT_NAME}] VM ip: ${IP}"
 
 echo "[$SCRIPT_NAME] Setup complete"
-
-echo "--------------------------------"
-echo "Tailscale IP:"
-cat /etc/tailscale_ip
-echo
-echo "Headscale auth key:"
-cat /etc/headscale_authkey
-echo "--------------------------------"o
 echo "--------------------------------"
 echo "Tailscale IP:"
 cat /etc/tailscale_ip
