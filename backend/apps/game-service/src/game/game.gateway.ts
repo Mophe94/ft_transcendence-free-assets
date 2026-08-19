@@ -11,10 +11,11 @@ import { Interval } from '@nestjs/schedule';
 import { WebSocket, Server } from 'ws';
 import { GameService } from './game.service';
 import { PlayerService } from './player/player.service';
-import { GamePayload } from './game.type';
+import type { GameMessage, GameData } from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
+import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
 import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
 
@@ -25,9 +26,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
     private wsAuthService: SharedAuthService,
+    private gameService: GameService,
     private playerService: PlayerService,
     private redisStateService: RedisStateService,
-    private gameService: GameService,
   ) {}
   private clients = new Map<WebSocket, ClientData>();
   private clientsById = new Map<string, WebSocket>();
@@ -38,26 +39,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): Promise<void> {
     const url = request.url!;
     const params = new URLSearchParams(url.split('?')[1]);
-    const token = params.get('token');
     const roomId = params.get('room');
-    console.log(url);
-    console.log(token);
-    console.log(roomId);
-    // Add JWT token validation
 
     const user = await this.wsAuthService.verifyWsHandshake(request);
-    if (!user.username) {
+    if (!user.username || !user.id) {
       client.close(1008, 'Unauthorized');
       return;
     }
     const userId = user.username;
-    if (
-      !token ||
-      !roomId
-      //|| !this.gameService.isPlayerInRoom(user.sub, roomId)
-    ) {
-      console.log('[GameGateway]: Missing token to authenticate');
-      client.close();
+
+    if (!roomId) {
+      console.log('[GameGateway]: Missing roomId');
+      client.close(4000, 'Missing roomId');
+      return;
+    }
+
+    const access = await this.gameService.verifyRoomAccess(userId, roomId);
+    if (access === null) {
+      client.close(4003, 'Room not found or not authorized');
       return;
     }
 
@@ -68,10 +67,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.on('pong', () => {
       console.log('pong received');
       const data = this.clients.get(client);
-      if (data) data.isAlive = true; //
+      if (data) data.isAlive = true;
     });
 
-    this.gameService.onGodotConnected(client, userId, roomId).catch((err) => {
+    this.gameService.onGodotConnected(userId, roomId, access).catch((err) => {
       console.log('[GameGateway]: handleConnection error');
       client.close();
     });
@@ -101,10 +100,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  private sendToClient(client: WebSocket, message: object | undefined) {
+  private sendToClient(client: WebSocket, message: GameMessage | undefined) {
     if (!message) {
-      console.log('[GameGateway] sendToclient called with undefined payload (skipping)');
-      return
+      console.log(
+        '[GameGateway] sendToclient called with undefined payload (skipping)',
+      );
+      return;
     }
     if (client.readyState === WebSocket.OPEN) {
       //console.log("Send_Gateway: " , message);
@@ -129,7 +130,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('game')
   async handleGame(
     @ConnectedSocket() client: WebSocket,
-    @MessageBody() payload: any,
+    @MessageBody() payload: GameData,
   ): Promise<void> {
     // create a GamePayload interface to avoid 'any'?
     const clientData = this.clients.get(client);
@@ -140,15 +141,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const userId = clientData.userId;
 
-    let response;
     try {
-      response = await this.gameService.handleMessage(userId, payload);
-    }
-    catch (err) {
+      await this.gameService.handleMessage(userId, payload);
+    } catch (err) {
       console.log('[GameGateway] handleMessage error: ', err);
-      response = { event: 'game', data: { state: 'error', message: 'internal error'} };
     }
-    this.sendToClient(client, response);
 
     /////////////////////////////////* REDIS STATE : UPDATE STATE */////////////////////////////////
     const playerState = this.playerService.getPlayer(userId)!;
@@ -167,7 +164,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     payload,
   }: {
     userId: string;
-    payload: object;
+    payload: GameMessage;
   }): void {
     const client = this.clientsById.get(userId);
     if (client) {
@@ -181,7 +178,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     payload,
   }: {
     clients: Set<WebSocket>;
-    payload: object;
+    payload: GameMessage;
   }): void {
     this.broadcast(clients, payload);
   }

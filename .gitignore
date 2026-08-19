@@ -13,3 +13,5 @@ host_ip.txt
 .secrets/
 .vite/
 node_modules
+tatusq
+wiq

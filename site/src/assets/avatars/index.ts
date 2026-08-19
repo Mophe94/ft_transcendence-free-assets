@@ -10,14 +10,14 @@ import satyr02 from './Satyr02.gif';
 import satyr03 from './Satyr03.gif';
 
 export const SKINS = [
-  ['DinoGreen', dinoGreen],
-  ['DinoBlue', dinoBlue],
-  ['DinoRed', dinoRed],
-  ['DinoYellow', dinoYellow],
-  ['Ghost', ghost],
-  ['Ghost02', ghost02],
-  ['Ghost03', ghost03],
-  ['Satyr01', satyr01],
-  ['Satyr02', satyr02],
-  ['Satyr03', satyr03],
+  ['dinoGreen', dinoGreen],
+  ['dinoBlue', dinoBlue],
+  ['dinoRed', dinoRed],
+  ['dinoYellow', dinoYellow],
+  ['ghost', ghost],
+  ['ghost02', ghost02],
+  ['ghost03', ghost03],
+  ['satyr01', satyr01],
+  ['satyr02', satyr02],
+  ['satyr03', satyr03],
 ];

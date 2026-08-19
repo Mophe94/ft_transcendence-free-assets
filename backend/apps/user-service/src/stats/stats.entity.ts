@@ -48,7 +48,7 @@ export class UserStats {
   @Column({
     name: 'monsters_discovered',
     type: 'text',
-	array: true,
+    array: true,
     default: '{}',
   })
   MonstersDiscovered!: string[];
@@ -62,8 +62,8 @@ export class UserStats {
   @Column({
     name: 'endings_discovered',
     type: 'text',
-	array: true,
-   default: '{}',
+    array: true,
+    default: '{}',
   })
   EndingsDiscovered!: string[];
 
@@ -75,8 +75,8 @@ export class UserStats {
 
   @Column({
     name: 'achievements',
-	type: 'text',
-	array: true,
+    type: 'text',
+    array: true,
     default: '{}',
   })
   Achievements!: string[];

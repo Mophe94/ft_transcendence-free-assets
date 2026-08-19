@@ -6,6 +6,7 @@ import {
   CurrentMonster,
   Skill,
 } from './player/player.interfaces';
+import { GameMessage } from './game.type';
 
 @Injectable()
 export class CombatService {
@@ -122,9 +123,9 @@ export class CombatService {
 
   // Helper
   private pushResult(
-    map: Map<string, Array<Object>>,
+    map: Map<string, GameMessage[]>,
     playerId: string,
-    result: Object,
+    result: GameMessage,
   ): void {
     const arr = map.get(playerId);
     if (arr) arr.push(result);
@@ -134,8 +135,8 @@ export class CombatService {
   resolving_battle_round(
     player1: Player,
     player2: Player,
-  ): Map<string, Array<Object>> {
-    let map_result = new Map<string, Array<Object>>();
+  ): Map<string, GameMessage[]> {
+    let map_result = new Map<string, GameMessage[]>();
     let first: Player = this.resolve_first(player1, player2);
     let second: Player = first === player1 ? player2 : player1;
 
@@ -369,25 +370,22 @@ export class CombatService {
             const resultAttack = this.attackResult(
               player,
               skill.type,
-			        skill.value,
+              skill.value,
               enemy,
               enemy.currentMonster.type,
               player.currentMonster.type,
             );
             if (resultAttack.result >= enemy.currentMonster.life.current)
               resultAttack.result = enemy.currentMonster.life.current;
-            if (resultAttack.effectiveness != '') effectiveness = resultAttack.effectiveness;
+            if (resultAttack.effectiveness != '')
+              effectiveness = resultAttack.effectiveness;
             resultDamage += resultAttack.result;
             enemy.currentMonster.life.current -= resultAttack.result;
           }
           if (skill.repetition > 1) {
             if (resultDamage > 0)
               player.text +=
-                ' and hit ' +
-                touch +
-                ' times for ' +
-                resultDamage +
-                ' damage';
+                ' and hit ' + touch + ' times for ' + resultDamage + ' damage';
             else
               player.text =
                 enemy.currentMonster.name +
@@ -406,14 +404,14 @@ export class CombatService {
         switch (target_up) {
           case 'defense':
             player.currentMonster.defense += skill.value;
-			player.currentMonster.defense_spe += skill.value;
+            player.currentMonster.defense_spe += skill.value;
             break;
           case 'speed':
             player.currentMonster.speed += skill.value;
             break;
           case 'attack':
             player.currentMonster.attack += skill.value;
-			player.currentMonster.attack_spe += skill.value;
+            player.currentMonster.attack_spe += skill.value;
             break;
           default:
             this.received_pass(player);
@@ -430,7 +428,10 @@ export class CombatService {
         const target_down = skill.data;
         switch (target_down) {
           case 'defense':
-            if (enemy.currentMonster.defense <= 0 && enemy.currentMonster.defense_spe <= 0) {
+            if (
+              enemy.currentMonster.defense <= 0 &&
+              enemy.currentMonster.defense_spe <= 0
+            ) {
               player.text =
                 player.currentMonster.name +
                 ' used ' +
@@ -439,7 +440,7 @@ export class CombatService {
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
-                ' won\'t go any lower.';
+                " won't go any lower.";
             } else {
               player.text =
                 player.currentMonster.name +
@@ -451,13 +452,13 @@ export class CombatService {
                 target_down +
                 '.';
               enemy.currentMonster.defense -= skill.value;
-			  if (enemy.currentMonster.defense < 0) {
-				enemy.currentMonster.defense = 0;
-			  }
-			  enemy.currentMonster.defense_spe -= skill.value;
-			  if (enemy.currentMonster.defense_spe < 0) {
-				enemy.currentMonster.defense_spe = 0;
-			  }
+              if (enemy.currentMonster.defense < 0) {
+                enemy.currentMonster.defense = 0;
+              }
+              enemy.currentMonster.defense_spe -= skill.value;
+              if (enemy.currentMonster.defense_spe < 0) {
+                enemy.currentMonster.defense_spe = 0;
+              }
             }
             break;
 
@@ -471,7 +472,7 @@ export class CombatService {
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
-                ' won\'t go any lower.';
+                " won't go any lower.";
             } else {
               player.text =
                 player.currentMonster.name +
@@ -487,7 +488,10 @@ export class CombatService {
             break;
 
           case 'attack':
-            if (enemy.currentMonster.attack <= 0 && enemy.currentMonster.attack_spe <= 0) {
+            if (
+              enemy.currentMonster.attack <= 0 &&
+              enemy.currentMonster.attack_spe <= 0
+            ) {
               player.text =
                 player.currentMonster.name +
                 ' used ' +
@@ -496,7 +500,7 @@ export class CombatService {
                 enemy.currentMonster.name +
                 ' ' +
                 target_down +
-                ' won\'t go any lower.';
+                " won't go any lower.";
             } else {
               player.text =
                 player.currentMonster.name +
@@ -508,13 +512,13 @@ export class CombatService {
                 target_down +
                 '.';
               enemy.currentMonster.attack -= skill.value;
-			  if (enemy.currentMonster.attack < 0) {
-				enemy.currentMonster.attack = 0
-			  }
-			  enemy.currentMonster.attack_spe -= skill.value;
-			  if (enemy.currentMonster.attack_spe < 0) {
-				enemy.currentMonster.attack_spe = 0
-			  }
+              if (enemy.currentMonster.attack < 0) {
+                enemy.currentMonster.attack = 0;
+              }
+              enemy.currentMonster.attack_spe -= skill.value;
+              if (enemy.currentMonster.attack_spe < 0) {
+                enemy.currentMonster.attack_spe = 0;
+              }
             }
             break;
           default:
@@ -543,7 +547,7 @@ export class CombatService {
     enemyMonster: CurrentMonster,
   ): boolean {
     let result = Math.floor(Math.random() * 100);
-    result += (enemyMonster.speed / 10);
+    result += enemyMonster.speed / 10;
     if (result > skill.precision) return false;
     return true;
   }
@@ -552,7 +556,7 @@ export class CombatService {
   private attackResult(
     player: Player,
     attackType: string,
-	  skillValue: number,
+    skillValue: number,
     enemy: Player,
     enemyType: string,
     monsterType: string,
@@ -566,7 +570,7 @@ export class CombatService {
     if (multi >= 2) effectiveness = ". It's super effective !";
     else if (multi <= 0.5) effectiveness = ". It's not very effective..";
     let result = Math.trunc(flatAttackDammage * multi);
-	  result *= skillValue;
+    result = Math.trunc(result * skillValue);
     if (attackType == enemyType) result -= enemy.currentMonster.defense_spe;
     else result -= enemy.currentMonster.defense;
     if (result <= 0) result = 0;
@@ -640,7 +644,7 @@ export class CombatService {
         switch (current_item.target) {
           case 'attack':
             enemy.currentMonster.attack -= current_item.value;
-			enemy.currentMonster.attack_spe -= current_item.value;
+            enemy.currentMonster.attack_spe -= current_item.value;
             break;
           case 'defense':
             enemy.currentMonster.defense -= current_item.value;
@@ -669,7 +673,7 @@ export class CombatService {
         switch (current_item.target) {
           case 'attack':
             player.currentMonster.attack += current_item.value;
-			player.currentMonster.attack_spe += current_item.value;
+            player.currentMonster.attack_spe += current_item.value;
             break;
           case 'defense':
             player.currentMonster.defense += current_item.value;
@@ -743,7 +747,11 @@ export class CombatService {
         ) {
           player.currentMonster = player.battle_team[i];
           player.text =
-            player.name + ' change ' + temp + ' for ' + player.currentMonster.name;
+            player.name +
+            ' change ' +
+            temp +
+            ' for ' +
+            player.currentMonster.name;
           break;
         }
       }
@@ -752,7 +760,7 @@ export class CombatService {
   }
 
   private received_pass(player: Player) {
-    console.log("RECEIVED PASS");
+    console.log('RECEIVED PASS');
     player.text = player.name + ' pass for this turn.';
   }
 }
