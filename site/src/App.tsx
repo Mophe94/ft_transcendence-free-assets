@@ -6,7 +6,6 @@ import AuthCallback from './page/Auth';
 import AppLayout from './layouts/AppLayout';
 import Play from './page/Play';
 import Profile from './page/Profile';
-import Admin from './page/Admin';
 import { useAuth } from './context/AuthContext';
 import { Loading } from './content/Loading';
 import Test from './page/Test';
@@ -36,7 +35,6 @@ function App() {
             <Route path="/play" element={<Play />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:username" element={<Profile />} />
-            <Route path="/admin" element={<Admin />} />
             <Route path="/friends" element={<Social/>} />
           </Route>
           <Route path="/" element={<Landing />} />
@@ -49,7 +47,7 @@ function App() {
 		      <Route path='/private_policy' element={<PrivacyPolity />} />
 		      <Route path='/terms_conditions' element={<TermsConditions />} />
         </Route>
-    
+        
         <Route element={<AppLayout />}>
           <Route path='/test' element={<Test />} />
           <Route path="*" element={<ErrorDisplay msg="Page not found" code={404} />} />

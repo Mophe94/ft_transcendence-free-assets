@@ -1,7 +1,7 @@
 import type React from 'react';
 import { ChatContext, type Chat, type Message } from './ChatContext';
 import { useEffect, useRef, useState } from 'react';
-import { Color } from '../constants/Colors';
+import { ChatColor } from '../constants/Colors';
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotifContext';
 
@@ -11,10 +11,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [isUnread, setIsUnread] = useState<boolean>(false);
   const wsRef = useRef<WebSocket | null>(null);
-  const userColorsRef = useRef<Map<string, Color>>(new Map());
+  const userColorsRef = useRef<Map<string, ChatColor>>(new Map());
 
-  function getRandomColor(): Color {
-    const colorArray = Object.values(Color);
+  function getRandomColor(): ChatColor {
+    const colorArray = Object.values(ChatColor);
     const randomIndex = Math.floor(Math.random() * colorArray.length);
     return colorArray[randomIndex];
   }

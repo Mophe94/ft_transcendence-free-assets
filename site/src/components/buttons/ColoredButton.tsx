@@ -10,6 +10,7 @@ interface ButtonProps {
 }
 
 const colorLoader = {
+  LightBlue: () => import("../../assets/buttons/colored_buttons/light_blue"),
   Blue: () => import("../../assets/buttons/colored_buttons/blue"),
   Red: () => import("../../assets/buttons/colored_buttons/red"),
   Black: () => import("../../assets/buttons/colored_buttons/black"),
@@ -73,7 +74,7 @@ export default function ColoredButton({ color = ButtonColor.Black, func = () => 
         borderStyle: 'solid',
         borderImageRepeat: 'round',
       }}
-      className={`w-min h-full cursor-pointer isolate font-im-fell font-bold flex items-center justify-center pixelated ${className}`}
+      className={`w-min h-full cursor-pointer isolate font-im-fell font-bold flex items-center justify-center pixelated`}
     >
       <div
         data-text={text}
@@ -82,7 +83,9 @@ export default function ColoredButton({ color = ButtonColor.Black, func = () => 
           before:content-[attr(data-text)] 
           before:absolute before:inset-0 before:-z-10 
           ${color.borderColor} 
-          before:text-transparent`}
+          before:text-transparent
+          ${className}
+          `}
       >
         {text}
       </div>

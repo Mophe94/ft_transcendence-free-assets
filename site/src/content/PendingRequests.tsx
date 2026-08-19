@@ -44,8 +44,8 @@ export default function PendingRequests () {
     },
   });
 
-  if (isLoading) return <div>Chargement...</div>;
-  if (isError) return <div>Erreur de chargement.</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error while Loading.</div>;
   return (
     <>
     <Heading size="m" text={`Pending Requests (${requests.length})`} className="justify-self-start"/>
@@ -53,7 +53,7 @@ export default function PendingRequests () {
       <div className="
       rounded-[10px]
       border border-solid border-[rgb(144,30,30)]
-      bg-[rgb(214,219,187)] p-4
+      bg-[#f6f1e3] p-4
       max-h-100 overflow-y-scroll overflow-x-hidden no-scrollbar">
         { requests.length == 0 ? 
           <div>No pending requests</div>

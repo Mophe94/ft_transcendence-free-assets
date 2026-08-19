@@ -22,12 +22,12 @@ const regStyles = {
 
 export default function SpecialBG({ children }: { children: React.ReactNode }) {
   return (
-    <div className='grid grid-cols-[54px_1fr_55px] grid-rows-[43px_1fr_44px] gap-0' style={regStyles}>
+    <div className='grid grid-cols-[54px_1fr_54px] grid-rows-[43px_1fr_43px] gap-0' style={regStyles}>
       <div className="bg-(image:--img-ul) bg-no-repeat" />
       <div className="bg-(image:--img-um) bg-[round_no-repeat]" />
       <div className="bg-(image:--img-ur) bg-no-repeat" />
       <div className="bg-(image:--img-ml) bg-[no-repeat_round]" />
-      <div className="relative bg-(image:--img-mm) bg-[round] bg-auto">
+      <div className="relative bg-(image:--img-mm) bg-[round] bg-auto -m-px">
           { children }
       </div>
       <div className="bg-(image:--img-mr) bg-[no-repeat_round]" />

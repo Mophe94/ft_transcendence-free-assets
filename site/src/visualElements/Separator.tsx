@@ -1,11 +1,11 @@
-import { Color } from "../constants/Colors"
+import { ChatColor } from "../constants/Colors"
 
 interface SepProps {
-  color?: Color;
+  color?: ChatColor;
   className?: string
 }
 
-export default function Sep({color= Color.ORANGE, className=''}: SepProps) {
+export default function Sep({color= ChatColor.ORANGE, className=''}: SepProps) {
   const separatorAttr = `border-s-[${color}]`
     return (
         <hr className={`${separatorAttr} w-6/10 ${color} ${className}`}/>

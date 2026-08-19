@@ -27,7 +27,7 @@ export default function SlotBg({ children }: { children: React.ReactNode }) {
       <div className="bg-(image:--img-um) bg-[round_no-repeat]" />
       <div className="bg-(image:--img-ur) bg-no-repeat" />
       <div className="bg-(image:--img-ml) bg-[no-repeat_round]" />
-      <div className="relative bg-(image:--img-mm)">
+      <div className="relative bg-(image:--img-mm) -m-px">
           { children }
       </div>
       <div className="bg-(image:--img-mr) bg-[no-repeat_round]" />

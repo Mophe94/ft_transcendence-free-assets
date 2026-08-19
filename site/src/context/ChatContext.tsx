@@ -1,11 +1,11 @@
 import { createContext } from 'react';
-import type { Color } from '../constants/Colors';
+import type { ChatColor } from '../constants/Colors';
 
 export interface Message {
   time: string;
   username: string;
   content: string;
-  color?: Color;
+  color?: ChatColor;
 }
 
 export interface Chat {

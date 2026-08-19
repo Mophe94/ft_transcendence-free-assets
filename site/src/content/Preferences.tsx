@@ -8,22 +8,16 @@ import { useNotification } from '../context/NotifContext';
 import { useParams } from 'react-router-dom';
 import type { Settings } from '../types/user';
 
-
-import sunTheme from '../assets/theme/sun_icon.png';
-import moonTheme from '../assets/theme/moon_icon.png';
 import pisciner from '../assets/starters/pisciner.gif';
 import Heading from '../components/heading/Heading';
 import { SKINS } from '../assets/avatars';
-
-const THEMES = [
-  ['light', sunTheme],
-  ['dark', moonTheme],
-];
-
+import { DEFAULT_THEME_KEY, Theme } from '../constants/Theme';
 
 const STARTERS = [
   ['pisciner', pisciner]
 ];
+
+const themes = Object.values(Theme);
 
 export default function Preferences() {
   const { username } = useParams();
@@ -34,7 +28,9 @@ export default function Preferences() {
   const [avatar_id, setSkinId] = useState<number>(0);
   const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuth();
-  const { setTheme } = useTheme();
+  const { setThemeKey } = useTheme();
+
+
 
   useEffect(() => {
     if (username || !user?.username) {
@@ -49,10 +45,10 @@ export default function Preferences() {
         setSettings(data);
         if (data) {
           if (data.theme) {
-            const tIndex = THEMES.findIndex(([k]) => k === data.theme);
+            const tIndex = themes.findIndex((k) => k.name === data.theme);
             if (tIndex !== -1) {
               setThemeId(tIndex);
-              setTheme(data.theme);
+              setThemeKey(data.theme);
             }
           }
           if (data.starter !== null) {
@@ -70,7 +66,7 @@ export default function Preferences() {
       .catch(() => {
         return null;
       });
-  }, [user?.username, username, setTheme]);
+  }, [user?.username, username, setThemeKey]);
 
   if (username) return;
 
@@ -93,17 +89,17 @@ export default function Preferences() {
   };
 
   const incrThemeId = () => {
-    if (theme_id < THEMES.length - 1) {
+    if (theme_id < themes.length - 1) {
       const new_id = theme_id + 1;
       setThemeId(new_id);
-      setTheme(THEMES[new_id][0]);
+      setThemeKey(themes[new_id].name);
     }
   };
   const decrThemeId = () => {
     if (theme_id > 0) {
       const new_id = theme_id - 1;
       setThemeId(new_id);
-      setTheme(THEMES[new_id][0]);
+      setThemeKey(themes[new_id].name);
     }
   };
 
@@ -118,7 +114,7 @@ export default function Preferences() {
     const updatedSettingsPayload = {
       starter: STARTERS[starter_id][0],
       skin: SKINS[avatar_id][0],
-      theme: THEMES[theme_id][0],
+      theme: themes[theme_id].name,
     };
     try {
       const response = await fetch(
@@ -149,12 +145,12 @@ export default function Preferences() {
     setSkinId(0);
     setStarterId(0);
     setThemeId(0);
-    setTheme('light');
+    setThemeKey(DEFAULT_THEME_KEY);
   };
 
   const starter_img = STARTERS[starter_id] ? STARTERS[starter_id][1] : STARTERS[0][1];
   const avatar_img = SKINS[avatar_id] ? SKINS[avatar_id][1] : SKINS[0][1];
-  const theme_img = THEMES[theme_id] ? THEMES[theme_id][1] : THEMES[0][1];
+  const theme_img = themes[theme_id].icon;
 
   return (
     <div className="preferences-content-layout">
@@ -222,7 +218,7 @@ export default function Preferences() {
               src={theme_img}
               alt="Theme selection"
             />
-            <RightArrowButton onClick={incrThemeId} disabled={theme_id === THEMES.length - 1} />
+            <RightArrowButton onClick={incrThemeId} disabled={theme_id === themes.length - 1} />
           </div>
         </div>
         <div className="

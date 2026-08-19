@@ -23,7 +23,6 @@ const privateLinks = {
   Admin: '/admin',
   Readme: '/readme',
   'About us': '/aboutus',
-  'admin': '/admin',
 };
 
 function NavMenu() {

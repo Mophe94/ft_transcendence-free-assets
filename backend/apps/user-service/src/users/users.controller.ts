@@ -44,6 +44,7 @@ export class UsersController {
         email: user.email,
         coalitionId: user.coalitionId,
         createdAt: user.createdAt,
+        avatarUrl: user.avatarUrl,
       },
       stats: {
         gamesLost: user.stats ? user.stats.gamesLost : 0,

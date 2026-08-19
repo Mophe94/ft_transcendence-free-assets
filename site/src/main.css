@@ -14,8 +14,8 @@
     display: none;
   }
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE et Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
@@ -36,43 +36,8 @@
     --nav-h: clamp(3rem, 7vw, 8rem);
     --nav-font: clamp(1rem, 3vw, 3rem);
   }
-    body {
-    font-size: 1.1rem;
-  }
 }
 
-@media (min-width: 1024px) {
-  body {
-    font-size: 1.2rem;
-  }
-}
-
-#main {
-  min-height: 100vh;
-  width: auto;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#main.theme-dark {
-  background-color: rgb(5, 1, 31);
-  background-image: var(--dark-cloud-img);
-  background-repeat: repeat;
-}
-
-#main.theme-light {
-  background-color: rgb(71, 171, 169);
-  background-image: var(--light-cloud-img);
-}
-
-.theme-light {
-  --bg-image: var(--light-cloud-img);
-  --bg-color: rgb(71, 171, 169);
-}
-
-body,
 #root {
   font-family: 'Ubuntu', sans-serif;
   font-size: 1rem;
@@ -80,27 +45,5 @@ body,
   min-height: 100vh;
   overflow-x: hidden;
   font-family: 'Ubuntu', sans-serif;
-  background-color: var(--bg-color);
-}
-
-@media (min-width: 768px) {
-
-}
-
-@media (min-width: 1024px) {
-  .heading-large {
-    font-size: clamp(7rem, 9vw, 10rem);
-    font-weight: 400;
-
-  }
-  .heading-medium {
-    font-size: clamp(6.4rem, 7vw, 8rem);
-    font-weight: 400;
-  }
-  
-}
-
-@media (min-width: 1280px) {
-
 }
 

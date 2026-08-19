@@ -6,7 +6,6 @@ export default function PrivacyPolity() {
       <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto space-y-8">
           
-          {/* En-tête */}
           <header className="border-b border-slate-900/10 pb-6">
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 uppercase">
               Privacy Policy

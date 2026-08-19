@@ -1,4 +1,5 @@
 
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLobbySocket } from '../../context/LobbySocketContext';
 import { useEffect, useState } from 'react';
@@ -8,14 +9,10 @@ interface InviteBarProps {
   roomId: string;
 }
 
-// const typeStyles: Record<NotificationType, string> = {
-//   success: 'bg-[#2ecc71] border-[#27ae60]',
-//   error: 'bg-[#e74c3c] border-[#c0392b]',
-//   warning: 'bg-[#f39c12] border-[#d35400]',
-// };
-
 export default function InviteBar({ username, roomId }: InviteBarProps) {
-const { user } = useAuth();
+
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const { joinRoom } = useLobbySocket()
   const [isLeaving, setIsLeaving] = useState(false);
 
@@ -39,7 +36,7 @@ const { user } = useAuth();
           ${isLeaving ? 'animate-[slideOutNotif_0.3s_ease-in_forwards]' : 'animate-[slideInNotif_0.3s_ease-out_forwards]'}
         `}
       >
-        {username} invites you to play in <span className='underline' onClick={() => joinRoom(roomId, user.username, 'DinoGreen')}>{roomId}</span>
+        {username} invites you to play in <span className='underline' onClick={() => {joinRoom(roomId, user.username, 'DinoGreen'); navigate('/home');}}>{roomId}</span>
         
       </div>
 

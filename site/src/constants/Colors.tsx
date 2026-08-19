@@ -1,4 +1,9 @@
-export const Color ={
+export const Color = {
+    SeaBlue: '#47aba9',
+    NightBlue:'#05011f',
+}
+
+export const ChatColor = {
   ORANGE: 'orangered',
   RED: 'red',
   MAROON: 'maroon',
@@ -14,7 +19,7 @@ export const Color ={
   TEAL: 'teal',
 } as const;
 
-export type Color = typeof Color[keyof typeof Color];
+export type ChatColor = typeof ChatColor[keyof typeof ChatColor];
 
 export const ButtonColor = {
   Black: {

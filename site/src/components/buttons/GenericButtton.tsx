@@ -10,7 +10,7 @@ interface ButtonProps {
 }
 
 const colorLoader = {
-  Blue: () => import("../../assets/buttons/colored_buttons/blue"),
+  Blue: () => import("../../assets/buttons/colored_buttons/light_blue"),
   Red: () => import("../../assets/buttons/colored_buttons/red"),
   Black: () => import("../../assets/buttons/colored_buttons/black"),
   Green: () => import("../../assets/buttons/colored_buttons/green"),

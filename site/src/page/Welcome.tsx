@@ -3,11 +3,14 @@ import { Banner } from '../components/Banner';
 import { ButtonColor } from '../constants/Colors';
 import AuthForm from '../components/form/AuthForm/AuthForm';
 import ColoredButton from '../components/buttons/ColoredButton';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Landing() {
+  const { user } = useAuth();
   const [signin, setSignin] = useState<boolean>(false);
   const formRef = useRef<HTMLDivElement>(null);
-
+  const navigate = useNavigate();
 
   const displaySignin = () => {
     setSignin(!signin);
@@ -43,7 +46,7 @@ export default function Landing() {
         <ColoredButton
           color={ButtonColor.Red}
           text="Enter"
-          func={displaySignin}
+          func={ user ? ()=>{navigate('/home')} : displaySignin}
           className="text-[clamp(0.5rem,2.5vw,5rem)] px-2"
         />
       </div>

@@ -34,7 +34,8 @@ export default function AddFriend() {
     <>
       <Heading size="m" text="Add friend" className=""/>
       <div className="flex flex-col sm:flex-row items-center justify-center">
-        <form onSubmit={(e) => e.preventDefault()}>
+        <form onSubmit={(e) => e.preventDefault()}
+          className="flex flex-col">
           <input
             type="text"
             autoComplete="none"
@@ -47,7 +48,7 @@ export default function AddFriend() {
               bg-white rounded sm:rounded-2xl
               text-[clamp(1rem,5vw,2rem)]
               "/>
-          <div className="h-full">
+          <div className="h-full self-center mt-2">
               <ColoredButton color={ButtonColor.Blue} text="Add" func={sendRequest} className="px-5 text-[clamp(1rem,3vw,2rem)]"/>
           </div>
         </form>
