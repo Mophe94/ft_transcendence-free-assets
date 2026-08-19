@@ -19,7 +19,6 @@ services:
     volumes:
       - nginx_ssl:/etc/nginx/ssl
     
-
   frontend:
     build:
       context: site
@@ -33,11 +32,10 @@ services:
       interval: 5s
       timeout: 3s
       retries: 3
-      start_period: 5s
+      start_period: 10s
     volumes:
       - ./site:/app
       - /app/node_modules
-
 
   game_service:
     build:
@@ -69,7 +67,6 @@ services:
       - ./backend:/app
       - /app/node_modules
     
-
   chat_service:
     build:
       context: backend
@@ -95,7 +92,7 @@ services:
     build:
       context: backend
     container_name: users_service
-    command: npm run start:dev account-service
+    command: npm run start:dev user-service
     depends_on:
       users_db:
         condition: service_healthy
@@ -153,6 +150,7 @@ services:
       - db_users_username
       - db_users_password
       - db_users_postgres_password
+
   game_db:
     build:
       context: database/game_db/

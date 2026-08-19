@@ -13,6 +13,7 @@ import parchMR from '../../assets/background/parchment/parchMR.png';
 import parchBL from '../../assets/background/parchment/parchBL.png';
 import parchBM from '../../assets/background/parchment/parchBM.png';
 import parchBR from '../../assets/background/parchment/parchBR.png';
+import { useAuth } from '../../context/AuthContext';
 
 const prefStyles = {
   '--img-ul': `url(${parchUL})`,
@@ -61,11 +62,13 @@ export function MessagesWindow() {
 export default function Chat() {
   const [visible, setVisible] = useState<boolean>(false);
   const chat = useContext(ChatContext);
+  const { user } = useAuth();
   
   useEffect(() => {
     if (chat && visible && chat.isUnread)
       chat.setIsUnread(false);
   }, [chat, visible, chat?.isUnread])
+  if (!user) return <></>;
   return (
     <>
       <div

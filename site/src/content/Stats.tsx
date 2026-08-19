@@ -3,37 +3,19 @@ import ImgFrame from '../components/ImgFrame';
 import React from 'react';
 
 import unitPic from '../assets/Units/Unit_05.png';
-import trojanLogo from '../assets/coalitions/trojan_logo.png';
-import spartanLogo from '../assets/coalitions/spartan_logo.png';
-import athenianLogo from '../assets/coalitions/athenian_logo.png';
 import Heading from '../components/heading/Heading';
+import { Coalitions } from '../constants/Coalition';
 
 interface StatsProps {
   user: User | null;
   stats: UserStats | null;
 }
 
-const coalitionColors: Record<string, string> = {
-  trojan: 'text-[rgb(53,92,157)]',
-  athenian: 'text-[rgb(26,98,0)]',
-  spartan: 'text-[rgb(141,4,2)]',
-};
+
 
 export default function Stats({ user, stats }: StatsProps) {
   if (!user || !stats) return null;
 
-  const getCoalition = (id: number) => {
-    switch (id) {
-      case 52:
-        return 'The Spartans';
-      case 53:
-        return 'The Athenians';
-      case 54:
-        return 'The Trojans';
-      default:
-        return 'None';
-    }
-  };
 
   const statistics = {
     'Games played': stats.gamesPlayed,
@@ -45,32 +27,18 @@ export default function Stats({ user, stats }: StatsProps) {
     'Achievements': stats.nbAchievements,
   };
 
-  const coalitionName = getCoalition(user.coalitionId);
-  let [coalLogo, colorKey] = ['', ''];
+  const coalConfig = Coalitions[user.coalitionId as keyof typeof Coalitions] ?? Coalitions.default
 
-  if (user.coalitionId === 52) {
-    coalLogo = spartanLogo;
-    colorKey = 'spartan';
-  } else if (user.coalitionId === 53) {
-    coalLogo = athenianLogo;
-    colorKey = 'athenian';
-  } else if (user.coalitionId === 54) {
-    coalLogo = trojanLogo;
-    colorKey = 'trojan';
-  }
-
-  const coalitionTextColor = coalitionColors[colorKey] || '';
 
   return (
     <>
-      {coalLogo && (
+      {coalConfig.coalLogo && (
         <img
-          src={coalLogo}
+          src={coalConfig.coalLogo}
           alt="coalition-logo"
           className={`
             invisible h-0
             xl:visible xl:absolute xl:top-0 xl:right-0 xl:h-[clamp(8rem,9vw,10rem)]
-            ${user.coalitionId !== 0 ? 'visible' : 'invisible'}
           `}
         />
       )}
@@ -84,7 +52,7 @@ export default function Stats({ user, stats }: StatsProps) {
           <ImgFrame
             imgSrc={user.avatarUrl ? user.avatarUrl : unitPic}
             imgAlt="avatar-pic"
-            color={colorKey}
+            color={coalConfig.colorkey}
           />
         </div>
 
@@ -117,8 +85,8 @@ export default function Stats({ user, stats }: StatsProps) {
           <div className="mt-4 text-[clamp(0.6rem,3.3vw,3rem)] font-medium xl:text-[2rem] xl:mt-4 xl:mb-0 xl:ml-12">
             Coalition:
           </div>
-          <div className={`text-[clamp(0.6rem,3vw,3rem)] xl:text-[1.8rem] xl:ml-[clamp(4rem,5vw,5rem)] ${coalitionTextColor}`}>
-            {coalitionName}
+          <div className={`text-[clamp(0.6rem,3vw,3rem)] xl:text-[1.8rem] xl:ml-[clamp(4rem,5vw,5rem)] ${coalConfig.textColor}`}>
+            {coalConfig.name}
           </div>
 
           <div className="mt-4 text-[clamp(0.6rem,3.3vw,3rem)] font-medium xl:text-[2rem] xl:mt-4 xl:mb-0 xl:ml-12">

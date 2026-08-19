@@ -1,7 +1,5 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-
-
 import genericAvatar from '../../assets/Units/Unit_05.png';
 import { useTheme } from '../../context/ThemeContext';
 

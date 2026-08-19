@@ -22,7 +22,6 @@ const privateLinks = {
   'How to play': '/howto',
   Readme: '/readme',
   'About us': '/aboutus',
-  'admin': '/dashboard',
 };
 
 function NavMenu() {

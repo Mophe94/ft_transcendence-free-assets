@@ -102,7 +102,7 @@ export function Lobby() {
           </div>
         )}
         <div className='room-button-container mt-5 grid grid-cols-2 justify-items-center'>
-          <div id='quick-btn-container' className='w-[clamp(6rem,30vw,18rem)]'>
+          <div id='quick-btn-container' className='w-[clamp(6rem,30vw,18rem)] self-center'>
             <QuickPairingButton onClick={() => quickPairing(username, skin)} />
           </div>
           <div id='create-btn-container' className='w-[clamp(6rem,30vw,18rem)] self-center'>

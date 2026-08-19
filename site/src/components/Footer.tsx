@@ -6,12 +6,14 @@ export default function Footer() {
 
   return (
 	<footer
-		className="z-10 mt-auto w-full bg-[#ffffffa3]">
+	  className="z-10 mt-auto w-full bg-[#ffffffa3]"
+	>
 	  <div className="
-		sm:space-y-4 
-		sm:italic text-3xl font-semibold
-		grid grid-cols-3 text-center
-		sm:border-b-4 p-4"
+		w-9/10
+		text-sm sm:text-2xl md:text-3xl
+		italic font-semibold
+		grid grid-cols-3 text-center items-center
+		p-4"
 	  >
 	    <Link
 		  to="/cookies_policy"

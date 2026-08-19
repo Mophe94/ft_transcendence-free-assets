@@ -11,7 +11,7 @@ export default function AppLayout() {
     <div
       className='relative min-h-screen flex flex-col'
       style={{ backgroundImage: `url(${theme.bgImg})`, backgroundColor: theme.bgColor }}>
-      <div>
+      <div className='mb-4'>
         <NavBar />
         <div className="w-[min(95vw,1500px)] mt-8 mx-auto flex flex-col">
           <Outlet />
