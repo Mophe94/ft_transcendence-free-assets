@@ -255,33 +255,22 @@ export class GameService {
   // }
   async startNextRound(roomId: string): Promise<void> {
     const active = this.activePlayersByRoom.get(roomId);
-    const connected = this.gameRooms.get(roomId);
-    if (!active || !connected) return;
+    //const connected = this.gameRooms.get(roomId);
+    if (!active ) return;
 
-    console.log(
-      `[GameService] activePlayersByRoom=${this.activePlayersByRoom.get(roomId)?.size}, connected=${this.gameRooms.get(roomId)?.size}`,
-    );
-
-    const allCombatsFinished = connected.size === active.size;
+    const allCombatsFinished = active.size === DEFAULT.CAPACITY / 2;
     const canPairEveryone = active.size >= 2 && active.size % 2 === 0;
 
     console.log('Active Players in startNextRound ', active);
-    console.log('Connected Players in startNextRound ', connected);
-    console.log('*********************************************');
     if (allCombatsFinished && canPairEveryone) {
       console.log(
         'Active Players allCombatsFinished && canPairEveryone: ',
         active,
       );
-      console.log(
-        'Connected Players allCombatsFinished && canPairEveryone: ',
-        connected,
-      );
       console.log('*********************************************');
-      this.combatService.matchmake(connected);
-      this.startMapPhase(roomId, connected, true);
+      this.combatService.matchmake(active);
+      this.startMapPhase(roomId, active, true);
     } else if (allCombatsFinished && active.size === 1) {
-      console.log('*********************************************');
       const winnerId = [...active][0];
       if (winnerId) {
         await this.deleteEndGame(roomId, winnerId);
@@ -707,9 +696,6 @@ export class GameService {
     const userId2 = this.combatService.getOpponentId(userId);
     if (!userId2) return;
 
-    console.log('player.currentActions; ', player.currentActions.actionType);
-    console.log('player2.currentActions; ', player2.currentActions.actionType);
-
     const bothPlayersActed =
       !!player.currentActions.actionType && !!player2.currentActions.actionType;
     if (!bothPlayersActed && !playerForce?.forceChooseMonster) return;
@@ -880,8 +866,13 @@ export class GameService {
     if (loser.isBot) {
       const loserBotRoomId = this.roomIdByPlayer.get(loser.id);
       if (loserBotRoomId) {
-        this.eliminatePlayer(loser.id, loserBotRoomId);
+        setTimeout(() => {
+          this.eliminatePlayer(loser.id, loserBotRoomId).catch((err) =>
+            console.log(`[GameService] eliminatePlayer (bot loser) failed for ${loser.id}`, err),
+          );
+        }, 5000);
       }
+    }
    
     // WINNER SCENE -END OF GAME
     if (winner.roundsRemaining === 0)
@@ -908,7 +899,6 @@ export class GameService {
       //   this.playerService.removePlayer(loser.id);
       //   this.startNextRound(roomId);
       // }
-    }
     // --- end AI ---
   }
 
