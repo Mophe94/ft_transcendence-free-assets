@@ -20,11 +20,10 @@ services:
           - node.role == manager
     volumes:
       - prom_data:/prometheus
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - obsrv_net
-      - site_net
-      - games_net
+#      - site_net
+#      - games_net
 
   grafana:
     image: grafana/grafana:13.2
@@ -58,18 +57,6 @@ services:
     networks:
         - obsrv_net
 
-#  cadvisor:
-#    image: gcr.io/cadvisor/cadvisor
-#    volumes:
-#      - /:/rootfs:ro
-#      - /var/run:/var/run:ro
-#      - /sys:/sys:ro
-#      - /var/lib/docker/:/var/lib/docker:ro
-#    networks:
-#      - obsrv_net
-#    deploy:
-#      mode: global
-      
   loki:
     user: "${LOKI_UID}:${LOKI_GID}"
     image: grafana/loki:3.5.2
@@ -90,35 +77,8 @@ services:
       restart_policy:
         condition: on-failure
 
-#  fluent-bit:
-#    image: fluent/fluent-bit:3.0
-#    volumes:
-#      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-#      - /var/run/docker.sock:/var/run/docker.sock:ro
-#      - fluent-bit_data:/fluent-bit/storage
-#
-#    configs:
-#      - source: fluent-bit_config
-#        target: /fluent-bit/etc/fluent-bit.conf
-#      - source: parsers_config
-#        target: /fluent-bit/etc/parsers.conf
-#      - source: lua_http_level
-#        target: /fluent-bit/scripts/http_level.lua
-#    
-#    command: ["/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]
-#    
-#    networks:
-#      - obsrv_net
-#    
-#    deploy:
-#      mode: global
-#      restart_policy:
-#        condition: any
-
   alloy:
     image: grafana/alloy:latest
- #   privileged: true
-#    user: "alloy:alloy"
     command:
       - run
       - --storage.path=/var/lib/alloy/data
