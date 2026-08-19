@@ -2,6 +2,7 @@
 
 SCRIPT_NAME="${0##*/}"
 SCRIPT_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_FILE="${LOCATION}/${SCRIPT_NAME%.sh}.log"
 
 # Set script variable
 CONFIG_FILE=${ENV_FILE}

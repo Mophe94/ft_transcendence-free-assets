@@ -1,5 +1,6 @@
 SCRIPT_NAME:=Infra-Makefile
 LOCATION := $(shell pwd)
+TEAM_CONTAINER:=$(shell dirname "$(LOCATION)")
 
 # Environment files
 ENV_NAME:=env_infra
@@ -13,7 +14,7 @@ DEPLOY_FILES = $(LOCATION)/stacks
 SWARM_UTILS = $(LOCATION)/swarm_utils
 CONFIG_SCRIPTS = $(LOCATION)/swarm_utils/config
 TOOLS_SCRIPTS = $(LOCATION)/swarm_utils/tools
-CONTAINER_FILES:= "$(LOCATION)/containers"
+CONTAINER_FILES:=$(LOCATION)/containers
 
 include $(ENV_MK)
 export
@@ -22,12 +23,12 @@ export
 IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
 HOST_IP:= $(shell cat host_ip.txt)
 HOST_TAILSCALE_IP = $(shell tailscale ip -4)
-USER_NAME="$(USER)"
+USER_NAME:=$(USER)
 
 # Miscellanious
 TAG ?= latest
 REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
-BAKE_ARG = BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) HOST_IP=$(HOST_IP) REGISTRY=$(REGISTRY) TAG=$(TAG)
+BAKE_ARG = BAKE_ROOT=$(CONTAINER_FILES) TEAM_CONTAINER=$(TEAM_CONTAINER) HOST_IP=$(HOST_IP) REGISTRY=$(REGISTRY) TAG=$(TAG)
 DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=$(PROM_SCRAPE_PORT) NFS_IP=$(HOST_TAILSCALE_IP)
 TARGET=""
 
@@ -45,24 +46,19 @@ swarm_setup:
 	@$(CONFIG_SCRIPTS)/launch_swarm.sh "$(SWARM_UTILS)" "$(HOST_IP)" "$(HOST_TAILSCALE_IP)"
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
 	
-push:
-	$(BAKE_ARG) LOCAL=false docker buildx bake databases website game -f $(CONTAINER_FILES)/docker-bake.hcl --push >> /home/stempels/infra/build.log
-
-test:
-	BUILDX_BAKE_ENTITLEMENTS_FS=0 BAKE_ROOT=$(CONTAINER_FILES) IP=$(IP4) docker buildx bake fluent-bit --no-cache -f $(CONTAINER_FILES)/docker-bake.hcl
-
 core:
-	@mkdir -p "/nfs-storage/frontend"
 	@echo $(USER)
-	@echo $(USER_NAME)
-	@doas echo $(USER)
 	@doas echo $(USER_NAME)
+	@mkdir -p "/nfs-storage/frontend"
 	@doas chown -R "$(USER_NAME):$(USER_NAME)" "/nfs-storage/frontend"
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 	@chmod +x $(TOOLS_SCRIPTS)/registry_check.sh
 	@if ! bash $(TOOLS_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \
           exit 1; \
         fi
+
+push:
+	$(BAKE_ARG) LOCAL=false docker buildx bake databases website game -f $(CONTAINER_FILES)/docker-bake.hcl --allow=fs.read=$(TEAM_CONTAINER) --allow=fs.write=/nfs-storage/frontend/ --push >> /home/stempels/infra/build.log
 
 base:
 	@make image TARGET=$@
@@ -186,4 +182,4 @@ $(ENV_FILE):
 fclean:
 	docker stack rm core website game observ && docker system prune -af --volumes
 
-PHONY: all node_launch swarm_setup swarm_status push test core website game observ up down swarm-status image wait_tailscale fclean
+PHONY: all node_launch swarm_setup swarm_status push core website game observ up down swarm-status image wait_tailscale fclean

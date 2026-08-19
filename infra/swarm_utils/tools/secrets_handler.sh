@@ -33,9 +33,8 @@ while IFS='=' read -r key value; do
     secret_name="${key,,}"
     secret_name="${secret_name#s_}"
     if docker secret inspect "$secret_name" >/dev/null 2>&1; then
-	echo "\t secret already exist: ${secret_name}"
+	echo "secret already exist: ${secret_name}"
     else
-        echo -n "\t"
 	echo -n "$value" | docker secret create "$secret_name" -
     fi
 done < "$SECRETS_FILE"

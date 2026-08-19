@@ -2,6 +2,7 @@ variable "LOCAL" { default = false }
 variable "REGISTRY" { default = "127.0.0.1:5050" }
 variable "TAG" { default = "latest" }
 variable "BAKE_ROOT" { default = "." }
+variable "TEAM_CONTAINER" { default = "." }
 variable "HOST_IP" { default = "127.0.0.1" }
 variable "API_42_CLIENT_ID" { default = "" }
 
@@ -44,7 +45,7 @@ target "postgress-base" {
 }
 
 target "frontend" {
-    context     = "${BAKE_ROOT}/../../site/"
+    context     = "${TEAM_CONTAINER}/site/"
     dockerfile  = "Dockerfile"
     contexts = {
 	base-image = (LOCAL
@@ -62,7 +63,7 @@ target "frontend" {
 }
 
 target "backend" {
-    context     = "${BAKE_ROOT}/../../backend"
+    context     = "${TEAM_CONTAINER}/backend"
     dockerfile  = "Dockerfile"
     contexts = {
 	base-image = (LOCAL
@@ -73,7 +74,7 @@ target "backend" {
 }
 
 target "game" {
-    context     = "${BAKE_ROOT}/../../game_test"
+    context     = "${TEAM_CONTAINER}/game_test"
     dockerfile  = "Dockerfile"
     contexts = {
 	base-image = (LOCAL
@@ -84,13 +85,13 @@ target "game" {
 }
 
 target "redis" {
-    context     = "${BAKE_ROOT}/../../redis"
+    context     = "${TEAM_CONTAINER}/redis"
     dockerfile  = "Dockerfile"
     tags        = ["${REGISTRY}/redis:${TAG}"]
 }
 
 target "users_db" {
-    context     = "${BAKE_ROOT}/../../database/users_db"
+    context     = "${TEAM_CONTAINER}/database/users_db"
     dockerfile  = "Dockerfile"
     contexts = {
 	base-image = (LOCAL
@@ -101,7 +102,7 @@ target "users_db" {
 }
 
 target "game_db" {
-    context     = "${BAKE_ROOT}/../../database/game_db"
+    context     = "${TEAM_CONTAINER}/database/game_db"
     dockerfile  = "Dockerfile"
     contexts = {
 	base-image = (LOCAL
