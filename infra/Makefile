@@ -57,7 +57,7 @@ core:
 	@echo $(USER_NAME)
 	@doas echo $(USER)
 	@doas echo $(USER_NAME)
-	@doas chown "$(USER_NAME):$(USER_NAME)" "/nfs-storage/frontend"
+	@doas chown -R "$(USER_NAME):$(USER_NAME)" "/nfs-storage/frontend"
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 	@chmod +x $(TOOLS_SCRIPTS)/registry_check.sh
 	@if ! bash $(TOOLS_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \

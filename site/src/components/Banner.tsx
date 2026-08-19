@@ -1,4 +1,5 @@
 import videoSource from '../assets/video_banner_web.mp4';
+import free_assets from '../assets/free_assets.png';
 
 export function Banner() {
   return (
@@ -9,7 +10,7 @@ export function Banner() {
     ">
       <img
         className="absolute top-0 right-0 w-[33%] z-10"
-        src="src/assets/free_assets.png"
+        src={free_assets}
         alt="Free assets"
       />
       <video
