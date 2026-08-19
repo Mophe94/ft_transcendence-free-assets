@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/08/12 12:20:09 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/19 12:35:37 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,10 +22,8 @@ services:
           - jwt_secret_key
           - redis_password
         command:
-          - npm
-          - run
-          - start:dev
-          - game-service
+          - node
+          - dist/apps/game-service/main.js
         networks:
             - games_net
         deploy:

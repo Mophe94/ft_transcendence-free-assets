@@ -38,7 +38,7 @@ swarm_launch: wait_tailscale
 	$(MAKE) core
 	$(MAKE) base
 	$(MAKE) -j4 push
-	$(MAKE) -j4 website observ game
+	$(MAKE) -j4 website game
 
 swarm_setup:
 	@chmod +x $(CONFIG_SCRIPTS)/launch_swarm.sh
@@ -53,7 +53,7 @@ test:
 
 core:
 	@mkdir -p "/nfs-storage/frontend"
-	@doas chown "$(USER):$(USER)" "/nfs-storage/frontend"
+	@doas chown "$(USER_NAME):$(USER_NAME)" "/nfs-storage/frontend"
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 	@chmod +x $(TOOLS_SCRIPTS)/registry_check.sh
 	@if ! bash $(TOOLS_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \
