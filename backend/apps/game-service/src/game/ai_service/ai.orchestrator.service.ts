@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AiService } from './ai.service';
 import { PlayerService } from '../player/player.service';
 import { Player } from '../player/player';
-
+import { GameData } from '../game.type';
 /**
  * Single entry point between GameService and everything related to AI.
  * GameService stays in charge of room management (the userId Set/Map);
@@ -75,7 +75,7 @@ export class AiOrchestratorService {
   /**
    * Décide de l'action de combat d'un bot pour ce tour.
    */
-  decideCombatAction(bot: Player, enemy: Player): Record<string, any> {
+  decideCombatAction(bot: Player, enemy: Player): GameData {
     return this.aiService.decideCombatAction(bot, enemy);
   }
 
