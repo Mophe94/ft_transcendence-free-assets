@@ -100,6 +100,7 @@ echo "[$SCRIPT_NAME] Changing VM hostname to: swarmnode.${NEW_USER}"
 echo "swarmnode.${NEW_USER}" > /etc/hostname
 
 # Docker configuration
+docker system prune -af
 mkdir -p /etc/docker
 
 cat >/etc/docker/daemon.json <<EOF
