@@ -132,19 +132,21 @@ export class GameService {
       /////////////////////////////////* END */////////////////////////////////
       console.log('Gameroom', this.gameRooms.get(roomId))
       this.combatService.matchmake(roomPlayers);
-      this.startMapPhase(roomId, roomPlayers);
 
-      // // --- AI (bot-vs-bot instant resolve) ---
-      // // Une paire 100% bot n'a pas besoin de passer par tout le flow
-      // // map/team_setup/combat : personne ne regarde ce combat, on tire
-      // // juste un vainqueur au hasard tout de suite.
-      // const resolvedPairs = this.resolveBotVsBotPairs(roomId, roomPlayers);
-      // const playersForMapPhase =
-      //   resolvedPairs.size > 0
-      //     ? new Set([...roomPlayers].filter((id) => !resolvedPairs.has(id)))
-      //     : roomPlayers;
-      // //if (resolvedPairs.size > 0) this.startNextRound(roomId);
-      // // --- end AI ---
+     // --- AI (bot-vs-bot instant resolve) ---
+      // Une paire 100% bot n'a pas besoin de passer par tout le flow
+      // map/team_setup/combat : personne ne regarde ce combat, on tire
+      // juste un vainqueur au hasard tout de suite.
+      const resolvedPairs = this.resolveBotVsBotPairs(roomId, roomPlayers);
+      const playersForMapPhase =
+        resolvedPairs.size > 0
+          ? new Set([...roomPlayers].filter((id) => !resolvedPairs.has(id)))
+          : roomPlayers;
+      //if (resolvedPairs.size > 0) this.startNextRound(roomId);
+      // --- end AI ---
+
+      this.startMapPhase(roomId, playersForMapPhase);
+
     }
   }
 
@@ -170,8 +172,20 @@ export class GameService {
         );
         await this.cleanupAbandonedRoom(roomId);
         return;
-      }
-
+      }const opponentId = this.combatService.getOpponentId(userId);
+      const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
+      
+      ///////////////////// TEST //////////////////////////////
+      // if (enemy) {
+      //   if (!player.teamReady) {
+      //     const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy);
+      //     void this.handleMessage(userId, { state: 'team_choice', battle_team: chosenTeam });
+      //   } else if (!player.currentActions?.actionType) {
+      //     this.triggerBotCombatTurn(userId, player, enemy);
+      //   }
+      // }
+      /////////////////////////////////////////////////////////
+      
       const totalRounds = Math.log2(DEFAULT.CAPACITY);
       const round = totalRounds - player.roundsRemaining + 1;
       this.aiOrchestrator.takeoverPlayer(round, totalRounds, player);
@@ -186,16 +200,16 @@ export class GameService {
     await this.redisStateService.removePlayer(userId);
     /////////////////////////////////* END */////////////////////////////////
 
-    const wasEliminated =
-      player?.status === 'loser' ||
-      (player?.status === 'winner' && player.roundsRemaining === 0);
-
     this.leaveGameRoom(roomId, userId);
     this.activePlayersByRoom.get(roomId)?.delete(userId);
+    this.roomIdByPlayer.delete(userId);
+    this.playerService.removePlayer(userId);
 
-    if (wasEliminated) this.startNextRound(roomId);
+    if (player) this.startNextRound(roomId);
     else {
-      console.log('') 
+      // useless with AI? 
+      // safety net
+      console.log('[GameService] onGodotDisconnected: AbortedGame cleaning'); 
       this.deleteAbortedGame(roomId, userId);
     }
   }
@@ -258,10 +272,10 @@ export class GameService {
     //const connected = this.gameRooms.get(roomId);
     if (!active ) return;
 
-    const allCombatsFinished = active.size === DEFAULT.CAPACITY / 2;
     const canPairEveryone = active.size >= 2 && active.size % 2 === 0;
+    const allCombatsFinished = [...active].every(
+      (id) => this.playerService.getPlayer(id)?.duelFinished === true);
 
-    console.log('Active Players in startNextRound ', active);
     if (allCombatsFinished && canPairEveryone) {
       console.log(
         'Active Players allCombatsFinished && canPairEveryone: ',
@@ -270,10 +284,10 @@ export class GameService {
       console.log('*********************************************');
       this.combatService.matchmake(active);
       this.startMapPhase(roomId, active, true);
-    } else if (allCombatsFinished && active.size === 1) {
-      const winnerId = [...active][0];
-      if (winnerId) {
-        await this.deleteEndGame(roomId, winnerId);
+    } else if (active.size === 1) {
+        const winnerId = [...active][0];
+        if (winnerId) {
+          await this.deleteEndGame(roomId, winnerId);
       }
       console.log('Game rooms end game: ', this.gameRooms);
       //console.log(`End of game: everything should be cleanup at this point!`);
@@ -330,7 +344,7 @@ export class GameService {
     this.combatService.playerCombatRoom.delete(winnerId);
 
     Promise.all([
-      //this.redisStateService.removePlayer(userId),
+      this.redisStateService.removePlayer(winnerId),
       this.redisService.deleteRoom(roomId),
       this.redisService.removeActiveRoom(roomId),
     ]).catch((err) =>
@@ -495,15 +509,6 @@ export class GameService {
       return;
     }
 
-    console.log(
-      'player.currentActions BEFORE; ',
-      player.currentActions.actionType,
-    );
-    console.log(
-      'player2.currentActions BEFORE; ',
-      player2.currentActions.actionType,
-    );
-
     // if (player.forceChooseMonster) -> if !currentMonster
     const forcedMonster =
       player.forceChooseMonster || player2.forceChooseMonster;
@@ -582,7 +587,14 @@ export class GameService {
     const state = payload?.state;
     console.log('STATE', state);
 
-    if (state === 'safe_to_disconnect') {
+    if (state === 'safe_to_continue') {
+
+      if (player.status === 'winner' && player.roundsRemaining > 0) {
+        player.duelFinished = true;
+        await this.startNextRound(roomId);
+        return;
+      }
+
       await new Promise<void>((resolve) => setTimeout(resolve, 5000));
 
       if (player.status === 'loser')
@@ -866,13 +878,14 @@ export class GameService {
     if (loser.isBot) {
       const loserBotRoomId = this.roomIdByPlayer.get(loser.id);
       if (loserBotRoomId) {
-        setTimeout(() => {
           this.eliminatePlayer(loser.id, loserBotRoomId).catch((err) =>
             console.log(`[GameService] eliminatePlayer (bot loser) failed for ${loser.id}`, err),
-          );
-        }, 10000);
+        )
       }
     }
+
+    loser.duelFinished = true;
+    if (winner.isBot) winner.duelFinished = true;
    
     // WINNER SCENE -END OF GAME
     if (winner.roundsRemaining === 0)
@@ -883,9 +896,10 @@ export class GameService {
 
     // reinitialize winner
     winner.resetAfterRound();
+
     // --- AI (bot loser cleanup) ---
     // Un joueur humain qui perd déclenche sa propre élimination via
-    // safe_to_disconnect -> onGodotDisconnected (côté client, qui se
+    // safe_to_continue -> onGodotDisconnected (côté client, qui se
     // déconnecte). Un bot n'a pas de websocket pour faire ça lui-même :
     // sans ce bloc, un bot qui perd face à un humain reste compté
     // indéfiniment dans gameRooms/activePlayersByRoom, et le round
@@ -953,6 +967,7 @@ export class GameService {
       winner.roundsRemaining -= 1;
       loser.roundsRemaining -= 1;
       winner.resetAfterRound(); // même nettoyage qu'un vrai vainqueur (currentMonster/battle_team vidés)
+      winner.duelFinished = true;
 
       // Annule la paire de combat que matchmake() venait de créer pour eux.
       const combatRoomId = this.combatService.playerCombatRoom.get(userId);
@@ -967,6 +982,7 @@ export class GameService {
       this.activePlayersByRoom.get(roomId)?.delete(loser.id);
       this.roomIdByPlayer.delete(loser.id);
       this.playerService.removePlayer(loser.id);
+      this.redisStateService.removePlayer(loser.id)
 
       resolved.add(userId);
       resolved.add(opponentId);
@@ -1070,7 +1086,7 @@ export class GameService {
       this.pendingBotActions.delete(userId);
       const action = this.aiOrchestrator.decideCombatAction(player, enemy);
       void this.handleMessage(userId, action);
-    }, 1500);
+    }, 500);
 
     this.pendingBotActions.set(userId, timer);
   }
