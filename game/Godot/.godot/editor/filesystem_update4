@@ -11,6 +11,5 @@ res://Scene/PlayerCharacter/Skin/Satyr02/satyr02SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr03/satyr03SpriteSheet.tres
 res://Scene/World01/Tree/tree.tres
 res://Scene/World01/Tree/tree3.tres
-res://Script/World/world_01.gd
 res://Script/Timer/timer.gd
-res://Scene/TeamSetup/team_setup.tscn
+res://Script/World/world_01.gd

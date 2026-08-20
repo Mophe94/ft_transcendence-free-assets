@@ -74,8 +74,6 @@
 [ext_resource type="Texture2D" uid="uid://u1m1jyw5k56s" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Units/Blue Units/Pawn/Pawn_Idle Meat.png" id="67_fop3w"]
 [ext_resource type="Texture2D" uid="uid://cf5glt1kxmnt2" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Units/Blue Units/Pawn/Pawn_Run Meat.png" id="68_reckf"]
 [ext_resource type="Texture2D" uid="uid://7yupmob4qg7c" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Units/Blue Units/Archer/Archer_Idle.png" id="69_0vbr2"]
-[ext_resource type="Texture2D" uid="uid://cbglmy6s2ax5u" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Units/Blue Units/Warrior/Warrior_Attack1.png" id="70_pwtwl"]
-[ext_resource type="Texture2D" uid="uid://cmbj8l8kf5td0" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Units/Blue Units/Lancer/Lancer_Down_Attack.png" id="71_ex8hr"]
 [ext_resource type="PackedScene" uid="uid://dxuhjorkcu4py" path="res://Scene/PlayerCharacter/character.tscn" id="72_benk5"]
 [ext_resource type="Texture2D" uid="uid://bcvqrkcnv21re" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Units/Blue Units/Pawn/Pawn_Interact Pickaxe.png" id="78_enpk8"]
 [ext_resource type="PackedScene" uid="uid://dv78rxpyp687i" path="res://Scene/Inventory/inventory_ui.tscn" id="82_rk1so"]
@@ -2226,79 +2224,6 @@ physics_layer_0/collision_layer = 1
 physics_layer_0/collision_mask = 0
 sources/0 = SubResource("TileSetAtlasSource_y7rjo")
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_gi67h"]
-atlas = ExtResource("70_pwtwl")
-region = Rect2(0, 0, 192, 192)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ygcno"]
-atlas = ExtResource("70_pwtwl")
-region = Rect2(192, 0, 192, 192)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_m7qpo"]
-atlas = ExtResource("70_pwtwl")
-region = Rect2(384, 0, 192, 192)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_uv1fh"]
-atlas = ExtResource("70_pwtwl")
-region = Rect2(576, 0, 192, 192)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_p7730"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_gi67h")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ygcno")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_m7qpo")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_uv1fh")
-}],
-"loop": true,
-"name": &"default",
-"speed": 5.0
-}]
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qu6c2"]
-radius = 20.0
-height = 46.0
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_w6cng"]
-atlas = ExtResource("71_ex8hr")
-region = Rect2(0, 0, 320, 320)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_08q8y"]
-atlas = ExtResource("71_ex8hr")
-region = Rect2(320, 0, 320, 320)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_xgah2"]
-atlas = ExtResource("71_ex8hr")
-region = Rect2(640, 0, 320, 320)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_h12da"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_w6cng")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_08q8y")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_xgah2")
-}],
-"loop": true,
-"name": &"default",
-"speed": 5.0
-}]
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_is20g"]
-radius = 24.0
-height = 130.0
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_rk1so"]
 atlas = ExtResource("78_enpk8")
 region = Rect2(0, 0, 192, 192)
@@ -2806,17 +2731,14 @@ sources/1 = SubResource("TileSetAtlasSource_e186e")
 texture = ExtResource("6_ys4rc")
 texture_region_size = Vector2i(64, 64)
 5:2/0 = 0
-5:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -1.4508591, -32, 32, 32, 32, 32, 28.537586, -22.923584, 28.001606, -28.291779, 17.26524, -28.727036, 3.0468063)
 0:0/0 = 0
 1:0/0 = 0
 2:0/0 = 0
 3:0/0 = 0
 4:0/0 = 0
 5:1/0 = 0
-5:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -11.0192795, -32, 32, -28.401672, 7.8393784)
 6:1/0 = 0
 7:1/0 = 0
-7:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(29.558311, 29.044258, 27.75911, -3.0843449, 32, -32)
 8:1/0 = 0
 8:0/0 = 0
 7:0/0 = 0
@@ -2853,11 +2775,9 @@ texture_region_size = Vector2i(64, 64)
 5:3/0 = 0
 6:3/0 = 0
 7:3/0 = 0
-7:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(25.344353, 15.977966, 26.730999, 1.0281181, 24.931797, -13.108469, 17.477962, -23.132591, -32, -32, 24.314255, -24.13869, 28.00087, -8.865482, 29.054214, 6.0566177, 25.016464, 17.994293, 15.360977, 23.963135, 2.896637, 23.085365)
 8:3/0 = 0
 8:2/0 = 0
 7:2/0 = 0
-7:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-3.3057861, 32, 17.079895, 26.446281, 21.900162, 27.053125, 30.125107, 11.4951, 32, -20.936634, 32, 2.8737755, 32, 32)
 6:2/0 = 0
 5:4/0 = 0
 5:5/0 = 0
@@ -2885,7 +2805,6 @@ texture_region_size = Vector2i(64, 64)
 7:3/0 = 0
 7:2/0 = 0
 7:1/0 = 0
-7:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(32, 3.4173164, 32, 6.2950554, 32, 32, 25.702885, 10.795212, 29.301289, -4.369488)
 6:0/0 = 0
 5:0/0 = 0
 4:0/0 = 0
@@ -2894,7 +2813,7 @@ texture_region_size = Vector2i(64, 64)
 0:2/0 = 0
 0:3/0 = 0
 0:4/0 = 0
-0:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-23.132591, 3.598404, -20.936638, -5.509636, -0.51405716, -21.59042, -12.672173, -7.162529)
+0:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, 4.958679, 3.8567505, -32, -13.774101, -12.672173)
 0:5/0 = 0
 0:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(32, 32, -24.24242, 32, 32, -10.8334465)
 1:5/0 = 0
@@ -2904,22 +2823,20 @@ texture_region_size = Vector2i(64, 64)
 2:3/0 = 0
 2:4/0 = 0
 3:4/0 = 0
-3:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(2.2038574, -21.487598, 18.971294, 8.7081375, 12.129189, -11.196175)
+3:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-1.1019287, -32, 32, 1.6528931, 14.876038, -12.121208)
 4:2/0 = 0
 3:1/0 = 0
 3:0/0 = 0
 2:1/0 = 0
 3:5/0 = 0
-3:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(21.487602, 32, -32, 32, -32, -17.079887)
+3:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(21.487602, 32, -32, 32, -32, -10.468315)
 4:5/0 = 0
 5:5/0 = 0
 6:3/0 = 0
 5:2/0 = 0
-5:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -7.7938766, -32, 32, 32, 32, -10.431793, 27.698246, -20.983505, 27.338528, -30.216263, 17.865967)
 4:4/0 = 0
 6:2/0 = 0
 5:1/0 = 0
-5:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -6.144394, -32, 32, -26.333115, 16.32653, -27.210892, 1.0533257)
 4:1/0 = 0
 8:2/0 = 0
 8:1/0 = 0
@@ -3545,7 +3462,7 @@ tile_set = SubResource("TileSet_mtmex")
 
 [node name="Tree_object_layer" type="TileMapLayer" parent="DecorationElements_layer" unique_id=703472942]
 z_index = 6
-tile_map_data = PackedByteArray("AAAkAAEAAAAAAAEAAAAkAAIAAAAAAAIAAAAkAAMAAAAAAAMAAAAlAAAAAAABAAAAAAAlAAEAAAABAAEAAAAlAAIAAAABAAIAAAAlAAMAAAABAAMAAAAmAAEAAAACAAEAAAAmAAIAAAACAAIAAAAmAAMAAAACAAMAAAA0AAQAAAAAAAEAAAA0AAUAAAAAAAIAAAA0AAYAAAAAAAMAAAA1AAMAAAABAAAAAAA1AAQAAAABAAEAAAA1AAUAAAABAAIAAAA1AAYAAAABAAMAAAA2AAQAAAACAAEAAAA2AAUAAAACAAIAAAA2AAYAAAACAAMAAAArABYAAAACAAMAAABaAAAAAAAAAAEAAABaAAEAAAAAAAIAAABaAAIAAAAAAAMAAABbAP//AAABAAAAAABbAAAAAAABAAEAAABbAAEAAAABAAIAAABbAAIAAAABAAMAAABcAAAAAAACAAEAAABcAAEAAAACAAIAAABcAAIAAAACAAMAAAASAAEAAgAAAAAAAAABAAcAAgAAAAAAAAAEAAYAAgAAAAAAAAAMAAoAAgAAAAAAAAAeAAAAAgAAAAAAAAAYAP//AgAAAAAAAAANAAUAAgAAAAAAAAAEABUAAgAAAAAAAAAGABUAAgAAAAAAAAAFABQAAgAAAAAAAAAYAAsAAgAAAAAAAAAXAAoAAgAAAAAAAAAbAAsAAgAAAAAAAAAaAAoAAgAAAAAAAAAhAAsAAgAAAAAAAAAhAAkAAgAAAAAAAAAkAAkAAgAAAAAAAAAbAB8AAgAAAAAAAAAZACoAAgAAAAAAAAAaACoAAgAAAAAAAAAZACkAAgAAAAAAAAAOACQAAgAAAAAAAAAOACUAAgAAAAAAAAAKACQAAgAAAAAAAAAQAC8AAgAAAAAAAAAQAC4AAgAAAAAAAAAIADIAAgAAAAAAAAAMADQAAgAAAAAAAAANADEAAgAAAAAAAAAIACoAAgAAAAAAAAAIACgAAgAAAAAAAAAHAB8AAgAAAAAAAAAHACAAAgAAAAAAAAAXACcAAgAAAAAAAAAYACcAAgAAAAAAAAANACoAAgAAAAAAAAAFABUAAgAAAAAAAAAEABYAAgAAAAAAAAAZAA8AAgAAAAAAAAAWAAwAAgAAAAAAAAAVAA0AAgAAAAAAAAAXAA8AAgAAAAAAAAAWAA0AAgAAAAAAAAAZAA0AAgAAAAAAAAA6ABQAAgAAAAAAAABAABsAAgAAAAAAAAA6ACYAAgAAAAAAAAAvAB0AAgAAAAAAAAAwACMAAgAAAAAAAAAsACsAAgAAAAAAAAArAC0AAgAAAAAAAAAyAC0AAgAAAAAAAAArAC4AAgAAAAAAAAA0ACcAAgAAAAAAAAArACYAAgAAAAAAAAAzAC4AAgAAAAAAAABNACcAAgAAAAAAAABOACwAAgAAAAAAAABVADAAAgAAAAAAAABbAC0AAgAAAAAAAABYAC0AAgAAAAAAAABZACUAAgAAAAAAAABWACQAAgAAAAAAAABBAAMAAgAAAAAAAABEAAMAAgAAAAAAAABYAAIAAgAAAAAAAABaAAcAAgAAAAAAAABRAAcAAgAAAAAAAABHABAAAgAAAAAAAABKAA0AAgAAAAAAAABQAA0AAgAAAAAAAABRABMAAgAAAAAAAABYABoAAgAAAAAAAABXABoAAgAAAAAAAABWABoAAgAAAAAAAABZABkAAgAAAAAAAABXABsAAgAAAAAAAABYABsAAgAAAAAAAABZABsAAgAAAAAAAABJABsAAgAAAAAAAABKABsAAgAAAAAAAABKAB0AAgAAAAAAAABTAA0AAgAAAAAAAABSAA0AAgAAAAAAAABTAAwAAgAAAAAAAABSAAwAAgAAAAAAAABUAA4AAgAAAAAAAAA+AAUAAgAAAAAAAABEAAkAAgAAAAAAAABOAAEAAgAAAAAAAABOAAIAAgAAAAAAAABNAAIAAgAAAAAAAABNADcAAgAAAAAAAABaADYAAgAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAAkAAEAAAAAAAEAAAAkAAIAAAAAAAIAAAAkAAMAAAAAAAMAAAAlAAAAAAABAAAAAAAlAAEAAAABAAEAAAAlAAIAAAABAAIAAAAlAAMAAAABAAMAAAAmAAEAAAACAAEAAAAmAAIAAAACAAIAAAAmAAMAAAACAAMAAAA0AAQAAAAAAAEAAAA0AAUAAAAAAAIAAAA0AAYAAAAAAAMAAAA1AAMAAAABAAAAAAA1AAQAAAABAAEAAAA1AAUAAAABAAIAAAA1AAYAAAABAAMAAAA2AAQAAAACAAEAAAA2AAUAAAACAAIAAAA2AAYAAAACAAMAAAArABYAAAACAAMAAABaAAAAAAAAAAEAAABaAAEAAAAAAAIAAABaAAIAAAAAAAMAAABbAP//AAABAAAAAABbAAAAAAABAAEAAABbAAEAAAABAAIAAABbAAIAAAABAAMAAABcAAAAAAACAAEAAABcAAEAAAACAAIAAABcAAIAAAACAAMAAAASAAEAAgAAAAAAAAABAAcAAgAAAAAAAAAEAAYAAgAAAAAAAAAMAAoAAgAAAAAAAAAeAAAAAgAAAAAAAAAYAP//AgAAAAAAAAANAAUAAgAAAAAAAAAEABUAAgAAAAAAAAAGABUAAgAAAAAAAAAFABQAAgAAAAAAAAAYAAsAAgAAAAAAAAAXAAoAAgAAAAAAAAAbAAsAAgAAAAAAAAAaAAoAAgAAAAAAAAAhAAsAAgAAAAAAAAAhAAkAAgAAAAAAAAAkAAkAAgAAAAAAAAAbAB8AAgAAAAAAAAAZACoAAgAAAAAAAAAaACoAAgAAAAAAAAAZACkAAgAAAAAAAAAOACQAAgAAAAAAAAAOACUAAgAAAAAAAAAKACQAAgAAAAAAAAAQAC8AAgAAAAAAAAAQAC4AAgAAAAAAAAAIADIAAgAAAAAAAAAMADQAAgAAAAAAAAANADEAAgAAAAAAAAAIACoAAgAAAAAAAAAIACgAAgAAAAAAAAAHAB8AAgAAAAAAAAAHACAAAgAAAAAAAAAXACcAAgAAAAAAAAAYACcAAgAAAAAAAAANACoAAgAAAAAAAAAFABUAAgAAAAAAAAAEABYAAgAAAAAAAAAZAA8AAgAAAAAAAAAWAAwAAgAAAAAAAAAVAA0AAgAAAAAAAAAXAA8AAgAAAAAAAAAWAA0AAgAAAAAAAAAZAA0AAgAAAAAAAAA6ABQAAgAAAAAAAABAABsAAgAAAAAAAAA6ACYAAgAAAAAAAAAvAB0AAgAAAAAAAAAwACMAAgAAAAAAAAAsACsAAgAAAAAAAAArAC0AAgAAAAAAAAAyAC0AAgAAAAAAAAArAC4AAgAAAAAAAAA0ACcAAgAAAAAAAAArACYAAgAAAAAAAAAzAC4AAgAAAAAAAABNACcAAgAAAAAAAABOACwAAgAAAAAAAABVADAAAgAAAAAAAABbAC0AAgAAAAAAAABYAC0AAgAAAAAAAABBAAMAAgAAAAAAAABEAAMAAgAAAAAAAABYAAIAAgAAAAAAAABaAAcAAgAAAAAAAABRAAcAAgAAAAAAAABHABAAAgAAAAAAAABKAA0AAgAAAAAAAABQAA0AAgAAAAAAAABRABMAAgAAAAAAAABYABoAAgAAAAAAAABXABoAAgAAAAAAAABWABoAAgAAAAAAAABZABkAAgAAAAAAAABXABsAAgAAAAAAAABYABsAAgAAAAAAAABZABsAAgAAAAAAAABJABsAAgAAAAAAAABKABsAAgAAAAAAAABKAB0AAgAAAAAAAABTAA0AAgAAAAAAAABSAA0AAgAAAAAAAABTAAwAAgAAAAAAAABSAAwAAgAAAAAAAABUAA4AAgAAAAAAAAA+AAUAAgAAAAAAAABEAAkAAgAAAAAAAABOAAEAAgAAAAAAAABOAAIAAgAAAAAAAABNAAIAAgAAAAAAAABNADcAAgAAAAAAAABaADYAAgAAAAAAAABZACYAAgAAAAAAAABZACcAAgAAAAAAAAA=")
 tile_set = SubResource("TileSet_dckw1")
 
 [node name="Tree2_object_layer" type="TileMapLayer" parent="DecorationElements_layer" unique_id=1394216427]
@@ -3668,35 +3585,8 @@ tile_set = SubResource("TileSet_03ed8")
 
 [node name="standing guard" type="TileMapLayer" parent="Deco_pnj_layer/bluePnjLayer" unique_id=256553538]
 z_index = 7
-tile_map_data = PackedByteArray("AAARABMAAAAAAAAAAAATABMAAAAAAAAAAAASABQAAAAAAAAAAAAQABAAAAAAAAAAABAEAAQAAAAAAAAAAAAFAAQAAAAAAAAAABAsAAYAAAAAAAAAAAAyAAUAAAAAAAAAABA=")
+tile_map_data = PackedByteArray("AAARABMAAAAAAAAAAAATABMAAAAAAAAAAAASABQAAAAAAAAAAAAQABAAAAAAAAAAABAEAAQAAAAAAAAAAAAFAAQAAAAAAAAAABAsAAYAAAAAAAAAAAAyAAUAAAAAAAAAABAdABkAAAAAAAAAAAA=")
 tile_set = SubResource("TileSet_dveta")
-
-[node name="warriorAttack" type="AnimatedSprite2D" parent="Deco_pnj_layer/bluePnjLayer" unique_id=1082656589]
-z_index = 7
-position = Vector2(1893, 1602)
-sprite_frames = SubResource("SpriteFrames_p7730")
-autoplay = "default"
-frame_progress = 0.69252604
-
-[node name="StaticBody2D" type="StaticBody2D" parent="Deco_pnj_layer/bluePnjLayer/warriorAttack" unique_id=750417006]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Deco_pnj_layer/bluePnjLayer/warriorAttack/StaticBody2D" unique_id=1392406298]
-position = Vector2(-2, 15)
-shape = SubResource("CapsuleShape2D_qu6c2")
-debug_color = Color(0.75135434, 0.10518243, 0.23270226, 0.41960785)
-
-[node name="spireAttack" type="AnimatedSprite2D" parent="Deco_pnj_layer/bluePnjLayer" unique_id=1446948392]
-z_index = 6
-position = Vector2(1048, 1472)
-sprite_frames = SubResource("SpriteFrames_h12da")
-autoplay = "default"
-frame_progress = 0.5985543
-
-[node name="StaticBody2D" type="StaticBody2D" parent="Deco_pnj_layer/bluePnjLayer/spireAttack" unique_id=1151977700]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Deco_pnj_layer/bluePnjLayer/spireAttack/StaticBody2D" unique_id=441615491]
-position = Vector2(7, 52)
-shape = SubResource("CapsuleShape2D_is20g")
 
 [node name="pickAxe_Pawn" type="AnimatedSprite2D" parent="Deco_pnj_layer/bluePnjLayer" unique_id=260843762]
 position = Vector2(646, 963)
@@ -3847,7 +3737,7 @@ tile_set = SubResource("TileSet_277l5")
 
 [node name="Player" parent="." unique_id=622233450 instance=ExtResource("72_benk5")]
 z_index = 4
-position = Vector2(3361, 715)
+position = Vector2(418, 1534)
 
 [node name="Collision" type="StaticBody2D" parent="." unique_id=828704952]
 
@@ -3896,9 +3786,9 @@ tile_set = SubResource("TileSet_t87or")
 [node name="Background_stare" type="TileMapLayer" parent="Stare_layer" unique_id=1840389910]
 top_level = true
 z_index = 1
+position = Vector2(-2, 0)
 tile_map_data = PackedByteArray("AAAUABQAAAAGAAQAAAA2ACsADAAFAAEAAABXADUACwAFAAIAAABPADcADAAFAAIAAABOADcADAAAAAUAAABWADUACwAAAAUAAAA1ACsADAAAAAUAAAA4ACwACwAHAAIAAAA5ACsACwADAAQAAAA5ACIACwAAAAUAAAA6ACIACwAFAAEAAAA0ACAACwADAAUAAAAzACAACwAHAAEAAAA0AB4ACwAHAAIAAAA4ABkACwAHAAMAAAA4ABsACwADAAUAAAA4AA8ACwAFAAEAAABCABsADAADAAUAAABBABsADAAHAAEAAAA5ACAACwAFAAIAAAA5ACwACwADAAUAAAAzAAcADAADAAUAAAAyAAcADAAHAAEAAAAHAAUACwADAAUAAAAMAAUADAADAAUAAAALAAUADAAHAAEAAAANABEACwADAAQAAAANABIACwADAAUAAAAMABIACwAHAAIAAAAJABYADAAAAAUAAAAJABUADAAAAAQAAAAcACYACwADAAUAAAAeADIACwADAAUAAAAOAC4ADAADAAQAAAAOAC8ADAADAAUAAAANAC4ADAAGAAEAAAAeACkADAADAAUAAAAeACgADAADAAQAAAAdACgADAAGAAEAAAA=")
 tile_set = SubResource("TileSet_siufi")
-collision_visibility_mode = 1
 navigation_enabled = false
 
 [node name="stare_blue_01" type="TileMapLayer" parent="Stare_layer" unique_id=1434287421]
