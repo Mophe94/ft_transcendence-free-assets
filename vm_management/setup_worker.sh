@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eux
 
 #Safeguard
 SCRIPT_NAME="${0##*/}"
