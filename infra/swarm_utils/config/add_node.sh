@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/16 14:57:00 by stempels          #+#    #+#              #
-#    Updated: 2026/08/16 17:30:14 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/20 15:42:45 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 #! /bin/bash
@@ -232,7 +232,6 @@ for user in "${NODE_USERS[@]}"; do
     while [ "$try" -lt 3 ]; do
 	if SSHPASS="$password" sshpass -e \
 	    ssh \
-	    - vvv \
 	    -i "$SSH_KEY" \
 	    -p "$SSH_PORT" \
 	    -o StrictHostKeyChecking=no \
