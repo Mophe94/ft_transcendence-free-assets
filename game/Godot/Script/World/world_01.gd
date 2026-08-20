@@ -19,9 +19,9 @@ func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
 	await transi_scene.get_node("CanvasLayer/ColorRect").close()
-#	transi_scene.queue_free()
 
 func _team_set_up_received():
+	$Timer.hide()
 	_stop_player()
 	await transi_close()
 	get_tree().change_scene_to_packed(GeneralData.team_setup_scene)

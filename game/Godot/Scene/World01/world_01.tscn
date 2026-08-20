@@ -2476,7 +2476,7 @@ texture_region_size = Vector2i(192, 192)
 0:0/animation_frame_2/duration = 1.0
 0:0/animation_frame_3/duration = 1.0
 0:0/0 = 0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(24.92868, -16.238754, 27.561981, -2.0188713, 25.806458, 5.705509, 22.99759, 11.674351, 22.99759, 20.803165, 20.013153, 26.420895, 21.417603, 32, 14.395416, 33.969723, 2.1066284, 36.42748, -14.219894, 34.847492, -21.066498, 32, -30.195313, 27.298664, -35.110825, 20.803165, -49.33072, 14.132107, -57.75731, 2.8966446, -54.24623, -2.0188713, -47.048508, -1.8433189, -41.25522, -3.4233055, -26.997242, -14.325066)
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(24.92868, -16.238754, 27.561981, -2.0188713, 25.806458, 5.705509, 22.99759, 11.674351, 22.99759, 20.803165, 20.013153, 26.420895, 21.417603, 32, 14.395416, 33.969723, 2.1066284, 36.42748, -14.219894, 34.847492, -21.066498, 32, -30.195313, 27.298664, -35.110825, 20.803165, -49.33072, 14.132107, -57.75731, 2.8966446, -54.24623, -2.0188713, -47.048508, -1.8433189, -41.25522, -3.4233055, -26.997242, -14.325066, 2.2038574, -40.771347)
 
 [sub_resource type="TileSet" id="TileSet_5hrnt"]
 tile_size = Vector2i(64, 64)
@@ -2566,7 +2566,7 @@ texture_region_size = Vector2i(192, 192)
 0:0/animation_frame_5/duration = 1.0
 0:0/0 = 0
 0:0/0/texture_origin = Vector2i(35, 35)
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-15.678741, -32, -20.305267, -20.819336, -23.389618, -13.108471, -36.24106, -10.795212, -38.040253, -4.6265182, -39.582428, 5.1405754, -32, 8.99601, -28.787231, 17.477962, -29.04425, 27.502087, -12.337372, 32, -5.6546326, 39.325413, 10.281158, 37.01215, 23.646667, 32, 29.044281, 25.188824, 35.72702, 17.73499, 37.783234, 2.0562325, 35.98404, -9.2530365, 35.47, -13.365498, 23.903687, -17.477959, 17.220947, -28.5302, 11.309265, -37.01215, 6.939789, -45.494102, -2.570282, -50.12062, -13.3654785, -49.092506)
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-39.66942, -80.99174, -29.201096, -72.17631, -23.691452, -60.055096, -14.325066, -48.484848, -4.407707, -36.914604, -8.264458, -19.283745, -18.181816, -6.6115723, -32, -2.7548218, -47.38291, -1.6528931, -59.504128, -15.977966, -70.52341, -31.40496, -63.911842, -45.730026, -53.44352, -58.402203, -48.48484, -74.380165)
 
 [sub_resource type="TileSet" id="TileSet_benk5"]
 tile_size = Vector2i(64, 64)
@@ -2637,7 +2637,7 @@ texture_region_size = Vector2i(192, 192)
 0:0/animation_frame_2/duration = 1.0
 0:0/animation_frame_3/duration = 1.0
 0:0/0 = 0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(17.63086, 32, -14.87603, 32, -32, 25.344353, -38.016525, 6.060608, -38.56749, -6.6115646, -32, -18.732777, 13.223145, -19.283749, 21.487602, -9.917358, 17.079895, 6.0606003)
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(17.63086, 32, -14.87603, 32, -32, 25.344353, -38.016525, 6.060608, -38.56749, -6.6115646, -24.24242, -39.118454, 4.407715, -37.46556, 21.487602, -9.917358, 17.079895, 6.0606003)
 
 [sub_resource type="TileSet" id="TileSet_kueic"]
 tile_size = Vector2i(64, 64)
@@ -2735,7 +2735,7 @@ texture_region_size = Vector2i(192, 192)
 0:0/animation_frame_5/duration = 1.0
 0:0/0 = 0
 0:0/0/texture_origin = Vector2i(35, 35)
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16.706848, -39.068382, -9.253021, -49.349533, 1.2851563, -47.80736, 6.42572, -40.867584, 9.253052, -34.441864, 17.477966, -22.875565, 19.79123, -15.42173, 32, -15.935787, 35.21295, -2.5702896, 35.21295, 10.024124, 34.441864, 19.791218, 29.55832, 26.730999, 24.160706, 32, 15.935791, 32, 0.77108765, 32, -10.024109, 36.241062, -20.562286, 32, -26.473969, 23.903683, -28.273163, 16.192814, -32, 7.710865, -42.923798, 2.3132591, -35.72699, -9.767094, -25.70288, -15.1647, -20.819336, -21.076363, -17.477936, -32)
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-41.32231, -79.8898, -33.608818, -76.03305, -26.446281, -68.31956, -20.385674, -58.402203, -14.325073, -48.484848, -4.407715, -44.628098, -3.3057861, -20.936638, -13.223145, -11.0192795, -25.895313, 0, -45.730026, -1.1019211, -52.892563, -8.264465, -58.402203, -19.83471, -65.56474, -28.650139, -69.421486, -44.628098, -56.19835, -49.035812, -51.790634, -65.01377)
 
 [sub_resource type="TileSet" id="TileSet_0vbr2"]
 tile_size = Vector2i(64, 64)
@@ -2827,7 +2827,7 @@ texture_region_size = Vector2i(64, 64)
 0:3/0 = 0
 0:4/0 = 0
 0:5/0 = 0
-0:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(-18.50879, 28.418354, 32, 28.090763, 32, -6.115196, 17.865967, -5.1559486, 12.590103, 4.796232, 0.23980713, 15.228041, -19.30484, 27.698244)
+0:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(32, 32, 32, -9.917351, -23.140495, 32)
 1:1/0 = 0
 1:2/0 = 0
 1:3/0 = 0
@@ -2844,7 +2844,7 @@ texture_region_size = Vector2i(64, 64)
 3:4/0 = 0
 3:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(2.2038574, -13.223137, 18.03828, 2.488041, 23.69146, 8.264465, -8.815422, -25.895313)
 3:5/0 = 0
-3:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, 27.42126, 15.37912, 28.436863, 18.425934, 26.986004, 4.9329224, 20.892391, -5.51326, 14.218433, -12.767563, 8.414989, -15.426994, 1.1019287, -20.385674, -2.2038498, -32, -12.121208)
+3:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, 32, 19.904308, 32, -32, -12.121208)
 4:1/0 = 0
 4:2/0 = 0
 4:3/0 = 0
@@ -2896,7 +2896,7 @@ texture_region_size = Vector2i(64, 64)
 0:4/0 = 0
 0:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-23.132591, 3.598404, -20.936638, -5.509636, -0.51405716, -21.59042, -12.672173, -7.162529)
 0:5/0 = 0
-0:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(32, 27.681274, -0.7022095, 28.088661, -19.837616, 26.157562, -8.77771, 22.11982, 3.511078, 15.624313, 12.81546, 7.1977158, 22.119812, -6.3199463, 32, -10.8334465)
+0:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(32, 32, -24.24242, 32, 32, -10.8334465)
 1:5/0 = 0
 1:4/0 = 0
 1:3/0 = 0
@@ -2910,7 +2910,7 @@ texture_region_size = Vector2i(64, 64)
 3:0/0 = 0
 2:1/0 = 0
 3:5/0 = 0
-3:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(-11.566296, -0.77108383, 21.84745, 26.216942, -32, 26.216942, -32, -17.079887)
+3:5/0/physics_layer_0/polygon_0/points = PackedVector2Array(21.487602, 32, -32, 32, -32, -17.079887)
 4:5/0 = 0
 5:5/0 = 0
 6:3/0 = 0
@@ -3802,7 +3802,6 @@ tile_set = SubResource("TileSet_kueic")
 
 [node name="warriorAttack2" type="TileMapLayer" parent="Deco_pnj_layer/blackPnjLayer" unique_id=1229056667]
 z_index = 8
-tile_map_data = PackedByteArray("AAAuABwAAAAAAAAAABAzABgAAAAAAAAAABA3ACAAAAAAAAAAABA=")
 tile_set = SubResource("TileSet_kueic")
 
 [node name="lancerRun" type="TileMapLayer" parent="Deco_pnj_layer/blackPnjLayer" unique_id=874424025]
@@ -3848,7 +3847,7 @@ tile_set = SubResource("TileSet_277l5")
 
 [node name="Player" parent="." unique_id=622233450 instance=ExtResource("72_benk5")]
 z_index = 4
-position = Vector2(5704, 3668)
+position = Vector2(3361, 715)
 
 [node name="Collision" type="StaticBody2D" parent="." unique_id=828704952]
 
@@ -3899,6 +3898,7 @@ top_level = true
 z_index = 1
 tile_map_data = PackedByteArray("AAAUABQAAAAGAAQAAAA2ACsADAAFAAEAAABXADUACwAFAAIAAABPADcADAAFAAIAAABOADcADAAAAAUAAABWADUACwAAAAUAAAA1ACsADAAAAAUAAAA4ACwACwAHAAIAAAA5ACsACwADAAQAAAA5ACIACwAAAAUAAAA6ACIACwAFAAEAAAA0ACAACwADAAUAAAAzACAACwAHAAEAAAA0AB4ACwAHAAIAAAA4ABkACwAHAAMAAAA4ABsACwADAAUAAAA4AA8ACwAFAAEAAABCABsADAADAAUAAABBABsADAAHAAEAAAA5ACAACwAFAAIAAAA5ACwACwADAAUAAAAzAAcADAADAAUAAAAyAAcADAAHAAEAAAAHAAUACwADAAUAAAAMAAUADAADAAUAAAALAAUADAAHAAEAAAANABEACwADAAQAAAANABIACwADAAUAAAAMABIACwAHAAIAAAAJABYADAAAAAUAAAAJABUADAAAAAQAAAAcACYACwADAAUAAAAeADIACwADAAUAAAAOAC4ADAADAAQAAAAOAC8ADAADAAUAAAANAC4ADAAGAAEAAAAeACkADAADAAUAAAAeACgADAADAAQAAAAdACgADAAGAAEAAAA=")
 tile_set = SubResource("TileSet_siufi")
+collision_visibility_mode = 1
 navigation_enabled = false
 
 [node name="stare_blue_01" type="TileMapLayer" parent="Stare_layer" unique_id=1434287421]
@@ -4636,7 +4636,7 @@ position = Vector2(2600, 160)
 position = Vector2(3232, 160)
 
 [node name="Water_trigger10" parent="Water_trigger" unique_id=357675361 instance=ExtResource("113_oicr7")]
-position = Vector2(3488, 416)
+position = Vector2(3486, 415)
 
 [node name="Water_trigger11" parent="Water_trigger" unique_id=600572944 instance=ExtResource("113_oicr7")]
 position = Vector2(3937, 472)
