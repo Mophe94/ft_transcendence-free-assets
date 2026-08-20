@@ -52,7 +52,7 @@ func _win():
 	await get_tree().create_timer(2.0).timeout
 	Received.action_finished.emit()
 	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAFE_TO_CONTINUE])
-	await get_tree().create_timer(10.0).timeout
+	await get_tree().create_timer(3.0).timeout
 	text_show("Waiting for the other matches to be over")
 
 func _change_monster():
