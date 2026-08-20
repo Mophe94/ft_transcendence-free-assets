@@ -760,7 +760,6 @@ export class CombatService {
   }
 
   private received_pass(player: Player) {
-    console.log('RECEIVED PASS');
     player.text = player.name + ' pass for this turn.';
   }
 }

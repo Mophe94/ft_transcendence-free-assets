@@ -262,7 +262,7 @@ export class Player {
       ],
     },
   ];
-  team: string[] = ['gigantomakia', 'gigantomakia', 'gigantomakia', 'gigantomakia', 'gigantomakia', 'gigantomakia'];
+  team: string[] = ['pisciner', 'gigantomakia', 'burpy', '', '', ''];
   inventory: Inventory[] = [
     {
       name: '',
@@ -305,6 +305,7 @@ export class Player {
   status: string = 'default';
   teamReady: boolean = false;
   forceChooseMonster: boolean = false;
+  duelFinished: boolean = false;
   timer: number = 0;
   current_map: string = '';
   current_monster: string = '';
@@ -321,6 +322,7 @@ export class Player {
 
   resetAfterRound(): void {
     this.forceChooseMonster = false;
+    this.duelFinished = false;
     this.currentActions.actionType = undefined;
     this.currentActions.data = '';
     this.text = '';
