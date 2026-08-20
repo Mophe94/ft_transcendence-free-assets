@@ -344,7 +344,7 @@ export class GameService {
     this.combatService.playerCombatRoom.delete(winnerId);
 
     Promise.all([
-      //this.redisStateService.removePlayer(userId),
+      this.redisStateService.removePlayer(winnerId),
       this.redisService.deleteRoom(roomId),
       this.redisService.removeActiveRoom(roomId),
     ]).catch((err) =>
@@ -983,6 +983,7 @@ export class GameService {
       this.activePlayersByRoom.get(roomId)?.delete(loser.id);
       this.roomIdByPlayer.delete(loser.id);
       this.playerService.removePlayer(loser.id);
+      this.redisStateService.removePlayer(loser.id)
 
       resolved.add(userId);
       resolved.add(opponentId);
