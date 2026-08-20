@@ -202,6 +202,8 @@ export class GameService {
 
     this.leaveGameRoom(roomId, userId);
     this.activePlayersByRoom.get(roomId)?.delete(userId);
+    this.roomIdByPlayer.delete(userId);
+    this.playerService.removePlayer(userId);
 
     if (player) this.startNextRound(roomId);
     else {
