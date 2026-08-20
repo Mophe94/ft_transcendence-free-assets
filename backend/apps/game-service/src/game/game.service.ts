@@ -190,8 +190,6 @@ export class GameService {
       const round = totalRounds - player.roundsRemaining + 1;
       this.aiOrchestrator.takeoverPlayer(round, totalRounds, player);
 
-
-
       console.log(
         `[GameService] Player ${userId} disconnected while still in the running -> replaced by AI`,
       );
@@ -202,16 +200,14 @@ export class GameService {
     await this.redisStateService.removePlayer(userId);
     /////////////////////////////////* END */////////////////////////////////
 
-    const wasEliminated =
-      player?.status === 'loser' ||
-      (player?.status === 'winner' && player.roundsRemaining === 0);
-
     this.leaveGameRoom(roomId, userId);
     this.activePlayersByRoom.get(roomId)?.delete(userId);
 
-    if (wasEliminated) this.startNextRound(roomId);
+    if (player) this.startNextRound(roomId);
     else {
-      console.log('') 
+      // useless with AI? 
+      // safety net
+      console.log('[GameService] onGodotDisconnected: AbortedGame cleaning'); 
       this.deleteAbortedGame(roomId, userId);
     }
   }
