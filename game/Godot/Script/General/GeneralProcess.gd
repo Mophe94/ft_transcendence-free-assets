@@ -17,7 +17,7 @@ func wait_signal(send_func: Callable, signal_to_wait: Signal) -> bool:
 		await get_tree().create_timer(TIMEVAL).timeout
 		time += TIMEVAL
 		if not received[0] and time % 2 == 0:
-			print("TIME WAITING FOR RECEIVED : ", str(time), "/", str(TIMEOUT))
+			print("ELAPSED TIME TO RECEIVE THE MESSAGE: ", str(time), "/", str(TIMEOUT))
 #			send_func.call()
 	if not received[0]:
 		Network.connection = false
@@ -37,7 +37,7 @@ func wait_signal_return(send_func: Callable, signal_to_wait: Signal) -> int:
 		await get_tree().create_timer(TIMEVAL).timeout
 		time += TIMEVAL
 		if received[0] == -1 and time % 5 == 0:
-			print("TIME WAITING FOR RECEIVED : ", str(time), "/", str(TIMEOUT))
+			print("ELAPSED TIME TO RECEIVE THE MESSAGE: ", str(time), "/", str(TIMEOUT))
 #			send_func.call()
 	if received[0] == -1:
 		Network.connection = false
@@ -56,7 +56,7 @@ var objectList: Array[String] = []
 
 var trigger_send = false
 	
-func trigger_activation():	
+func trigger_activation():
 	activate_random_collectibles()
 	activate_random_trees()
 	activate_random_fishing_spots()
@@ -69,9 +69,7 @@ func realloc_node():
 
 func activate_random_collectibles() -> void:
 	var collectibles = get_tree().get_nodes_in_group("collectible")
-	collectibles.shuffle()
-	var half = int(collectibles.size() / 2)
-	for i in range(half):
+	for i in range(collectibles.size()):
 		objectList.append(collectibles[i].name)
 		collectibles[i].set_interactable(true)
 
@@ -86,8 +84,6 @@ func activate_random_trees() -> void:
 	trees.shuffle()
 
 	var count = min(trees_to_activate, trees.size())
-	if trees_to_activate > trees.size():
-		push_warning("trees_to_activate (%d) dépasse le nombre d'arbres présents (%d)" % [trees_to_activate, trees.size()])
 
 	for tree in trees:
 		tree.set_interactable(false)
@@ -107,8 +103,6 @@ func activate_random_fishing_spots() -> void:
 	spots.shuffle()
 
 	var count = min(fishing_spots_to_activate, spots.size())
-	if fishing_spots_to_activate > spots.size():
-		push_warning("fishing_spots_to_activate (%d) dépasse le nombre de spots présents (%d)" % [fishing_spots_to_activate, spots.size()])
 
 	for spot in spots:
 		spot.set_interactable(false)

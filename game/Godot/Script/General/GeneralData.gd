@@ -52,16 +52,16 @@ const object_database: Dictionary = {
 }
 
 const monster_description: Dictionary = {
-	"burpy": "Water 💧 | 🔵 Uncommon | HP: 100 | Slimy, gooey, and somehow absolutely adorable. Just don't hug it too tight.",
-	"fishet": "Water 💧 | ⚪ Common | HP: 120 | Chubby, cute and cuddly… until the spikes come out. Don't let the big eyes fool you, it tanks hits better than your main defender.",
-	"gigantomakia": "Earth 🪨 | 🟠 Rare | HP: 200 | A war-forged stone golem standing at attention for millennia. Nobody knows who gave the orders. It's still waiting.",
-	"leafs": "Plant 🌿 | ⚪ Common | HP: 80 | A wild ball of leaves and branches that charges in headfirst without thinking. Super aggressive, super fragile.",
-	"monkel": "Neutral ☯️| 🔵 Uncommon | HP: 130 | A curious little monkey that pokes at everything it shouldn't. Balanced in a fight, but its natural instinct is to take the hit and keep smiling.",
-	"papate": "Earth 🪨 | 🔵 Uncommon | HP: 180 | A snobbish bulldog in a shell. Too classy to fight, too tough to die.",
-	"pigeonne": "Flying 🪶 | 🟠 Rare | HP: 120 | Don't let the bird fool you. Fast, hits hard, and definitely saw you coming.",
-	"pisciner": "Neutral ☯️ | ✨ Not Foundable | HP: 50 | Rumored to haunt the halls of 42, forever stuck in his pool exam. Useless in battle, useless in life.",		
-	"sharky": "Water 💧 | 🟠 Rare | HP: 150 | A shark wreathed in crackling energy, cutting through battle like a ghost through water. By the time you see it, it's already too late.",
-	"squirel": "Neutral ☯️ | ⚪ Common | HP: 100 | Half squirrel, half hedgehog, all chaos. Cute enough to distract you, spiky enough to regret it"
+	"burpy": "Water | Uncommon | HP: 120 | Slimy, gooey, and somehow absolutely adorable. Just don't hug it too tight.",
+	"fishet": "Water | Common | HP: 100 | Chubby, cute and cuddly… until the spikes come out. Don't let the big eyes fool you, it will reflect your biggest hit back at you.",
+	"gigantomakia": "Earth | Rare | HP: 200 | A war-forged stone golem standing at attention for millennia. Nobody knows who gave the orders. It's still waiting.",
+	"leafs": "Plant | Common | HP: 80 | A wild ball of leaves and branches that charges in headfirst without thinking. Super aggressive, super fragile.",
+	"monkel": "Neutral | Uncommon | HP: 130 | A curious little monkey that pokes at everything it shouldn't. Balanced in a fight, but its natural instinct is to take the hit and keep smiling.",
+	"papate": "Earth | Uncommon | HP: 160 | A snobbish bulldog in a shell. Too classy to fight, too tough to die.",
+	"pigeonne": "Flying | Rare | HP: 140 | Don't let the bird fool you. Fast, hits hard, and definitely saw you coming.",
+	"pisciner": "Neutral | Starter | HP: 50 | Rumored to haunt the halls of 42, forever stuck in his pool exam. Useless in battle, useless in life.",	
+	"sharky": "Water | Rare | HP: 150 | A shark wreathed in crackling energy, cutting through battle like a ghost through water. By the time you see it, it's already too late.",
+	"squirel": "Neutral | Common | HP: 100 | Half squirrel, half hedgehog, all chaos. Cute enough to distract you, spiky enough to regret it."
 }
 
 const object_description: Dictionary = {
@@ -112,7 +112,7 @@ const player_charactere_scene = preload("res://Scene/PlayerCharacter/character.t
 const player_enemy_scene = preload("res://Scene/PlayerCharacter/enemy_character.tscn")
 
 var player: Dictionary = {
-	"id": 0,
+	"id": "",
 	"name": "",
 	"asset": "",
 	"currentMonster": {
@@ -198,7 +198,7 @@ var player: Dictionary = {
 }
 
 var enemy: Dictionary = {
-	"id": 0,
+	"id": "",
 	"name": "",
 	"asset": "",
 	"currentMonster": {
@@ -215,7 +215,7 @@ var enemy: Dictionary = {
 const SPEED_TEXT = 0.02
 const WAIT_TEXT = 0.2
 
-var position_player = Vector2(4937.0, 1105.0)
+var position_player = Vector2(3430.0, 980.0)
 var player_speed = 0.0
 var timer = 0
 

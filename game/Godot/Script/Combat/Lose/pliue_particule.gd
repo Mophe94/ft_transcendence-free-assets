@@ -7,10 +7,8 @@ func _ready() -> void:
 func _update_emission_area() -> void:
 	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
  
-	# Positionne le node au centre de la moitie superieure de l'ecran
 	position = Vector2(viewport_size.x / 3.0, viewport_size.y * 0.25)
  
-	# La zone d'emission couvre toute la largeur, sur la moitie superieure (donc demi-hauteur)
 	var mat := process_material as ParticleProcessMaterial
 	if mat:
 		mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX

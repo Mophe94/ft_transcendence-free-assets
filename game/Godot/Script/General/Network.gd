@@ -45,19 +45,19 @@ func receive_token():
 			if user != null && user != "":
 				if user_ok == false:
 					user_ok = true
-					print("TOKEN USER RECEIVE: " +  user)
+					print("TOKEN USER RECEIVED: " +  user)
 		if result_room != null:
 			room = result_room
 			if room != null && room != "":
 				if room_ok == false:
 					room_ok = true
-					print("TOKEN ROOM RECEIVE: " +  room)
+					print("TOKEN ROOM RECEIVED: " +  room)
 		if result_domain != null:
 			domain = result_domain
 			if domain != null && domain != "":
 				if domain_ok == false:
 					domain_ok = true
-					print("TOKEN DOMAIN RECEIVE: " +  domain)
+					print("TOKEN DOMAIN RECEIVED: " +  domain)
 		if user_ok == true && room_ok == true && domain_ok == true:
 			return true
 		await get_tree().create_timer(0.2).timeout
@@ -65,7 +65,6 @@ func receive_token():
 	return false
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if OS.has_feature("web"):
 		var result = await receive_token()
@@ -97,7 +96,6 @@ func _process(_delta: float) -> void:
 func process_network_messages():
 	if processing_messages:
 		return
-#	processing_messages = true
 	if messageQueue.size() > 0:
 		processing_messages = true
 		

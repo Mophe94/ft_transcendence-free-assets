@@ -135,7 +135,6 @@ func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
 	await transi_scene.get_node("CanvasLayer/ColorRect").close()
-#	transi_scene.queue_free()
 
 func generate_charactere():
 	var player_scene = assetPlayer.instantiate()
@@ -230,8 +229,6 @@ func _ready() -> void:
 	$CombatMenus.action_combat.connect(show_UI)
 	$CombatMenus.change_monster.connect(_new_current_monster)
 	$CombatMenus.enemy_change_monster.connect(_new_enemy_monster)
-#	$CombatMenus.stop_timer.connect(_stop_timer)
-#	$CombatMenus.run_timer.connect(_run_timer)
 	$CombatMenus.hide_timer.connect(_hide_timer)
 	$CombatBanner.hide()
 #	$Timer.time_finish.connect(_time_finish)

@@ -3,7 +3,7 @@ extends Control
 @onready var sprite = $Monster
 var base_scale_multiplier: float = 2
 
-const REF_SLOT_SIZE = Vector2(150, 150)  # même valeur que pour Player, à ajuster si différent
+const REF_SLOT_SIZE = Vector2(150, 150)
 
 func _ready() -> void:
 	resized.connect(_update_sprite_transform)

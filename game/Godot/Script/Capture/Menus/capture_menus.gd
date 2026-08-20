@@ -21,7 +21,6 @@ func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
 	await transi_scene.get_node("CanvasLayer/ColorRect").close()
-#	transi_scene.queue_free()
 
 func _stop_event():
 	stop_event = true
@@ -90,7 +89,7 @@ func set_menus_back():
 func set_menus_flee_choice(object):
 	hide_button()
 	if object == "yes":
-		await text_show("you flee")
+		await text_show("You are fleeing")
 		var tween = create_tween()
 		tween.tween_property(self, "modulate:a", 0.0, 1.0)
 		await tween.finished
@@ -130,7 +129,7 @@ func set_menus_capture():
 			button[3].show()
 			back_button.show()
 			return
-	await text_show("Your team is already full !")
+	await text_show("Your team is already full!")
 	back_button.show()
 	
 func set_menus_catch(object):
@@ -145,20 +144,20 @@ func set_menus_catch(object):
 			# Catch success
 			if success == 0:
 				emit_signal("catch_ok")
-				await text_show("You success to capture " + GeneralData.monster_encounter + " !")
+				await text_show("You success to capture " + GeneralData.monster_encounter + "!")
 				if stop_event == false:
 					await transi_close()
 					get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
 			# Cacth fail
 			elif success == 1:
 				emit_signal("catch_fail")
-				await text_show("You fail to capture " + GeneralData.monster_encounter)
+				await text_show("You failed to capture " + GeneralData.monster_encounter)
 				_back()
 			# Catch fail + monster flee
 			else:
-				await text_show("You fail to capture " + GeneralData.monster_encounter)
+				await text_show("You failed to capture " + GeneralData.monster_encounter)
 				emit_signal("monster_flee")
-				await text_show(GeneralData.monster_encounter + " flee")
+				await text_show(GeneralData.monster_encounter + " fled")
 				if stop_event == false:
 					await transi_close()
 					get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
@@ -177,13 +176,13 @@ func set_menus_use(object):
 		
 	if success >= 0:
 		emit_signal("catch_ok")
-		await text_show("You success to capture " + GeneralData.monster_encounter + " !")
+		await text_show("The capture of " + GeneralData.monster_encounter + " was successful!")
 		if stop_event == false:
 			await transi_close()
 			get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
 	else:
 		emit_signal("catch_fail")
-		await text_show("You fail to capture " + GeneralData.monster_encounter)
+		await text_show("You failed to capture " + GeneralData.monster_encounter)
 		_back()
 
 func set_menus_items():

@@ -133,9 +133,9 @@ func _next_map(data):
 	if player.has("inventory"):
 		for i in range(player["inventory"].size()):
 			var item = player["inventory"][i]
-			GeneralData.player["inventory"][i]["name"] = player["inventory"][i]["name"]
-			GeneralData.player["inventory"][i]["scene"] = player["inventory"][i]["scene"]
-			GeneralData.player["inventory"][i]["current"] = int(player["inventory"][i]["current"])
+			GeneralData.player["inventory"][i]["name"] = item["name"]
+			GeneralData.player["inventory"][i]["scene"] = item["scene"]
+			GeneralData.player["inventory"][i]["current"] = int(item["current"])
 	
 	if player.has("text"):
 		GeneralData.text = player["text"]
@@ -200,7 +200,7 @@ func _action_battle(data):
 	await reset_player_current_monster()
 	await reset_player_inventory()
 	var signal_to_send = ""
-	var change = -5
+	var change = ""
 	
 	if data.has("max"):
 		max_action = int(data["max"])
@@ -214,10 +214,10 @@ func _action_battle(data):
 		order_action = int(data["order"])
 
 	if data.has("change_monster"):
-		change = int(data["change_monster"])
-		if change == int(GeneralData.player["id"]):
+		change = data["change_monster"]
+		if change == GeneralData.player["id"]:
 			signal_to_send = "new_current_monster"
-		elif change >= 0:
+		elif change == GeneralData.enemy["id"]:
 			signal_to_send = "new_enemy_monster"
 		else:
 			signal_to_send = "action"
@@ -385,7 +385,7 @@ func _start_game(data):
 		var player = data["player"]
 
 		if player.has("id"):
-			GeneralData.player["id"] = int(player["id"])
+			GeneralData.player["id"] = player["id"]
 	
 		if player.has("name"):
 			GeneralData.player["name"] = player["name"]
@@ -408,7 +408,6 @@ func _start_game(data):
 
 
 func reset_player_current_monster():
-		var cMonsterPlayer = GeneralData.player["currentMonster"]
 		GeneralData.player["currentMonster"]["name"] = ""
 		GeneralData.player["currentMonster"]["slot"] = -1
 

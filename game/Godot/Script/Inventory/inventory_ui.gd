@@ -7,8 +7,8 @@ extends Control
 @onready var buttonNo = $ConfirmationDialog/Panel/ButtonNo
 var is_open = false
 
-var pending_action: String = ""   # NOUVEAU : "quit" / "delete_monster" / "delete_object"
-var pending_index: int = -1       # NOUVEAU
+var pending_action: String = ""
+var pending_index: int = -1
 
 signal stop_inventory
 signal run_inventory
@@ -52,21 +52,21 @@ func _ready():
 	close()
 
 func _on_quit_pressed():
-	pending_action = "quit"                        # MODIFIÉ
+	pending_action = "quit"
 	confirmation_dialog.visible = true
 
-func _on_monster_delete_requested(index: int):     # NOUVEAU
+func _on_monster_delete_requested(index: int):
 	pending_action = "delete_monster"
 	pending_index = index
 	confirmation_dialog.visible = true
 
-func _on_object_delete_requested(index: int):      # NOUVEAU
+func _on_object_delete_requested(index: int):
 	pending_action = "delete_object"
 	pending_index = index
 	confirmation_dialog.visible = true
 
 func _on_yes_pressed():   
-	confirmation_dialog.visible = false                         # MODIFIÉ
+	confirmation_dialog.visible = false 
 	match pending_action:
 		"quit":
 			get_tree().quit()
@@ -82,12 +82,12 @@ func _on_yes_pressed():
 	pending_action = ""
 	pending_index = -1
 
-func _on_no_pressed():                             # MODIFIÉ
+func _on_no_pressed(): 
 	pending_action = ""
 	pending_index = -1
 	confirmation_dialog.visible = false
 
-func update_slots():                                # MODIFIÉ
+func update_slots():
 	var inventory = GeneralData.player["inventory"]
 	for i in range(min(inventory.size(), slots.size())):
 		slots[i].update(inventory[i], i)

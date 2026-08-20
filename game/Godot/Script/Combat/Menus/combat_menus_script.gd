@@ -18,15 +18,13 @@ signal action_combat
 signal change_monster
 signal enemy_change_monster
 signal hide_timer
-signal stop_timer
-signal run_timer
 signal last_scene
 
 var result_scene = null
 
 ##############################################################
 func _finish():
-	await text_show("You are the best !", 1)
+	await text_show("You are the best!", 1)
 	if is_instance_valid(result_scene):
 		result_scene.queue_free()
 		result_scene = null
@@ -41,10 +39,10 @@ func _lose():
 	get_tree().current_scene.add_child(result_scene)
 	hide_timer.emit()
 	Received.action_finished.emit()
-	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAFE_TO_DISCONNECT])
+	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAFE_TO_CONTINUE])
 	
 func _win():
-	await text_show("YOU WIN !")
+	await text_show("YOU WIN!")
 	if is_instance_valid(result_scene):
 		result_scene.queue_free()
 		
@@ -53,16 +51,15 @@ func _win():
 	hide_timer.emit()
 	await get_tree().create_timer(2.0).timeout
 	Received.action_finished.emit()
-	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAFE_TO_DISCONNECT])
+	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAFE_TO_CONTINUE])
 	await get_tree().create_timer(10.0).timeout
-	text_show("Until all the other matches are over")
+	text_show("Waiting for the other matches to be over")
 
 func _change_monster():
 	hide_selection()
 	await text_show(GeneralData.text, 1)
 	$Text.text = ""
 	set_menus_select_monster()
-	run_timer.emit()
 	Received.action_finished.emit()
 
 func _enemy_change_monster():
@@ -72,27 +69,24 @@ func _enemy_change_monster():
 
 func _new_current_monster():
 	hide_selection()
-#	stop_timer.emit()
-	await text_show(GeneralData.text, 1)
+	if GeneralData.text:
+		await text_show(GeneralData.text, 1)
 	emit_signal("change_monster")
 		
 func _new_enemy_monster():
 	hide_selection()
-#	stop_timer.emit()
 	await text_show(GeneralData.text, 1)
 	emit_signal("enemy_change_monster")
 
 func waiting_player(send_func: Callable):
-#	stop_timer.emit()
 	hide_selection()
 	lock_button()
 	send_func.call()
-	await text_show("Waiting action enemy.")
+	await text_show("Waiting enemy action.")
 
 func _received_action():
 	hide_selection()
 	$Text.text = ""
-#	stop_timer.emit()
 	emit_signal("action_combat")
 	await text_show(GeneralData.text, 1)
 	Received.action_finished.emit()
@@ -100,7 +94,6 @@ func _received_action():
 func _new_turn():
 	await text_show(GeneralData.text)
 	$Text.text = ""
-#	run_timer.emit()
 	_back()
 ##############################################################
 
@@ -161,7 +154,7 @@ func set_menus_choice_pass(object):
 func set_menus_pass():
 	unlock_button()
 	hide_selection()
-	text_show("Are you sure you want pass ?")
+	text_show("Are you sure you want to pass your turn?")
 	button[2].show()
 	button[2].text = "YES"
 	button[2].action = "choice_pass"
@@ -198,7 +191,7 @@ func set_menus_select_monster():
 func set_menus_change():
 	unlock_button()
 	hide_selection()
-	await text_show("Which monster you want to switch to ?")
+	await text_show("Which monster do you want to switch with?")
 	var current_button = 2
 	for i in range(3):
 		if i == int(GeneralData.player["currentMonster"]["slot"]):

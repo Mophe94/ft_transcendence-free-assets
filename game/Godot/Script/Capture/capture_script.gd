@@ -28,7 +28,6 @@ func transi_close():
 	var transi_scene = GeneralData.transi.instantiate()
 	add_child(transi_scene)
 	await transi_scene.get_node("CanvasLayer/ColorRect").close()
-#	transi_scene.queue_free()
 
 func _catch_fail():
 	for child in monster.get_children():

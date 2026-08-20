@@ -18,9 +18,7 @@ func _ready():
 	_update_sprite_transform()
 
 func _update_sprite_transform() -> void:
-	# Centre le sprite dans le rectangle du Slot
 	sprite.position = size / 2
-	# Scale le sprite proportionnellement à la taille actuelle du Slot
 	var scale_factor = min(size.x / REF_SLOT_SIZE.x, size.y / REF_SLOT_SIZE.y)
 	sprite.scale = Vector2(scale_factor, scale_factor) * base_scale_multiplier
 

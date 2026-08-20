@@ -1,7 +1,5 @@
 extends Control
 
-# Taille de référence du rectangle "asset" — lis la vraie valeur
-# dans Inspector > Layout > Size pour ce node, et remplace ci-dessous
 const REF_ASSET_SIZE = Vector2(200, 300)
 const base_scale_multiplier: float = 3.0
 

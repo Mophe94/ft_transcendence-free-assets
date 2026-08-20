@@ -10,9 +10,6 @@ extends CharacterBody2D
 @onready var item_icon: Sprite2D = $ItemPopup/ItemIcon
 @export var item_popup_duration: float = 2.0
 
-# Liste des zones (Area2D) actuellement en contact, dans l'ordre d'entrée.
-# On garde les Area2D (pas les Interactable directement) car ce sont elles
-# qui déclenchent area_entered / area_exited.
 var active_zones: Array[Area2D] = []
 
 
@@ -28,7 +25,6 @@ func _ready():
 
 func apply_skin(skin: SkinData) -> void:
 	if skin == null:
-#		push_warning("Aucune skin valide à appliquer.")
 		return
 	sprite.sprite_frames = skin.sprite_frames
 	sprite.scale = skin.scale
@@ -45,7 +41,6 @@ func _on_area_entered(area: Area2D) -> void:
 
 	var spot = _resolve_interactable(area)
 	if spot == null:
-#		push_warning("%s est dans le groupe trigger_zone mais n'a pas de méthode interact() (ni lui, ni son parent)" % area.name)
 		return
 
 	active_zones.append(area)
@@ -63,12 +58,6 @@ func _on_area_exited(area: Area2D) -> void:
 
 	active_zones.erase(area)
 
-
-## Un objet interactif peut être structuré de deux façons :
-## - une TriggerZone (Area2D) enfant d'un nœud parent qui porte la logique
-##   (TreeObject, Collectible : Node2D racine + Area2D "TriggerZone")
-## - l'Area2D elle-même qui porte toute la logique (Teleporter)
-## On accepte les deux : on cherche d'abord sur l'area elle-même, sinon sur son parent.
 func _resolve_interactable(area: Area2D) -> Node:
 	if area.has_method("interact"):
 		return area
@@ -77,8 +66,6 @@ func _resolve_interactable(area: Area2D) -> Node:
 		return parent
 	return null
 
-
-## L'interactable "actif" est toujours le dernier auquel on est entré.
 func get_current_interactable() -> Node:
 	if active_zones.is_empty():
 		return null
@@ -102,9 +89,6 @@ func _physics_process(_delta: float) -> void:
 		sprite.play("idle")
 		return
 
-#	if Input.is_action_just_pressed("ui_selec"):
-#		GeneralData.current_item = "rage"
-#		_on_item_received()
 
 	if Input.is_action_just_pressed("action"):
 		var spot = get_current_interactable()
@@ -116,9 +100,6 @@ func _physics_process(_delta: float) -> void:
 	move_and_slide()
 
 
-## Le popup ne reflète pas juste "je suis dans une zone", mais "il y a
-## quelque chose que je peux VRAIMENT faire là, maintenant".
-## Ça évite qu'il reste affiché pendant un mash, ou pour un objet déjà utilisé.
 func _update_interaction_prompt() -> void:
 	var spot = get_current_interactable()
 	popup.visible = spot != null and _can_interact(spot)
@@ -146,7 +127,6 @@ func teleport_to(target_position: Vector2) -> void:
 func _on_item_received():
 	var item_name = GeneralData.current_item
 	if not GeneralData.object_database.has(item_name):
-#		print("Objet inconnu reçu : " + item_name)
 		return
 	item_icon.texture = GeneralData.object_database[item_name]
 	_play_item_popup_animation()

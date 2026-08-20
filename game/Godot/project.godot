@@ -25,6 +25,8 @@ GeneralProcess="*res://Script/General/GeneralProcess.gd"
 
 [display]
 
+window/size/viewport_width=1500
+window/size/viewport_height=1000
 window/size/no_focus=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"

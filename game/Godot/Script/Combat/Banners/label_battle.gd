@@ -16,7 +16,6 @@ func _update_battle_anime() -> void:
 
 	battle_anime.position = size * 0.5
 
-	# Hauteur native (en pixels) de la frame actuellement affichée.
 	var anim_name: StringName = battle_anime.animation
 	var frame_index: int = battle_anime.frame
 	var texture: Texture2D = battle_anime.sprite_frames.get_frame_texture(anim_name, frame_index)
@@ -27,9 +26,7 @@ func _update_battle_anime() -> void:
 	if native_height <= 0.0:
 		return
 
-	# Hauteur cible voulue à l'écran = 80% de la hauteur réelle du bandeau.
 	var target_height: float = size.y * height_ratio
 
-	# Scale uniforme (garde les proportions) pour atteindre cette hauteur.
 	var scale_factor: float = target_height / native_height
 	battle_anime.scale = Vector2(scale_factor, scale_factor)

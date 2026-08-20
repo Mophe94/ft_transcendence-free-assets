@@ -6,8 +6,8 @@ extends Panel
 
 var current_item: Dictionary = {}
 var current_monster: String = ""
-var slot_index: int = -1                        # NOUVEAU
-signal delete_requested(index: int)              # NOUVEAU
+var slot_index: int = -1
+signal delete_requested(index: int)
 const SCALE_HOVER = Vector2(1.12, 1.12)
 const SCALE_NORMAL = Vector2(1.0, 1.0)
 const DURATION = 0.12
@@ -17,9 +17,9 @@ func _ready():
 	pivot_offset = size / 2
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
-	gui_input.connect(_on_gui_input)             # NOUVEAU
+	gui_input.connect(_on_gui_input)
 
-func _on_gui_input(event: InputEvent) -> void:   # NOUVEAU
+func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			var has_item = not current_item.is_empty() and current_item.get("name", "") != ""
@@ -50,11 +50,11 @@ func _on_mouse_exited():
 	tween.tween_property(self, "scale", SCALE_NORMAL, DURATION)\
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tooltip.hide_tooltip()
-
-func update(item: Dictionary, index: int):        # ajout de index
+ 
+func update(item: Dictionary, index: int):
 	current_item = item
 	current_monster = ""
-	slot_index = index                             # NOUVEAU
+	slot_index = index
 	if item["name"] == "" or item["current"] == 0:
 		item_visual.visible = false
 		item_count.visible = false
@@ -64,10 +64,10 @@ func update(item: Dictionary, index: int):        # ajout de index
 		item_count.visible = true
 		item_count.text = str(item["current"])
 
-func update_monster(monster_name: String, index: int):  # ajout de index
+func update_monster(monster_name: String, index: int):
 	current_monster = monster_name
 	current_item = {}
-	slot_index = index                             # NOUVEAU
+	slot_index = index
 	if monster_name == "":
 		item_visual.visible = false
 	else:

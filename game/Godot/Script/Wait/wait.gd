@@ -11,7 +11,7 @@ func _ready() -> void:
 func _scene_fail():
 	$CenterContainer/AnimationPlayer.clear_queue()
 	$CenterContainer/Label.modulate.a = 1
-	$CenterContainer/Label.text = "Connection fail"
+	$CenterContainer/Label.text = "Connection failed"
 	get_tree().paused = true
 
 func _on_start_game():
