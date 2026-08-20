@@ -67,9 +67,9 @@ for network in "${networks[@]}"; do
 done
 
 #Adding preconfigured nodes
-read -p "[$SCRIPT_NAME] Do you want to add preconfigured node (y/N): " -t 15 answer || {
+read -p "[$SCRIPT_NAME] Do you want to add preconfigured node (y/N): " -t 5 answer || {
         echo
-        answer=""
+        answer="yes"
 }
 case "${answer,,}" in
 	y|yes)
@@ -80,7 +80,7 @@ esac
 
 chmod +x "$CONFIG_DIR"/add_manager.sh
 if ! bash "$CONFIG_DIR"/add_manager.sh "$MANAGER_NUMBER"; then
-    read -p "[$SCRIPT_NAME] Do you wish to continue: " -t 1 answer || {
+    read -p "[$SCRIPT_NAME] Do you wish to continue: " -t 5 answer || {
 	    echo
 	    answer="Yes"
     }

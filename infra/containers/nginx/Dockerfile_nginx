@@ -1,7 +1,0 @@
-FROM alpine_base:latest
-
-LABEL   version="0.5"
-
-RUN apk ad nginx
-
-ENTRYPOINT ["/bin/bash", "-c", "echo coucou from nginx base"]

@@ -1,47 +1,33 @@
 services:
 
-  prometheus:
-    image: prom/prometheus
-    user: "${PROMETHEUS_UID}:${PROMETHEUS_GID}"
-    command:
-      - "--web.enable-remote-write-receiver"
-      - "--config.file=/etc/prometheus/prometheus.yml"
-    configs:
-      - source: prometheus_config
-        target: /etc/prometheus/prometheus.yml
+    prometheus:
+      image: prom/prometheus
+      user: "${PROMETHEUS_UID}:${PROMETHEUS_GID}"
+      command:
+        - "--web.enable-remote-write-receiver"
+        - "--config.file=/etc/prometheus/prometheus.yml"
+      configs:
+        - source: prometheus_config
+          target: /etc/prometheus/prometheus.yml
+      deploy:
+        replicas: 1
+        placement:
+          constraints:
+            - node.role == manager
+      volumes:
+        - prom_data:/prometheus
+      networks:
+        - obsrv_net
 
-    deploy:
-      labels:
-          prometheus_scrape: "false"
-          prometheus_port: "${PROM_SCRAPE_PORT}"
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-    volumes:
-      - prom_data:/prometheus
-    networks:
-      - obsrv_net
-#      - site_net
-#      - games_net
-
-  grafana:
-    image: grafana/grafana:13.2
-    user: "${GRAFANA_UID}:${GRAFANA_GID}"
-    configs:
+    grafana:
+      image: grafana/grafana:13.2
+      user: "${GRAFANA_UID}:${GRAFANA_GID}"
+      configs:
         - source: grafana_datasources
           target: /etc/grafana/provisioning/datasources/datasources.yml
         - source: grafana_dashboards
           target: /etc/grafana/provisioning/dashboards/dashboards.yml
-    deploy:
-      labels:
-          prometheus_scrape: "false"
-          prometheus_port: "${PROM_SCRAPE_PORT}"
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-    environment:
+      environment:
         - GF_SERVER_ROOT_URL=https://${HOST_IP}/grafana/
         - GF_SERVER_SERVE_FROM_SUB_PATH=true
         - GF_SECURITY_ALLOW_EMBEDDING=true
@@ -49,69 +35,67 @@ services:
         - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
         - GF_SECURITY_ADMIN_USER__FILE=/run/secret/grafana_admin_user
         - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana_admin_password
-    secrets:
+      secrets:
         - grafana_admin_user
         - grafana_admin_password
-    volumes:
-        - grafana_data:/var/lib/grafana
-    networks:
+      networks:
         - obsrv_net
+      volumes:
+        - grafana_data:/var/lib/grafana
+      deploy:
+        replicas: 1
+        placement:
+          constraints:
+            - node.role == manager
 
-  loki:
-    image: grafana/loki:3.5.2
-    user: "${LOKI_UID}:${LOKI_GID}"
-    command:
-      -config.file=/etc/loki/config.yml
-    volumes:
-      - loki_data:/loki
-    configs:
-      - source: loki_config
-        target: /etc/loki/config.yml
-    networks:
-      - obsrv_net
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
-      restart_policy:
-        condition: on-failure
+    loki:
+      image: grafana/loki:3.5.2
+      user: "${LOKI_UID}:${LOKI_GID}"
+      volumes:
+        - loki_data:/loki
+      configs:
+        - source: loki_config
+          target: /etc/loki/config.yml
+      networks:
+        - obsrv_net
+      command:
+        - config.file=/etc/loki/config.yml
+      deploy:
+        replicas: 1
+        placement:
+          constraints:
+            - node.role == manager
 
-  alloy:
-    image: grafana/alloy:latest
-    user: "0:0"
-    command:
-      - run
-      - --storage.path=/var/lib/alloy/data
-      - /etc/alloy/config.alloy
-    configs:
-      - source: alloy_config
-        target: /etc/alloy/config.alloy
-    volumes:
-      # Unix exporter
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/host/root:ro
-
-      # cAdvisor
-      - /sys:/sys:ro
-      - /:/rootfs:ro
-      - /var/run:/var/run
-      - /var/lib/docker:/var/lib/docker:ro
-
-      # Docker API
-      - /var/run/docker.sock:/var/run/docker.sock
-
-      - /dev:/dev:ro
-    environment:
-      - NODE_HOSTNAME="{{.Node.Hostname}}"
-      - NODE_ID="{{.Node.ID}}"
-    networks:
-      - obsrv_net
-    deploy:
-      mode: global
-      restart_policy:
-        condition: on-failure
+    alloy:
+      image: grafana/alloy:latest
+      user: "0:0"
+      configs:
+        - source: alloy_config
+          target: /etc/alloy/config.alloy
+      environment:
+        - NODE_HOSTNAME="{{.Node.Hostname}}"
+        - NODE_ID="{{.Node.ID}}"
+      command:
+        - run
+        - --storage.path=/var/lib/alloy/data
+        - /etc/alloy/config.alloy
+      networks:
+        - obsrv_net
+      volumes:
+        - /dev:/dev:ro
+        # Unix exporter
+        - /proc:/host/proc:ro
+        - /sys:/host/sys:ro
+        - /:/host/root:ro
+        # cAdvisor
+        - /sys:/sys:ro
+        - /:/rootfs:ro
+        - /var/run:/var/run
+        - /var/lib/docker:/var/lib/docker:ro
+        # Docker API
+        - /var/run/docker.sock:/var/run/docker.sock
+      deploy:
+        mode: global
 
 volumes:
     loki_data:

@@ -2,24 +2,15 @@ services:
 
     chat_service:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/backend:latest
-        networks:
-            - site_net
         secrets:
           - jwt_secret_key
-#        volumes:
-#          - ./backend:/app
-#          - /app/node_modules
+        networks:
+            - site_net
         command:
           - node
           - dist/apps/chat-service/main.js
         deploy:
-            labels:
-                prometheus_scrape: "false"
-                prometheus_port: "${PROM_SCRAPE_PORT}"
-            replicas: 1
- #           placement:
-  #            constraints:
-   #             - node.role == worker
+          replicas: 1
         healthcheck:
           test: ["CMD", "/app/healthcheck.sh"]
           interval: 15s
@@ -34,8 +25,6 @@ services:
           - FORTYTWO_API_TOKENEXCHANGE=http://nginx:420/fortytwoapi/oauth/token
           - FORTYTWO_REDIRECT_URI=https://${HOST_IP}:8443/auth/callback
           - FORTYTWO_API=http://nginx:420/fortytwoapi/v2
-        networks:
-            - site_net
         secrets:
           - db_users_db_name
           - db_users_username
@@ -43,17 +32,13 @@ services:
           - fortytwo_client_id
           - fortytwo_client_secret
           - jwt_secret_key
+        networks:
+          - site_net
         command:
           - node
           - dist/apps/user-service/main.js
         deploy:
-            labels:
-                prometheus_scrape: "false"
-                prometheus_port: "${PROM_SCRAPE_PORT}"
             replicas: 1
-#            placement:
-#              constraints:
-#                - node.role == worker
         healthcheck:
           test: ["CMD", "/app/healthcheck.sh"]
           interval: 15s
@@ -63,12 +48,6 @@ services:
 
     users_db:
         image: ${HOST_TAILSCALE_IP}:${REGISTRY_PORT}/users_db:latest
-#        env_file:
-#          - "site/databases/user_db/.env"
-#        configs:
-#          - source: load_secrets
-#            target: /load_secrets.sh
-#            mode: 0555
         environment:
           - POSTGRES_PASSWORD=$$(cat "/run/secrets/db_users_postgres_password")
         secrets:
@@ -76,23 +55,15 @@ services:
           - db_users_username
           - db_users_password
           - db_users_postgres_password
-#        entrypoint:
-#          - /load_secrets.sh
-#        command:
-#          - /usr/local/bin/docker-entrypoint.sh 
-#          - postgres
         volumes:
           - users_data:/var/lib/postgresql/
         networks:
-            - site_net
+          - site_net
         deploy:
-            labels:
-                prometheus_scrape: "false"
-                prometheus_port: "${PROM_SCRAPE_PORT}"
-            replicas: 1
-            placement:
-              constraints:
-                - node.labels.leader == true
+          replicas: 1
+          placement:
+            constraints:
+              - node.labels.leader == true
         healthcheck:
           test: ["CMD-SHELL", "pg_isready -U postgres"]
           interval: 3s
@@ -107,26 +78,26 @@ networks:
         external: true
 
 volumes:
-  users_data:
+    users_data:
 
 secrets:
-  db_users_db_name:
-    external: true
-  db_users_username:
-    external: true
-  db_users_password:
-    external: true
-  db_users_postgres_password:
-    external: true
-  fortytwo_client_id:
-    external: true
-  fortytwo_client_secret:
-    external: true
-  jwt_secret_key:
-    external: true
-  db_game_db_name:
-    external: true
-  db_game_username:
-    external: true
-  db_game_password:
-    external: true
+    db_users_db_name:
+      external: true
+    db_users_username:
+      external: true
+    db_users_password:
+      external: true
+    db_users_postgres_password:
+      external: true
+    fortytwo_client_id:
+      external: true
+    fortytwo_client_secret:
+      external: true
+    jwt_secret_key:
+      external: true
+    db_game_db_name:
+      external: true
+    db_game_username:
+      external: true
+    db_game_password:
+      external: true
