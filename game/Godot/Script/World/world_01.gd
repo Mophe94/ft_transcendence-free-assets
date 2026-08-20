@@ -61,8 +61,8 @@ func _ready() -> void:
 		GeneralProcess.trigger_activation()
 	else:
 		GeneralProcess.realloc_node()
-#	if GeneralData.position_player != Vector2(0.0, 0.0):
-#		$Player.position = GeneralData.position_player
+	if GeneralData.position_player != Vector2(0.0, 0.0):
+		$Player.position = GeneralData.position_player
 
 func _close_game():
 	if Input.is_action_just_pressed("quit"):
