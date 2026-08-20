@@ -25,44 +25,42 @@ services:
         volumes:
           - frontend:/usr/share/nginx/html:ro
         deploy:
-            labels:
-                prometheus_scrape: "false"
-                prometheus_port: "${PROM_SCRAPE_PORT}"
-            replicas: 1
-            placement:
-                constraints:
-                    - node.labels.leader == true
+          replicas: 1
+          placement:
+            constraints:
+              - node.labels.leader == true
+          restart_policy:
+            condition: on-failure
+            delay: 5s
+            max_attempts: 5
 
     registry:
-      image: registry:2
-      environment:
-        REGISTRY_STORAGE_DELETE_ENABLED: "true"
-      deploy:
-        labels:
-            prometheus_scrape: "false"
-            prometheus_port: "${PROM_SCRAPE_PORT}"
-        replicas: 1
-        placement:
-          constraints:
-            - node.labels.leader == true
-        restart_policy:
-          condition: on-failure
-          delay: 5s
-          max_attempts: 3
-      volumes:
-        - registry_data:/var/lib/registry
-      networks:
-        - swarm_net
+        image: registry:2
+        environment:
+          REGISTRY_STORAGE_DELETE_ENABLED: "true"
+        volumes:
+          - registry_data:/var/lib/registry
+        networks:
+          - swarm_net
+        deploy:
+          replicas: 1
+          placement:
+            constraints:
+              - node.labels.leader == true
+          restart_policy:
+            condition: on-failure
+            delay: 5s
+            max_attempts: 5
 
 volumes:
-  frontend:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: "addr=${IP},nfsvers=4,rw"
-      device: ":/nfs-storage/frontend"
-  registry_data:
-    driver: local
+    frontend:
+      driver: local
+      driver_opts:
+        type: nfs
+        o: "addr=${IP},nfsvers=4,rw,soft"
+        device: ":/nfs-storage/frontend"
+    registry_data:
+      driver: local
 
 configs:
     nginx_conf:
@@ -71,23 +69,23 @@ configs:
       file: ../containers/nginx/logging.conf
 
 secrets:
-  nginx_crt:
-    external: true
-  nginx_key:
-    external: true
-  registry_crt:
-    external: true
-  registry_key:
-    external: true
-  ca_crt:
-    external: true
+    nginx_crt:
+      external: true
+    nginx_key:
+      external: true
+    registry_crt:
+      external: true
+    registry_key:
+      external: true
+    ca_crt:
+      external: true
 
 networks:
     swarm_net:
-        external: true
+      external: true
     obsrv_net:
-        external: true
+      external: true
     games_net:
-        external: true
+      external: true
     site_net:
-        external: true
+      external: true

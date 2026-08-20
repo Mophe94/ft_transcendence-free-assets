@@ -236,11 +236,10 @@ rc-update add rpcbind
 rc-update add nfs
 
 echo "[$SCRIPT_NAME] Setting up nfs-storage"
-mkdir -p /nfs-storage/{registry,monitoring,backups} \
+mkdir -p /nfs-storage/{monitoring,backups} \
     && chown -R ${NEW_USER}:${NEW_USER} "/nfs-storage"
 echo "/nfs-storage *(rw,sync,no_subtree_check,no_root_squash)" >> "/etc/exports"
 exportfs -ra
-#check with exportfs -v
 
 #Server CA creation
 echo "[$SCRIPT_NAME] Setting up directory"

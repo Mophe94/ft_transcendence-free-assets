@@ -36,7 +36,6 @@ all: swarm_launch
 
 swarm_launch: wait_tailscale
 	@$(MAKE) swarm_setup
-	@$(MAKE) core
 	@$(MAKE) base
 	@$(MAKE) -j4 push
 	@$(MAKE) -j4 website game
@@ -44,36 +43,34 @@ swarm_launch: wait_tailscale
 swarm_setup:
 	@chmod +x $(CONFIG_SCRIPTS)/launch_swarm.sh
 	@$(CONFIG_SCRIPTS)/launch_swarm.sh "$(SWARM_UTILS)" "$(HOST_IP)" "$(HOST_TAILSCALE_IP)"
-	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/core_deploy.yml    core
+	@$(MAKE) core
 	
 core:
-	@echo $(USER)
-	@doas echo $(USER_NAME)
 	@mkdir -p "/nfs-storage/frontend"
+	@doas chown "$(USER):$(USER)" /nfs-storage/frontend
+	@$(BAKE_ARG) LOCAL=false docker buildx bake frontend -f $(CONTAINER_FILES)/docker-bake.hcl --allow=fs.read=$(TEAM_CONTAINER) --allow=fs.write=/nfs-storage/frontend/
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
-	@doas chown -R "$(USER_NAME):$(USER_NAME)" "/nfs-storage/frontend"
 	@chmod +x $(TOOLS_SCRIPTS)/registry_check.sh
 	@if ! bash $(TOOLS_SCRIPTS)/registry_check.sh "$(REGISTRY)";then \
           exit 1; \
         fi
 
 push:
-	@$(BAKE_ARG) LOCAL=false docker buildx bake databases website game -f $(CONTAINER_FILES)/docker-bake.hcl --allow=fs.read=$(TEAM_CONTAINER) --allow=fs.write=/nfs-storage/frontend/ --push >> /home/stempels/infra/build.log
+	@$(BAKE_ARG) LOCAL=false docker buildx bake databases website game -f $(CONTAINER_FILES)/docker-bake.hcl --allow=fs.read=$(TEAM_CONTAINER) --push
 
 base:
 	@make image TARGET=$@
 
 website:
 	@doas mkdir -p "/var/lib/postgresql/data"
-	@doas mkdir -p "/var/lib/game/data"
-	@mkdir -p "/nfs-storage/users_data"
-	@make image TARGET=$@
+	#@mkdir -p "/nfs-storage/users_data"
+	#@make image TARGET=$@
 	@$(DEPLOY_ARG) API_42_CLIENT_ID=$(API_42_CLIENT_ID) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 game:
 	@doas mkdir -p "/var/lib/postgresql/data"
-	@doas mkdir -p "/var/lib/game/data"
-	@mkdir -p "/nfs-storage/game_data"
+	#@doas mkdir -p "/var/lib/game/data"
+	#@mkdir -p "/nfs-storage/game_data"
 	@make image TARGET=$@
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
@@ -94,7 +91,6 @@ up: build
 
 down:
 	@chmod 777 $(CONFIG_SCRIPTS)/end_swarm.sh:wq
-
 	@$(CONFIG_SCRIPTS)/end_swarm.sh
 	@$(MAKE) --no-print-directory swarm-status
 

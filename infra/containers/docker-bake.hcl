@@ -19,7 +19,7 @@ group "observ" {
 }
 
 group "website" {
-    targets = ["frontend", "backend"]
+    targets = ["backend"]
 }
 
 group "game" {

@@ -1,4 +1,5 @@
 #SWARM_STATUS := $(shell docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null)
+SCRIPT_NAME:=Vm-Makefile
 LOCATION := $(shell pwd)
 
 # Environment files
@@ -33,15 +34,15 @@ vm :
 	@bash $(VM_SCRIPTS)/vm.sh
 
 install_deps:
-	@echo "[INFO] Installing site dependencies..."
+	@echo "[INFO][$(SCRIPT_NAME)] Installing site dependencies..."
 	@cd site && rm -rf dist && rm -rf node_modules && rm -rf package-lock.json && npm install
-	@echo "[INFO] Installing backend dependencies..."
+	@echo "[INFO][$(SCRIPT_NAME)] Installing backend dependencies..."
 	@cd backend && rm -rf dist && rm -rf node_modules && rm -rf package-lock.json && npm install
 
 setup_worker: install_deps
 	@ssh-keygen -f "/home/$(USER)/.ssh/known_hosts" -R "[localhost]:2222"
 	@if [ ! -f $(VM_SCRIPTS)/node.sh ]; then \
-		echo "node.sh file missing"; \
+		echo "[ERROR][$(SCRIPT_NAME)] node.sh file missing"; \
 		exit 1; \
 	fi
 	@chmod +x $(VM_SCRIPTS)/node.sh
@@ -60,7 +61,7 @@ vm_erase:
 
 $(ENV_MK): $(ENV_FILE)
 	@if [ ! -f "$(TOOLS_SCRIPTS)"/create_env.sh ] || [ ! -f "$(TOOLS_SCRIPTS)"/check_env.sh ]; then \
-	    echo "Missing env handlers"; \
+	    echo "[ERROR][$(SCRIPT_NAME)] Missing env handlers"; \
 	    exit 1; \
 	fi
 	@chmod +x "$(TOOLS_SCRIPTS)/check_env.sh"
@@ -70,11 +71,11 @@ $(ENV_MK): $(ENV_FILE)
 
 $(ENV_FILE):
 	@if [ -f $(TEMPLATE) ]; then \
-		echo "Creating $(ENV_FILE) file, please set all variables"; \
+		echo "[INFO][$(SCRIPT_NAME)] Creating $(ENV_FILE) file, please set all variables"; \
 		cp $(TEMPLATE) $(ENV_FILE); \
 		vim -c 'set shortmess+=I' $(ENV_FILE); \
 	else \
-		echo "Template_env file missing, you will need to create $(ENV_FILE) file yourself.\n See READ_ME for how to do it"; \
+		echo "[ERROR][$(SCRIPT_NAME)] Template_env file missing, you will need to create $(ENV_FILE) file yourself.\n See READ_ME for how to do it"; \
 		exit 1; \
 	fi
 	

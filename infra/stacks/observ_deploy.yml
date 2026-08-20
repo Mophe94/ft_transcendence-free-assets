@@ -58,8 +58,8 @@ services:
         - obsrv_net
 
   loki:
-    user: "${LOKI_UID}:${LOKI_GID}"
     image: grafana/loki:3.5.2
+    user: "${LOKI_UID}:${LOKI_GID}"
     command:
       -config.file=/etc/loki/config.yml
     volumes:
@@ -79,6 +79,7 @@ services:
 
   alloy:
     image: grafana/alloy:latest
+    user: "0:0"
     command:
       - run
       - --storage.path=/var/lib/alloy/data
