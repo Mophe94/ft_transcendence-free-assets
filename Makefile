@@ -39,7 +39,7 @@ install_deps:
 	@echo "[INFO][$(SCRIPT_NAME)] Installing backend dependencies..."
 	@cd backend && rm -rf dist && rm -rf node_modules && rm -rf package-lock.json && npm install --package-lock-only
 
-setup_worker: install_deps
+setup_worker:
 	@ssh-keygen -f "/home/$(USER)/.ssh/known_hosts" -R "[localhost]:2222"
 	@if [ ! -f $(VM_SCRIPTS)/node.sh ]; then \
 		echo "[ERROR][$(SCRIPT_NAME)] node.sh file missing"; \
@@ -48,7 +48,7 @@ setup_worker: install_deps
 	@chmod +x $(VM_SCRIPTS)/node.sh
 	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4)
 
-leader:
+leader: install_deps
 	@$(MAKE) setup_worker TYPE="leader"
 	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make && /bin/bash"
 
