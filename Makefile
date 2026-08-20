@@ -56,8 +56,6 @@ worker:
 	@$(MAKE) setup_worker TYPE="worker"
 	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "/bin/bash"
 
-vm_erase:
-
 $(ENV_MK): $(ENV_FILE)
 	@if [ ! -f "$(TOOLS_SCRIPTS)"/create_env.sh ] || [ ! -f "$(TOOLS_SCRIPTS)"/check_env.sh ]; then \
 	    echo "[ERROR][$(SCRIPT_NAME)] Missing env handlers"; \

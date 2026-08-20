@@ -63,14 +63,10 @@ base:
 
 website:
 	@doas mkdir -p "/var/lib/postgresql/data"
-	#@mkdir -p "/nfs-storage/users_data"
-	#@make image TARGET=$@
 	@$(DEPLOY_ARG) API_42_CLIENT_ID=$(API_42_CLIENT_ID) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 game:
 	@doas mkdir -p "/var/lib/postgresql/data"
-	#@doas mkdir -p "/var/lib/game/data"
-	#@mkdir -p "/nfs-storage/game_data"
 	@make image TARGET=$@
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
@@ -83,7 +79,6 @@ observ:
 	@doas chown -R $(PROMETHEUS_UID):$(PROMETHEUS_GID) /nfs-storage/prometheus;
 	@mkdir -p "/nfs-storage/loki"
 	@doas chown -R $(LOKI_UID):$(LOKI_GID) /nfs-storage/loki;
-#	@make image TARGET=$@ --> need adding them in bake.hcl
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 up: build
