@@ -154,7 +154,7 @@ run_setup_script() {
     printf '%s\n' "$user_password" |
         ssh \
         -p "$SSH_PORT" \
-	- tt \
+	-tt \
 	-o IdentitiesOnly=yes \
 	-i "$SSH_KEY" \
         -o StrictHostKeyChecking=no \
