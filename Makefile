@@ -51,7 +51,6 @@ setup_worker: install_deps
 leader:
 	@$(MAKE) setup_worker TYPE="leader"
 	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make && /bin/bash"
-#	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "/bin/bash"
 
 worker:
 	@$(MAKE) setup_worker TYPE="worker"
