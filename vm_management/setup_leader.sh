@@ -111,6 +111,8 @@ apk add --no-cache \
 	jq \
 	sshpass
 
+docker system prune -af
+
 echo "[$SCRIPT_NAME] Setting up tailscape"
 apk add tailscale
 rc-update add tailscale default
