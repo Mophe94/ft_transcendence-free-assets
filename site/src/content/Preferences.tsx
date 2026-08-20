@@ -185,6 +185,7 @@ export default function Preferences() {
               alt="Skin selection"
             />
             <RightArrowButton onClick={incrSkinId} disabled={avatar_id === SKINS.length - 1} />
+
           </div>
 
           <div className="

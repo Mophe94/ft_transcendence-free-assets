@@ -109,7 +109,7 @@ export class RedisService {
 
   async getPlayersFromRoom(
     roomId: string,
-  ): Promise<Array<{ username: string; skin: string }>> {
+  ): Promise<Array<{ username: string; skin: string; isBot: boolean }>> {
     const entries = await this.redis.hvals(LOBBY_KEYS.ROOM_PLAYERS(roomId));
     return entries.map((entry) => JSON.parse(entry));
   }
@@ -158,6 +158,7 @@ export class RedisService {
       this.deleteRoomTimer(roomId),
       this.deleteRoomCapacity(roomId),
       this.deleteAllPlayersFromRoom(roomId),
+      this.deleteRoomBots(roomId),
       this.freeRoomId(roomId),
     ]);
   }
@@ -206,5 +207,36 @@ export class RedisService {
     end: number,
   ): Promise<Array<string>> {
     return await this.redis.lrange(key, start, end);
+  }
+
+  ///////////////////////////////* AI  *///////////////////////////////
+
+  async addBotToRoom(botId: string, roomId: string): Promise<void> {
+    await this.redis.sadd(LOBBY_KEYS.ROOM_BOTS(roomId), botId);
+  }
+
+  async removeBotFromRoom(botId: string, roomId: string): Promise<void> {
+    await this.redis.srem(LOBBY_KEYS.ROOM_BOTS(roomId), botId);
+  }
+
+  async getRoomBots(roomId: string): Promise<string[]> {
+    return await this.redis.smembers(LOBBY_KEYS.ROOM_BOTS(roomId));
+  }
+
+  /**
+   * Retire ET renvoie UN bot au hasard du set de la room, en une seule
+   * opération atomique côté Redis (SPOP). Contrairement à un
+   * getRoomBots() + removeBotFromRoom() séparés, deux appels
+   * concurrents (deux vrais joueurs qui rejoignent en même temps) ne
+   * peuvent jamais tomber sur le même botId : Redis garantit que
+   * chaque SPOP retire un élément différent. C'est ce qui évite la
+   * race condition qui laissait passer une room à 5/4.
+   */
+  async popRoomBot(roomId: string): Promise<string | null> {
+    return await this.redis.spop(LOBBY_KEYS.ROOM_BOTS(roomId));
+  }
+
+  async deleteRoomBots(roomId: string): Promise<void> {
+    await this.redis.del(LOBBY_KEYS.ROOM_BOTS(roomId));
   }
 }

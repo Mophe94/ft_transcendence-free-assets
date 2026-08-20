@@ -20,7 +20,6 @@ const publicLinks = {
 const privateLinks = {
   Home: '/Home',
   'How to play': '/howto',
-  Admin: '/admin',
   Readme: '/readme',
   'About us': '/aboutus',
 };

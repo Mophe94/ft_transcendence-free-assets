@@ -74,6 +74,7 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
           <div className='min-h-50 overflow-y-scroll no-scrollbar p-2'>
             {players.length ? (
               players.map((player) => {
+                console.log(player)
                 return (
                 <div className='grid grid-cols-2 w-full' key={player.username}>
                   <div className='flex py-2.5 px-5 self-center justify-center font-semibold'>{player.username}</div>

@@ -35,9 +35,9 @@ vm :
 
 install_deps:
 	@echo "[INFO][$(SCRIPT_NAME)] Installing site dependencies..."
-	@cd site && rm -rf dist && rm -rf node_modules && rm -rf package-lock.json && npm install
+	@cd site && rm -rf dist && rm -rf node_modules && rm -rf package-lock.json && npm install --package-lock-only
 	@echo "[INFO][$(SCRIPT_NAME)] Installing backend dependencies..."
-	@cd backend && rm -rf dist && rm -rf node_modules && rm -rf package-lock.json && npm install
+	@cd backend && rm -rf dist && rm -rf node_modules && rm -rf package-lock.json && npm install --package-lock-only
 
 setup_worker: install_deps
 	@ssh-keygen -f "/home/$(USER)/.ssh/known_hosts" -R "[localhost]:2222"

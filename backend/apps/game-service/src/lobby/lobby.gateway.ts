@@ -54,6 +54,16 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('[LobbyGateway]: Client disconnected');
   }
 
+  /**
+   * roomService.leaveRoom retire le client de l'état in-memory + de
+   * Redis, et renvoie :
+   *  - null si la room vient d'être supprimée (plus aucun vrai
+   *    joueur) -> rien à faire de plus.
+   *  - le Set des clients restants sinon -> on demande à LobbyService
+   *    de remettre un bot à la place du joueur parti. handlePlayerLeave
+   *    ne fait rien si la room est déjà à capacité (ex: déconnexion
+   *    tardive d'un socket /lobby après le lancement de la partie).
+   */
   private async notifyRoomOnLeave(
     client: WebSocket,
     roomId: string,
@@ -65,11 +75,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
       userId,
     );
     if (remainingClients) {
-      this.eventEmitter.emit('lobby.player_joined', {
-        clients: remainingClients,
-        roomId,
-        playerCount: remainingClients.size,
-      });
+      await this.lobbyService.handlePlayerLeave(roomId, remainingClients);
     }
   }
 
