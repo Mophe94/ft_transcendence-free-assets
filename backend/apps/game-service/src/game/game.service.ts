@@ -1,5 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { WebSocket } from 'ws';
+import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PlayerService } from './player/player.service';
 import { MapService } from './map.service';
@@ -10,7 +9,8 @@ import { GameMessage, GameData, RoomAcces } from 'apps/game-service/src/game/gam
 import { PHASE_DURATIONS } from 'apps/game-service/src/game/game.type';
 import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
-import { LOBBY_KEYS } from '../lobby/lobby.const';
+import { AiOrchestratorService } from './ai_service/ai.orchestrator.service';
+import { LOBBY_KEYS, DEFAULT } from '../lobby/lobby.const';
 
 
 @Injectable()
@@ -23,6 +23,7 @@ export class GameService {
     private mapService: MapService,
     private redisService: RedisService,
     private redisStateService: RedisStateService,
+    private aiOrchestrator: AiOrchestratorService,
   ) {}
 
   /*  ATTRIBUTES  */
@@ -40,7 +41,7 @@ export class GameService {
 
   /*  GAME ROOMS */
 
-  async  verifyRoomAccess(userId: string, roomId: string): Promise<RoomAcces | null> {
+  async verifyRoomAccess(userId: string, roomId: string): Promise<RoomAcces | null> {
     const [isActive, players, capacity] = await Promise.all([
       this.redisService.isInSet(LOBBY_KEYS.ACTIVE_ROOMS, roomId),
       this.redisService.getPlayersFromRoom(roomId),
@@ -52,14 +53,14 @@ export class GameService {
       return null;
     }
 
-    // is authorize? 
+    // is authorize?
     const player = players.find((p) => p.username === userId);
     if (!player) {
       console.log(`[GameGateway]: User ${userId} not authorized in room ${roomId}`);
-      return null
+      return null;
     }
 
-    return {capacity, skin: player.skin };
+    return { capacity, skin: player.skin };
   }
 
   private joinGameRoom(roomId: string, userId: string): Set<string> {
@@ -88,12 +89,10 @@ export class GameService {
     roomId: string,
     access: RoomAcces,
   ): Promise<void> {
-    const roomPlayers = this.joinGameRoom(roomId, userId);
+    let roomPlayers = this.joinGameRoom(roomId, userId);
     this.roomIdByPlayer.set(userId, roomId);
     console.log(`Size = ${roomPlayers.size}, RoomId = ${roomId}`);
 
-    // Init or retrieve Player
-    //if (!this.playerService.getPlayer(userId))
     this.playerService.initPlayer(userId, access.skin);
     const player = this.playerService.getPlayer(userId)!;
 
@@ -103,44 +102,116 @@ export class GameService {
       this.activePlayersByRoom.set(roomId, activePlayers);
     }
     activePlayers.add(userId);
+
+    // --- AI (feature 1, lobby-level fill) ---
+    // Les bots manquants (s'il y en a) ont déjà été créés par
+    // LobbyService au moment du timeout du lobby, et enregistrés à la
+    // fois dans PlayerService (injectPlayer) et dans Redis
+    // (room:{roomId}:bots). On les "attache" ici à cette room côté
+    // GameService — pas besoin de les recréer.
+    const botIds = await this.redisService.getRoomBots(roomId);
+    for (const botId of botIds) {
+      if (roomPlayers.has(botId)) continue; // déjà attaché par une connexion précédente
+      roomPlayers.add(botId);
+      // roomPlayers = this.joinGameRoom(roomId,botId);
+      this.roomIdByPlayer.set(botId, roomId);
+      activePlayers.add(botId);
+    }
+    // --- end AI ---
+
     console.log('Active Players at start: ', this.activePlayersByRoom);
     console.log('*********************************************');
     player.roundsRemaining = Math.log2(access.capacity);
-
-    if (
-      roomPlayers.size === access.capacity ) {
+    
+    if (roomPlayers.size === access.capacity) {
       /////////////////////////////////* REDIS STATE : ADD ALL PLAYERS AND STATE */////////////////////////////////
-      for (const userId of roomPlayers) {
-        const playerState = this.playerService.getPlayer(userId)!;
-        await this.redisStateService.updateStatePlayer(
-          userId,
-          playerState,
-        );
+      for (const uid of roomPlayers) {
+        const playerState = this.playerService.getPlayer(uid)!;
+        await this.redisStateService.updateStatePlayer(uid, playerState);
       }
       /////////////////////////////////* END */////////////////////////////////
+      console.log('Gameroom', this.gameRooms.get(roomId))
       this.combatService.matchmake(roomPlayers);
-      console.log("PLAYER SKIN: ", player.asset);
-      this.startMapPhase(roomId, roomPlayers);
+
+     // --- AI (bot-vs-bot instant resolve) ---
+      // Une paire 100% bot n'a pas besoin de passer par tout le flow
+      // map/team_setup/combat : personne ne regarde ce combat, on tire
+      // juste un vainqueur au hasard tout de suite.
+      const resolvedPairs = this.resolveBotVsBotPairs(roomId, roomPlayers);
+      const playersForMapPhase =
+        resolvedPairs.size > 0
+          ? new Set([...roomPlayers].filter((id) => !resolvedPairs.has(id)))
+          : roomPlayers;
+      //if (resolvedPairs.size > 0) this.startNextRound(roomId);
+      // --- end AI ---
+
+      this.startMapPhase(roomId, playersForMapPhase);
+
     }
   }
 
   async onGodotDisconnected(userId: string, roomId: string): Promise<void> {
     const room = this.gameRooms.get(roomId);
     if (!room || !room.has(userId)) return;
+
+    // --- AI takeover (feature 2) ---
+    // Un bot ne remplace un joueur QUE s'il reste au moins un humain
+    // dans la room pour qui ça a un intérêt. S'il n'en reste aucun,
+    // inutile de laisser des bots jouer entre eux : on nettoie tout à
+    // la place, plus bas.
+    const player = this.playerService.getPlayer(userId);
+    const tournamentOver = player?.status === 'winner' && player.roundsRemaining === 0;
+    const stillInTheRunning = !!player && player.status !== 'loser' && !tournamentOver;
+
+    if (stillInTheRunning) {
+      const roomHasOtherHumans = this.hasHumanPlayers(roomId, userId);
+
+      if (!roomHasOtherHumans) {
+        console.log(
+          `[GameService] No human players left in room ${roomId} -> deleting room instead of AI takeover`,
+        );
+        await this.cleanupAbandonedRoom(roomId);
+        return;
+      }const opponentId = this.combatService.getOpponentId(userId);
+      const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
+      
+      ///////////////////// TEST //////////////////////////////
+      // if (enemy) {
+      //   if (!player.teamReady) {
+      //     const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy);
+      //     void this.handleMessage(userId, { state: 'team_choice', battle_team: chosenTeam });
+      //   } else if (!player.currentActions?.actionType) {
+      //     this.triggerBotCombatTurn(userId, player, enemy);
+      //   }
+      // }
+      /////////////////////////////////////////////////////////
+      
+      const totalRounds = Math.log2(DEFAULT.CAPACITY);
+      const round = totalRounds - player.roundsRemaining + 1;
+      this.aiOrchestrator.takeoverPlayer(round, totalRounds, player);
+
+      console.log(
+        `[GameService] Player ${userId} disconnected while still in the running -> replaced by AI`,
+      );
+      return;
+    }
+    // --- end AI takeover ---
     /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
     await this.redisStateService.removePlayer(userId);
     /////////////////////////////////* END */////////////////////////////////
 
-    const player = this.playerService.getPlayer(userId);
-    const wasEliminated =
-      player?.status === 'loser' ||
-      (player?.status === 'winner' && player.roundsRemaining === 0);
-
     this.leaveGameRoom(roomId, userId);
     this.activePlayersByRoom.get(roomId)?.delete(userId);
+    this.roomIdByPlayer.delete(userId);
+    this.playerService.removePlayer(userId);
 
-    if (wasEliminated) this.startNextRound(roomId);
-    else this.deleteAbortedGame(roomId, userId);
+    if (player) this.startNextRound(roomId);
+    else {
+      // useless with AI? 
+      // safety net
+      console.log('[GameService] onGodotDisconnected: AbortedGame cleaning'); 
+      this.deleteAbortedGame(roomId, userId);
+    }
   }
 
   private sendToPlayer(userId: string, payload: GameMessage): void {
@@ -148,39 +219,75 @@ export class GameService {
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
-  startNextRound(roomId: string): void {
+  // startNextRound(roomId: string): void {
+  //   const active = this.activePlayersByRoom.get(roomId);
+  //   const connected = this.gameRooms.get(roomId);
+  //   if (!active || !connected) return;
+
+  //   console.log(
+  //     `[GameService] activePlayersByRoom=${this.activePlayersByRoom.get(roomId)?.size}, connected=${this.gameRooms.get(roomId)?.size}`,
+  //   );
+
+  //   const allCombatsFinished = connected.size === active.size;
+  //   const canPairEveryone = active.size >= 2 && active.size % 2 === 0;
+
+  //   console.log('Active Players in startNextRound ', active);
+  //   console.log('Connected Players in startNextRound ', connected);
+  //   console.log('*********************************************');
+  //   if (allCombatsFinished && canPairEveryone) {
+  //     console.log(
+  //       'Active Players allCombatsFinished && canPairEveryone: ',
+  //       active,
+  //     );
+  //     console.log(
+  //       'Connected Players allCombatsFinished && canPairEveryone: ',
+  //       connected,
+  //     );
+  //     console.log('*********************************************');
+  //     this.combatService.matchmake(connected);
+
+  //     // // --- AI (bot-vs-bot instant resolve) ---
+  //     const resolvedPairs = this.resolveBotVsBotPairs(roomId, connected);
+  //     const playersForMapPhase =
+  //       resolvedPairs.size > 0
+  //         ? new Set([...connected].filter((id) => !resolvedPairs.has(id)))
+  //         : connected;
+  //     this.startMapPhase(roomId, playersForMapPhase, true);
+  //     if (resolvedPairs.size > 0) this.startNextRound(roomId);
+  //     // // --- end AI ---
+  //   } else if (allCombatsFinished && active.size === 1) {
+  //     console.log('*********************************************');
+  //     const winnerId = [...active][0];
+  //     if (winnerId) {
+  //       this.deleteEndGame(roomId, winnerId);
+  //       this.combatService.playerCombatRoom.delete(winnerId);
+  //     }
+  //     console.log('Game rooms end game: ', this.gameRooms);
+  //     //console.log(`End of game: everything should be cleanup at this point!`);
+  //     return;
+  //   }
+  // }
+  async startNextRound(roomId: string): Promise<void> {
     const active = this.activePlayersByRoom.get(roomId);
-    const connected = this.gameRooms.get(roomId);
-    if (!active || !connected) return;
+    //const connected = this.gameRooms.get(roomId);
+    if (!active ) return;
 
-    console.log(
-      `[GameService] activePlayersByRoom=${this.activePlayersByRoom.get(roomId)?.size}, connected=${this.gameRooms.get(roomId)?.size}`,
-    );
-
-    const allCombatsFinished = connected.size === active.size;
     const canPairEveryone = active.size >= 2 && active.size % 2 === 0;
+    const allCombatsFinished = [...active].every(
+      (id) => this.playerService.getPlayer(id)?.duelFinished === true);
 
-    console.log('Active Players in startNextRound ', active);
-    console.log('Connected Players in startNextRound ', connected);
-    console.log('*********************************************');
     if (allCombatsFinished && canPairEveryone) {
       console.log(
         'Active Players allCombatsFinished && canPairEveryone: ',
         active,
       );
-      console.log(
-        'Connected Players allCombatsFinished && canPairEveryone: ',
-        connected,
-      );
       console.log('*********************************************');
-      this.combatService.matchmake(connected);
-      this.startMapPhase(roomId, connected, true);
-    } else if (allCombatsFinished && active.size === 1) {
-      console.log('*********************************************');
-      const winnerId = [...active][0];
-      if (winnerId) {
-        this.deleteEndGame(roomId, winnerId);
-        this.combatService.playerCombatRoom.delete(winnerId);
+      this.combatService.matchmake(active);
+      this.startMapPhase(roomId, active, true);
+    } else if (active.size === 1) {
+        const winnerId = [...active][0];
+        if (winnerId) {
+          await this.deleteEndGame(roomId, winnerId);
       }
       console.log('Game rooms end game: ', this.gameRooms);
       //console.log(`End of game: everything should be cleanup at this point!`);
@@ -195,7 +302,8 @@ export class GameService {
       `[GameService] Eliminating player ${userId} from room ${roomId}`,
     );
     // IF BOT?
-    if (userId === '') {
+    const player = this.playerService.getPlayer(userId);
+    if (player?.isBot) {
       await this.onGodotDisconnected(userId, roomId);
       return;
     }
@@ -236,7 +344,7 @@ export class GameService {
     this.combatService.playerCombatRoom.delete(winnerId);
 
     Promise.all([
-      //this.redisStateService.removePlayer(userId),
+      this.redisStateService.removePlayer(winnerId),
       this.redisService.deleteRoom(roomId),
       this.redisService.removeActiveRoom(roomId),
     ]).catch((err) =>
@@ -311,6 +419,16 @@ export class GameService {
         userId,
         this.mapService.team_setup(player, enemy ?? player),
       );
+      // --- AI team_setup (feature 4a) ---
+      // Un bot ne peut pas répondre lui-même à ce payload (pas de
+      // websocket), donc on déclenche sa décision tout de suite en
+      // rappelant handleMessage exactement comme si le message venait
+      // du client — aucune logique dupliquée.
+      if (player.isBot) {
+        const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy ?? player);
+        void this.handleMessage(userId, { state: 'team_choice', battle_team: chosenTeam });
+      }
+      // --- end AI team_setup ---
     }
   }
 
@@ -391,15 +509,6 @@ export class GameService {
       return;
     }
 
-    console.log(
-      'player.currentActions BEFORE; ',
-      player.currentActions.actionType,
-    );
-    console.log(
-      'player2.currentActions BEFORE; ',
-      player2.currentActions.actionType,
-    );
-
     // if (player.forceChooseMonster) -> if !currentMonster
     const forcedMonster =
       player.forceChooseMonster || player2.forceChooseMonster;
@@ -478,7 +587,14 @@ export class GameService {
     const state = payload?.state;
     console.log('STATE', state);
 
-    if (state === 'safe_to_disconnect') {
+    if (state === 'safe_to_continue') {
+
+      if (player.status === 'winner' && player.roundsRemaining > 0) {
+        player.duelFinished = true;
+        await this.startNextRound(roomId);
+        return;
+      }
+
       await new Promise<void>((resolve) => setTimeout(resolve, 5000));
 
       if (player.status === 'loser')
@@ -550,8 +666,13 @@ export class GameService {
           this.startCombatPhase(roomId, new Set([userId, userId2]));
           this.sendToPlayer(userId, this.mapService.combat(player));
           this.sendToPlayer(userId2, this.mapService.combat(player2));
-        } else
-          result = { event: 'game', data: { state: 'waiting_for_opponent' } };
+          // --- AI combat ---
+          this.triggerBotCombatTurn(userId, player, player2);
+          this.triggerBotCombatTurn(userId2, player2, player);
+          // --- end AI combat ---
+        }
+        else
+        result = {event: 'game', data: { state: 'waiting_for_opponent'}};
         break;
       }
       case 'change_current_monster':
@@ -586,9 +707,6 @@ export class GameService {
 
     const userId2 = this.combatService.getOpponentId(userId);
     if (!userId2) return;
-
-    console.log('player.currentActions; ', player.currentActions.actionType);
-    console.log('player2.currentActions; ', player2.currentActions.actionType);
 
     const bothPlayersActed =
       !!player.currentActions.actionType && !!player2.currentActions.actionType;
@@ -626,6 +744,10 @@ export class GameService {
       this.startNewTurn(combatRoomId, new Set([userId, userId2]));
       this.sendToPlayer(userId, this.combatService.new_turn(player));
       this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+      // --- AI combat ---
+      this.triggerBotCombatTurn(userId, player, player2);
+      this.triggerBotCombatTurn(userId2, player2, player);
+      // --- end AI combat ---
 
       // si un combat deja finish declenchement du roundLeft
       // send new_turn(player, rounLeft)
@@ -695,6 +817,11 @@ export class GameService {
         this.combatService.result_battle(player2, otherPlayer.id),
       );
 
+      // --- AI combat ---
+      const koUserId = koPlayer.id === player.id ? userId : userId2;
+      this.triggerBotCombatTurn(koUserId, koPlayer, otherPlayer);
+      // --- end AI combat ---
+
       return true;
     }
 
@@ -722,6 +849,11 @@ export class GameService {
       this.combatService.change_monster(player2, koPlayer.id),
     );
 
+    // --- AI combat ---
+    const koUserId = koPlayer.id === player.id ? userId : userId2;
+    this.triggerBotCombatTurn(koUserId, koPlayer, otherPlayer);
+    // --- end AI combat ---
+
     return false;
   }
 
@@ -738,6 +870,23 @@ export class GameService {
     this.combatService.combatRooms.delete(combatRoomId);
     this.phaseTimer.clear(`combat: ${combatRoomId}`);
 
+    // --- AI combat ---
+    this.clearPendingBotAction(winner.id);
+    this.clearPendingBotAction(loser.id);
+    // --- end AI combat ---
+
+    if (loser.isBot) {
+      const loserBotRoomId = this.roomIdByPlayer.get(loser.id);
+      if (loserBotRoomId) {
+          this.eliminatePlayer(loser.id, loserBotRoomId).catch((err) =>
+            console.log(`[GameService] eliminatePlayer (bot loser) failed for ${loser.id}`, err),
+        )
+      }
+    }
+
+    loser.duelFinished = true;
+    if (winner.isBot) winner.duelFinished = true;
+   
     // WINNER SCENE -END OF GAME
     if (winner.roundsRemaining === 0)
       this.sendToPlayer(winner.id, {
@@ -747,5 +896,198 @@ export class GameService {
 
     // reinitialize winner
     winner.resetAfterRound();
+
+    // --- AI (bot loser cleanup) ---
+    // Un joueur humain qui perd déclenche sa propre élimination via
+    // safe_to_continue -> onGodotDisconnected (côté client, qui se
+    // déconnecte). Un bot n'a pas de websocket pour faire ça lui-même :
+    // sans ce bloc, un bot qui perd face à un humain reste compté
+    // indéfiniment dans gameRooms/activePlayersByRoom, et le round
+    // suivant ne se déclenche jamais (allCombatsFinished ne devient
+    // jamais vrai).
+      // const roomId = this.roomIdByPlayer.get(winner.id);
+      // if (roomId) {
+      //   this.leaveGameRoom(roomId, loser.id);
+      //   this.activePlayersByRoom.get(roomId)?.delete(loser.id);
+      //   this.roomIdByPlayer.delete(loser.id);
+      //   this.playerService.removePlayer(loser.id);
+      //   this.startNextRound(roomId);
+      // }
+    // --- end AI ---
+  }
+
+  /* AI Function */
+
+  // userId (bot) -> timer de sa prochaine action programmée
+  private pendingBotActions = new Map<string, NodeJS.Timeout>();
+
+  /**
+   * Détecte les paires 100% bot juste après le matchmake, et les
+   * résout instantanément avec un vainqueur tiré au hasard, au lieu de
+   * les faire passer par tout le flow map/team_setup/combat (personne
+   * ne regarde un combat bot-vs-bot, autant ne pas le simuler).
+   *
+   * Le perdant est éliminé exactement comme un vrai joueur qui perd
+   * (retiré de gameRooms/activePlayersByRoom/roomIdByPlayer/
+   * PlayerService). Le vainqueur reste actif pour le round suivant,
+   * mais ne participe pas à la phase map/combat de CE round.
+   *
+   * Retourne l'ensemble des userId déjà résolus ici (vainqueurs +
+   * perdants), pour que l'appelant les exclue de roomPlayers avant de
+   * démarrer startMapPhase.
+   */
+  private resolveBotVsBotPairs(roomId: string, roomPlayers: Set<string>): Set<string> {
+    const handled = new Set<string>();
+    const resolved = new Set<string>();
+
+    for (const userId of roomPlayers) {
+      if (handled.has(userId)) continue;
+
+      const player = this.playerService.getPlayer(userId);
+      if (!player?.isBot) continue;
+
+      const opponentId = this.combatService.getOpponentId(userId);
+      if (!opponentId || !roomPlayers.has(opponentId)) continue;
+
+      const opponent = this.playerService.getPlayer(opponentId);
+      if (!opponent?.isBot) continue; // au moins un humain dans la paire -> flow normal
+
+      handled.add(userId);
+      handled.add(opponentId);
+
+      const winner = Math.random() < 0.5 ? player : opponent;
+      const loser = winner === player ? opponent : player;
+
+      console.log(
+        `[GameService] Bot-vs-bot ${userId} vs ${opponentId} -> résolu instantanément, vainqueur: ${winner.id}`,
+      );
+
+      winner.status = 'winner';
+      loser.status = 'loser';
+      winner.roundsRemaining -= 1;
+      loser.roundsRemaining -= 1;
+      winner.resetAfterRound(); // même nettoyage qu'un vrai vainqueur (currentMonster/battle_team vidés)
+      winner.duelFinished = true;
+
+      // Annule la paire de combat que matchmake() venait de créer pour eux.
+      const combatRoomId = this.combatService.playerCombatRoom.get(userId);
+      if (combatRoomId) {
+        this.combatService.combatRooms.delete(combatRoomId);
+      }
+      this.combatService.playerCombatRoom.delete(userId);
+      this.combatService.playerCombatRoom.delete(opponentId);
+
+      // Le perdant est éliminé, exactement comme un vrai départ.
+      this.leaveGameRoom(roomId, loser.id);
+      this.activePlayersByRoom.get(roomId)?.delete(loser.id);
+      this.roomIdByPlayer.delete(loser.id);
+      this.playerService.removePlayer(loser.id);
+      this.redisStateService.removePlayer(loser.id)
+
+      resolved.add(userId);
+      resolved.add(opponentId);
+    }
+
+    return resolved;
+  }
+
+  /**
+   * Est-ce qu'il reste au moins un joueur humain (pas un bot) dans cette
+   * room, en excluant `excludingUserId` (typiquement celui qui vient de
+   * se déconnecter et qu'on ne veut pas compter).
+   */
+  private hasHumanPlayers(roomId: string, excludingUserId?: string): boolean {
+    const roomPlayers = this.gameRooms.get(roomId);
+    if (!roomPlayers) return false;
+
+    for (const id of roomPlayers) {
+      if (id === excludingUserId) continue;
+      const player = this.playerService.getPlayer(id);
+      if (player && !player.isBot) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Supprime entièrement une room qui n'a plus aucun joueur humain
+   * (uniquement des bots restants). Contrairement à deleteEndGame
+   * (utilisée pour une fin de tournoi normale avec un vainqueur), on
+   * nettoie ici TOUS les joueurs de la room, humains ou bots.
+   */
+  private async cleanupAbandonedRoom(roomId: string): Promise<void> {
+    const roomPlayers = this.gameRooms.get(roomId);
+    const userIds = roomPlayers ? [...roomPlayers] : [];
+
+    // Cancel any timer tied to this room, so a leftover callback can't
+    // fire later and try to act on a room that no longer exists.
+    this.phaseTimer.clear(`game: ${roomId}`);
+
+    for (const id of userIds) {
+      // Also cancel a pending combat timer / pairing this player was part of.
+      const combatRoomId = this.combatService.playerCombatRoom.get(id);
+      if (combatRoomId) {
+        this.phaseTimer.clear(`combat: ${combatRoomId}`);
+        this.combatService.combatRooms.delete(combatRoomId);
+      }
+      this.combatService.playerCombatRoom.delete(id);
+      this.clearPendingBotAction(id); // idem pour un éventuel timer de décision IA en attente
+
+      await this.redisStateService.removePlayer(id.toString());
+      this.playerService.removePlayer(id);
+      this.roomIdByPlayer.delete(id);
+    }
+
+    this.gameRooms.delete(roomId);
+    this.activePlayersByRoom.delete(roomId);
+
+    await Promise.all([
+      this.redisService.deleteRoom(roomId),
+      this.redisService.removeActiveRoom(roomId),
+    ]).catch((err) =>
+      console.log(`[GameService] cleanupAbandonedRoom: failed cleaning of ${roomId}`, err),
+    );
+
+    console.log(`[GameService] Room ${roomId} abandoned (no human players left) -> deleted`);
+  }
+
+  /**
+   * Annule un timer de bot en attente, s'il y en a un. À appeler aussi
+   * bien avant de reprogrammer (triggerBotCombatTurn) qu'à la fin d'un
+   * combat / suppression de room, pour ne jamais laisser un timer
+   * fantôme se déclencher plus tard sur un état déjà terminé.
+   */
+  private clearPendingBotAction(userId: string): void {
+    const existing = this.pendingBotActions.get(userId);
+    if (existing) {
+      clearTimeout(existing);
+      this.pendingBotActions.delete(userId);
+    }
+  }
+
+  /**
+   * Si le joueur est un bot, déclenche sa décision de combat pour ce
+   * tour, après un petit délai (1.5s au lieu d'un queueMicrotask quasi
+   * instantané) : le client Godot a besoin d'un peu de temps pour
+   * charger/transitionner la scène de combat avant de recevoir la mise
+   * à jour du monstre.
+   *
+   * Important : on annule d'abord tout timer déjà programmé pour ce
+   * bot. Sans ça, en combat bot-vs-bot (pas de rythme humain pour
+   * naturellement espacer les tours), un ancien timer laissé en
+   * attente peut se déclencher en retard sur le mauvais tour et
+   * désynchroniser le combat.
+   */
+  private triggerBotCombatTurn(userId: string, player: Player, enemy: Player): void {
+    if (!player.isBot) return;
+
+    this.clearPendingBotAction(userId);
+
+    const timer = setTimeout(() => {
+      this.pendingBotActions.delete(userId);
+      const action = this.aiOrchestrator.decideCombatAction(player, enemy);
+      void this.handleMessage(userId, action);
+    }, 500);
+
+    this.pendingBotActions.set(userId, timer);
   }
 }
