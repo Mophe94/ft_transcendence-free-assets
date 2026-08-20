@@ -870,7 +870,7 @@ export class GameService {
           this.eliminatePlayer(loser.id, loserBotRoomId).catch((err) =>
             console.log(`[GameService] eliminatePlayer (bot loser) failed for ${loser.id}`, err),
           );
-        }, 5000);
+        }, 10000);
       }
     }
    

@@ -1,5 +1,5 @@
 export const DEFAULT = {
-  COUNTDOWN: 10,
+  COUNTDOWN: 30,
   CAPACITY: 4,
 };
 
@@ -11,7 +11,7 @@ export const LOBBY_KEYS = {
   ROOM_PLAYERS: (roomId: string) => `room:${roomId}:players`,
   ROOM_CAPACITY: (roomId: string) => `room:${roomId}:capacity`,
   ROOM_TIMER: (roomId: string) => `room:${roomId}:timer`,
-  ROOM_BOTS: (roomId: string) => 'room:${roomID}:bots',
+  ROOM_BOTS: (roomId: string) => `room:${roomId}:bots`,
 };
 
 export const ROOM_IDS = [
