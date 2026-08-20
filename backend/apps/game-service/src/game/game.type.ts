@@ -15,7 +15,7 @@ export interface RoomAcces {
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 5,
+  map: 20,
   team_setup: 15,
   choose_action: 20,
 };

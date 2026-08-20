@@ -47,6 +47,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     const userId = user.username;
+    const uID = user.id;
 
     if (!roomId) {
       console.log('[GameGateway]: Missing roomId');
@@ -70,7 +71,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (data) data.isAlive = true;
     });
 
-    this.gameService.onGodotConnected(userId, roomId, access).catch((err) => {
+    this.gameService.onGodotConnected(userId, uID, roomId, access).catch((err) => {
       console.log('[GameGateway]: handleConnection error');
       client.close();
     });

@@ -298,7 +298,7 @@ export class AiService {
     const id = botId ?? this.generateBotId();
     const skinPair = this.pickBotSkin();
 
-    const bot = new Player(id, botName ?? 'Bot IA', skinPair.game);
+    const bot = new Player(id, botName ?? 'Bot IA', "-1", skinPair.game);
     bot.isBot = true;
     bot.team = [...team];
     this.equipBotItems(bot, tier);

@@ -6,11 +6,12 @@ export class PlayerService {
   players = new Map<string, Player>();
   idsByPlayers = new Map<Player, string>();
 
-  initPlayer(userId: string, skin: string): void {
+  initPlayer(userId: string, uID: string, skin: string): void {
     console.log("SKIN: ", skin);
     const player = new Player(
       userId,
       userId,
+      uID,
       skin,
     );
     this.players.set(userId, player);
