@@ -12,8 +12,8 @@ host_ip.txt
 !**/template.*.*
 .secrets/
 .vite/
-**/**/node_modules
-**/**/package-lock.json
+**/node_modules
+**/package-lock.json
 node_modules
 tatusq
 wiq
