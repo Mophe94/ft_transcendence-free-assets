@@ -13,6 +13,8 @@ export interface RoomAcces {
   skin: string;
 }
 
+export type PlayerPhase = 'map' | 'team_choice' | 'combat';
+
 export const PHASE_DURATIONS = {
   lobby: 10,
   map: 20,

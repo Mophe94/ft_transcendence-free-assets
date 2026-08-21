@@ -38,11 +38,12 @@ export class GameService {
   // roomId -> active players
   private activePlayersByRoom = new Map<string, Set<string>>();
 
+
+  /*  GAME ROOMS */
+
   getRoomById(userId: string) {
     return this.roomIdByPlayer.get(userId);
   }
-
-  /*  GAME ROOMS */
 
   async verifyRoomAccess(userId: string, roomId: string): Promise<RoomAcces | null> {
     const [isActive, players, capacity] = await Promise.all([
@@ -180,17 +181,6 @@ export class GameService {
       } const opponentId = this.combatService.getOpponentId(userId);
       const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
 
-      ///////////////////// TEST //////////////////////////////
-      // if (enemy) {
-      //   if (!player.teamReady) {
-      //     const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy);
-      //     void this.handleMessage(userId, { state: 'team_choice', battle_team: chosenTeam });
-      //   } else if (!player.currentActions?.actionType) {
-      //     this.triggerBotCombatTurn(userId, player, enemy);
-      //   }
-      // }
-      /////////////////////////////////////////////////////////
-
       const totalRounds = Math.log2(DEFAULT.CAPACITY);
       const round = totalRounds - player.roundsRemaining + 1;
       this.aiOrchestrator.takeoverPlayer(round, totalRounds, player);
@@ -236,54 +226,6 @@ export class GameService {
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
-  // startNextRound(roomId: string): void {
-  //   const active = this.activePlayersByRoom.get(roomId);
-  //   const connected = this.gameRooms.get(roomId);
-  //   if (!active || !connected) return;
-
-  //   console.log(
-  //     `[GameService] activePlayersByRoom=${this.activePlayersByRoom.get(roomId)?.size}, connected=${this.gameRooms.get(roomId)?.size}`,
-  //   );
-
-  //   const allCombatsFinished = connected.size === active.size;
-  //   const canPairEveryone = active.size >= 2 && active.size % 2 === 0;
-
-  //   console.log('Active Players in startNextRound ', active);
-  //   console.log('Connected Players in startNextRound ', connected);
-  //   console.log('*********************************************');
-  //   if (allCombatsFinished && canPairEveryone) {
-  //     console.log(
-  //       'Active Players allCombatsFinished && canPairEveryone: ',
-  //       active,
-  //     );
-  //     console.log(
-  //       'Connected Players allCombatsFinished && canPairEveryone: ',
-  //       connected,
-  //     );
-  //     console.log('*********************************************');
-  //     this.combatService.matchmake(connected);
-
-  //     // // --- AI (bot-vs-bot instant resolve) ---
-  //     const resolvedPairs = this.resolveBotVsBotPairs(roomId, connected);
-  //     const playersForMapPhase =
-  //       resolvedPairs.size > 0
-  //         ? new Set([...connected].filter((id) => !resolvedPairs.has(id)))
-  //         : connected;
-  //     this.startMapPhase(roomId, playersForMapPhase, true);
-  //     if (resolvedPairs.size > 0) this.startNextRound(roomId);
-  //     // // --- end AI ---
-  //   } else if (allCombatsFinished && active.size === 1) {
-  //     console.log('*********************************************');
-  //     const winnerId = [...active][0];
-  //     if (winnerId) {
-  //       this.deleteEndGame(roomId, winnerId);
-  //       this.combatService.playerCombatRoom.delete(winnerId);
-  //     }
-  //     console.log('Game rooms end game: ', this.gameRooms);
-  //     //console.log(`End of game: everything should be cleanup at this point!`);
-  //     return;
-  //   }
-  // }
   async startNextRound(roomId: string): Promise<void> {
     const active = this.activePlayersByRoom.get(roomId);
     //const connected = this.gameRooms.get(roomId);
@@ -428,9 +370,11 @@ export class GameService {
       } else return { userId, payload: this.mapService.start_game(player) };
     });
 
-    payloads.forEach(({ userId, payload }) =>
-      this.sendToPlayer(userId, payload),
-    );
+    payloads.forEach(({ userId, payload }) => {
+      this.playerService.getPlayer(userId)!.currentPhase = 'map';
+      console.log(`${this.playerService.getPlayer(userId)!.id}: CURRENT PHASE -> ${this.playerService.getPlayer(userId)!.currentPhase}`);
+      this.sendToPlayer(userId, payload);
+    });
     console.log(
       `[GameService]: startMapPhase -> start_game sent to ${roomPlayers.size} players of ${roomId}`,
     );
@@ -446,8 +390,11 @@ export class GameService {
 
     for (const userId of roomPlayers) {
       const player = this.playerService.getPlayer(userId)!;
+      player.currentPhase = 'team_choice';
       player.timer = teamSetupTimer;
       player.teamReady = false;
+
+      console.log(`${player.id}: CURRENT PHASE -> ${player.currentPhase}`);
 
       const opponentId = this.combatService.getOpponentId(userId);
       const enemy = opponentId
@@ -458,16 +405,6 @@ export class GameService {
           `[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`,
         );
       }
-
-      // TEST MATCHMAKING //
-      console.log(
-        'USER ID: ',
-        userId /* ': ', this.team_setup(player, enemy ?? player) */,
-      );
-      console.log('OPONNENT ID: ', opponentId);
-      console.log('******************');
-      //******************************//
-
       this.sendToPlayer(
         userId,
         this.mapService.team_setup(player, enemy ?? player),
@@ -493,9 +430,9 @@ export class GameService {
 
       const opponentId = this.combatService.getOpponentId(userId);
       const combatRoomId = this.combatService.playerCombatRoom.get(userId);
-      if (!combatRoomId) {
+      if (!combatRoomId || !opponentId) {
         console.log(
-          `[GameService]: start CombatPhase -> missing combatRoomId for ${userId}`,
+          `[GameService]: start CombatPhase -> missing combatRoomId or opponent for ${userId}`,
         );
         continue;
       }
@@ -511,12 +448,17 @@ export class GameService {
         this.phaseTimer.startTimes.get(timerKey)! +
         PHASE_DURATIONS.choose_action;
 
-      this.playerService.getPlayer(userId)!.timer = combatTimer;
+      const player = this.playerService.getPlayer(userId)!;
+      player.currentPhase = 'combat';
+      player.timer = combatTimer;
       handled.add(userId);
-      if (opponentId) {
-        this.playerService.getPlayer(opponentId)!.timer = combatTimer;
-        handled.add(opponentId);
-      }
+
+      const player2 = this.playerService.getPlayer(opponentId)!;
+      player2.currentPhase = 'combat';
+      player2.timer = combatTimer;
+      handled.add(opponentId);
+      console.log(`${player.id}: CURRENT PHASE -> ${player.currentPhase}`);
+      console.log(`${player2.id}: CURRENT PHASE -> ${player2.currentPhase}`);
     }
     console.log('Combat timer started');
   }
@@ -947,7 +889,6 @@ export class GameService {
     await this.redisStateService.updateStatePlayer(winner.id, winner);
     
     loser.duelFinished = true;
-    if (winner.isBot) winner.duelFinished = true;
 
     if (loser.isBot) {
       const loserBotRoomId = this.roomIdByPlayer.get(loser.id);
@@ -960,6 +901,8 @@ export class GameService {
 
     // reinitialize winner
     winner.resetAfterRound();
+    if (winner.isBot) winner.duelFinished = true;
+
 
     // --- AI (bot loser cleanup) ---
     // Un joueur humain qui perd déclenche sa propre élimination via
