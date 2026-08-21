@@ -19,6 +19,7 @@ export class UserStatService {
     }
 
     stats.gamesWon += 1;
+	stats.gamesPlayed += 1;
     await this.userStatsRepository.save(stats);
   }
 
@@ -40,6 +41,7 @@ export class UserStatService {
     }
 
     stats.gamesLost += 1;
+	stats.gamesPlayed += 1;
     await this.userStatsRepository.save(stats);
   }
 
@@ -53,17 +55,6 @@ export class UserStatService {
   }
 
   /************************ PLAYED ************************/
-  async newGamePlayed(userId: string): Promise<void> {
-    const stats = await this.userStatsRepository.findOne({ where: { userId } });
-
-    if (!stats) {
-      throw new Error(`No stat found for ${userId}`);
-    }
-
-    stats.gamesPlayed += 1;
-    await this.userStatsRepository.save(stats);
-  }
-
   async getGamePlayed(userId: string): Promise<number> {
     const stats = await this.userStatsRepository.findOne({ where: { userId } });
     if (!stats) {
@@ -94,7 +85,7 @@ export class UserStatService {
     return stats.totalPlayerDefeated;
   }
 
-  /************************ Catch Monsters ************************/
+  /************************ CATCH MONSTERS ************************/
   async newMonsterCatch(userId: string, monsterArray: string[]): Promise<void> {
     const stats = await this.userStatsRepository.findOne({ where: { userId } });
 
@@ -135,7 +126,7 @@ export class UserStatService {
     return stats.NbMonstersDiscovered;
   }
 
-  /************************ Ending ************************/
+  /************************ ENDING ************************/
   async newEnding(userId: string, assetEnding: string): Promise<void> {
     const stats = await this.userStatsRepository.findOne({ where: { userId } });
 
@@ -174,7 +165,7 @@ export class UserStatService {
     return stats.NbEndingsDiscovered;
   }
 
-  /************************ Achivements ************************/
+  /************************ ACHIEVEMENTS ************************/
   async newAchievement(userId: string, achievement: string): Promise<void> {
     const stats = await this.userStatsRepository.findOne({ where: { userId } });
 
@@ -213,8 +204,8 @@ export class UserStatService {
     return stats.NbAchievements;
   }
 
-  /************************ Update ************************/
-  async updateStat(userId: string, achievement: string): Promise<void> {
+  /************************ UPDATE ************************/
+  async updateStat(userId: string): Promise<void> {
     const stats = await this.userStatsRepository.findOne({ where: { userId } });
 
     if (!stats) {
@@ -232,5 +223,69 @@ export class UserStatService {
     }
 
     return stats.updatedAt;
+  }
+
+/************************ ALL ************************/
+  async allUpdate(userId: string, monsterArray: string[], win: boolean, lose: boolean, playerDefeated: number, assetEnding: string): Promise<void> {
+	const stats = await this.userStatsRepository.findOne({ where: { userId } });
+
+	if (!stats) {
+	  throw new Error(`No stat found for ${userId}`);
+	}
+
+	/*monster*/
+	for (const monster of monsterArray) {
+	  if (!stats.MonstersDiscovered.includes(monster)) {
+	  	stats.MonstersDiscovered.push(monster);
+	  	stats.NbMonstersDiscovered += 1;
+	  }
+	}
+
+	if (stats.MonstersDiscovered.length === 9) {
+	  if (!stats.Achievements.includes("monsterCatch")) {
+	  	stats.Achievements.push("monsterCatch");
+	  	stats.NbAchievements += 1;
+	  }
+	}
+
+	/*gamePlayed*/
+	stats.gamesPlayed += 1;
+
+	if (win) {
+	  stats.gamesWon += 1;
+	  if (assetEnding) {
+	  	if (!stats.EndingsDiscovered.includes(assetEnding)) {
+	  	  stats.EndingsDiscovered.push(assetEnding);
+	  	  stats.NbEndingsDiscovered += 1;
+	  	}
+	  }
+	}
+
+	if (lose) {
+	  stats.gamesLost += 1;
+	}
+
+	if (stats.EndingsDiscovered.length === 10) {
+	  if (!stats.Achievements.includes("ending")) {
+	  	stats.Achievements.push("ending");
+	  	stats.NbAchievements += 1;
+	  }
+	}
+
+	if (stats.gamesWon === 1) {
+	  if (!stats.Achievements.includes("firstWin")) {
+	  	stats.Achievements.push("firstWin");
+	  	stats.NbAchievements += 1;
+	  }
+	}
+
+	if (playerDefeated > 0) {
+	  stats.totalPlayerDefeated += playerDefeated;
+	}
+
+	/*date*/
+	stats.updatedAt = new Date();
+
+	await this.userStatsRepository.save(stats);
   }
 }

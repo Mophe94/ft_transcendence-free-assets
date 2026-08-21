@@ -297,6 +297,8 @@ export class MapService {
 
     if (result == 1) {
       msg.data.success = 'ok';
+      if (!player.monsterCatch.includes(player.current_monster))
+        player.monsterCatch.push(player.current_monster);
       return msg;
     } else {
       let flee = Math.floor(Math.random() * 101);

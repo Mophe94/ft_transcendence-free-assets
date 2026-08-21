@@ -10,8 +10,9 @@ import { emptyCurrentMonster } from './player.interfaces';
 export class Player {
   readonly id: string = '';
   readonly name: string = '';
+  readonly uid: string = '';
   readonly asset: string = '';
-  isBot: boolean = false; // permet de detecter si ses un bot ou pas 
+  isBot: boolean = false;
   currentMonster: CurrentMonster = {
     name: '',
     slot: -1,
@@ -312,10 +313,16 @@ export class Player {
   current_monster_rarity: string = '';
   current_item: string = '';
   text: string = '';
+  monsterCatch: string[] = [];
+  playerDefeated: number = 0;
+  win: boolean = false;
+  lose: boolean = false;
 
-  constructor(new_id: string, name: string, asset: string) {
+
+  constructor(new_id: string, name: string, uid: string, asset: string) {
     this.id = new_id;
     this.name = name;
+    this.uid = uid;
     this.asset = asset;
     this.team[0] = 'pisciner';
   }

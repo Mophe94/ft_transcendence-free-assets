@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import Redis from 'ioredis/built';
 import { REDIS_CLIENT } from './redis.const';
 import { STATE_PLAYER } from '../game/state_player.const';
+import { Player } from '../game/player/player';
 
 @Injectable()
 export class RedisStateService {
@@ -19,7 +20,7 @@ export class RedisStateService {
 
   /* ###################### STATE ###################### */
 
-  async getStatePlayer(playerId: string): Promise<Object | undefined> {
+  async getStatePlayer(playerId: string): Promise<Player | undefined> {
     const key = STATE_PLAYER.state(playerId);
     const data = await this.redis.get(key);
 
@@ -27,7 +28,7 @@ export class RedisStateService {
     return undefined;
   }
 
-  async updateStatePlayer(playerId: string, state: Object): Promise<void> {
+  async updateStatePlayer(playerId: string, state: Player): Promise<void> {
     const key = STATE_PLAYER.state(playerId);
     // Expire after 1h
     await this.redis.set(key, JSON.stringify(state), 'EX', 3600);

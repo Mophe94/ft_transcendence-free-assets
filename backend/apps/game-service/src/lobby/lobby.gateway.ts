@@ -25,7 +25,6 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private lobbyService: LobbyService,
     private roomService: RoomService,
     private redisService: RedisService,
-    private readonly eventEmitter: EventEmitter2,
     private readonly wsAuthService: SharedAuthService,
   ) {}
 

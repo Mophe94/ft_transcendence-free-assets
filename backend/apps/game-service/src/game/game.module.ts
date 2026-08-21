@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { GameGateway } from './game.gateway';
 import { GameService } from './game.service';
 import { SharedModule } from 'apps/game-service/src/shared/shared.module';
-//import { PlayerService } from './player/player.service';
 import { CombatService } from './combat.service';
 import { EntityModule } from './entities/entity.module';
 import { RedisService } from '../redis/redis.service';
@@ -10,6 +9,8 @@ import { RedisStateService } from '../redis/redis_state.service';
 import { MapService } from './map.service';
 import { AiModule } from './ai_service/ai.module';
 import { PlayerModule } from './player/player.module';
+import { UserStatsClientService } from './user-stats-client.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   providers: [
@@ -19,7 +20,8 @@ import { PlayerModule } from './player/player.module';
     CombatService,
     RedisService,
     RedisStateService,
+    UserStatsClientService,
   ],
-  imports: [SharedModule, EntityModule, AiModule, PlayerModule],
+  imports: [SharedModule, EntityModule, AiModule, PlayerModule, HttpModule],
 })
 export class GameModule {}
