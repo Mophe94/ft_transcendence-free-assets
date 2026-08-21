@@ -1,0 +1,351 @@
+[INFO][2026-08-21 09:45:19][node.sh] /home/stempels/19/6_circle/ft_transcendence/.env_vm found.
+[32m[INFO][0m[node.sh] /home/stempels/19/6_circle/ft_transcendence/.env_vm found.
+[INFO][2026-08-21 09:45:19][node.sh] VM name: leader_node_stempels
+[32m[INFO][0m[node.sh] VM name: leader_node_stempels
+[INFO][2026-08-21 09:45:19][node.sh] VM directory: /media/stempels/Extreme SSD/ft_transcendence/
+[32m[INFO][0m[node.sh] VM directory: /media/stempels/Extreme SSD/ft_transcendence/
+[32m[INFO][0m[node.sh] Creating VM...
+[INFO][2026-08-21 09:45:19][node.sh] Creating VM...
+Virtual machine 'leader_node_stempels' is created and registered.
+UUID: 15294392-a892-45a3-9b57-a1c3d4008d52
+Settings file: '/media/stempels/Extreme SSD/ft_transcendence/leader_node_stempels/leader_node_stempels.vbox'
+[INFO][2026-08-21 09:45:19][node.sh] Configuring VM...
+[32m[INFO][0m[node.sh] Configuring VM...
+[INFO][2026-08-21 09:45:19][node.sh] Creating virtual disk...
+[32m[INFO][0m[node.sh] Creating virtual disk...
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+Clone medium created in format 'VDI'. UUID: 4ec3bdc0-3cd4-4e98-b757-5f7473d9237c
+[INFO][2026-08-21 09:45:20][node.sh] Resizing disk to 30720 MB...
+[32m[INFO][0m[node.sh] Resizing disk to 30720 MB...
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+[INFO][2026-08-21 09:45:20][node.sh] Adding storage controllers...
+[32m[INFO][0m[node.sh] Adding storage controllers...
+[INFO][2026-08-21 09:45:20][node.sh] Attaching disk...
+[32m[INFO][0m[node.sh] Attaching disk...
+[32m[INFO][0m[node.sh] Configuring boot order...
+[INFO][2026-08-21 09:45:21][node.sh] Configuring boot order...
+[INFO][2026-08-21 09:45:21][node.sh] Starting VM...
+[32m[INFO][0m[node.sh] Starting VM...
+Waiting for VM "leader_node_stempels" to power on...
+VM "leader_node_stempels" has been successfully started.
+[INFO][2026-08-21 09:45:21][node.sh] Checking SSH key...
+[32m[INFO][0m[node.sh] Checking SSH key...
+[INFO][2026-08-21 09:45:21][node.sh] SSH key already exists: /home/stempels/.ssh/transcendence_node
+[32m[INFO][0m[node.sh] SSH key already exists: /home/stempels/.ssh/transcendence_node
+[INFO][2026-08-21 09:45:21][node.sh] Waiting for VM to boot.
+[32m[INFO][0m[node.sh] Waiting for VM to boot.
+........
+[INFO][2026-08-21 09:45:53][node.sh] VM SSH server is available.
+[32m[INFO][0m[node.sh] VM SSH server is available.
+[INFO][2026-08-21 09:45:53][node.sh] Setting up node...
+[32m[INFO][0m[node.sh] Setting up node...
+[INFO][2026-08-21 09:45:53][node.sh] Installing SSH key...
+[32m[INFO][0m[node.sh] Installing SSH key...
+Warning: Permanently added '[localhost]:2222' (ED25519) to the list of known hosts.
+[INFO][2026-08-21 09:45:53][node.sh] SSH key installed
+[32m[INFO][0m[node.sh] SSH key installed
+[INFO][2026-08-21 09:45:53][node.sh] Adding needed files...
+[32m[INFO][0m[node.sh] Adding needed files...
+[32m[INFO][0m[node.sh] Running setup_leader.sh...
+[INFO][2026-08-21 09:45:54][node.sh] Running setup_leader.sh...
+Warning: Permanently added '[localhost]:2222' (ED25519) to the list of known hosts.
+Ndstempels123
+[setup_leader.sh] VM ip: 10.0.2.15
+[setup_leader.sh] Expanding root partition
+7[fetch http://dl-cdn.alpinelinux.org/alpine/...]8[0K7[fetch http://dl-cdn.alpinelinux.org/alpine/...]8[0Kv3.23.5-137-g140f5b06fef [http://dl-cdn.alpinelinux.org/alpine/v3.23/main]
+v3.23.5-136-g62634b2dda9 [http://dl-cdn.alpinelinux.org/alpine/v3.23/community]
+OK: 27597 distinct packages available
+7[fetch http://dl-cdn.alpinelinux.org/alpine/...]8[0K7[fetch http://dl-cdn.alpinelinux.org/alpine/...]8[0K(1/6) Installing libsmartcols (2.41.4-r0)
+7  0%                                             8[0K7  6% ##                                          8[0K(2/6) Installing partx (2.41.4-r0)
+7  6% ##                                          8[0K7 14% ######                                      8[0K7 16% #######                                     8[0K(3/6) Installing libfdisk (2.41.4-r0)
+7 16% #######                                     8[0K7 24% ##########                                  8[0K7 38% #################                           8[0K(4/6) Installing sfdisk (2.41.4-r0)
+7 38% #################                           8[0K7 46% ####################                        8[0K7 50% ######################                      8[0K(5/6) Installing cloud-utils-growpart (0.33-r1)
+7 50% ######################                      8[0K7 58% #########################                   8[0K7 59% ##########################                  8[0K(6/6) Installing e2fsprogs-extra (1.47.3-r0)
+7 59% ##########################                  8[0K7 67% #############################               8[0K7 82% ####################################        8[0K7 92% ########################################    8[0K7100% ############################################8[0KExecuting busybox-1.37.0-r30.trigger
+7[syncing disks...]8[0KOK: 681.6 MiB in 116 packages
+CHANGED: partition=3 start=5859328 old: size=15112192 end=20971519 new: size=57055199 end=62914526
+resize2fs 1.47.3 (8-Jul-2025)
+Filesystem at /dev/sda3 is mounted on /; on-line resizing required
+old_desc_blocks = 1, new_desc_blocks = 4
+The filesystem on /dev/sda3 is now 7131899 (4k) blocks long.
+
+[setup_leader.sh] Waiting for network
+[setup_leader.sh] Synchronizing system clock
+ [1m[33m*[m WARNING: you are stopping a boot service[K
+ [1m[32m*[m Stopping busybox ntpd[K ...
+ [ ok ]
+ [1m[32m*[m Starting busybox ntpd[K ...
+ [ ok ]
+Fri Aug 21 07:45:58 UTC 2026
+[setup_leader.sh] Creating user: stempels
+chpasswd: password for 'stempels' changed
+[setup_leader.sh] Setting up stempels permissions
+[setup_leader.sh] Setting up stempels SSH login
+[setup_leader.sh] Disabling root SSH login
+[setup_leader.sh] Changing VM hostname to: swarmnode.stempels
+[setup_leader.sh] Adding utils
+7[fetch http://dl-cdn.alpinelinux.org/alpine/...]8[0K7[fetch http://dl-cdn.alpinelinux.org/alpine/...]8[0Kv3.23.5-137-g140f5b06fef [http://dl-cdn.alpinelinux.org/alpine/v3.23/main]
+v3.23.5-136-g62634b2dda9 [http://dl-cdn.alpinelinux.org/alpine/v3.23/community]
+OK: 27597 distinct packages available
+7[fetch http://dl-cdn.alpinelinux.org/alpine/...]8[0K7[fetch http://dl-cdn.alpinelinux.org/alpine/...]8[0K( 1/15) Installing brotli-libs (1.2.0-r0)
+7  0%                                             8[0K7  1%                                             8[0K7  2% #                                           8[0K7  3% #                                           8[0K( 2/15) Installing c-ares (1.34.8-r0)
+7  3% #                                           8[0K7  4% #                                           8[0K( 3/15) Installing libunistring (1.4.1-r0)
+7  4% #                                           8[0K7  4% ##                                          8[0K7  5% ##                                          8[0K7  6% ###                                         8[0K7  7% ###                                         8[0K7  8% ###                                         8[0K7  9% ####                                        8[0K7 10% ####                                        8[0K( 4/15) Installing libidn2 (2.3.8-r0)
+7 10% ####                                        8[0K7 11% #####                                       8[0K( 5/15) Installing nghttp2-libs (1.69.0-r0)
+7 11% #####                                       8[0K7 12% #####                                       8[0K( 6/15) Installing libpsl (0.21.5-r3)
+7 12% #####                                       8[0K7 13% #####                                       8[0K( 7/15) Installing libcurl (8.20.0-r0)
+7 13% #####                                       8[0K7 13% ######                                      8[0K7 14% ######                                      8[0K7 15% ######                                      8[0K7 16% #######                                     8[0K( 8/15) Installing curl (8.20.0-r0)
+7 16% #######                                     8[0K7 17% #######                                     8[0K7 18% ########                                    8[0K( 9/15) Installing oniguruma (6.9.10-r0)
+7 18% ########                                    8[0K7 19% ########                                    8[0K7 20% ########                                    8[0K(10/15) Installing jq (1.8.1-r0)
+7 20% ########                                    8[0K7 20% #########                                   8[0K7 21% #########                                   8[0K(11/15) Installing sshpass (1.10-r0)
+7 21% #########                                   8[0K7 22% #########                                   8[0K(12/15) Installing vim-common (9.2.0854-r0)
+7 22% #########                                   8[0K7 23% ##########                                  8[0K7 24% ##########                                  8[0K7 25% ###########                                 8[0K7 26% ###########                                 8[0K7 27% ############                                8[0K7 28% ############                                8[0K7 29% ############                                8[0K7 30% #############                               8[0K7 31% #############                               8[0K7 32% ##############                              8[0K7 33% ##############                              8[0K7 34% ###############                             8[0K7 35% ###############                             8[0K7 36% ###############                             8[0K7 37% ################                            8[0K7 38% ################                            8[0K7 39% #################                           8[0K7 40% #################                           8[0K7 41% ##################                          8[0K7 42% ##################                          8[0K7 43% ###################                         8[0K7 44% ###################                         8[0K7 45% ####################                        8[0K7 46% ####################                        8[0K7 47% #####################                       8[0K7 48% #####################                       8[0K7 49% #####################                       8[0K7 50% ######################                      8[0K7 51% ######################                      8[0K7 52% #######################                     8[0K7 53% #######################                     8[0K7 54% #######################                     8[0K7 55% ########################                    8[0K7 56% ########################                    8[0K7 57% #########################                   8[0K7 58% #########################                   8[0K7 59% ##########################                  8[0K7 60% ##########################                  8[0K7 61% ##########################                  8[0K7 62% ###########################                 8[0K7 63% ###########################                 8[0K7 64% ############################                8[0K7 65% ############################                8[0K7 66% #############################               8[0K7 67% #############################               8[0K7 68% #############################               8[0K7 69% ##############################              8[0K7 70% ###############################             8[0K7 71% ###############################             8[0K7 72% ################################            8[0K7 73% ################################            8[0K7 74% ################################            8[0K7 75% #################################           8[0K7 76% #################################           8[0K7 77% ##################################          8[0K7 78% ##################################          8[0K7 79% ###################################         8[0K7 80% ###################################         8[0K7 81% ###################################         8[0K7 82% ####################################        8[0K7 83% ####################################        8[0K7 84% #####################################       8[0K(13/15) Installing xxd (9.2.0854-r0)
+7 84% #####################################       8[0K7 85% #####################################       8[0K(14/15) Installing vim (9.2.0854-r0)
+7 85% #####################################       8[0K7 86% ######################################      8[0K7 87% ######################################      8[0K7 88% ######################################      8[0K7 89% #######################################     8[0K7 90% #######################################     8[0K7 91% ########################################    8[0K7 92% ########################################    8[0K7 93% #########################################   8[0K7 94% #########################################   8[0K7 95% #########################################   8[0K7 96% ##########################################  8[0K7 97% ##########################################  8[0K7 98% ########################################### 8[0K7 99% ########################################### 8[0K(15/15) Installing nftables-vim (0_git20200629-r1)
+7 99% ########################################### 8[0K7100% ############################################8[0KExecuting busybox-1.37.0-r30.trigger
+7[syncing disks...]8[0KOK: 716.5 MiB in 131 packages
+Deleted Containers:
+3b44b70c29797fba5d27e013fa585ba393db9743319770abda2233c11e49ac6b
+0477818426d334f3b0ff32474a5c27d40dc426757fd888c5a6f91b193dbe6d80
+cfe87dc37efd73389d93c45cdacf3b4500c2730188f3aef3135163147006a1a1
+9b2632317a3f1b278d9ea19a565267135893a983d45389449129bd9e70bc9cbc
+90d3b47f99254ece5f8adea8e881855f41347f15ea00f0a00f2f774d951dd8b4
+1b90c1eab74bf14d209bd02545dfd0234d5eea79e6e9b8a772d50d9171a7b63e
+14165ca6de13bd4f96ab2a937e10c7e478507eca3768d8dc058982fc34de390e
+d56f7f83079ecc2b235a414435a22fe726e16d4f3b8c4aa7101694388cdd924c
+
+Deleted Images:
+untagged: hello-world:latest
+deleted: sha256:0e760fdfbc48ba8041e7c6db999bb40bfca508b4be580ac75d32c4e29d202ce1
+deleted: sha256:d1a8d0a4eeb63aff09f5f34d4d80505e0ba81905f36158cc3970d8e07179e59e
+deleted: sha256:8e752a1cddeafc02597e756f4a0ec96e29f63ac4bc4af87682daf3f1de843bb7
+
+Total reclaimed space: 54.47kB
+[setup_leader.sh] Setting up tailscape
+(1/3) Installing openresolv (3.17.4-r0)
+7  0%                                             8[0K(2/3) Installing tailscale (1.90.9-r6)
+7  0%                                             8[0K  Executing tailscale-1.90.9-r6.pre-install
+7  0%                                             8[0K7  1%                                             8[0K7  2% #                                           8[0K7  3% #                                           8[0K7  4% ##                                          8[0K7  5% ##                                          8[0K7  6% ##                                          8[0K7  7% ###                                         8[0K7  8% ###                                         8[0K7  9% ####                                        8[0K7 10% ####                                        8[0K7 11% #####                                       8[0K7 12% #####                                       8[0K7 13% ######                                      8[0K7 14% ######                                      8[0K7 15% ######                                      8[0K7 16% #######                                     8[0K7 17% #######                                     8[0K7 18% ########                                    8[0K7 19% ########                                    8[0K7 20% #########                                   8[0K7 21% #########                                   8[0K7 22% ##########                                  8[0K7 24% ##########                                  8[0K7 25% ###########                                 8[0K7 26% ###########                                 8[0K7 27% ###########                                 8[0K7 28% ############                                8[0K7 29% ############                                8[0K7 30% #############                               8[0K7 31% #############                               8[0K7 32% ##############                              8[0K7 33% ##############                              8[0K7 34% ###############                             8[0K7 35% ###############                             8[0K7 36% ###############                             8[0K7 37% ################                            8[0K7 38% ################                            8[0K7 39% #################                           8[0K7 40% #################                           8[0K7 41% ##################                          8[0K7 42% ##################                          8[0K7 43% ###################                         8[0K7 44% ###################                         8[0K7 45% ###################                         8[0K7 46% ####################                        8[0K7 47% ####################                        8[0K7 48% #####################                       8[0K7 49% #####################                       8[0K7 50% ######################                      8[0K7 51% ######################                      8[0K7 52% #######################                     8[0K7 53% #######################                     8[0K7 54% #######################                     8[0K7 55% ########################                    8[0K7 56% ########################                    8[0K7 57% #########################                   8[0K7 58% #########################                   8[0K7 59% ##########################                  8[0K7 60% ##########################                  8[0K7 61% ###########################                 8[0K7 62% ###########################                 8[0K7 63% ###########################                 8[0K7 64% ############################                8[0K7 65% ############################                8[0K7 66% #############################               8[0K7 67% #############################               8[0K7 68% ##############################              8[0K7 69% ##############################              8[0K7 70% ###############################             8[0K7 71% ###############################             8[0K7 72% ###############################             8[0K7 73% ################################            8[0K7 74% ################################            8[0K7 75% #################################           8[0K7 76% #################################           8[0K7 77% ##################################          8[0K7 78% ##################################          8[0K7 79% ###################################         8[0K7 80% ###################################         8[0K7 81% ####################################        8[0K7 82% ####################################        8[0K7 83% ####################################        8[0K7 84% #####################################       8[0K7 85% #####################################       8[0K7 86% ######################################      8[0K7 87% ######################################      8[0K7 88% #######################################     8[0K7 89% #######################################     8[0K7 90% ########################################    8[0K7 92% ########################################    8[0K7 93% ########################################    8[0K7 94% #########################################   8[0K7 95% #########################################   8[0K7 96% ##########################################  8[0K7 97% ##########################################  8[0K7 98% ########################################### 8[0K  Executing tailscale-1.90.9-r6.post-install
+7 98% ########################################### 8[0K  * 
+7 98% ########################################### 8[0K  * tailscaled runs as root by default. For security reasons, we highly
+7 98% ########################################### 8[0K  * recommend that you run it under an unprivileged user. See command_user
+7 98% ########################################### 8[0K  * in /etc/conf.d/tailscale for more information.
+7 98% ########################################### 8[0K  * 
+7 98% ########################################### 8[0K(3/3) Installing tailscale-openrc (1.90.9-r6)
+7 98% ########################################### 8[0K7 99% ########################################### 8[0K7100% ############################################8[0KExecuting busybox-1.37.0-r30.trigger
+7[syncing disks...]8[0KOK: 750.8 MiB in 134 packages
+ [1m[32m*[m service tailscale added to runlevel default[K
+ [1m[32m*[m Caching service dependencies[K ...
+ [ ok ]
+ [1m[32m*[m /var/log/tailscaled.log: creating file[K
+ [1m[32m*[m /var/log/tailscaled.log: correcting owner[K
+ [1m[32m*[m /run/tailscale: creating directory[K
+ [1m[32m*[m /run/tailscale: correcting owner[K
+ [1m[32m*[m Starting tailscale[K ...
+ [ ok ]
+[setup_leader.sh] Setting up Headscale
+[1A[1B[0G[?25l[+] Running 0/1
+ [33m⠙[0m headscale Pulling [34m0.1s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠹[0m headscale Pulling [34m0.2s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠸[0m headscale Pulling [34m0.3s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠼[0m headscale Pulling [34m0.4s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠴[0m headscale Pulling [34m0.5s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠦[0m headscale Pulling [34m0.6s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠧[0m headscale Pulling [34m0.7s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠇[0m headscale Pulling [34m0.8s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠏[0m headscale Pulling [34m0.9s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠋[0m headscale Pulling [34m1.0s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠙[0m headscale Pulling [34m1.1s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠹[0m headscale Pulling [34m1.2s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠸[0m headscale Pulling [34m1.3s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠼[0m headscale Pulling [34m1.4s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠴[0m headscale Pulling [34m1.5s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠦[0m headscale Pulling [34m1.6s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠧[0m headscale Pulling [34m1.7s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/1
+ [33m⠇[0m headscale Pulling [34m1.8s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/20
+ [33m⠏[0m headscale [[32m⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[0m] Pulling [34m1.9s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/20
+ [33m⠋[0m headscale [[32m⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀[0m] Pulling [34m2.0s [0m
+[?25h[1A[1A[0G[?25l[+] Running 0/20
+ [33m⠙[0m headscale [[32m⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿[0m] Pulling [34m2.1s [0m
+[?25h[1A[1A[0G[?25l[+] Running 2/20
+ [33m⠹[0m headscale [[32m⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿[0m] Pulling [34m2.2s [0m
+[?25h[1A[1A[0G[?25l[+] Running 3/20
+ [33m⠸[0m headscale [[32m⠀⣿⣿⣿⠀⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿[0m] Pulling [34m2.3s [0m
+[?25h[1A[1A[0G[?25l[+] Running 9/20
+ [33m⠼[0m headscale [[32m⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⣿⠀⣿⠀⣿⣿⣿⣿[0m] Pulling [34m2.4s [0m
+[?25h[1A[1A[0G[?25l[+] Running 12/20
+ [33m⠴[0m headscale [[32m⡀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄⣿⣦⣿⣿⣿⣿⣿⣿[0m] 8.099MB / 31.28MB Pulling [34m2.5s [0m
+[?25h[1A[1A[0G[?25l[+] Running 16/20
+ [33m⠦[0m headscale [[32m⣀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 16.24MB / 31.28MB Pulling [34m2.6s [0m
+[?25h[1A[1A[0G[?25l[+] Running 17/20
+ [33m⠧[0m headscale [[32m⣤⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 22.54MB / 31.28MB Pulling [34m2.7s [0m
+[?25h[1A[1A[0G[?25l[+] Running 17/20
+ [33m⠇[0m headscale [[32m⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 27.78MB / 31.28MB Pulling [34m2.8s [0m
+[?25h[1A[1A[0G[?25l[+] Running 17/20
+ [33m⠏[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] Pulling [34m2.9s [0m
+[?25h[1A[1A[0G[?25l[+] Running 17/20
+ [33m⠋[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] Pulling [34m3.0s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠙[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] Pulling [34m3.1s [0m
+[?25h[1A[1A[0G[?25l[+] Running 19/20
+ [33m⠹[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m3.2s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠸[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m3.3s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠼[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m3.4s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠴[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m3.5s [0m
+[?25h[1A[1A[0G[?25l[+] Running 19/20
+ [33m⠦[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m3.6s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠧[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m3.7s [0m
+[?25h[1A[1A[0G[?25l[+] Running 19/20
+ [33m⠇[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m3.8s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠏[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m3.9s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠋[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m4.0s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠙[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m4.1s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠹[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m4.2s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠸[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m4.3s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠼[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m4.4s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠴[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m4.5s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠦[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m4.6s [0m
+[?25h[1A[1A[0G[?25l[+] Running 18/20
+ [33m⠧[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m4.7s [0m
+[?25h[1A[1A[0G[?25l[+] Running 19/20
+ [33m⠇[0m headscale [[32m⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿[0m] 31.28MB / 31.28MB Pulling [34m4.8s [0m
+[?25h[1A[1A[0G[?25l[+] Running 20/20
+ [32m✔[0m headscale Pulled         [32m[0m[34m4.8s [0m
+[?25h[1A[1B[0G[?25l[+] Running 0/1
+ [33m⠋[0m Network headscale_default  Creating[34m0.0s [0m
+[?25h[1A[1A[0G[?25l[34m[+] Running 1/2[0m
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [33m⠋[0m Container headscale        Creating[34m0.0s [0m
+[?25h[1A[1A[1A[0G[?25l[+] Running 1/2
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [33m⠙[0m Container headscale        Creating[34m0.1s [0m
+[?25h[1A[1A[1A[0G[?25l[+] Running 1/2
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [33m⠹[0m Container headscale        Creating[34m0.2s [0m
+[?25h[1A[1A[1A[0G[?25l[+] Running 1/2
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [33m⠸[0m Container headscale        Creating[34m0.3s [0m
+[?25h[1A[1A[1A[0G[?25l[+] Running 1/2
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [33m⠼[0m Container headscale        Creating[34m0.4s [0m
+[?25h[1A[1A[1A[0G[?25l[+] Running 1/2
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [33m⠴[0m Container headscale        Creating[34m0.5s [0m
+[?25h[1A[1A[1A[0G[?25l[+] Running 1/2
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [33m⠦[0m Container headscale        Creating[34m0.6s [0m
+[?25h[1A[1A[1A[0G[?25l[34m[+] Running 2/2[0m
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [32m✔[0m Container headscale        [32mCreated[0m[34m0.7s [0m
+[?25h[1A[1A[1A[0G[?25l[+] Running 1/2
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [33m⠧[0m Container headscale        Starting[34m0.8s [0m
+[?25h[1A[1A[1A[0G[?25l[+] Running 1/2
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [33m⠇[0m Container headscale        Starting[34m0.9s [0m
+[?25h[1A[1A[1A[0G[?25l[+] Running 1/2
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [33m⠏[0m Container headscale        Starting[34m1.0s [0m
+[?25h[1A[1A[1A[0G[?25l[34m[+] Running 2/2[0m
+ [32m✔[0m Network headscale_default  [32mCreated[0m[34m0.1s [0m
+ [32m✔[0m Container headscale        [32mStarted[0m[34m1.1s [0m
+[?25h[setup_leader.sh] Creating Headscale user
+User created
+[setup_leader.sh] Creating Headscale auth key
+[setup_leader.sh] USER_ID=1
+[setup_leader.sh] Registering leader in Tailscale
+[setup_leader.sh] Tailscale IP: 100.64.0.1
+[setup_leader.sh] Setting up NFS
+( 1/21) Installing libtirpc-conf (1.3.5-r1)
+7  0%                                             8[0K( 2/21) Installing krb5-conf (1.0-r2)
+7  0%                                             8[0K( 3/21) Installing keyutils-libs (1.6.3-r4)
+7  0%                                             8[0K( 4/21) Installing libverto (0.3.2-r2)
+7  0%                                             8[0K7  1%                                             8[0K( 5/21) Installing krb5-libs (1.22.1-r0)
+7  1%                                             8[0K7  2% #                                           8[0K7  3% #                                           8[0K7  4% #                                           8[0K7  4% ##                                          8[0K7  5% ##                                          8[0K7  6% ##                                          8[0K( 6/21) Installing libtirpc (1.3.5-r1)
+7  6% ##                                          8[0K7  6% ###                                         8[0K7  7% ###                                         8[0K( 7/21) Installing rpcbind (1.2.8-r0)
+7  7% ###                                         8[0K  Executing rpcbind-1.2.8-r0.pre-install
+7  7% ###                                         8[0K( 8/21) Installing rpcbind-openrc (1.2.8-r0)
+7  7% ###                                         8[0K7  8% ###                                         8[0K( 9/21) Installing libexpat (2.8.3-r0)
+7  8% ###                                         8[0K7  9% ####                                        8[0K(10/21) Installing libbz2 (1.0.8-r6)
+7  9% ####                                        8[0K(11/21) Installing gdbm (1.26-r0)
+7  9% ####                                        8[0K7 10% ####                                        8[0K(12/21) Installing mpdecimal (4.0.1-r0)
+7 10% ####                                        8[0K7 11% ####                                        8[0K(13/21) Installing libpanelw (6.5_p20251123-r0)
+7 11% ####                                        8[0K7 11% #####                                       8[0K(14/21) Installing sqlite-libs (3.53.4-r0)
+7 11% #####                                       8[0K7 12% #####                                       8[0K7 13% ######                                      8[0K7 14% ######                                      8[0K7 15% ######                                      8[0K7 16% #######                                     8[0K7 17% #######                                     8[0K(15/21) Installing python3 (3.12.14-r0)
+7 17% #######                                     8[0K7 18% ########                                    8[0K7 19% ########                                    8[0K7 20% ########                                    8[0K7 21% #########                                   8[0K7 22% #########                                   8[0K7 22% ##########                                  8[0K7 23% ##########                                  8[0K7 24% ##########                                  8[0K7 25% ###########                                 8[0K7 26% ###########                                 8[0K7 27% ############                                8[0K7 28% ############                                8[0K7 29% ############                                8[0K7 30% #############                               8[0K7 31% #############                               8[0K7 32% ##############                              8[0K7 33% ##############                              8[0K7 34% ###############                             8[0K7 35% ###############                             8[0K7 36% ################                            8[0K7 37% ################                            8[0K7 38% ################                            8[0K7 39% #################                           8[0K7 40% #################                           8[0K7 41% ##################                          8[0K7 42% ##################                          8[0K7 43% ##################                          8[0K7 43% ###################                         8[0K7 44% ###################                         8[0K7 45% ####################                        8[0K7 46% ####################                        8[0K7 47% ####################                        8[0K7 47% #####################                       8[0K7 48% #####################                       8[0K7 49% #####################                       8[0K7 50% ######################                      8[0K7 51% ######################                      8[0K7 52% #######################                     8[0K7 53% #######################                     8[0K7 54% #######################                     8[0K7 55% ########################                    8[0K7 56% ########################                    8[0K7 57% #########################                   8[0K7 58% #########################                   8[0K7 59% ##########################                  8[0K7 60% ##########################                  8[0K7 61% ###########################                 8[0K7 62% ###########################                 8[0K7 63% ###########################                 8[0K7 64% ############################                8[0K7 65% ############################                8[0K7 66% #############################               8[0K7 67% #############################               8[0K(16/21) Installing python3-pycache-pyc0 (3.12.14-r0)
+7 67% #############################               8[0K7 68% ##############################              8[0K7 69% ##############################              8[0K7 70% ##############################              8[0K7 70% ###############################             8[0K7 71% ###############################             8[0K7 72% ###############################             8[0K7 73% ################################            8[0K7 74% ################################            8[0K7 75% #################################           8[0K7 76% #################################           8[0K7 77% ##################################          8[0K7 78% ##################################          8[0K7 79% ###################################         8[0K7 80% ###################################         8[0K7 81% ###################################         8[0K7 82% ####################################        8[0K7 83% ####################################        8[0K7 84% #####################################       8[0K7 85% #####################################       8[0K7 86% #####################################       8[0K7 86% ######################################      8[0K7 87% ######################################      8[0K7 88% ######################################      8[0K7 89% #######################################     8[0K7 90% #######################################     8[0K7 91% ########################################    8[0K7 92% ########################################    8[0K7 93% #########################################   8[0K7 94% #########################################   8[0K(17/21) Installing pyc (3.12.14-r0)
+7 94% #########################################   8[0K(18/21) Installing python3-pyc (3.12.14-r0)
+7 94% #########################################   8[0K(19/21) Installing libnfsidmap (2.6.4-r6)
+7 94% #########################################   8[0K7 95% #########################################   8[0K7 95% ##########################################  8[0K(20/21) Installing nfs-utils (2.6.4-r6)
+7 95% ##########################################  8[0K7 96% ##########################################  8[0K7 97% ##########################################  8[0K7 98% ########################################### 8[0K7 99% ########################################### 8[0K(21/21) Installing nfs-utils-openrc (2.6.4-r6)
+7 99% ########################################### 8[0K7100% ############################################8[0KExecuting busybox-1.37.0-r30.trigger
+7[syncing disks...]8[0KOK: 789.4 MiB in 155 packages
+ [1m[32m*[m service rpcbind added to runlevel default[K
+ [1m[32m*[m service nfs added to runlevel default[K
+[setup_leader.sh] Setting up nfs-storage
+[setup_leader.sh] Setting up directory
+[setup_leader.sh] Generating CA
+[cert_rootCA.sh] Setting up directory
+[cert_rootCA.sh] Generating CA
+[setup_leader.sh] Configuring Docker startup dependency on Tailscale
+[setup_leader.sh] Setting up Docker Daemon
+[setup_leader.sh] Found CA certificate, marking registry as secure
+[setup_leader.sh] VM ip: 10.0.2.15
+[setup_leader.sh] Setup complete
+--------------------------------
+Tailscale IP:
+100.64.0.1
+
+Headscale auth key:
+hskey-auth-zi1Lgsoxz-Zu-ojb3hbuEwb8qUuyGw5ICeR6QPcCSCnkgWc4t4QlU_ssOdXqJ3w5KsO4agBbbGeju
+--------------------------------
+[setup_leader.sh] Configuring login welcome message
+[setup_leader.sh] Setup complete
+[setup_leader.sh] Restarting VM
+Connection to localhost closed.
+[INFO][2026-08-21 09:46:14][node.sh] Waiting for VM SSH connection to restart...
+[32m[INFO][0m[node.sh] Waiting for VM SSH connection to restart...
+[INFO][2026-08-21 09:46:16][node.sh] Switching user...
+[32m[INFO][0m[node.sh] Switching user...
+[32m[INFO][0m[node.sh] Current user: stempels
+[INFO][2026-08-21 09:46:16][node.sh] Current user: stempels
+[INFO][2026-08-21 09:46:16][node.sh] Waiting for VM to boot.
+[32m[INFO][0m[node.sh] Waiting for VM to boot.
+..........
+[32m[INFO][0m[node.sh] VM SSH connection established.
+[INFO][2026-08-21 09:46:52][node.sh] VM SSH connection established.
+[32m[INFO][0m[node.sh] Adding needed files...
+[INFO][2026-08-21 09:46:52][node.sh] Adding needed files...
+[INFO][2026-08-21 09:46:53][node.sh] Script completed successfully.
+[32m[INFO][0m[node.sh] Script completed successfully.
