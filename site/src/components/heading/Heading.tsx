@@ -1,5 +1,3 @@
-import { Color } from "../../constants/Colors";
-
 
 interface HeadingProps {
     text: string;
