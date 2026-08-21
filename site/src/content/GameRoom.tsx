@@ -64,8 +64,8 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
 
       </div>
       <div className='grid md:grid-cols-2 gap-2 justify-items-center'>
-        <div className='bg-[#d3d5b0c4] border rounded-t-4xl rounded-4xl w-full max-w-150'>
-          <div className=' bg-[#8f5407b9] rounded-t-4xl'>
+        <div className='bg-light-olive border rounded-t-4xl rounded-4xl w-full max-w-150'>
+          <div className=' bg-muted-gold rounded-t-4xl'>
             <div className='grid grid-cols-2 w-full'>
               <div className='text-2xl t-w justify-center font-semibold p-2.5 text-center'>Players</div>
               <div className='text-2xl t-w justify-center font-semibold p-2.5 text-center'>Skin</div>
@@ -92,8 +92,8 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
             )}
           </div>
         </div>
-        <div className='bg-[#d3d5b0c4] border rounded-4xl w-full max-w-150'>
-          <div className=' bg-[#8f5407b9] rounded-t-4xl'>
+        <div className='bg-light-olive border rounded-4xl w-full max-w-150'>
+          <div className=' bg-muted-gold rounded-t-4xl'>
             <div className='text-2xl t-w text-center font-semibold p-2.5'>
               Online friends
             </div>

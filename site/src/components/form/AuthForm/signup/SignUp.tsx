@@ -54,7 +54,6 @@ export default function SignUpForm() {
     })
     .then ((data) => {
       showNotification('User creation successful', 'success');
-      console.log(data);
       setUser(data);
       navigate('/home');
     })

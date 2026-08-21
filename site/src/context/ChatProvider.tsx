@@ -21,13 +21,11 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const socket = new WebSocket(`${import.meta.env.VITE_CHAT_SERVICE}`);
     wsRef.current = socket;
-    socket.onopen = () => console.log('connection');
     socket.onclose = () => {
       return;
     }
 
     socket.onmessage = (event) => {
-      console.log(event);
       const data = JSON.parse(event.data);
       switch (data.type) {
       case 'message': {

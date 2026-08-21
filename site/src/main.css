@@ -8,6 +8,41 @@
   --font-im-fell: "IM Fell English", serif;
   --font-merienda: "Merienda", cursive;
   --font-sour: "Sour Gummy", sans-serif;
+
+  --color-sky-blue: #1cbbb3f2;
+  --color-sea-blue: #47aba9;
+  --color-steel-blue: #41919d;
+  --color-slate-blue: #4a6982;
+  --color-night-blue: #05011f;
+  --color-vibrant-cobalt: #1a69b8;
+  --color-deep-sapphire: #0f3e6d;
+  --color-light-olive: #d3d5b0;
+  --color-sage-green: #d6dbbc;
+  --color-mint-green: #caffc8;
+  --color-forest-green: #327c00;
+  --color-lush-green: #10901a;
+  --color-vibrant-emerald: #15b122;
+  --color-soft-sand: #e0ce9e;
+  --color-pastel-yellow: #fff657;
+  --color-pastel-red: #f65555;
+  --color-dark-garnet: #700e0e;
+  --color-deep-amber: #914103;
+  --color-dark-crimson: #840606;
+  --color-dark-blood: #670808;
+  --color-deep-magenta: #88186b;
+  --color-dark-plum: #6d1256;
+  --color-muted-gold: #9c6721;
+  --color-saddle-brown: #7f4508;
+  --color-light-grey: #e7e7e7;
+  --color-grey: #797979;
+  --color-dark-grey: #140a32f2;
+  --color-anthracite-grey: #323441;
+  --color-trans-grey: #ffffffa3;
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-pearl-white: #e3e7ec;
+  --color-warm-eggshell: #f2eadb;
+
 }
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {

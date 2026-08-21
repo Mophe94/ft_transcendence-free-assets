@@ -1,5 +1,3 @@
-import './ResetButton.css'
-
 import { useState } from 'react';
 
 
@@ -30,8 +28,17 @@ export default function ResetButton({ onClick }: ResetButtonProps) {
   return (
     <button
         style={prefStyles}
-        className={`reset-button ${isPressed ? 'pressed': ''}`}
+        className={`
+          w-full
+          aspect-23/14
+          bg-no-repeat
+          bg-contain
+          bg-center
+          ${isPressed ? 'bg-(image:--img-reset-pressed)': 'bg-(image:--img-reset) hover:bg-(image:--img-reset-hover)'}`}
         type="button"
+        onMouseDown={() => setIsPressed(true)}
+        onMouseUp={() => setIsPressed(false)}
+        onMouseLeave={() => setIsPressed(false)}
         onClick={handleClick}
         aria-label='Reset'
     />

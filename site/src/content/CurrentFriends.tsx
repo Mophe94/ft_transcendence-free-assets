@@ -36,8 +36,8 @@ export default function CurrentFriends() {
         text={`Current Friends (${currentFriends.users.length})`}
         className="justify-self-start"/>
       <div className="rounded-[10px]
-      border border-solid border-[rgb(144,30,30)]
-      bg-[#f6f1e3] p-4
+      border border-solid border-dark-blood
+      bg-warm-eggshell p-4
       max-h-100 overflow-y-scroll overflow-x-hidden no-scrollbar"> 
       {
         currentFriends.users.length !== 0 ?

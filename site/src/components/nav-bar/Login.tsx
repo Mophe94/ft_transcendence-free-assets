@@ -26,7 +26,7 @@ export function AuthSection() {
           >
           <div className="
             block
-            font-ubuntu font-bold text-[#797979] text-(length:--nav-font)
+            font-ubuntu font-bold text-grey text-(length:--nav-font)
             whitespace-nowrap max-w-[10ch]"
           >
             {user.username}
@@ -42,7 +42,7 @@ export function AuthSection() {
             w-max
             rounded-md invisible opacity-0  group-hover:visible group-hover:opacity-100 group-hover:translate-y-0
             -translate-y-1.5 transition-[opacity,transform,visibility] duration-200 ease-out z-1000
-            shadow-[0_4px_10px_#00000026]
+            shadow-[0_4px_10px_black]
           `}>
             <li>
               <Link to={'/profile'}

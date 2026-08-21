@@ -11,17 +11,17 @@ export const Theme =  {
     bgColor: Color.SeaBlue,
     bgImg: lightBgImg,
     icon: sunTheme,
-    dropMenuColor: 'bg-[#1cbbb3f2]',
-    authLinkColor: 'text-[#797979] hover:bg-[#0000000f]'
+    dropMenuColor: `bg-sky-blue`,
+    authLinkColor: `text-grey hover:bg-[#0000000f]`
   },
   dark: {
     name: 'dark',
-    fontColor: 'text-[#e7e7e7]',
+    fontColor: `text-light-grey`,
     bgColor: Color.NightBlue,
     bgImg: darkBgImg,
     icon: moonTheme,
-    dropMenuColor: 'bg-[#140a32f2]',
-    authLinkColor: 'text-[#797979] hover:bg-[#ffffff14]'
+    dropMenuColor: `bg-dark-grey`,
+    authLinkColor: `text-grey hover:bg-[#ffffff14]`
   }
 } as const;
 

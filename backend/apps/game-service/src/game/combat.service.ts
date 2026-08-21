@@ -305,9 +305,9 @@ export class CombatService {
 
   readonly typeChart: Record<string, Record<string, number>> = {
     fire: { plant: 1.5, water: 0.5, neutral: 1, earth: 1, fly: 1 },
-    water: { fire: 1.5, plant: 0.5, earth: 0.5, neutral: 1, fly: 1 },
+    water: { fire: 1.5, plant: 0.5, earth: 1, neutral: 1, fly: 1 },
     earth: { water: 1.5, fire: 0.5, plant: 0.5, neutral: 1, fly: 1 },
-    plant: { water: 1.5, earth: 1.5, neutral: 1, fire: 0.5, fly: 0.5 },
+    plant: { water: 1.5, earth: 1, neutral: 1, fire: 0.5, fly: 0.5 },
     neutral: { water: 1, fire: 1, plant: 1, earth: 1, fly: 1 },
     fly: { water: 1, fire: 1, plant: 1.5, earth: 0.5, neutral: 1 },
   };
@@ -648,7 +648,10 @@ export class CombatService {
 
       case 'stat_down':
         console.log('3 type: ', type);
-        switch (current_item.target) {
+		console.log('stat_up: ', current_item.name);
+		console.log('target: ', current_item.target);
+		const target = current_item.target;
+        switch (target) {
           case 'attack':
             enemy.currentMonster.attack -= current_item.value;
             enemy.currentMonster.attack_spe -= current_item.value;

@@ -44,7 +44,7 @@ export default function AddFriend() {
             className="
               w-full
               mb-4 sm:mr-4 sm:mb-0
-              border-2 border-amber-800
+              border-2 border-dark-crimson
               bg-white rounded sm:rounded-2xl
               text-[clamp(1rem,5vw,2rem)]
               "/>
