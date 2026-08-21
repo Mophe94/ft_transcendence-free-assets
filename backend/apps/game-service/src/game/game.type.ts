@@ -1,5 +1,5 @@
 export interface GameData {
-  state: string;
+  state: string ;
   [key: string]: any;
 }
 
