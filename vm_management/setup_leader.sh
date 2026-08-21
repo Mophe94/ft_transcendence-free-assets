@@ -97,6 +97,7 @@ log_wait() {
 # ---------------------------------------------------------------------------
 # Safeguard
 # ---------------------------------------------------------------------------
+
 set -e
 
 if [ $# -ne 3 ]; then
@@ -126,7 +127,7 @@ TAILSCALE_IP_FILE="/etc/tailscale_ip"
 log_info "VM IP: ${IP}"
 
 # ---------------------------------------------------------------------------
-# Resize root partition
+# Resize Root Partition
 # ---------------------------------------------------------------------------
 
 if [ "$RESIZE_DISK" = "true" ]; then
@@ -140,7 +141,7 @@ if [ "$RESIZE_DISK" = "true" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Wait for network
+# Wait for Network
 # ---------------------------------------------------------------------------
 
 TIMEOUT=60
@@ -167,7 +168,7 @@ printf '\n' >&4
 printf '\n' >&3
 
 # ---------------------------------------------------------------------------
-# Synchronize system clock
+# Synchronize System Clock
 # ---------------------------------------------------------------------------
 
 log_info "Synchronizing system clock"
@@ -193,7 +194,7 @@ rc-service ntpd start
 date -u
 
 # ---------------------------------------------------------------------------
-# Create user
+# Create User
 # ---------------------------------------------------------------------------
 
 NEW_USER_HOME="/home/$NEW_USER"
@@ -212,7 +213,7 @@ addgroup "$NEW_USER" wheel
 addgroup "$NEW_USER" docker
 
 # ---------------------------------------------------------------------------
-# Configure SSH access
+# Configure SSH Access
 # ---------------------------------------------------------------------------
 
 log_info "Setting up ${NEW_USER} SSH login"
@@ -236,7 +237,7 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# Configure hostname
+# Configure Hostname
 # ---------------------------------------------------------------------------
 
 log_info "Changing VM hostname to: swarmnode.${NEW_USER}"
@@ -244,7 +245,7 @@ log_info "Changing VM hostname to: swarmnode.${NEW_USER}"
 echo "swarmnode.${NEW_USER}" > /etc/hostname
 
 # ---------------------------------------------------------------------------
-# Install utilities
+# Install Utilities
 # ---------------------------------------------------------------------------
 
 log_info "Adding utilities"
@@ -336,7 +337,64 @@ services:
 EOF
 
 cd "${HEADSCALE_DIR}"
-docker compose up -d
+
+# ---------------------------------------------------------------------------
+# Pull Headscale Image
+# ---------------------------------------------------------------------------
+
+log_info "Pulling Headscale image"
+
+PULL_OUTPUT="$(mktemp)"
+
+set +e
+
+docker compose pull headscale >"$PULL_OUTPUT" 2>&1
+PULL_RESULT=$?
+
+set -e
+
+if [ "$PULL_RESULT" -ne 0 ]; then
+    log_error "Failed to pull Headscale image"
+    cat "$PULL_OUTPUT" >&4
+    cat "$PULL_OUTPUT" >&3
+    rm -f "$PULL_OUTPUT"
+    exit "$PULL_RESULT"
+fi
+
+rm -f "$PULL_OUTPUT"
+
+log_info "Headscale image ready"
+
+# ---------------------------------------------------------------------------
+# Start Headscale
+# ---------------------------------------------------------------------------
+
+log_info "Starting Headscale"
+
+COMPOSE_OUTPUT="$(mktemp)"
+
+set +e
+
+docker compose up -d >"$COMPOSE_OUTPUT" 2>&1
+COMPOSE_RESULT=$?
+
+set -e
+
+if [ "$COMPOSE_RESULT" -ne 0 ]; then
+    log_error "Failed to start Headscale"
+    cat "$COMPOSE_OUTPUT" >&4
+    cat "$COMPOSE_OUTPUT" >&3
+    rm -f "$COMPOSE_OUTPUT"
+    exit "$COMPOSE_RESULT"
+fi
+
+rm -f "$COMPOSE_OUTPUT"
+
+log_info "Headscale container started"
+
+# ---------------------------------------------------------------------------
+# Wait for Headscale
+# ---------------------------------------------------------------------------
 
 TIMEOUT=60
 ELAPSED=0
@@ -362,8 +420,10 @@ done
 printf '\n' >&4
 printf '\n' >&3
 
+log_info "Headscale is ready"
+
 # ---------------------------------------------------------------------------
-# Create Headscale user
+# Create Headscale User
 # ---------------------------------------------------------------------------
 
 log_info "Creating Headscale user"
@@ -397,7 +457,7 @@ echo "${AUTH_KEY}" > /etc/headscale_authkey
 chmod 600 /etc/headscale_authkey
 
 # ---------------------------------------------------------------------------
-# Register leader in Tailscale
+# Register Leader in Tailscale
 # ---------------------------------------------------------------------------
 
 log_info "Registering leader in Tailscale"
@@ -432,7 +492,7 @@ echo "/nfs-storage *(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
 exportfs -ra
 
 # ---------------------------------------------------------------------------
-# Configure server certificates
+# Configure Server Certificates
 # ---------------------------------------------------------------------------
 
 log_info "Setting up certificate directory"
@@ -446,7 +506,7 @@ chmod +x /cert_rootCA.sh
 bash /cert_rootCA.sh "${CERT_DIR}" "${TAILSCALE_IP}"
 
 # ---------------------------------------------------------------------------
-# Configure Docker startup dependency
+# Configure Docker Startup Dependency
 # ---------------------------------------------------------------------------
 
 log_info "Configuring Docker startup dependency on Tailscale"
@@ -462,7 +522,7 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# Configure Docker daemon
+# Configure Docker Daemon
 # ---------------------------------------------------------------------------
 
 log_info "Setting up Docker daemon"
@@ -512,7 +572,7 @@ fi
 log_info "VM IP: ${IP}"
 
 # ---------------------------------------------------------------------------
-# Display setup information
+# Display Setup Information
 # ---------------------------------------------------------------------------
 
 log_info "Setup complete"
@@ -526,7 +586,7 @@ cat /etc/headscale_authkey
 echo "--------------------------------"
 
 # ---------------------------------------------------------------------------
-# Configure login welcome message
+# Configure Login Welcome Message
 # ---------------------------------------------------------------------------
 
 log_info "Configuring login welcome message"
