@@ -6,7 +6,9 @@ LOGS_LOCATION="${LOGS_LOCATION:-"."}/${SCRIPT_NAME%.sh}"
 LOG_FILE="${LOGS_LOCATION}/${SCRIPT_NAME%.sh}_$(date '+%Y-%m-%d_%H-%M-%S').log"
 
 
-# Utils
+# ---------------------------------------------------------------------------
+# Utilities
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -26,18 +28,20 @@ exec 3>>"$LOG_FILE"
 # File descriptor 4: terminal
 exec 4>&1
 
-# Log everything else to the log AND terminal.
+# Log everything else to the log and terminal
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 log_info() {
     local message="$*"
     local timestamp
     timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
     printf '%b[INFO]%b[%s] %s\n' \
         "$COLOR_GREEN" \
         "$COLOR_RESET" \
         "$SCRIPT_NAME" \
         "$message" >&4
+
     printf '[INFO][%s][%s] %s\n' \
         "$timestamp" \
         "$SCRIPT_NAME" \
@@ -48,11 +52,13 @@ log_warn() {
     local message="$*"
     local timestamp
     timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
     printf '%b[WARN]%b[%s] %s\n' \
         "$COLOR_ORANGE" \
         "$COLOR_RESET" \
         "$SCRIPT_NAME" \
         "$message" >&4
+
     printf '[WARN][%s][%s] %s\n' \
         "$timestamp" \
         "$SCRIPT_NAME" \
@@ -63,16 +69,22 @@ log_error() {
     local message="$*"
     local timestamp
     timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
     printf '%b[ERROR]%b[%s] %s\n' \
         "$COLOR_RED" \
         "$COLOR_RESET" \
         "$SCRIPT_NAME" \
         "$message" >&4
+
     printf '[ERROR][%s][%s] %s\n' \
         "$timestamp" \
         "$SCRIPT_NAME" \
         "$message" >&3
 }
+
+# ---------------------------------------------------------------------------
+# SSH
+# ---------------------------------------------------------------------------
 
 wait_for_ssh() {
     set +e
@@ -82,7 +94,7 @@ wait_for_ssh() {
     local status
     local result
 
-    log_info "Waiting for VM to boot."
+    log_info "Waiting for VM to boot"
 
     while :; do
         status=$(
@@ -100,25 +112,25 @@ wait_for_ssh() {
 
         if [ "$result" -eq 0 ]; then
             printf '\n'
-            log_info "VM SSH connection established."
+            log_info "VM SSH connection established"
             break
         fi
 
         if [ "$result" -eq 255 ] &&
            [[ "$status" == *"Permission denied"* ]]; then
             printf '\n'
-            log_info "VM SSH server is available."
+            log_info "VM SSH server is available"
             break
         fi
 
-        printf '.'
+        printf '.' >&4
         sleep "$interval"
 
         timeout=$((timeout - 1))
 
         if [ "$timeout" -eq 0 ]; then
             printf '\n'
-            log_error "Timed out waiting for VM SSH."
+            log_error "Timed out waiting for VM SSH"
             set -e
             exit 1
         fi
@@ -126,6 +138,10 @@ wait_for_ssh() {
 
     set -e
 }
+
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
 
 get_env_value() {
     local wanted_key="$1"
@@ -153,6 +169,10 @@ get_env_value() {
     return 1
 }
 
+# ---------------------------------------------------------------------------
+# SSH Key Bootstrap
+# ---------------------------------------------------------------------------
+
 bootstrap_ssh_key() {
     local root_password
     local pub_key_content
@@ -168,7 +188,7 @@ bootstrap_ssh_key() {
         exit 1
     fi
 
-    log_info "Installing SSH key..."
+    log_info "Installing SSH key"
 
     pub_key_content="$(cat "$PUB_KEY")"
 
@@ -213,6 +233,10 @@ EOF
     log_info "SSH key installed"
 }
 
+# ---------------------------------------------------------------------------
+# Node Setup
+# ---------------------------------------------------------------------------
+
 run_setup_script() {
     local user_password
 
@@ -226,7 +250,7 @@ run_setup_script() {
         exit 1
     fi
 
-    log_info "Running setup_${TYPE}.sh..."
+    log_info "Running setup_${TYPE}.sh"
 
     printf '%s\n' "$user_password" |
         ssh \
@@ -244,8 +268,9 @@ run_setup_script() {
 }
 
 # ---------------------------------------------------------------------------
-# Safeguard
+# Validation
 # ---------------------------------------------------------------------------
+
 set -euo pipefail
 
 if [ $# -eq 2 ]; then
@@ -258,11 +283,13 @@ if [ $# -eq 2 ]; then
 
     HOST_IP="$2"
 else
-    log_error "Invalid argument."
+    log_error "Invalid argument"
     exit 1
 fi
 
-# Set script variable
+# ---------------------------------------------------------------------------
+# Script Configuration
+# ---------------------------------------------------------------------------
 
 # SSH
 SSH_KEY_NAME="transcendence_node"
@@ -276,15 +303,15 @@ VM_USER="$USER"
 VM_TARGET_DIR="/home/$USER"
 CONFIG_FILE="${ENV_FILE:-}"
 
-# Default values for VM
+# Default VM directories
 using_defaults=false
 DEFAULT_BASE_DIR="$HOME/sgoinfre/students/stempels/"
 DEFAULT_VM_DIR="$HOME/goinfre/"
 
-# Values for VM base image
+# Base VM image
 BASE_IMG_SIZE=10240
 
-# VM hardware
+# VM Hardware
 RAM_MB=2048
 VRAM_MB=16
 CPUS=2
@@ -294,7 +321,7 @@ VAR="DISK_SIZE_${TYPE^^}"
 DISK_SIZE_MB=${!VAR}
 
 # ---------------------------------------------------------------------------
-# Check if VM already runs / exists
+# Check VM State
 # ---------------------------------------------------------------------------
 
 if VBoxManage showvminfo "$VM_NAME" --machinereadable 2>&1 |
@@ -305,21 +332,21 @@ if VBoxManage showvminfo "$VM_NAME" --machinereadable 2>&1 |
 
 elif VBoxManage showvminfo "$VM_NAME" >/dev/null 2>&1; then
 
-    log_info "$VM_NAME exists..."
+    log_info "$VM_NAME exists"
 
     # Start VM
-    log_info "Starting VM..."
+    log_info "Starting VM"
     VBoxManage startvm "$VM_NAME" --type headless
     wait_for_ssh
 
 elif [ -f "$VM_DIR/$VM_NAME/$VM_NAME.vbox" ]; then
 
-    log_warn "$VM_NAME exists but is not registered. Registering now..."
+    log_warn "$VM_NAME exists but is not registered. Registering now"
 
     VBoxManage registervm "$VM_DIR/$VM_NAME/$VM_NAME.vbox"
 
     # Start VM
-    log_info "Starting VM..."
+    log_info "Starting VM"
     VBoxManage startvm "$VM_NAME" --type headless
     wait_for_ssh
 
@@ -327,15 +354,15 @@ else
     VM_USER="root"
 
     # -----------------------------------------------------------------------
-    # Get config argument and set default value if missing
+    # Load Configuration
     # -----------------------------------------------------------------------
 
     if [ ! -f "$CONFIG_FILE" ]; then
         using_defaults=true
-        log_warn "$CONFIG_FILE not found."
+        log_warn "$CONFIG_FILE not found"
 
     else
-        log_info "$CONFIG_FILE found."
+        log_info "$CONFIG_FILE found"
 
         while IFS='=' read -r key value; do
             case "$key" in
@@ -350,16 +377,16 @@ else
 
         if [ -z "${BASE_DIR:-}" ] || [ -z "${VM_DIR:-}" ]; then
             using_defaults=true
-            log_warn "Variable missing in configuration file."
+            log_warn "Variable missing in configuration file"
         fi
     fi
 
     # -----------------------------------------------------------------------
-    # Prompt for default value usage
+    # Apply Default Configuration
     # -----------------------------------------------------------------------
 
     if [ "$using_defaults" == true ]; then
-        log_warn "Using default values."
+        log_warn "Using default values"
 
         BASE_DIR="$DEFAULT_BASE_DIR"
         VM_DIR="$DEFAULT_VM_DIR"
@@ -371,17 +398,17 @@ else
 
         case "${answer,,}" in
             [y]|[yes])
-                log_info "Proceeding with default values."
+                log_info "Proceeding with default values"
                 ;;
             *)
-                log_warn "Aborted."
+                log_warn "Aborted"
                 exit 1
                 ;;
         esac
     fi
 
     # -----------------------------------------------------------------------
-    # Validate the values
+    # Validate Configuration
     # -----------------------------------------------------------------------
 
     if [ ! -d "$BASE_DIR" ] || [ ! -d "$VM_DIR" ]; then
@@ -400,7 +427,7 @@ else
     # Create VM
     # -----------------------------------------------------------------------
 
-    log_info "Creating VM..."
+    log_info "Creating VM"
 
     VBoxManage createvm \
         --name "$VM_NAME" \
@@ -411,7 +438,7 @@ else
     # Configure VM
     # -----------------------------------------------------------------------
 
-    log_info "Configuring VM..."
+    log_info "Configuring VM"
 
     VBoxManage modifyvm "$VM_NAME" \
         --memory "$RAM_MB" \
@@ -432,10 +459,10 @@ else
         --graphicscontroller vmsvga
 
     # -----------------------------------------------------------------------
-    # Create Disk
+    # Create Virtual Disk
     # -----------------------------------------------------------------------
 
-    log_info "Creating virtual disk..."
+    log_info "Creating virtual disk"
 
     mkdir -p "$VM_DIR/$VM_NAME"
 
@@ -446,7 +473,7 @@ else
     resize_disk=false
 
     if [ "$DISK_SIZE_MB" -gt "$BASE_IMG_SIZE" ]; then
-        log_info "Resizing disk to ${DISK_SIZE_MB} MB..."
+        log_info "Resizing disk to ${DISK_SIZE_MB} MB"
 
         VBoxManage modifymedium disk \
             "$VM_DIR/$VM_NAME/$VM_NAME.vdi" \
@@ -456,16 +483,16 @@ else
     fi
 
     # -----------------------------------------------------------------------
-    # Storage Controllers
+    # Configure Storage
     # -----------------------------------------------------------------------
 
-    log_info "Adding storage controllers..."
+    log_info "Adding storage controllers"
 
     VBoxManage storagectl "$VM_NAME" \
         --name "SATA Controller" \
         --add sata
 
-    log_info "Attaching disk..."
+    log_info "Attaching disk"
 
     VBoxManage storageattach "$VM_NAME" \
         --storagectl "SATA Controller" \
@@ -475,10 +502,10 @@ else
         --medium "$VM_DIR/$VM_NAME/$VM_NAME.vdi"
 
     # -----------------------------------------------------------------------
-    # Boot Order
+    # Configure Boot Order
     # -----------------------------------------------------------------------
 
-    log_info "Configuring boot order..."
+    log_info "Configuring boot order"
 
     VBoxManage modifyvm "$VM_NAME" \
         --boot1 disk \
@@ -487,8 +514,10 @@ else
         --boot4 none
 
     # -----------------------------------------------------------------------
-    # Set scalable GUI
+    # Configure GUI Scaling
     # -----------------------------------------------------------------------
+
+    log_info "Configuring GUI scaling"
 
     VBoxManage setextradata "$VM_NAME" \
         --GUI/SCALEMODE "true"
@@ -497,21 +526,21 @@ else
     # Start VM
     # -----------------------------------------------------------------------
 
-    log_info "Starting VM..."
+    log_info "Starting VM"
 
     VBoxManage startvm "$VM_NAME" --type headless
 
     # -----------------------------------------------------------------------
-    # Generate SSH key
+    # Configure SSH Key
     # -----------------------------------------------------------------------
 
-    log_info "Checking SSH key..."
+    log_info "Checking SSH key"
 
     SSH_KEY="$HOME/.ssh/${SSH_KEY_NAME}"
     PUB_KEY="$SSH_KEY.pub"
 
     if [ ! -f "$PUB_KEY" ]; then
-        log_info "Generating SSH key..."
+        log_info "Generating SSH key"
 
         ssh-keygen -t ed25519 \
             -f "$SSH_KEY" \
@@ -520,23 +549,27 @@ else
         log_info "SSH key already exists: $SSH_KEY"
     fi
 
+    # -----------------------------------------------------------------------
+    # Wait for SSH
+    # -----------------------------------------------------------------------
+
     wait_for_ssh
 
     # -----------------------------------------------------------------------
-    # Setup node
+    # Set Up Node
     # -----------------------------------------------------------------------
 
-    log_info "Setting up node..."
+    log_info "Setting up node"
 
     echo "$HOST_IP" > "infra/host_ip.txt"
 
     bootstrap_ssh_key
 
     # -----------------------------------------------------------------------
-    # Copy setup files
+    # Copy Setup Files
     # -----------------------------------------------------------------------
 
-    log_info "Adding needed files..."
+    log_info "Adding needed files"
 
     declare -A BUNDLE
 
@@ -566,15 +599,19 @@ else
         exit "$SCP_RESULT"
     fi
 
+    # -----------------------------------------------------------------------
+    # Run Node Setup
+    # -----------------------------------------------------------------------
+
     run_setup_script
 
     set -e
 
     # -----------------------------------------------------------------------
-    # Wait for SSH to go down
+    # Wait for SSH Restart
     # -----------------------------------------------------------------------
 
-    log_info "Waiting for VM SSH connection to restart..."
+    log_info "Waiting for VM SSH connection to restart"
 
     while ssh \
         -p "$SSH_PORT" \
@@ -588,10 +625,10 @@ else
     done
 
     # -----------------------------------------------------------------------
-    # Switch user
+    # Switch to User
     # -----------------------------------------------------------------------
 
-    log_info "Switching user..."
+    log_info "Switching user"
 
     VM_USER="$USER"
     VM_TARGET_DIR="/home/$USER"
@@ -601,7 +638,7 @@ else
     wait_for_ssh
 
     # -----------------------------------------------------------------------
-    # Copy project files
+    # Copy Project Files
     # -----------------------------------------------------------------------
 
     declare -A PACK
@@ -614,7 +651,7 @@ else
     if ((${#files[@]} == 0)); then
         log_info "No files to copy"
     else
-        log_info "Adding needed files..."
+        log_info "Adding needed files"
 
         set +e
 
@@ -639,4 +676,4 @@ else
     fi
 fi
 
-log_info "Script completed successfully."
+log_info "Script completed successfully"
