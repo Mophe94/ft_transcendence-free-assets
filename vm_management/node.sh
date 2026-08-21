@@ -17,11 +17,14 @@ COLOR_GREEN='\033[32m'
 COLOR_ORANGE='\033[38;5;208m'
 COLOR_RED='\033[31m'
 
-mkdit -p "$LOGS_LOCATION"
+mkdir -p "$LOGS_LOCATION"
 mkdir -p "$(dirname "$LOG_FILE")"
 
-# File descriptor 3 = log file
+# File descriptor 3: log file
 exec 3>>"$LOG_FILE"
+
+# File descriptor 4: terminal
+exec 4>&1
 
 # Log everything else to the log AND terminal.
 exec > >(tee -a "$LOG_FILE") 2>&1
@@ -34,7 +37,7 @@ log_info() {
         "$COLOR_GREEN" \
         "$COLOR_RESET" \
         "$SCRIPT_NAME" \
-        "$message"
+        "$message" >&4
     printf '[INFO][%s][%s] %s\n' \
         "$timestamp" \
         "$SCRIPT_NAME" \
@@ -49,7 +52,7 @@ log_warn() {
         "$COLOR_ORANGE" \
         "$COLOR_RESET" \
         "$SCRIPT_NAME" \
-        "$message"
+        "$message" >&4
     printf '[WARN][%s][%s] %s\n' \
         "$timestamp" \
         "$SCRIPT_NAME" \
@@ -64,7 +67,7 @@ log_error() {
         "$COLOR_RED" \
         "$COLOR_RESET" \
         "$SCRIPT_NAME" \
-        "$message"
+        "$message" >&4
     printf '[ERROR][%s][%s] %s\n' \
         "$timestamp" \
         "$SCRIPT_NAME" \
