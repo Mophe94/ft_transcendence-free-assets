@@ -2,14 +2,14 @@
 # Script
 # ---------------------------------------------------------------------------
 
-SCRIPT_NAME := Vm-Makefile
+SCRIPT_NAME := Infra-Makefile
 LOCATION := $(shell pwd)
 
 # ---------------------------------------------------------------------------
 # Environment
 # ---------------------------------------------------------------------------
 
-ENV_NAME := env_vm
+ENV_NAME := env_infra
 ENV_FILE := $(LOCATION)/.$(ENV_NAME)
 ENV_MK := $(LOCATION)/.$(ENV_NAME).mk
 TEMPLATE := template_$(ENV_NAME)
@@ -18,18 +18,14 @@ TEMPLATE := template_$(ENV_NAME)
 # Paths
 # ---------------------------------------------------------------------------
 
-VM_SCRIPTS := $(LOCATION)/vm_management
-TOOLS_SCRIPTS := $(LOCATION)/tools
 LOGS_LOCATION := $(LOCATION)/logs
-
-# ---------------------------------------------------------------------------
-# VM Configuration
-# ---------------------------------------------------------------------------
-
-IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
-USER_NAME := $(USER)
-TYPE :=
-SSH_PORT := 2222
+BUILD_FILE := $(LOCATION)/docker-compose-build.yml
+DEPLOY_FILES := $(LOCATION)/stacks
+SWARM_UTILS := $(LOCATION)/swarm_utils
+CONFIG_SCRIPTS := $(LOCATION)/swarm_utils/config
+TOOLS_SCRIPTS := $(LOCATION)/swarm_utils/tools
+CONTAINER_FILES := $(LOCATION)/containers
+TEAM_CONTAINER := $(shell dirname "$(LOCATION)")
 
 # ---------------------------------------------------------------------------
 # Environment variables
@@ -37,6 +33,55 @@ SSH_PORT := 2222
 
 include $(ENV_MK)
 export
+
+# ---------------------------------------------------------------------------
+# Host configuration
+# ---------------------------------------------------------------------------
+
+IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src") print $$(i+1)}')
+HOST_IP := $(shell cat host_ip.txt)
+HOST_TAILSCALE_IP := $(shell tailscale ip -4)
+USER_NAME := $(USER)
+
+# ---------------------------------------------------------------------------
+# Images
+# ---------------------------------------------------------------------------
+
+BASE_IMAGES := node-base postgress-base
+WEBSITE_IMAGES := backend
+DATABASE_IMAGES := users_db game_db
+GAME_IMAGES := game redis
+
+ALL_IMAGES := \
+	$(BASE_IMAGES) \
+	$(WEBSITE_IMAGES) \
+	$(DATABASE_IMAGES) \
+	$(GAME_IMAGES)
+
+# ---------------------------------------------------------------------------
+# Build and deployment configuration
+# ---------------------------------------------------------------------------
+
+TAG ?= latest
+REGISTRY ?= $(HOST_TAILSCALE_IP):$(REG_PORT)
+
+BAKE_ARG := \
+	BAKE_ROOT=$(CONTAINER_FILES) \
+	TEAM_CONTAINER=$(TEAM_CONTAINER) \
+	HOST_IP=$(HOST_IP) \
+	REGISTRY=$(REGISTRY) \
+	TAG=$(TAG)
+
+DEPLOY_ARG := \
+	IP=$(IP4) \
+	HOST_IP=$(HOST_IP) \
+	HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) \
+	REGISTRY_PORT=$(REG_PORT) \
+	REGISTRY=$(REGISTRY) \
+	PROM_SCRAPE_PORT=$(PROM_SCRAPE_PORT) \
+	NFS_IP=$(HOST_TAILSCALE_IP)
+
+TARGET :=
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -84,88 +129,328 @@ endef
 # Default target
 # ---------------------------------------------------------------------------
 
-all:
-	@$(MAKE) leader
+all: swarm_launch
 
 # ---------------------------------------------------------------------------
-# VM management
+# Swarm launch
 # ---------------------------------------------------------------------------
 
-vm:
-	@if [ "$(USER)" != "stempels" ]; then \
-		printf '\033[31m[ERROR]\033[0m[%s] %s\n' \
-			"$(SCRIPT_NAME)" \
-			"You are not supposed to use that"; \
+swarm_launch: wait_tailscale
+	@$(MAKE) swarm_setup
+	@$(MAKE) base
+	@$(MAKE) -j4 push
+	@$(MAKE) -j4 website game
+
+# ---------------------------------------------------------------------------
+# Swarm setup
+# ---------------------------------------------------------------------------
+
+swarm_setup:
+	@chmod +x "$(CONFIG_SCRIPTS)/launch_swarm.sh"
+	@"$(CONFIG_SCRIPTS)/launch_swarm.sh" \
+		"$(SWARM_UTILS)" \
+		"$(HOST_IP)" \
+		"$(HOST_TAILSCALE_IP)"
+	@$(MAKE) core
+
+core:
+	@mkdir -p "/registry"
+	@mkdir -p "/nfs-storage/frontend"
+	@doas chown "$(USER):$(USER)" "/nfs-storage/frontend"
+
+	@$(BAKE_ARG) \
+		LOCAL=false \
+		docker buildx bake frontend \
+		-f "$(CONTAINER_FILES)/docker-bake.hcl" \
+		--allow=fs.read="$(TEAM_CONTAINER)" \
+		--allow=fs.write=/nfs-storage/frontend/
+
+	@$(DEPLOY_ARG) \
+		docker stack deploy \
+		--detach=true \
+		-c "$(DEPLOY_FILES)/$@_deploy.yml" \
+		$@
+
+	@chmod +x "$(TOOLS_SCRIPTS)/registry_check.sh"
+
+	@if ! bash "$(TOOLS_SCRIPTS)/registry_check.sh" "$(REGISTRY)"; then \
 		exit 1; \
 	fi
 
-	@if [ ! -f "$(VM_SCRIPTS)/vm.sh" ]; then \
-		printf '\033[31m[ERROR]\033[0m[%s] %s\n' \
-			"$(SCRIPT_NAME)" \
-			"vm.sh file missing"; \
+# ---------------------------------------------------------------------------
+# Image push
+# ---------------------------------------------------------------------------
+
+push:
+	@$(BAKE_ARG) \
+		LOCAL=false \
+		docker buildx bake databases website game \
+		-f "$(CONTAINER_FILES)/docker-bake.hcl" \
+		--allow=fs.read="$(TEAM_CONTAINER)" \
+		--push
+
+# ---------------------------------------------------------------------------
+# Base images
+# ---------------------------------------------------------------------------
+
+base:
+	@$(MAKE) image TARGET=$@
+
+# ---------------------------------------------------------------------------
+# Website stack
+# ---------------------------------------------------------------------------
+
+website:
+	@doas mkdir -p "/var/lib/postgresql/data"
+
+	@$(DEPLOY_ARG) \
+		API_42_CLIENT_ID=$(API_42_CLIENT_ID) \
+		docker stack deploy \
+		--detach=true \
+		-c "$(DEPLOY_FILES)/$@_deploy.yml" \
+		$@
+
+# ---------------------------------------------------------------------------
+# Game stack
+# ---------------------------------------------------------------------------
+
+game:
+	@doas mkdir -p "/var/lib/postgresql/data"
+	@$(MAKE) image TARGET=$@
+
+	@$(DEPLOY_ARG) \
+		docker stack deploy \
+		--detach=true \
+		-c "$(DEPLOY_FILES)/$@_deploy.yml" \
+		$@
+
+# ---------------------------------------------------------------------------
+# Observability stack
+# ---------------------------------------------------------------------------
+
+observ:
+	@mkdir -p "/nfs-storage/grafana/dashboards"
+	@doas cp \
+		"$(CONTAINER_FILES)/grafana/dashboards/"* \
+		"/nfs-storage/grafana/dashboards/"
+	@doas chown -R \
+		"$(GRAFANA_UID):$(GRAFANA_GID)" \
+		"/nfs-storage/grafana"
+
+	@mkdir -p "/nfs-storage/prometheus"
+	@doas chown -R \
+		"$(PROMETHEUS_UID):$(PROMETHEUS_GID)" \
+		"/nfs-storage/prometheus"
+
+	@mkdir -p "/nfs-storage/loki"
+	@doas chown -R \
+		"$(LOKI_UID):$(LOKI_GID)" \
+		"/nfs-storage/loki"
+
+	@$(DEPLOY_ARG) \
+		docker stack deploy \
+		--detach=true \
+		-c "$(DEPLOY_FILES)/$@_deploy.yml" \
+		$@
+
+# ---------------------------------------------------------------------------
+# Stack management
+# ---------------------------------------------------------------------------
+
+up: build
+	@$(DEPLOY_ARG) \
+		docker stack deploy \
+		--detach=true \
+		-c "$(DEPLOY_FILES)/$@_deploy.yml" \
+		$@
+
+down:
+	@stacks="$$(docker stack ls --format '{{.Name}}')"; \
+	if [ -n "$$stacks" ]; then \
+		echo "$$stacks" | xargs docker stack rm; \
+	else \
+		echo "[INFO] No stacks to remove"; \
+	fi
+
+# ---------------------------------------------------------------------------
+# Swarm shutdown
+# ---------------------------------------------------------------------------
+
+swarm_down: down
+	@chmod +x "$(CONFIG_SCRIPTS)/end_swarm.sh"
+	@"$(CONFIG_SCRIPTS)/end_swarm.sh"
+	@docker swarm leave --force
+
+# ---------------------------------------------------------------------------
+# Swarm status
+# ---------------------------------------------------------------------------
+
+swarm-status:
+	@if ! docker info >/dev/null 2>&1; then \
+		echo "Docker daemon unavailable"; \
+	elif [ "$$(docker info --format '{{.Swarm.LocalNodeState}}')" = "active" ]; then \
+		echo "Swarm status: active"; \
+	else \
+		echo "Swarm status: inactive"; \
+	fi
+
+# ---------------------------------------------------------------------------
+# Node management
+# ---------------------------------------------------------------------------
+
+addnode:
+	@if read -r -t 15 -p \
+		"[$(SCRIPT_NAME)] Node user(s) you want to add: " answer || false; then \
+		[ -n "$$answer" ] && \
+		chmod +x "$(CONFIG_SCRIPTS)/add_node.sh" && \
+		bash "$(CONFIG_SCRIPTS)/add_node.sh" \
+			"$(HOST_IP)" \
+			"$(HOST_TAILSCALE_IP)" \
+			$$answer; \
+	else \
+		echo "[$(SCRIPT_NAME)] No node added"; \
+	fi
+
+# ---------------------------------------------------------------------------
+# Image management
+# ---------------------------------------------------------------------------
+
+image:
+	@case "$(TARGET)" in \
+		base) \
+			IMAGES="$(BASE_IMAGES)";; \
+		website) \
+			IMAGES="$(WEBSITE_IMAGES)";; \
+		databases) \
+			IMAGES="$(DATABASE_IMAGES)";; \
+		game) \
+			IMAGES="$(GAME_IMAGES)";; \
+		*) \
+			echo "Unknown target $(TARGET)"; \
+			exit 1;; \
+	esac; \
+	MISSING=0; \
+	MISSING_TARGETS=""; \
+	for img in $$IMAGES; do \
+		if doas docker manifest inspect \
+			"$(REGISTRY)/$$img:$(TAG)" >/dev/null 2>&1; then \
+			echo "Image $(REGISTRY)/$$img:$(TAG) exists, skip build"; \
+		else \
+			echo "Image $(REGISTRY)/$$img:$(TAG) not found, building"; \
+			MISSING=1; \
+			MISSING_TARGETS="$$MISSING_TARGETS $$img"; \
+		fi; \
+	done; \
+	if [ $$MISSING -eq 1 ]; then \
+		echo "Building missing images for $(TARGET)"; \
+		$(BAKE_ARG) \
+			docker buildx bake $$MISSING_TARGETS \
+			-f "$(CONTAINER_FILES)/docker-bake.hcl" \
+			--push; \
+	else \
+		echo "All images for $(TARGET) already exist"; \
+	fi
+
+img_del:
+	@if [ ! -f "$(TOOLS_SCRIPTS)/registry_delete_img.sh" ]; then \
+		$(call LOG_ERROR,Missing script: registry_delete_img.sh); \
 		exit 1; \
 	fi
 
-	@chmod +x "$(VM_SCRIPTS)/vm.sh"
-	@bash "$(VM_SCRIPTS)/vm.sh"
-
-# ---------------------------------------------------------------------------
-# Dependency installation
-# ---------------------------------------------------------------------------
-
-install_deps:
-	$(call LOG_INFO,Installing site dependencies)
-	@cd site && \
-		rm -rf dist node_modules package-lock.json && \
-		npm install --package-lock-only
-
-	$(call LOG_INFO,Installing backend dependencies)
-	@cd backend && \
-		rm -rf dist node_modules package-lock.json && \
-		npm install --package-lock-only
-
-# ---------------------------------------------------------------------------
-# Node setup
-# ---------------------------------------------------------------------------
-
-setup_node:
-	@mkdir -p "$(LOGS_LOCATION)"
-
-	@ssh-keygen \
-		-f "/home/$(USER)/.ssh/known_hosts" \
-		-R "[localhost]:2222"
-
-	@if [ ! -f "$(VM_SCRIPTS)/node.sh" ]; then \
-		printf '\033[31m[ERROR]\033[0m[%s] %s\n' \
-			"$(SCRIPT_NAME)" \
-			"node.sh file missing"; \
+	@if [ -z "$(IMAGE)" ]; then \
+		$(call LOG_ERROR,Usage: make img_del IMAGE=<image>); \
 		exit 1; \
 	fi
 
-	@chmod +x "$(VM_SCRIPTS)/node.sh"
-	@bash "$(VM_SCRIPTS)/node.sh" "$(TYPE)" "$(IP4)"
+	@if [ -z "$(TAG)" ]; then \
+		$(call LOG_ERROR,TAG is required); \
+		exit 1; \
+	fi
+
+	@chmod +x "$(TOOLS_SCRIPTS)/registry_delete_img.sh"
+	@"$(TOOLS_SCRIPTS)/registry_delete_img.sh" \
+		"$(REGISTRY)" \
+		"$(IMAGE):$(TAG)"
+
+img_del_stack:
+	@if [ ! -f "$(TOOLS_SCRIPTS)/registry_delete_img.sh" ]; then \
+		$(call LOG_ERROR,Missing script: registry_delete_img.sh); \
+		exit 1; \
+	fi
+
+	@if [ -z "$(TARGET)" ]; then \
+		$(call LOG_ERROR,Usage: make img_del_stack TARGET=<target>); \
+		exit 1; \
+	fi
+
+	@if [ -z "$(TAG)" ]; then \
+		$(call LOG_ERROR,TAG is required); \
+		exit 1; \
+	fi
+
+	@case "$(TARGET)" in \
+		base) \
+			IMAGES="$(BASE_IMAGES)";; \
+		website) \
+			IMAGES="$(WEBSITE_IMAGES)";; \
+		databases) \
+			IMAGES="$(DATABASE_IMAGES)";; \
+		game) \
+			IMAGES="$(GAME_IMAGES)";; \
+		*) \
+			echo "Unknown target $(TARGET)"; \
+			exit 1;; \
+	esac; \
+	chmod +x "$(TOOLS_SCRIPTS)/registry_delete_img.sh"; \
+	for img in $$IMAGES; do \
+		echo "Deleting image $(REGISTRY)/$$img:$(TAG)"; \
+		"$(TOOLS_SCRIPTS)/registry_delete_img.sh" \
+			"$(REGISTRY)" \
+			"$$img:$(TAG)" || exit 1; \
+	done
+
+img_del_all:
+	@if [ ! -f "$(TOOLS_SCRIPTS)/registry_delete_img.sh" ]; then \
+		$(call LOG_ERROR,Missing script: registry_delete_img.sh); \
+		exit 1; \
+	fi
+
+	@if [ -z "$(ALL_IMAGES)" ]; then \
+		$(call LOG_ERROR,No images configured); \
+		exit 1; \
+	fi
+
+	@if [ -z "$(TAG)" ]; then \
+		$(call LOG_ERROR,TAG is required); \
+		exit 1; \
+	fi
+
+	@chmod +x "$(TOOLS_SCRIPTS)/registry_delete_img.sh"
+
+	@for img in $(ALL_IMAGES); do \
+		echo "Deleting image $(REGISTRY)/$$img:$(TAG)"; \
+		"$(TOOLS_SCRIPTS)/registry_delete_img.sh" \
+			"$(REGISTRY)" \
+			"$$img:$(TAG)" || exit 1; \
+	done
 
 # ---------------------------------------------------------------------------
-# Leader
+# Tailscale
 # ---------------------------------------------------------------------------
 
-leader: install_deps
-	@$(MAKE) setup_node TYPE="leader"
-	@ssh -tt \
-		-p$(SSH_PORT) \
-		"$(USER)@localhost" \
-		"cd /home/$(USER)/infra && make && /bin/bash"
-
-# ---------------------------------------------------------------------------
-# Worker
-# ---------------------------------------------------------------------------
-
-worker:
-	@$(MAKE) setup_node TYPE="worker"
-	@ssh -tt \
-		-p$(SSH_PORT) \
-		"$(USER)@localhost" \
-		"/bin/bash"
+wait_tailscale:
+	@TIMEOUT=60; \
+	INTERVAL=1; \
+	ELAPSED=0; \
+	until IP=$$(tailscale ip -4 2>/dev/null) && [ -n "$$IP" ]; do \
+		sleep $$INTERVAL; \
+		ELAPSED=$$((ELAPSED+INTERVAL)); \
+		if [ "$$ELAPSED" -ge "$$TIMEOUT" ]; then \
+			$(call LOG_ERROR,Headscale failed to become ready); \
+			docker logs headscale; \
+			exit 1; \
+		fi; \
+	done
 
 # ---------------------------------------------------------------------------
 # Environment makefile
@@ -174,9 +459,7 @@ worker:
 $(ENV_MK): $(ENV_FILE)
 	@if [ ! -f "$(TOOLS_SCRIPTS)/create_env.sh" ] || \
 		[ ! -f "$(TOOLS_SCRIPTS)/check_env.sh" ]; then \
-		printf '\033[31m[ERROR]\033[0m[%s] %s\n' \
-			"$(SCRIPT_NAME)" \
-			"Missing env handlers"; \
+		$(call LOG_ERROR,Missing env handlers); \
 		exit 1; \
 	fi
 
@@ -192,29 +475,11 @@ $(ENV_MK): $(ENV_FILE)
 
 $(ENV_FILE):
 	@if [ -f "$(TEMPLATE)" ]; then \
-		mkdir -p "$(LOGS_LOCATION)"; \
-		timestamp="$$(date '+%Y-%m-%d %H:%M:%S')"; \
-		printf '\033[32m[INFO]\033[0m[%s] %s\n' \
-			"$(SCRIPT_NAME)" \
-			"Creating $(ENV_FILE) file, please set all variables"; \
-		printf '[INFO][%s][%s] %s\n' \
-			"$$timestamp" \
-			"$(SCRIPT_NAME)" \
-			"Creating $(ENV_FILE) file, please set all variables" \
-			>> "$(LOG_FILE)"; \
+		$(call LOG_INFO,Creating $(ENV_FILE) file, please set all variables); \
 		cp "$(TEMPLATE)" "$(ENV_FILE)"; \
 		vim -c 'set shortmess+=I' "$(ENV_FILE)"; \
 	else \
-		mkdir -p "$(LOGS_LOCATION)"; \
-		timestamp="$$(date '+%Y-%m-%d %H:%M:%S')"; \
-		printf '\033[31m[ERROR]\033[0m[%s] %s\n' \
-			"$(SCRIPT_NAME)" \
-			"Template_env file missing, you will need to create $(ENV_FILE) file yourself. See READ_ME for how to do it"; \
-		printf '[ERROR][%s][%s] %s\n' \
-			"$$timestamp" \
-			"$(SCRIPT_NAME)" \
-			"Template_env file missing, you will need to create $(ENV_FILE) file yourself. See READ_ME for how to do it" \
-			>> "$(LOG_FILE)"; \
+		$(call LOG_ERROR,Template_env file missing, create $(ENV_FILE) manually. See READ_ME for instructions); \
 		exit 1; \
 	fi
 
@@ -222,10 +487,32 @@ $(ENV_FILE):
 # Cleanup
 # ---------------------------------------------------------------------------
 
-.PHONY: all \
-	vm \
-	install_deps \
-	setup_node \
-	leader \
-	worker \
-	vm_erase
+fclean:
+	@docker stack rm core website game observ
+	@docker system prune -af --volumes
+
+# ---------------------------------------------------------------------------
+# Phony targets
+# ---------------------------------------------------------------------------
+
+.PHONY: \
+	all \
+	swarm_launch \
+	swarm_setup \
+	core \
+	push \
+	base \
+	website \
+	game \
+	observ \
+	up \
+	down \
+	swarm_down \
+	swarm-status \
+	addnode \
+	image \
+	img_del \
+	img_del_stack \
+	img_del_all \
+	wait_tailscale \
+	fclean
