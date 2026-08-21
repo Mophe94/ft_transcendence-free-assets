@@ -202,7 +202,6 @@ export class GameService {
     // --- end AI takeover ---
     /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
     if (!player?.isBot) {
-      console.log("IḾ NOT A BOT!!!");
       const playerState = await this.redisStateService.getStatePlayer(userId);
       if (playerState) {
         const monsterCatch = playerState.monsterCatch;
@@ -305,7 +304,6 @@ export class GameService {
       const winnerId = [...active][0];
       if (winnerId) {
         const player = this.playerService.getPlayer(winnerId);
-        console.log("WINNER: ", winnerId, player?.uid );
         await this.deleteEndGame(roomId, winnerId);
       }
       console.log('Game rooms end game: ', this.gameRooms);
@@ -320,7 +318,6 @@ export class GameService {
     console.log(
       `[GameService] Eliminating player ${userId} from room ${roomId}`,
     );
-    // IF BOT?
     const player = this.playerService.getPlayer(userId);
     if (player?.isBot) {
       await this.onGodotDisconnected(userId, roomId);
@@ -348,9 +345,8 @@ export class GameService {
       const player = this.playerService.getPlayer(id);
 
       /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
-      console.log
+      console.log("ABORTED GAME");
       if (player && !player.isBot) {
-        console.log("ABORTED GAME NOT A BOT BUT NOT IN A RIGHT WAY");
         const playerState = await this.redisStateService.getStatePlayer(id);
         if (playerState) {
           const monsterCatch = playerState.monsterCatch;
@@ -381,11 +377,11 @@ export class GameService {
     this.roomIdByPlayer.delete(winnerId);
     this.combatService.playerCombatRoom.delete(winnerId);
 
+    console.log("ENDGAME");
+
     /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
     const playerState = await this.redisStateService.getStatePlayer(winnerId);
     if (playerState && !playerState.isBot) {
-      console.log("ENDGAME NOT A BOT BUT NOT IN A RIGHT WAY");
-
       if (playerState) {
         const monsterCatch = playerState.monsterCatch;
         const win = playerState.win;
@@ -656,7 +652,7 @@ export class GameService {
       if (player.status === 'loser')
         await this.eliminatePlayer(player.id, roomId);
       if (player.status === 'winner' && player.roundsRemaining === 0)
-        await this.eliminatePlayer(player.id, roomId);
+        this.eventEmitter.emit('close_player_socket', { userId: player.id });
       return;
     }
 
@@ -745,7 +741,9 @@ export class GameService {
         console.log('Unknow state:', state);
     }
     if (result) this.sendToPlayer(userId, result);
+    
     const playerState = this.playerService.getPlayer(userId);
+
     if (playerState)
       await this.redisStateService.updateStatePlayer(userId, playerState);
   }
@@ -937,15 +935,17 @@ export class GameService {
     // WINNER SCENE -END OF GAME
     if (winner.roundsRemaining === 0) {
       winner.win = true;
-      console.log("WINNER FINALIZE BATTLE")
       this.sendToPlayer(winner.id, {
       event: 'game',
       data: { state: 'finish' },
       });
     }
 
-/*     await this.redisStateService.updateStatePlayer(loser.id, loser);
-    await this.redisStateService.updateStatePlayer(winner.id, winner); */
+    await this.redisStateService.updateStatePlayer(loser.id, loser);
+    await this.redisStateService.updateStatePlayer(winner.id, winner);
+    
+    loser.duelFinished = true;
+    if (winner.isBot) winner.duelFinished = true;
 
     if (loser.isBot) {
       const loserBotRoomId = this.roomIdByPlayer.get(loser.id);
@@ -955,9 +955,6 @@ export class GameService {
         )
       }
     }
-
-    loser.duelFinished = true;
-    if (winner.isBot) winner.duelFinished = true;
 
     // reinitialize winner
     winner.resetAfterRound();
