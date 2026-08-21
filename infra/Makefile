@@ -1,6 +1,18 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2026/08/21 17:35:19 by stempels          #+#    #+#              #
+#    Updated: 2026/08/21 17:47:37 by stempels         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 SCRIPT_NAME:=Infra-Makefile
 LOCATION := $(shell pwd)
-TEAM_CONTAINER:=$(shell dirname "$(LOCATION)")
+LOGS_LOCATION:=$(LOCATION)/logs
 
 # Environment files
 ENV_NAME:=env_infra
@@ -15,6 +27,7 @@ SWARM_UTILS = $(LOCATION)/swarm_utils
 CONFIG_SCRIPTS = $(LOCATION)/swarm_utils/config
 TOOLS_SCRIPTS = $(LOCATION)/swarm_utils/tools
 CONTAINER_FILES:=$(LOCATION)/containers
+TEAM_CONTAINER:=$(shell dirname "$(LOCATION)")
 
 include $(ENV_MK)
 export
@@ -25,12 +38,23 @@ HOST_IP:= $(shell cat host_ip.txt)
 HOST_TAILSCALE_IP = $(shell tailscale ip -4)
 USER_NAME:=$(USER)
 
+# Images handling
+BASE_IMAGES      := node-base postgress-base
+WEBSITE_IMAGES   := backend
+DATABASE_IMAGES  := users_db game_db
+GAME_IMAGES      := game redis
+ALL_IMAGES := $(BASE_IMAGES) \
+              $(WEBSITE_IMAGES) \
+              $(DATABASE_IMAGES) \
+              $(GAME_IMAGES)
+
 # Miscellanious
 TAG ?= latest
 REGISTRY?=$(HOST_TAILSCALE_IP):$(REG_PORT)
 BAKE_ARG = BAKE_ROOT=$(CONTAINER_FILES) TEAM_CONTAINER=$(TEAM_CONTAINER) HOST_IP=$(HOST_IP) REGISTRY=$(REGISTRY) TAG=$(TAG)
 DEPLOY_ARG= IP=$(IP4) HOST_IP=$(HOST_IP) HOST_TAILSCALE_IP=$(HOST_TAILSCALE_IP) REGISTRY_PORT=$(REG_PORT) PROM_SCRAPE_PORT=$(PROM_SCRAPE_PORT) NFS_IP=$(HOST_TAILSCALE_IP)
 TARGET=""
+
 
 all: swarm_launch
 
@@ -46,6 +70,7 @@ swarm_setup:
 	@$(MAKE) core
 	
 core:
+	@mkdir -p "/registry"
 	@mkdir -p "/nfs-storage/frontend"
 	@doas chown "$(USER):$(USER)" /nfs-storage/frontend
 	@$(BAKE_ARG) LOCAL=false docker buildx bake frontend -f $(CONTAINER_FILES)/docker-bake.hcl --allow=fs.read=$(TEAM_CONTAINER) --allow=fs.write=/nfs-storage/frontend/
@@ -85,9 +110,17 @@ up: build
 	@$(DEPLOY_ARG) docker stack deploy --detach=true -c $(DEPLOY_FILES)/$@_deploy.yml $@
 
 down:
+	@stacks="$$(docker stack ls --format '{{.Name}}')"; \
+	if [ -n "$$stacks" ]; then \
+		echo "$$stacks" | xargs docker stack rm; \
+	else \
+		echo "[INFO] No stacks to remove"; \
+	fi
+
+swarm_down: down
 	@chmod 777 $(CONFIG_SCRIPTS)/end_swarm.sh:wq
 	@$(CONFIG_SCRIPTS)/end_swarm.sh
-	@$(MAKE) --no-print-directory swarm-status
+	@docker swarm leave --force
 
 swarm-status:
 	@if ! docker info >/dev/null 2>&1; then \
@@ -99,24 +132,21 @@ swarm-status:
 	fi
 
 addnode:
-	@read -r -t 15 -p "[$(SCRIPT_NAME)] Do you want to add more nodes (y/N): " answer || true; \
-	case "$$(printf '%s' "$$answer" | tr '[:upper:]' '[:lower:]')" in \
-		y|yes) \
-			read -r -t 15 -p "[$(SCRIPT_NAME)] Node user(s): " answer || true; \
-			[ -n "$$answer" ] && \
-				chmod +x "$(CONFIG_SCRIPTS)/add_node.sh" && \
-				bash "$(CONFIG_SCRIPTS)/add_node.sh" "$(HOST_IP)" $$answer ;; \
-		*) \
-			echo "[$(SCRIPT_NAME)] No node added" ;; \
-	esac
+	@if read -r -t 15 -p "[$(SCRIPT_NAME)] Node user(s) you want to add: " answer || false; then \
+                [ -n "$$answer" ] && \
+                chmod +x "$(CONFIG_SCRIPTS)/add_node.sh" && \
+                bash "$(CONFIG_SCRIPTS)/add_node.sh" "$(HOST_IP)" "$(HOST_TAILSCALE_IP)" $$answer; \
+        else \
+                echo "[$(SCRIPT_NAME)] No node added"; \
+        fi
 
 image:
 	@case "$(TARGET)" in \
-	    base) IMAGES="node-base postgress-base";; \
-	    website) IMAGES="backend ";; \
-	    databases) IMAGES="users_db game_db";; \
-	    game) IMAGES="game redis";; \
-	    *) echo "Unknown target $(TARGET)"; exit 1;; \
+		base) IMAGES="$(BASE_IMAGES)";; \
+		website) IMAGES="$(WEBSITE_IMAGES)";; \
+		databases) IMAGES="$(DATABASE_IMAGES)";; \
+		game) IMAGES="$(GAME_IMAGES)";; \
+		*) echo "Unknown target $(TARGET)"; exit 1;; \
 	esac; \
 	MISSING=0; \
 	MISSING_TARGETS=""; \
@@ -135,6 +165,67 @@ image:
 	else \
 	    echo "All images for $(TARGET) already exist"; \
 	fi
+
+img_del:
+	@if [ ! -f $(TOOLS_SCRIPTS)/registry_delete_img.sh ]; then \
+                 echo "[$(SCRIPT_NAME)] Missing script: registry_delete_img.sh"; \
+                 exit 1; \
+        fi
+	@if [ -z "$(IMAGE)" ]; then \
+                 echo "[ERROR] Usage: make registry-delete IMAGE=<image>"; \
+                 exit 1; \
+        fi
+	@if [ -z "$(TAG)" ]; then \
+                 echo "[ERROR] TAG is required"; \
+                 exit 1; \
+        fi
+	@chmod +x $(TOOLS_SCRIPTS)/registry_delete_img.sh
+	@$(TOOLS_SCRIPTS)/registry_delete_img.sh "$(REGISTRY)" "$(IMAGE):$(TAG)"
+
+img_del_stack:
+	@if [ ! -f $(TOOLS_SCRIPTS)/registry_delete_img.sh ]; then \
+                 echo "[$(SCRIPT_NAME)] Missing script: registry_delete_img.sh"; \
+                 exit 1; \
+        fi
+	@if [ -z "$(TARGET)" ]; then \
+                 echo "[ERROR] Usage: make registry-delete IMAGE=<image>"; \
+                 exit 1; \
+        fi
+	@if [ -z "$(TAG)" ]; then \
+                 echo "[ERROR] TAG is required"; \
+                 exit 1; \
+        fi
+	@case "$(TARGET)" in \
+		base) IMAGES="$(BASE_IMAGES)";; \
+		website) IMAGES="$(WEBSITE_IMAGES)";; \
+		databases) IMAGES="$(DATABASE_IMAGES)";; \
+		game) IMAGES="$(GAME_IMAGES)";; \
+		*) echo "Unknown target $(TARGET)"; exit 1;; \
+	esac; \
+	@chmod +x $(TOOLS_SCRIPTS)/registry_delete_img.sh \
+        for img in $$IMAGES; do \
+                 echo "Deleting image $(REGISTRY)/$$img:$(TAG)"; \
+                 $(TOOLS_SCRIPTS)/registry_delete_img.sh "$(REGISTRY)" "$$img:$(TAG)" || exit 1; \
+        done
+ 
+img_del_all:
+	@if [ ! -f $(TOOLS_SCRIPTS)/registry_delete_img.sh ]; then \
+                 echo "[$(SCRIPT_NAME)] Missing script: registry_delete_img.sh"; \
+                 exit 1; \
+        fi
+	@if [ -z "$(ALL_IMAGES)" ]; then \
+                 echo "[ERROR] Usage: make registry-delete IMAGE=<image>"; \
+                 exit 1; \
+        fi
+	@if [ -z "$(TAG)" ]; then \
+                 echo "[ERROR] TAG is required"; \
+                 exit 1; \
+        fi
+	@chmod +x $(TOOLS_SCRIPTS)/registry_delete_img.sh
+	@for img in $(ALL_IMAGES); do \
+		echo "Deleting image $(REGISTRY)/$$img:$(TAG)"; \
+                $(TOOLS_SCRIPTS)/registry_delete_img.sh "$(REGISTRY)" "$$img:$(TAG)" || exit 1; \
+	done
 
 wait_tailscale:
 	@TIMEOUT=60; \
@@ -173,4 +264,4 @@ $(ENV_FILE):
 fclean:
 	docker stack rm core website game observ && docker system prune -af --volumes
 
-PHONY: all node_launch swarm_setup swarm_status push core website game observ up down swarm-status image wait_tailscale fclean
+PHONY: all node_launch swarm_setup swarm_status push core website game observ up down swarm_down swarm-status image img_del img_del_stack img_del_all wait_tailscale fclean

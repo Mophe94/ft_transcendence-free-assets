@@ -61,6 +61,10 @@ volumes:
         device: ":/nfs-storage/frontend"
     registry_data:
       driver: local
+      driver_opts:
+        type: none
+        o: bind
+        device: /registry
 
 configs:
     nginx_conf:
