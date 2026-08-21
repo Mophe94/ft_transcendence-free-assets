@@ -180,10 +180,14 @@ export class GameService {
         return;
       } const opponentId = this.combatService.getOpponentId(userId);
       const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
-
+      if (!enemy) {
+        console.log('[GameService] enemy is undefined');
+        return;
+      }
       const totalRounds = Math.log2(DEFAULT.CAPACITY);
       const round = totalRounds - player.roundsRemaining + 1;
-      this.aiOrchestrator.takeoverPlayer(round, totalRounds, player);
+
+      this.aiOrchestrator.takeoverPlayer(round, totalRounds, player, enemy);
 
       console.log(
         `[GameService] Player ${userId} disconnected while still in the running -> replaced by AI`,

@@ -60,8 +60,21 @@ export class AiOrchestratorService {
    * in progress — only their team pool gets refreshed to match the
    * current round so they stay competitive (feature 3).
    */
-  takeoverPlayer(round: number, totalRounds: number, player: Player): void {
-    this.aiService.createBotPlayer('takeover', round, totalRounds, undefined, player);
+  takeoverPlayer(round: number, totalRounds: number, player: Player, opponent: Player): void {
+    if (player.currentPhase == 'map') {
+      this.aiService.createBotPlayer('takeover', round, totalRounds, undefined, player);
+    }
+    else if (player.currentPhase == 'team_choice') {
+      if (player.teamReady == true) {
+        this.aiService.createBotPlayer('takeover', round, totalRounds, undefined, player);
+        return;
+      }
+      this.decideBattleTeam(this.aiService.createBotPlayer('takeover',round,totalRounds,undefined,player),opponent);
+      player.teamReady = true;
+    }
+    // else if (player.currentPhase == 'combat') {
+
+    // }
   }
 
   /**
