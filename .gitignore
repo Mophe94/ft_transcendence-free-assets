@@ -17,3 +17,5 @@ host_ip.txt
 node_modules
 tatusq
 wiq
+logs
+**/*.log*

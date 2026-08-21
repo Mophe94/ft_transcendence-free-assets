@@ -14,6 +14,7 @@ IP4 := $(shell ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($$i=="src")
 USER_NAME="$(USER)"
 TYPE=""
 SSH_PORT=2222
+LOGS_LOCATION:=$(LOCATION)/logs
 
 include $(ENV_MK)
 export
@@ -39,7 +40,8 @@ install_deps:
 	@echo "[INFO][$(SCRIPT_NAME)] Installing backend dependencies..."
 	@cd backend && rm -rf dist && rm -rf node_modules && rm -rf package-lock.json && npm install --package-lock-only
 
-setup_worker:
+setup_node:
+	@mkdir -p $(LOGS_LOCATION)
 	@ssh-keygen -f "/home/$(USER)/.ssh/known_hosts" -R "[localhost]:2222"
 	@if [ ! -f $(VM_SCRIPTS)/node.sh ]; then \
 		echo "[ERROR][$(SCRIPT_NAME)] node.sh file missing"; \
@@ -49,11 +51,11 @@ setup_worker:
 	@bash $(VM_SCRIPTS)/node.sh $(TYPE) $(IP4)
 
 leader: install_deps
-	@$(MAKE) setup_worker TYPE="leader"
+	@$(MAKE) setup_node TYPE="leader"
 	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "cd /home/$(USER)/infra && make && /bin/bash"
 
 worker:
-	@$(MAKE) setup_worker TYPE="worker"
+	@$(MAKE) setup_node TYPE="worker"
 	ssh -tt -p$(SSH_PORT) "$(USER)@localhost" "/bin/bash"
 
 $(ENV_MK): $(ENV_FILE)
@@ -76,4 +78,4 @@ $(ENV_FILE):
 		exit 1; \
 	fi
 	
-.PHONY: all vm install_deps setup_worker leader worker vm_erase
+.PHONY: all vm install_deps setup_node leader worker vm_erase
