@@ -643,7 +643,7 @@ else
 
     declare -A PACK
 
-    PACK[leader]="infra site backend database game_test redis"
+    PACK[leader]="infra site backend database game/Export redis"
     PACK[worker]=""
 
     read -r -a files <<< "${PACK[$TYPE]}"

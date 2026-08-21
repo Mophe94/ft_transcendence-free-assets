@@ -74,7 +74,7 @@ target "backend" {
 }
 
 target "game" {
-    context     = "${TEAM_CONTAINER}/game_test"
+    context     = "${TEAM_CONTAINER}/game/Export"
     dockerfile  = "Dockerfile"
     contexts = {
 	base-image = (LOCAL
