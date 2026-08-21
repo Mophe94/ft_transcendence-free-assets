@@ -1,5 +1,3 @@
-import './JoinButton.css'
-
 import { useState } from 'react';
 
 
@@ -29,11 +27,20 @@ export default function JoinButton({ onClick }: ResetButtonProps) {
 
   return (
     <button
-        style={prefStyles}
-        className={`join-button ${isPressed ? 'pressed': ''}`}
-        type="button"
-        onClick={handleClick}
-        aria-label='Join'
+      style={prefStyles}
+      className={`
+        w-full
+        aspect-3/1
+        bg-no-repeat
+        bg-contain
+        bg-center
+        ${isPressed ? 'bg-(image:--img-join-pressed)': 'bg-(image:--img-join) hover:bg-(image:--img-join-hover)'}`}
+      type="button"
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onMouseLeave={() => setIsPressed(false)}
+      onClick={handleClick}
+      aria-label='Join'
     />
   )
 }

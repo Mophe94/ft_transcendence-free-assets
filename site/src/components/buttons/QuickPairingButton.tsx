@@ -1,5 +1,3 @@
-import './QuickPairingButton.css'
-
 import { useState } from 'react';
 
 import quickBtn from '../../assets/buttons/quick_pairing_button/quick_pairing_button_regular.png';
@@ -29,8 +27,17 @@ export default function QuickPairingButton({ onClick }: QuickButtonProps) {
   return (
     <button
         style={prefStyles}
-        className={`quick-button ${isPressed ? 'pressed': ''}`}
+        className={`
+          w-full
+          aspect-3/1
+          bg-no-repeat
+          bg-contain
+          bg-center
+          ${isPressed ? 'bg-(image:--img-quick-pressed)': 'bg-(image:--img-quick) hover:bg-(image:--img-quick-hover)'}`}
         type="button"
+        onMouseDown={() => setIsPressed(true)}
+        onMouseUp={() => setIsPressed(false)}
+        onMouseLeave={() => setIsPressed(false)}
         onClick={handleClick}
         aria-label='Quick pairing'
     />

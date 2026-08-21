@@ -7,9 +7,9 @@ interface NotificationBarProps {
 }
 
 const typeStyles: Record<NotificationType, string> = {
-  success: 'bg-[#2ecc71] border-[#27ae60]',
-  error: 'bg-[#e74c3c] border-[#c0392b]',
-  warning: 'bg-[#f39c12] border-[#d35400]',
+  success: 'bg-lush-green border-black',
+  error: 'bg-pastel-red border-black',
+  warning: 'bg-pastel-yellow border-black',
 };
 
 export default function NotificationBar({ message, type }: NotificationBarProps) {
