@@ -27,7 +27,6 @@ export default function AuthCallback() {
         }
       })
         .then(() => checkUserStatus())
-        .then(() => new Promise((resolve) => setTimeout(resolve, 2000)))
         .then(() => navigate('/home'))
         .catch((err) => navigate(`/login?error=${err}`));
     } else {

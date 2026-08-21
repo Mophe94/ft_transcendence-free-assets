@@ -113,7 +113,7 @@ export default function Stats({ user, stats }: StatsProps) {
               </div>
               <div className="
                 text-[clamp(0.6rem,3vw,3rem)]
-                xl:text-[1.8rem] xl:m-0 xl:justify-self-start
+                xl:text-[2rem] xl:m-0 xl:justify-self-start
               ">
                 {value}
               </div>

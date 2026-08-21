@@ -1,5 +1,3 @@
-import './CreateRoomButton.css'
-
 import { useState } from 'react';
 
 import createBtn from '../../assets/buttons/create_room_button/create_room_button_regular.png';
@@ -29,8 +27,17 @@ export default function CreateRoomButton({ onClick }: QuickButtonProps) {
   return (
     <button
         style={prefStyles}
-        className={`create-button ${isPressed ? 'pressed': ''}`}
+        className={`
+          w-full
+          aspect-3/1
+          bg-no-repeat
+          bg-contain
+          bg-center
+          ${isPressed ? 'bg-(image:--img-create-pressed)': 'bg-(image:--img-create) hover:bg-(image:--img-create-hover)'}`}
         type="button"
+        onMouseDown={() => setIsPressed(true)}
+        onMouseUp={() => setIsPressed(false)}
+        onMouseLeave={() => setIsPressed(false)}
         onClick={handleClick}
         aria-label='Quick pairing'
     />

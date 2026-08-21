@@ -64,8 +64,8 @@ export function Lobby() {
   return (
     <div className="lobby-content">
       <SpecialBG>
-        <Heading size='m' text='Games'/>
-        <div className='table-games rounded-xl border border-[#901e1e] p-4 bg-[#d6dbbb]'>
+        <Heading size='l' text='Games'/>
+        <div className='table-games rounded-xl border border-deep-amber p-4 bg-sage-green'>
           <div className='
             table-games-content
             min-h-[30vh] max-h-[calc(60vh-2rem-clamp(2rem,6vw,5rem))]
@@ -81,7 +81,7 @@ export function Lobby() {
                         <div className='nb-players t-[clamp(0.6rem,2.5vw,2rem)]'>Players: {room.nb_player}/4</div>
                       </div>
                       <div className='right-ticket content-center border-l border-gray-500'>
-                        <div className='room-status t-[clamp(0.6rem,2.5vw,2rem)] text-center border-l-2 border-[#adadad]'>{room.status}</div>
+                        <div className='room-status t-[clamp(0.6rem,2.5vw,2rem)] text-center border-l-2 border-grey'>{room.status}</div>
                         {room.status == 'Waiting for players' &&
                           <div className='join-button-container flex justify-center h-[min(4rem,8vw)] mt-2'>
                             <JoinButton onClick={() => joinRoom(room.roomId, username, skin)} />
@@ -98,7 +98,7 @@ export function Lobby() {
         </div>
         {joinError && (
           <div className='join-error self-center'>
-            {joinError === 'full' ? 'Room just got full.' : "Room doesn't exist any;ore"}
+            {joinError === 'full' ? 'Room just got full.' : "Room doesn't exist anymore"}
           </div>
         )}
         <div className='room-button-container mt-5 grid grid-cols-2 justify-items-center'>

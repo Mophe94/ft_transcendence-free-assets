@@ -12,6 +12,7 @@ import { RedisStateService } from '../redis/redis_state.service';
 import { AiOrchestratorService } from './ai_service/ai.orchestrator.service';
 import { LOBBY_KEYS, DEFAULT } from '../lobby/lobby.const';
 import { UserStatsClientService } from './user-stats-client.service';
+import { CurrentActions } from './player/player.interfaces';
 
 
 @Injectable()
@@ -590,7 +591,7 @@ export class GameService {
       }
     }
 
-    this.resolveTurn(userId, player, player2);
+    this.resolveTurn(player, player2);
   }
 
   private needMonsterChoice(player: Player): boolean {
@@ -703,39 +704,15 @@ export class GameService {
         );
         break;
       case 'team_choice': {
-        const error = await this.mapService.received_team_choice(
-          player,
-          payload.battle_team,
-        );
-        if (error) {
-          console.log('TEAM CHOICE PAYLOAD ERROR', error);
-          result = error;
-          break;
-        }
-        player.teamReady = true;
-
-        if (player2.teamReady) {
-          this.startCombatPhase(roomId, new Set([userId, userId2]));
-          this.sendToPlayer(userId, this.mapService.combat(player));
-          this.sendToPlayer(userId2, this.mapService.combat(player2));
-          // --- AI combat ---
-          this.triggerBotCombatTurn(userId, player, player2);
-          this.triggerBotCombatTurn(userId2, player2, player);
-          // --- end AI combat ---
-        }
-        else
-          result = { event: 'game', data: { state: 'waiting_for_opponent' } };
+        result = await this.resolveTeamChoice(player, player2, roomId, payload);
         break;
       }
       case 'change_current_monster':
       case 'use_item_combat':
       case 'try_attack':
       case 'pass':
-        player.currentActions = {
-          actionType: state,
-          data: payload,
-        };
-        this.resolveTurn(userId, player, player2);
+        this.applyPlayerAction(player, payload);
+        this.resolveTurn(player, player2);
         break;
       default:
         console.log('Unknow state:', state);
@@ -748,12 +725,46 @@ export class GameService {
       await this.redisStateService.updateStatePlayer(userId, playerState);
   }
 
-  private resolveTurn(userId: string, player: Player, player2: Player): void {
-    const combatRoomId = this.combatService.playerCombatRoom.get(userId);
+  private async resolveTeamChoice (player: Player, player2: Player, roomId: string, payload: GameData): Promise<GameMessage | undefined> {
+    let result: GameMessage | undefined;
+    const error = await this.mapService.received_team_choice(
+      player,
+      payload.battle_team,
+    );
+    if (error) {
+      console.log('TEAM CHOICE PAYLOAD ERROR', error);
+      result = error;
+      return;
+    }
+    player.teamReady = true;
+
+    if (player2.teamReady) {
+      this.startCombatPhase(roomId, new Set([player.id, player2.id]));
+      this.sendToPlayer(player.id, this.mapService.combat(player));
+      this.sendToPlayer(player2.id, this.mapService.combat(player2));
+      // --- AI combat ---
+      this.triggerBotCombatTurn(player.id, player, player2);
+      this.triggerBotCombatTurn(player2.id, player2, player);
+      // --- end AI combat ---
+    }
+
+    if (!result)
+      result = { event: 'game', data: { state: 'waiting_for_opponent' } };
+  }
+
+  private applyPlayerAction(player: Player, payload: GameData): void {
+    player.currentActions = {
+      actionType: payload.state as CurrentActions['actionType'],
+      data: payload,
+    };
+  }
+
+  private resolveTurn(player: Player, player2: Player): void {
+    const combatRoomId = this.combatService.playerCombatRoom.get(player.id);
     if (!combatRoomId) {
       console.log(
-        `[GameService]: Missing combat room at end of combat, userId=${userId}`,
-        userId,
+        `[GameService]: Missing combat room at end of combat, userId=${player.id}`,
+        player.id,
       );
       return;
     }
@@ -762,9 +773,6 @@ export class GameService {
     if (player.forceChooseMonster) playerForce = player;
     else if (player2?.forceChooseMonster) playerForce = player2;
 
-    const userId2 = this.combatService.getOpponentId(userId);
-    if (!userId2) return;
-
     const bothPlayersActed =
       !!player.currentActions.actionType && !!player2.currentActions.actionType;
     if (!bothPlayersActed && !playerForce?.forceChooseMonster) return;
@@ -772,8 +780,8 @@ export class GameService {
     const roundResolved = this.applyBattleRound(
       player,
       player2,
-      userId,
-      userId2,
+      player.id,
+      player2.id,
     );
     if (!roundResolved) return; // waiting on opponent't result;
 
@@ -782,8 +790,6 @@ export class GameService {
       endOfBattle = this.resolveMonsterKO(
         player,
         player2,
-        userId,
-        userId2,
         /* KO */ player,
         player2,
       );
@@ -791,19 +797,17 @@ export class GameService {
       endOfBattle = this.resolveMonsterKO(
         player,
         player2,
-        userId,
-        userId2,
         /* KO */ player2,
         player,
       );
     } else {
       endOfBattle = false;
-      this.startNewTurn(combatRoomId, new Set([userId, userId2]));
-      this.sendToPlayer(userId, this.combatService.new_turn(player));
-      this.sendToPlayer(userId2, this.combatService.new_turn(player2));
+      this.startNewTurn(combatRoomId, new Set([player.id, player2.id]));
+      this.sendToPlayer(player.id, this.combatService.new_turn(player));
+      this.sendToPlayer(player2.id, this.combatService.new_turn(player2));
       // --- AI combat ---
-      this.triggerBotCombatTurn(userId, player, player2);
-      this.triggerBotCombatTurn(userId2, player2, player);
+      this.triggerBotCombatTurn(player.id, player, player2);
+      this.triggerBotCombatTurn(player2.id, player2, player);
       // --- end AI combat ---
 
       // si un combat deja finish declenchement du roundLeft
@@ -852,8 +856,6 @@ export class GameService {
   private resolveMonsterKO(
     player: Player,
     player2: Player,
-    userId: string,
-    userId2: string,
     koPlayer: Player,
     otherPlayer: Player,
   ): boolean {
@@ -866,16 +868,16 @@ export class GameService {
       otherPlayer.roundsRemaining -= 1;
 
       this.sendToPlayer(
-        userId,
+        player.id,
         this.combatService.result_battle(player, otherPlayer.id),
       );
       this.sendToPlayer(
-        userId2,
+        player2.id,
         this.combatService.result_battle(player2, otherPlayer.id),
       );
 
       // --- AI combat ---
-      const koUserId = koPlayer.id === player.id ? userId : userId2;
+      const koUserId = koPlayer.id === player.id ? player.id : player2.id;
       this.triggerBotCombatTurn(koUserId, koPlayer, otherPlayer);
       // --- end AI combat ---
 
@@ -886,28 +888,28 @@ export class GameService {
     player.timer = -1;
 
     // AutoChooseMonster case
-    const combatRoomId = this.combatService.playerCombatRoom.get(userId);
+    const combatRoomId = this.combatService.playerCombatRoom.get(player.id);
     if (combatRoomId) {
-      this.startNewTurn(combatRoomId, new Set([userId, userId2]));
+      this.startNewTurn(combatRoomId, new Set([player.id, player2.id]));
       // this.sendToPlayer(userId, this.combatService.new_turn(player));
       // this.sendToPlayer(userId, this.combatService.new_turn(player));
     } else {
       console.log(
-        `[GameService]: resolveMonsterKO -> missing combatRoomIdfor ${userId}`,
+        `[GameService]: resolveMonsterKO -> missing combatRoomIdfor ${player.id}`,
       );
     }
 
     this.sendToPlayer(
-      userId,
+      player.id,
       this.combatService.change_monster(player, koPlayer.id),
     );
     this.sendToPlayer(
-      userId2,
+      player2.id,
       this.combatService.change_monster(player2, koPlayer.id),
     );
 
     // --- AI combat ---
-    const koUserId = koPlayer.id === player.id ? userId : userId2;
+    const koUserId = koPlayer.id === player.id ? player.id : player2.id;
     this.triggerBotCombatTurn(koUserId, koPlayer, otherPlayer);
     // --- end AI combat ---
 

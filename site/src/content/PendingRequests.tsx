@@ -52,8 +52,8 @@ export default function PendingRequests () {
       
       <div className="
       rounded-[10px]
-      border border-solid border-[rgb(144,30,30)]
-      bg-[#f6f1e3] p-4
+      border border-solid border-dark-crimson
+      bg-warm-eggshell p-4
       max-h-100 overflow-y-scroll overflow-x-hidden no-scrollbar">
         { requests.length == 0 ? 
           <div>No pending requests</div>

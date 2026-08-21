@@ -1,5 +1,3 @@
-import './SaveButton.css';
-
 import { useState } from 'react';
 
 
@@ -30,7 +28,16 @@ export default function SaveButton({ onClick }: SaveButtonProps) {
   return (
     <button
         style={prefStyles}
-        className={`save-button ${isPressed ? 'pressed': ''}`}
+        className={`
+          w-full
+          aspect-23/14
+          bg-no-repeat
+          bg-contain
+          bg-center
+          ${isPressed ? 'bg-(image:--img-save-pressed)': 'bg-(image:--img-save) hover:bg-(image:--img-save-hover)'}`}
+        onMouseDown={() => setIsPressed(true)}
+        onMouseUp={() => setIsPressed(false)}
+        onMouseLeave={() => setIsPressed(false)}
         onClick={handleClick}
         aria-label='Save'
         type="submit"

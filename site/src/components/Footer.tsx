@@ -6,7 +6,7 @@ export default function Footer() {
 
   return (
 	<footer
-	  className="z-10 mt-auto w-full bg-[#ffffffa3]"
+	  className="z-10 mt-auto w-full bg-trans-grey"
 	>
 	  <div className="
 		w-9/10

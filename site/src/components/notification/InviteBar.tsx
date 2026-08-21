@@ -24,6 +24,28 @@ export default function InviteBar({ username, roomId }: InviteBarProps) {
     return () => clearTimeout(timer);
   }, []);
 
+  const acceptInvite = async () => {
+    if (!user || isLeaving) return;
+    setIsLeaving(true);
+    let userSkin = 'DinoGreen';
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_USERS_SERVICE}/settings`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (data?.skin) userSkin = data.skin;
+    } catch (e) {
+      console.error(e);
+    }
+    setTimeout(()=> {
+      navigate('/loading')
+      joinRoom(roomId, user.username, userSkin);
+      navigate('/home');
+    },300);
+  };
+
   if (!user)
     return <></>;
   return (
@@ -32,11 +54,11 @@ export default function InviteBar({ username, roomId }: InviteBarProps) {
         className={`
           px-6 py-3 rounded-md border text-white font-semibold font-sans
           shadow-[0_4px_12px_rgba(0,0,0,0.15)]
-          bg-[#2ecc71] border-[#27ae60]
+          bg-vibrant-emerald border-black
           ${isLeaving ? 'animate-[slideOutNotif_0.3s_ease-in_forwards]' : 'animate-[slideInNotif_0.3s_ease-out_forwards]'}
         `}
       >
-        {username} invites you to play in <span className='underline' onClick={() => {joinRoom(roomId, user.username, 'DinoGreen'); navigate('/home');}}>{roomId}</span>
+        {username} invites you to play in <span className='underline' onClick={acceptInvite}>{roomId}</span>
         
       </div>
 
