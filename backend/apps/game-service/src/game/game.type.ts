@@ -1,5 +1,5 @@
 export interface GameData {
-  state: string;
+  state: string ;
   [key: string]: any;
 }
 
@@ -15,9 +15,9 @@ export interface RoomAcces {
 
 export const PHASE_DURATIONS = {
   lobby: 10,
-  map: 5,
-  team_setup: 10,
-  choose_action: 15,
+  map: 20,
+  team_setup: 15,
+  choose_action: 20,
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;

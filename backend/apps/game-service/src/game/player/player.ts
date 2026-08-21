@@ -10,7 +10,9 @@ import { emptyCurrentMonster } from './player.interfaces';
 export class Player {
   readonly id: string = '';
   readonly name: string = '';
+  readonly uid: string = '';
   readonly asset: string = '';
+  isBot: boolean = false;
   currentMonster: CurrentMonster = {
     name: '',
     slot: -1,
@@ -261,7 +263,7 @@ export class Player {
       ],
     },
   ];
-  team: string[] = ['pisciner', '', '', '', '', ''];
+  team: string[] = ['pisciner', 'gigantomakia', 'burpy', '', '', ''];
   inventory: Inventory[] = [
     {
       name: '',
@@ -304,22 +306,30 @@ export class Player {
   status: string = 'default';
   teamReady: boolean = false;
   forceChooseMonster: boolean = false;
+  duelFinished: boolean = false;
   timer: number = 0;
   current_map: string = '';
   current_monster: string = '';
   current_monster_rarity: string = '';
   current_item: string = '';
   text: string = '';
+  monsterCatch: string[] = [];
+  playerDefeated: number = 0;
+  win: boolean = false;
+  lose: boolean = false;
 
-  constructor(new_id: string, name: string, asset: string) {
+
+  constructor(new_id: string, name: string, uid: string, asset: string) {
     this.id = new_id;
     this.name = name;
+    this.uid = uid;
     this.asset = asset;
     this.team[0] = 'pisciner';
   }
 
   resetAfterRound(): void {
     this.forceChooseMonster = false;
+    this.duelFinished = false;
     this.currentActions.actionType = undefined;
     this.currentActions.data = '';
     this.text = '';

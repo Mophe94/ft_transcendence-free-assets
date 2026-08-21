@@ -194,27 +194,6 @@ export class MapService {
           value: skill.value,
         })),
       };
-      let skill = player.battle_team[slot].skill;
-      console.log('TESTS SKILLS');
-      console.log(
-        player.battle_team[slot].name,
-        skill[0].name,
-        skill[0].data,
-        skill[0].value,
-      );
-      console.log(
-        player.battle_team[slot].name,
-        skill[1].name,
-        skill[1].data,
-        skill[1].value,
-      );
-      if (skill[3])
-        console.log(
-          player.battle_team[slot].name,
-          skill[2].name,
-          skill[2].data,
-          skill[2].value,
-        );
     }
     return undefined;
   }
@@ -318,6 +297,8 @@ export class MapService {
 
     if (result == 1) {
       msg.data.success = 'ok';
+      if (!player.monsterCatch.includes(player.current_monster))
+        player.monsterCatch.push(player.current_monster);
       return msg;
     } else {
       let flee = Math.floor(Math.random() * 101);

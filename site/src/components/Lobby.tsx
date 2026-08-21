@@ -78,7 +78,7 @@ export function Lobby() {
                     <div className='ticket grid grid-cols-2'>
                       <div className='left-ticket overflow-hidden'>
                         <div className='room-id font-semibold t-[clamp(0.8rem,3vw,2rem)] content-center wrap-break-word text-ellipsis overflow-y-hidden'>{room.roomId}</div>
-                        <div className='nb-players t-[clamp(0.6rem,2.5vw,2rem)]'>Players: {room.nb_player}/8</div>
+                        <div className='nb-players t-[clamp(0.6rem,2.5vw,2rem)]'>Players: {room.nb_player}/4</div>
                       </div>
                       <div className='right-ticket content-center border-l border-gray-500'>
                         <div className='room-status t-[clamp(0.6rem,2.5vw,2rem)] text-center border-l-2 border-grey'>{room.status}</div>
