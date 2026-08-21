@@ -476,9 +476,9 @@ COPY public.skills (id, name, power_point, effect, type, value, repetition, "pre
 14	tornade	3	damage	fly	1.5	4	70	\N
 15	dodge	3	dodge	none	0	1	100	\N
 16	armor	3	up_stat	none	5	1	100	defense
-17	swimming	3	up_stat	none	10	1	100	speed
-18	grow	3	up_stat	none	5	1	100	attack
-19	kawai	3	down_stat	none	5	1	100	attack
+17	swimming	2	up_stat	none	10	1	100	speed
+18	grow	1	up_stat	none	20	1	100	attack
+19	kawai	2	down_stat	none	5	1	100	attack
 \.
 
 
