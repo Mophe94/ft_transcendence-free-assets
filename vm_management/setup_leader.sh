@@ -1,14 +1,109 @@
 #!/bin/bash
+
+SCRIPT_NAME="${0##*/}"
+SCRIPT_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOGS_LOCATION="${LOGS_LOCATION:-"."}/${SCRIPT_NAME%.sh}"
+LOG_FILE="${LOGS_LOCATION}/${SCRIPT_NAME%.sh}_$(date '+%Y-%m-%d_%H-%M-%S').log"
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+
+COLOR_RESET='\033[0m'
+COLOR_GREEN='\033[32m'
+COLOR_ORANGE='\033[38;5;208m'
+COLOR_RED='\033[31m'
+
+mkdir -p "$LOGS_LOCATION"
+mkdir -p "$(dirname "$LOG_FILE")"
+
+# File descriptor 3: log file
+exec 3>>"$LOG_FILE"
+
+# File descriptor 4: terminal
+exec 4>&1
+
+# Log everything else to the log and terminal
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+log_info() {
+    local message="$*"
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
+    printf '%b[INFO]%b[%s] %s\n' \
+        "$COLOR_GREEN" \
+        "$COLOR_RESET" \
+        "$SCRIPT_NAME" \
+        "$message" >&4
+
+    printf '[INFO][%s][%s] %s\n' \
+        "$timestamp" \
+        "$SCRIPT_NAME" \
+        "$message" >&3
+}
+
+log_warn() {
+    local message="$*"
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
+    printf '%b[WARN]%b[%s] %s\n' \
+        "$COLOR_ORANGE" \
+        "$COLOR_RESET" \
+        "$SCRIPT_NAME" \
+        "$message" >&4
+
+    printf '[WARN][%s][%s] %s\n' \
+        "$timestamp" \
+        "$SCRIPT_NAME" \
+        "$message" >&3
+}
+
+log_error() {
+    local message="$*"
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
+    printf '%b[ERROR]%b[%s] %s\n' \
+        "$COLOR_RED" \
+        "$COLOR_RESET" \
+        "$SCRIPT_NAME" \
+        "$message" >&4
+
+    printf '[ERROR][%s][%s] %s\n' \
+        "$timestamp" \
+        "$SCRIPT_NAME" \
+        "$message" >&3
+}
+
+log_wait() {
+    local message="$*"
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
+    printf '%b[INFO]%b[%s] %s' \
+        "$COLOR_GREEN" \
+        "$COLOR_RESET" \
+        "$SCRIPT_NAME" \
+        "$message" >&4
+
+    printf '[INFO][%s][%s] %s' \
+        "$timestamp" \
+        "$SCRIPT_NAME" \
+        "$message" >&3
+}
+
+# ---------------------------------------------------------------------------
+# Safeguard
+# ---------------------------------------------------------------------------
 set -e
 
-#Safeguard
-SCRIPT_NAME="${0##*/}"
-
 if [ $# -ne 3 ]; then
-    echo "Usage: ${SCRIPT_NAME} <node new username> <host_ip> <resize_disk_flag>"
+    log_error "Usage: ${SCRIPT_NAME} <node new username> <host_ip> <resize_disk_flag>"
     exit 1
 elif [ -z "$1" ]; then
-    echo "Usage: ${SCRIPT_NAME} <node new username> <host_ip> <resize_disk_flag>"
+    log_error "Usage: ${SCRIPT_NAME} <node new username> <host_ip> <resize_disk_flag>"
     exit 1
 else
     NEW_USER="$1"
@@ -16,41 +111,66 @@ else
     RESIZE_DISK="$3"
 fi
 
-#Setup
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+
 TYPE="leader"
-IP=$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')
+IP="$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}')"
 CERT_DIR="/etc/certs/"
 SSH_CONFIG="/etc/ssh/sshd_config"
 HEADSCALE_DIR="/opt/headscale"
 HEADSCALE_PORT="8080"
 TAILSCALE_IP_FILE="/etc/tailscale_ip"
 
-echo "[${SCRIPT_NAME}] VM ip: ${IP}"
-if [ "$RESIZE_DISK" = "true" ]; then
-    echo "[$SCRIPT_NAME] Expanding root partition"
+log_info "VM IP: ${IP}"
 
-    apk update && apk add --no-cache cloud-utils-growpart e2fsprogs-extra
+# ---------------------------------------------------------------------------
+# Resize root partition
+# ---------------------------------------------------------------------------
+
+if [ "$RESIZE_DISK" = "true" ]; then
+    log_info "Expanding root partition"
+
+    apk update
+    apk add --no-cache cloud-utils-growpart e2fsprogs-extra
 
     growpart /dev/sda 3
     resize2fs /dev/sda3
 fi
 
-echo "[$SCRIPT_NAME] Waiting for network"
+# ---------------------------------------------------------------------------
+# Wait for network
+# ---------------------------------------------------------------------------
 
 TIMEOUT=60
 ELAPSED=0
+
+log_wait "Waiting for network"
 
 until ip route get 1.1.1.1 >/dev/null 2>&1; do
     sleep 1
     ELAPSED=$((ELAPSED + 1))
 
+    printf '.' >&4
+    printf '.' >&3
+
     if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
-        echo "[$SCRIPT_NAME] Network failed to become ready"
+        printf '\n' >&4
+        printf '\n' >&3
+        log_error "Network failed to become ready"
         exit 1
     fi
 done
 
-echo "[$SCRIPT_NAME] Synchronizing system clock"
+printf '\n' >&4
+printf '\n' >&3
+
+# ---------------------------------------------------------------------------
+# Synchronize system clock
+# ---------------------------------------------------------------------------
+
+log_info "Synchronizing system clock"
 
 rc-service ntpd stop
 
@@ -58,12 +178,12 @@ TIMEOUT=90
 ELAPSED=0
 
 until ntpd -nq -p pool.ntp.org; do
-    echo "[$SCRIPT_NAME] NTP synchronization failed, retrying..."
+    log_warn "NTP synchronization failed, retrying"
     sleep 5
     ELAPSED=$((ELAPSED + 5))
 
     if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
-        echo "[$SCRIPT_NAME] Failed to synchronize system clock"
+        log_error "Failed to synchronize system clock"
         exit 1
     fi
 done
@@ -72,56 +192,91 @@ rc-service ntpd start
 
 date -u
 
-#Change for env procured password
+# ---------------------------------------------------------------------------
+# Create user
+# ---------------------------------------------------------------------------
+
 NEW_USER_HOME="/home/$NEW_USER"
 
-echo "[$SCRIPT_NAME] Creating user: $NEW_USER"
+log_info "Creating user: $NEW_USER"
+
 adduser -D -h "$NEW_USER_HOME" "$NEW_USER"
+
 IFS= read -r NEW_USER_PASSWORD
 echo "${NEW_USER}:${NEW_USER_PASSWORD}" | chpasswd
 unset NEW_USER_PASSWORD
 
-echo "[$SCRIPT_NAME] Setting up ${NEW_USER} permissions"
+log_info "Setting up ${NEW_USER} permissions"
+
 addgroup "$NEW_USER" wheel
 addgroup "$NEW_USER" docker
 
-echo "[$SCRIPT_NAME] Setting up ${NEW_USER} SSH login"
+# ---------------------------------------------------------------------------
+# Configure SSH access
+# ---------------------------------------------------------------------------
+
+log_info "Setting up ${NEW_USER} SSH login"
+
 mkdir -p "$NEW_USER_HOME/.ssh"
 chmod 700 "${NEW_USER_HOME}/.ssh"
-cat "${HOME}/.ssh/authorized_keys" > "${NEW_USER_HOME}/.ssh/authorized_keys" 
-chmod 600 "${NEW_USER_HOME}/.ssh/authorized_keys"
-chown -R ${NEW_USER}:${NEW_USER} "${NEW_USER_HOME}/.ssh"
 
-echo "[$SCRIPT_NAME] Disabling root SSH login"
+cat "${HOME}/.ssh/authorized_keys" > "${NEW_USER_HOME}/.ssh/authorized_keys"
+
+chmod 600 "${NEW_USER_HOME}/.ssh/authorized_keys"
+chown -R "${NEW_USER}:${NEW_USER}" "${NEW_USER_HOME}/.ssh"
+
+log_info "Disabling root SSH login"
+
 cp "$SSH_CONFIG" "${SSH_CONFIG}.bak"
+
 if grep -q "^#*PermitRootLogin" "$SSH_CONFIG"; then
     sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' "$SSH_CONFIG"
 else
     echo "PermitRootLogin no" >> "$SSH_CONFIG"
 fi
 
-echo "[$SCRIPT_NAME] Changing VM hostname to: swarmnode.${NEW_USER}"
+# ---------------------------------------------------------------------------
+# Configure hostname
+# ---------------------------------------------------------------------------
+
+log_info "Changing VM hostname to: swarmnode.${NEW_USER}"
+
 echo "swarmnode.${NEW_USER}" > /etc/hostname
 
-echo "[$SCRIPT_NAME] Adding utils"
+# ---------------------------------------------------------------------------
+# Install utilities
+# ---------------------------------------------------------------------------
+
+log_info "Adding utilities"
+
 apk update
 apk add --no-cache \
-	curl \
-	vim \
-	jq \
-	sshpass
+    curl \
+    vim \
+    jq \
+    sshpass
 
 docker system prune -af
 
-echo "[$SCRIPT_NAME] Setting up tailscape"
+# ---------------------------------------------------------------------------
+# Configure Tailscale
+# ---------------------------------------------------------------------------
+
+log_info "Setting up Tailscale"
+
 apk add tailscale
 rc-update add tailscale default
 service tailscale start
 
-echo "[$SCRIPT_NAME] Setting up Headscale"
-mkdir -p ${HEADSCALE_DIR}/{config,data}
+# ---------------------------------------------------------------------------
+# Configure Headscale
+# ---------------------------------------------------------------------------
 
-cat > ${HEADSCALE_DIR}/config/config.yaml <<EOF
+log_info "Setting up Headscale"
+
+mkdir -p "${HEADSCALE_DIR}"/{config,data}
+
+cat > "${HEADSCALE_DIR}/config/config.yaml" <<EOF
 server_url: http://${HOST_IP}:9090
 
 listen_addr: 0.0.0.0:${HEADSCALE_PORT}
@@ -158,8 +313,7 @@ log:
 
 EOF
 
-cat > ${HEADSCALE_DIR}/docker-compose.yml <<EOF
-
+cat > "${HEADSCALE_DIR}/docker-compose.yml" <<EOF
 services:
 
   headscale:
@@ -181,80 +335,124 @@ services:
 
 EOF
 
-cd ${HEADSCALE_DIR}
+cd "${HEADSCALE_DIR}"
 docker compose up -d
+
 TIMEOUT=60
 ELAPSED=0
+
+log_wait "Waiting for Headscale to become ready"
+
 until docker exec headscale headscale version >/dev/null 2>&1; do
     sleep 2
-    ELAPSED=$((ELAPSED+2))
+    ELAPSED=$((ELAPSED + 2))
+
+    printf '.' >&4
+    printf '.' >&3
 
     if [ "$ELAPSED" -ge "$TIMEOUT" ]; then
-        echo "[$SCRIPT_NAME] Headscale failed to become ready"
+        printf '\n' >&4
+        printf '\n' >&3
+        log_error "Headscale failed to become ready"
         docker logs headscale
         exit 1
     fi
 done
 
-echo "[$SCRIPT_NAME] Creating Headscale user"
-docker exec headscale \
-headscale users create swarm || true
+printf '\n' >&4
+printf '\n' >&3
 
-echo "[$SCRIPT_NAME] Creating Headscale auth key"
+# ---------------------------------------------------------------------------
+# Create Headscale user
+# ---------------------------------------------------------------------------
+
+log_info "Creating Headscale user"
+
+docker exec headscale headscale users create swarm || true
+
+log_info "Creating Headscale auth key"
+
 USER_ID=$(
-    docker exec headscale headscale users list -o json \
-    | jq -r '.[] | select(.name=="swarm") | .id'
+    docker exec headscale headscale users list -o json |
+        jq -r '.[] | select(.name=="swarm") | .id'
 )
 
-echo "[$SCRIPT_NAME] USER_ID=$USER_ID"
+log_info "USER_ID=$USER_ID"
+
 if [ -z "$USER_ID" ]; then
-    echo "[$SCRIPT_NAME] Failed to determine Headscale user ID"
+    log_error "Failed to determine Headscale user ID"
     docker exec headscale headscale users list
     exit 1
 fi
 
-AUTH_KEY=$(docker exec headscale \
-    headscale preauthkeys create \
-    --user "$USER_ID" \
-    --reusable \
-    --expiration 24h)
+AUTH_KEY=$(
+    docker exec headscale \
+        headscale preauthkeys create \
+        --user "$USER_ID" \
+        --reusable \
+        --expiration 24h
+)
 
 echo "${AUTH_KEY}" > /etc/headscale_authkey
 chmod 600 /etc/headscale_authkey
 
-echo "[$SCRIPT_NAME] Registering leader in Tailscale"
+# ---------------------------------------------------------------------------
+# Register leader in Tailscale
+# ---------------------------------------------------------------------------
+
+log_info "Registering leader in Tailscale"
+
 tailscale up \
- --login-server=http://${HOST_IP}:9090 \
- --authkey=${AUTH_KEY} \
- --hostname=swarmnode.${NEW_USER}
+    --login-server="http://${HOST_IP}:9090" \
+    --authkey="${AUTH_KEY}" \
+    --hostname="swarmnode.${NEW_USER}"
 
-TAILSCALE_IP=$(tailscale ip -4)
-echo "${TAILSCALE_IP}" > ${TAILSCALE_IP_FILE}
-echo "[$SCRIPT_NAME] Tailscale IP: ${TAILSCALE_IP}"
+TAILSCALE_IP="$(tailscale ip -4)"
 
-echo "[$SCRIPT_NAME] Setting up NFS"
+echo "${TAILSCALE_IP}" > "${TAILSCALE_IP_FILE}"
+
+log_info "Tailscale IP: ${TAILSCALE_IP}"
+
+# ---------------------------------------------------------------------------
+# Configure NFS
+# ---------------------------------------------------------------------------
+
+log_info "Setting up NFS"
+
 apk add nfs-utils
 rc-update add rpcbind
 rc-update add nfs
 
-echo "[$SCRIPT_NAME] Setting up nfs-storage"
-mkdir -p /nfs-storage/{monitoring,backups} \
-    && chown -R ${NEW_USER}:${NEW_USER} "/nfs-storage"
-echo "/nfs-storage *(rw,sync,no_subtree_check,no_root_squash)" >> "/etc/exports"
+log_info "Setting up NFS storage"
+
+mkdir -p /nfs-storage/{monitoring,backups}
+chown -R "${NEW_USER}:${NEW_USER}" /nfs-storage
+
+echo "/nfs-storage *(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
 exportfs -ra
 
-#Server CA creation
-echo "[$SCRIPT_NAME] Setting up directory"
-mkdir -p ${CERT_DIR}
-mv /cert_info.env ${CERT_DIR}/cert_info.env 
+# ---------------------------------------------------------------------------
+# Configure server certificates
+# ---------------------------------------------------------------------------
 
-#Server CA generation
-echo "[$SCRIPT_NAME] Generating CA"
+log_info "Setting up certificate directory"
+
+mkdir -p "${CERT_DIR}"
+mv /cert_info.env "${CERT_DIR}/cert_info.env"
+
+log_info "Generating CA"
+
 chmod +x /cert_rootCA.sh
-bash /cert_rootCA.sh ${CERT_DIR} ${TAILSCALE_IP}
+bash /cert_rootCA.sh "${CERT_DIR}" "${TAILSCALE_IP}"
 
-echo "[${SCRIPT_NAME}] Configuring Docker startup dependency on Tailscale"
+# ---------------------------------------------------------------------------
+# Configure Docker startup dependency
+# ---------------------------------------------------------------------------
+
+log_info "Configuring Docker startup dependency on Tailscale"
+
 mkdir -p /etc/conf.d
+
 if [ -f /etc/conf.d/docker ]; then
     if ! grep -q 'rc_need="tailscale"' /etc/conf.d/docker; then
         echo 'rc_need="tailscale"' | doas tee -a /etc/conf.d/docker >/dev/null
@@ -263,46 +461,62 @@ else
     echo 'rc_need="tailscale"' | doas tee /etc/conf.d/docker >/dev/null
 fi
 
-echo "[$SCRIPT_NAME] Setting up Docker Daemon"
-mkdir -p "/etc/docker"
-if [ ! -f ${CERT_DIR}/ca.crt ]; then
-    echo "[$SCRIPT_NAME] Missing CA certificate, marking registry as insecure"
+# ---------------------------------------------------------------------------
+# Configure Docker daemon
+# ---------------------------------------------------------------------------
+
+log_info "Setting up Docker daemon"
+
+mkdir -p /etc/docker
+
+if [ ! -f "${CERT_DIR}/ca.crt" ]; then
+    log_warn "Missing CA certificate, marking registry as insecure"
+
     if [ -f "/etc/docker/daemon.json" ]; then
-	rm -f "/etc/docker/daemon.json"
+        rm -f "/etc/docker/daemon.json"
     fi
-    cat > "/etc/docker/daemon.json" << EOF
-    {
-	"insecure-registries": [
-	    "${TAILSCALE_IP}:5050"
-	]
-	"log-driver": "json-file",
-	"log-opts": {
-	    "max-size": "10m",
-	    "max-file": "3"
-	}
+
+    cat > "/etc/docker/daemon.json" <<EOF
+{
+    "insecure-registries": [
+        "${TAILSCALE_IP}:5050"
+    ],
+    "log-driver": "json-file",
+    "log-opts": {
+        "max-size": "10m",
+        "max-file": "3"
     }
+}
 EOF
 else
-    echo "[$SCRIPT_NAME] Found CA certificate, marking registry as secure"
+    log_info "Found CA certificate, marking registry as secure"
+
     mkdir -p "/etc/docker/certs.d/${TAILSCALE_IP}:5050/"
     cp "${CERT_DIR}/ca.crt" "/etc/docker/certs.d/${TAILSCALE_IP}:5050/"
+
     if [ -f "/etc/docker/daemon.json" ]; then
-	rm -f "/etc/docker/daemon.json"
+        rm -f "/etc/docker/daemon.json"
     fi
-    cat > "/etc/docker/daemon.json" << EOF
-    {
-	"log-driver": "json-file",
-	"log-opts": {
-	    "max-size": "10m",
-	    "max-file": "3"
-	}
+
+    cat > "/etc/docker/daemon.json" <<EOF
+{
+    "log-driver": "json-file",
+    "log-opts": {
+        "max-size": "10m",
+        "max-file": "3"
     }
+}
 EOF
 fi
 
-echo "[${SCRIPT_NAME}] VM ip: ${IP}"
+log_info "VM IP: ${IP}"
 
-echo "[$SCRIPT_NAME] Setup complete"
+# ---------------------------------------------------------------------------
+# Display setup information
+# ---------------------------------------------------------------------------
+
+log_info "Setup complete"
+
 echo "--------------------------------"
 echo "Tailscale IP:"
 cat /etc/tailscale_ip
@@ -311,7 +525,11 @@ echo "Headscale auth key:"
 cat /etc/headscale_authkey
 echo "--------------------------------"
 
-echo "[$SCRIPT_NAME] Configuring login welcome message"
+# ---------------------------------------------------------------------------
+# Configure login welcome message
+# ---------------------------------------------------------------------------
+
+log_info "Configuring login welcome message"
 
 cat > /etc/motd <<EOF
 
@@ -369,6 +587,7 @@ cat > /etc/motd <<EOF
 
 EOF
 
-echo "[$SCRIPT_NAME] Setup complete"
-echo "[$SCRIPT_NAME] Restarting VM"
+log_info "Setup complete"
+log_info "Restarting VM"
+
 reboot
