@@ -15,24 +15,11 @@
 export const BOT_TEAM_TIERS = {
   // Round(s) de début : 0 ou 1 rare max
   faible: [
-    ['fishet', 'squirel', 'leafs', 'burpy', 'papate', 'monkel'], // aucun rare
-    ['sharky', 'squirel', 'leafs', 'burpy', 'papate', 'monkel'], // variante eau
-    ['fishet', 'squirel', 'leafs', 'burpy', 'papate', 'gigantomakia'], // variante terre
-    ['fishet', 'squirel', 'leafs', 'burpy', 'pigeonne', 'monkel'], // variante air
+    ['pisciner', /*'squirel', 'burpy'*/], // aucun rare
   ],
-
-  // Round(s) intermédiaires : 2 rares
-  moyen: [
-    ['pisciner',], // full uncommon+rare
-    ['pisciner',], // full common+rare
-    ['pisciner',],
-  ],
-
   // Round(s) de fin : les 3 rares
   fort: [
-    ['pisciner',], // full uncommon+rare
-    ['pisciner',], // full common+rare
-    ['pisciner',], // mix
+     ['fishet', 'squirel', 'leafs', 'burpy', 'papate', 'gigantomakia'],
   ],
 } as const;
 
@@ -71,8 +58,7 @@ export const BOT_ITEMS: Record<string, { scene: string; type: string; value: num
  */
 export const BOT_ITEM_COUNTS: Record<BotTeamTier, { potion: number; bomb: number }> = {
   faible: { potion: 1, bomb: 1 },
-  moyen: { potion: 2, bomb: 2 },
-  fort: { potion: 3, bomb: 3 },
+  fort: { potion: 2, bomb: 2 },
 };
 
 /**

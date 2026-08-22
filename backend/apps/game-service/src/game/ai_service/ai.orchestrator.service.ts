@@ -61,21 +61,14 @@ export class AiOrchestratorService {
    * current round so they stay competitive (feature 3).
    */
   takeoverPlayer(round: number, totalRounds: number, player: Player, opponent: Player): void {
-    if (player.currentPhase == 'map') {
-      this.aiService.createBotPlayer('takeover', round, totalRounds, undefined, player);
-    }
-    else if (player.currentPhase == 'team_choice') {
-      if (player.teamReady == true) {
-        this.aiService.createBotPlayer('takeover', round, totalRounds, undefined, player);
-        return;
-      }
-      this.decideBattleTeam(this.aiService.createBotPlayer('takeover',round,totalRounds,undefined,player),opponent);
-      player.teamReady = true;
-    }
-    // else if (player.currentPhase == 'combat') {
-
-    // }
-  }
+    this.aiService.createBotPlayer('takeover', round, totalRounds, undefined, player);
+  // else if (player.currentPhase == 'team_choice' && !player.teamReady) {
+  //   this.aiService.createBotPlayer('takeover', round, totalRounds, undefined, player);
+  // }
+  // else if (player.currentPhase == 'combat') {
+  //   this.aiService.createBotPlayer('takeover', round, totalRounds, undefined, player);
+  // }
+}
 
   /**
    * Décide de l'équipe de combat (3 monstres) d'un bot pour le
@@ -99,5 +92,10 @@ export class AiOrchestratorService {
    */
   getLobbySkin(bot: Player): string {
     return this.aiService.getLobbySkin(bot.asset);
+  }
+
+  refreshBotForRound(bot: Player, round: number, totalRounds: number): void {
+  if (!bot.isBot) return;
+  this.aiService.refreshBotLoadout(bot, round, totalRounds);
   }
 }

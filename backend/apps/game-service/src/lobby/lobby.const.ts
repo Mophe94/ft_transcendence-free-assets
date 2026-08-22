@@ -1,6 +1,6 @@
 export const DEFAULT = {
   COUNTDOWN: 30,
-  CAPACITY: 2,
+  CAPACITY: 4,
 };
 
 export const LOBBY_KEYS = {

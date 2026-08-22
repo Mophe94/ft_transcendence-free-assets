@@ -68,25 +68,26 @@ export class AiService {
    * adverses ; on garde les 3 meilleurs.
    */
   chooseBattleTeam(botTeam: string[], enemyTeam: string[]): string[] {
+    console.log(botTeam);
     const enemyTypes = enemyTeam
-      .filter((name) => name !== '')
-      .map((name) => MONSTER_TYPES[name])
-      .filter((type): type is string => !!type);
-
+    .filter((name) => name !== '')
+    .map((name) => MONSTER_TYPES[name])
+    .filter((type): type is string => !!type);
+    
     const scored = botTeam
-      .filter((name) => name !== '')
-      .map((name) => {
-        const type = MONSTER_TYPES[name];
-        const score =
-          enemyTypes.length === 0
-            ? 1
-            : enemyTypes.reduce(
-                (sum, enemyType) => sum + (this.typeChart[type]?.[enemyType] ?? 1),
-                0,
-              ) / enemyTypes.length;
-        return { name, score };
-      });
-
+    .filter((name) => name !== '')
+    .map((name) => {
+      const type = MONSTER_TYPES[name];
+      const score =
+      enemyTypes.length === 0
+      ? 1
+      : enemyTypes.reduce(
+        (sum, enemyType) => sum + (this.typeChart[type]?.[enemyType] ?? 1),
+        0,
+      ) / enemyTypes.length;
+      return { name, score };
+    });
+    
     scored.sort((a, b) => b.score - a.score);
     return scored.slice(0, 3).map((entry) => entry.name);
   }
@@ -210,13 +211,8 @@ export class AiService {
    * @param totalRounds  Nombre total de rounds du bracket (Math.log2(FULL))
    */
   private pickTierName(round: number, totalRounds: number): BotTeamTier {
-    if (totalRounds <= 0) return 'faible';
-
-    const progress = round / totalRounds; // 0 (1er round) -> 1 (finale)
-
-    if (progress <= 1 / 3) return 'faible';
-    if (progress <= 2 / 3) return 'moyen';
-    return 'fort';
+    if (totalRounds <= 1) return 'fort'; // tournoi à 1 round = direct la finale
+    return round > totalRounds / 2 ? 'fort' : 'faible';
   }
 
   /**
@@ -251,6 +247,12 @@ export class AiService {
     }
   }
 
+  public refreshBotLoadout(bot: Player, round: number, totalRounds: number): void {
+  const tier = this.pickTierName(round, totalRounds);
+  bot.team = [...this.pickTeamFromTier(tier)];
+  this.equipBotItems(bot, tier);
+  }
+
   /**
    * Construit un nouveau bot ou transforme un joueur humain déconnecté en bot.
    *
@@ -281,19 +283,13 @@ export class AiService {
         `[AiService] Prise de contrôle du joueur ${humanToReplace.id} par l'IA (déconnexion)`,
       );
       humanToReplace.isBot = true;
-
-      // Le joueur peut avoir une équipe faible ou incomplète (peu de
-      // monstres attrapés avant la déconnexion). On lui donne une équipe
-      // du palier correspondant au round courant pour qu'il reste
-      // compétitif pour la suite du bracket. On ne touche pas à
-      // battle_team : si un combat est déjà en cours, il continue tel
-      // quel, seul le prochain team_setup profitera de la mise à jour.
-      humanToReplace.team = [...this.pickTeamFromTier(tier)];
-      this.equipBotItems(humanToReplace, tier);
-
+      if (humanToReplace.currentPhase == 'map') {
+        humanToReplace.team = [...this.pickTeamFromTier(tier)];
+        this.equipBotItems(humanToReplace,tier)
+      }
       return humanToReplace;
     }
-
+    
     const team = this.pickTeamFromTier(tier);
     const id = botId ?? this.generateBotId();
     const skinPair = this.pickBotSkin();

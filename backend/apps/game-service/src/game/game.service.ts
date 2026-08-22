@@ -188,10 +188,12 @@ export class GameService {
       const round = totalRounds - player.roundsRemaining + 1;
 
       this.aiOrchestrator.takeoverPlayer(round, totalRounds, player, enemy);
-
-      console.log(
-        `[GameService] Player ${userId} disconnected while still in the running -> replaced by AI`,
-      );
+      if (player.currentPhase === 'team_choice' && !player.teamReady) {
+        const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy);
+        void this.handleMessage(player.id, { state: 'team_choice', battle_team: chosenTeam });
+      } else if (player.currentPhase === 'combat') {
+        this.triggerBotCombatTurn(player.id, player, enemy);
+      }
       return;
     }
     // --- end AI takeover ---
@@ -215,7 +217,6 @@ export class GameService {
     this.activePlayersByRoom.get(roomId)?.delete(userId);
     this.roomIdByPlayer.delete(userId);
     this.playerService.removePlayer(userId);
-
     if (player) this.startNextRound(roomId);
     else {
       // useless with AI? 
@@ -392,6 +393,8 @@ export class GameService {
       this.phaseTimer.startTimes.get(`game: ${roomId}`)! +
       PHASE_DURATIONS.team_setup;
 
+    
+    const totalRounds = Math.log2(DEFAULT.CAPACITY);
     for (const userId of roomPlayers) {
       const player = this.playerService.getPlayer(userId)!;
       player.currentPhase = 'team_choice';
@@ -419,6 +422,8 @@ export class GameService {
       // rappelant handleMessage exactement comme si le message venait
       // du client — aucune logique dupliquée.
       if (player.isBot) {
+        const round = totalRounds - player.roundsRemaining + 1;
+        this.aiOrchestrator.refreshBotForRound(player, round, totalRounds);
         const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy ?? player);
         void this.handleMessage(userId, { state: 'team_choice', battle_team: chosenTeam });
       }
@@ -891,6 +896,9 @@ export class GameService {
 
     await this.redisStateService.updateStatePlayer(loser.id, loser);
     await this.redisStateService.updateStatePlayer(winner.id, winner);
+    // reinitialize winner
+    winner.resetAfterRound();
+    if (winner.isBot) winner.duelFinished = true;
     
     loser.duelFinished = true;
 
@@ -903,9 +911,6 @@ export class GameService {
       }
     }
 
-    // reinitialize winner
-    winner.resetAfterRound();
-    if (winner.isBot) winner.duelFinished = true;
 
 
     // --- AI (bot loser cleanup) ---
