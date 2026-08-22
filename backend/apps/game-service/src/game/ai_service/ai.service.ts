@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Player } from '../player/player';
-import { BOT_TEAM_TIERS, BOT_NAMES, BOT_SKIN_PAIRS, MONSTER_TYPES, BOT_ITEMS, BOT_ITEM_COUNTS, BotTeamTier } from './bot.data';
+import { BOT_TEAM_TIERS, BOT_NAMES, BOT_SKINS, MONSTER_TYPES, BOT_ITEMS, BOT_ITEM_COUNTS, BotTeamTier } from './bot.data';
 import { GameData } from '../game.type';
 
 export type BotMode = 'hardcoded' | 'takeover';
@@ -32,8 +32,8 @@ export class AiService {
    * aux noms, pas besoin d'éviter les doublons : deux bots avec le même
    * skin dans une room, ce n'est pas gênant.
    */
-  pickBotSkin(): { lobby: string; game: string } {
-    return BOT_SKIN_PAIRS[Math.floor(Math.random() * BOT_SKIN_PAIRS.length)];
+  pickBotSkin(): string {
+  return BOT_SKINS[Math.floor(Math.random() * BOT_SKINS.length)];
   }
 
   /**
@@ -43,8 +43,7 @@ export class AiService {
    * bot dans Redis pour l'écran d'attente.
    */
   getLobbySkin(gameSkin: string): string {
-    const pair = BOT_SKIN_PAIRS.find((p) => p.game === gameSkin);
-    return pair?.lobby ?? BOT_SKIN_PAIRS[0].lobby;
+    return BOT_SKINS.includes(gameSkin) ? gameSkin : BOT_SKINS[0];
   }
 
   /**
@@ -292,15 +291,15 @@ export class AiService {
     
     const team = this.pickTeamFromTier(tier);
     const id = botId ?? this.generateBotId();
-    const skinPair = this.pickBotSkin();
+    const skin = this.pickBotSkin();
 
-    const bot = new Player(id, botName ?? 'Bot IA', "-1", skinPair.game);
+    const bot = new Player(id, botName ?? 'Bot IA', "-1", skin);
     bot.isBot = true;
     bot.team = [...team];
     this.equipBotItems(bot, tier);
 
     this.logger.log(
-      `[AiService] Instanciation du bot ${id} (round ${round}/${totalRounds}, palier ${tier}, skin ${skinPair.lobby}), équipe: ${team.join(', ')}`,
+      `[AiService] Instanciation du bot ${id} (round ${round}/${totalRounds}, palier ${tier}, skin ${skin}), équipe: ${team.join(', ')}`,
     );
 
     return bot;

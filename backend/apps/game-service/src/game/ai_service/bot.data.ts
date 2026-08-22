@@ -13,11 +13,9 @@
  * toujours la même composition.
  */
 export const BOT_TEAM_TIERS = {
-  // Round(s) de début : 0 ou 1 rare max
   faible: [
-    ['pisciner', /*'squirel', 'burpy'*/], // aucun rare
+    ['pisciner', 'squirel', 'burpy'],
   ],
-  // Round(s) de fin : les 3 rares
   fort: [
      ['fishet', 'squirel', 'leafs', 'burpy', 'papate', 'gigantomakia'],
   ],
@@ -84,15 +82,15 @@ export const BOT_NAMES = [
  * pioche un au hasard à sa création, pour ne pas toujours afficher le
  * même sprite.
  */
-export const BOT_SKIN_PAIRS: ReadonlyArray<{ lobby: string; game: string }> = [
-  { lobby: 'DinoGreen', game: 'dinogreen' },
-  { lobby: 'DinoBlue', game: 'dinoblue' },
-  { lobby: 'DinoRed', game: 'dinored' },
-  { lobby: 'DinoYellow', game: 'dinoyellow' },
-  { lobby: 'Ghost', game: 'ghost' },
-  { lobby: 'Ghost02', game: 'ghost02' },
-  { lobby: 'Ghost03', game: 'ghost03' },
-  { lobby: 'Satyr01', game: 'satyr01' },
-  { lobby: 'Satyr02', game: 'satyr02' },
-  { lobby: 'Satyr03', game: 'satyr03' },
+export const BOT_SKINS: ReadonlyArray<string> = [
+  'dinoGreen',
+  'dinoBlue',
+  'dinoRed',
+  'dinoYellow',
+  'ghost',
+  'ghost02',
+  'ghost03',
+  'satyr01',
+  'satyr02',
+  'satyr03',
 ];
