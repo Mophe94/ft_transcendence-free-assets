@@ -1,6 +1,4 @@
 
-
-Readme · MD
 *This project has been created as part of the 42 curriculum by Bertrmar, Stempels, Dbajeux, Kprist, Agaland.*
  
 
@@ -71,12 +69,14 @@ Built and maintained a stable, reproducible environment for the project (VMs) an
  
 TO-DO agaland 
 ---
+
 ## Individual Contributions
  
 | Scope | Team | Main Features |
 |---|---|---|
 | **Infrastructure / Docker** | stempels | Docker Swarm deployment across multiple school computers, VM provisioning, container-to-container networking, monitoring & logging stack |
 | **Frontend** | kprist | User management UI, friends UI, chat UI, general design (React, HTML, Tailwind) |
+| **Backend (User & Chat Services)** | kprist | Backend logic for user management, authentication (42 OAuth + classic accounts, JWT), the chat service, friends/social system, and notifications |
 | **Game** | bertrmar, dbajeux, agaland | Multiplayer mode, AI opponent, map exploration, game visuals/assets, core gameplay/design |
 | **Game ↔ Web Liaison** | agaland, dbajeux, bertrmar | WebSocket bridge between Godot and the backend, lobby management (Redis), connection/disconnection handling |
 | **Database** | kprist, bertrmar | Design and setup of both databases; storage and retrieval logic for user data and game/stats data |
@@ -88,7 +88,6 @@ TO-DO agaland
 - **Project management tooling:** GitHub (repository + version control) was the main tool. The team initially intended to also use GitHub Issues more formally, but in practice quickly fell back to coordinating through Slack alongside Git for versioning.
 - **Communication:** Slack was used throughout the project as the main communication channel, alongside live/in-person meetings.
 ---
-
 ### Team Wellbeing & Cohesion
 
 Beyond task tracking, the team made a deliberate effort to protect group cohesion throughout the project.
@@ -253,8 +252,9 @@ The diagram below traces the full lifecycle of a game session, from the initial 
 | 10 | Multiplayer game (3+ players) | Major | 2 | Built with Godot, WebSocket, and Redis. |
 | 11 | Game customization options | Minor | 1 | *(à préciser : power-ups, skins, maps  tu mentionnes déjà "in-game skins" ailleurs dans le README, à relier ici)* |
 | 12 | Backend as microservices | Major | 2 | Structured progressively into loosely-coupled services (game, user, chat, AI). |
+| 13 | Custom design system with reusable components | Minor | 1 | Built with React and Tailwind CSS, including a dedicated color palette, typography, and icon set (10+ reusable components). |
 
-**Standard modules subtotal: 8 Major (16 pts) + 4 Minor (4 pts) = 20 points**
+**Standard modules subtotal: 8 Major (16 pts) + 5 Minor (5 pts) = 21 points**
 
 ---
 
@@ -278,9 +278,9 @@ The diagram below traces the full lifecycle of a game session, from the initial 
 
 | Category | Points |
 |---|---|
-| Standard modules | 20 |
+| Standard modules | 21 |
 | Modules of choice (custom) | 7 |
-| **Total** | **27** |
+| **Total** | **28** |
 
 
 ## Instructions
