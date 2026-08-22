@@ -13,11 +13,17 @@
  * toujours la même composition.
  */
 export const BOT_TEAM_TIERS = {
-  faible: [
-    ['pisciner', 'squirel', 'burpy'],
+  // faible: [
+  //   ['pisciner', 'squirel', 'burpy'],
+  // ],
+  // fort: [
+  //    ['fishet', 'squirel', 'leafs', 'burpy', 'papate', 'gigantomakia'],
+  // ],
+   faible: [
+    ['pisciner', 'pisciner', 'pisciner'],
   ],
   fort: [
-     ['fishet', 'squirel', 'leafs', 'burpy', 'papate', 'gigantomakia'],
+     ['pisciner', 'pisciner', 'pisciner', 'pisciner', 'pisciner', 'pisciner'],
   ],
 } as const;
 
