@@ -1,491 +1,363 @@
-*This project has been created as part of the 42 curriculum by Dbajeux,Agaland,Bertrmar,Kprist,Stempels*
 
----
-## Workfow
 
-[![Update Architecture Diagram](https://github.com/sitempels/ft_transcendence/actions/workflows/update_architecture_diagram.yml/badge.svg?branch=main)](https://github.com/sitempels/ft_transcendence/actions/workflows/update_architecture_diagram.yml)
+Readme · MD
+*This project has been created as part of the 42 curriculum by Bertrmar, Stempels, Dbajeux, Kprist, Agaland.*
+ 
 
-# ft_transcendence
-
+# ft_transcendence - Free Assets <img src="./icon_project.png" width="40" align="left" alt="ft_transcendence mascot"/>
+ 
 ## Table of Contents
-
+ 
 1. [Description](#description)
 2. [Team Information](#team-information)
 3. [Project Management](#project-management)
 4. [Technical Stack](#technical-stack)
-5. [Project Structure](#project-structure)
-6. [Docker Architecture](#docker-architecture)
-7. [Database Schema](#database-schema)
-8. [Features List](#features-list)
-9. [Modules](#modules)
-10. [Individual Contributions](#individual-contributions)
-11. [Instructions](#instructions)
-12. [Resources](#resources)
-
+5. [Database Schema](#database-schema)
+6. [Features List](#features-list)
+7. [Modules](#modules)
+8. [Individual Contributions](#individual-contributions)
+9. [Instructions](#instructions)
+10. [Resources](#resources)
+11. [Ideas for Future Evolution](#ideas-for-future-evolution)
+12. [Credits](#credits)
 ---
-
+ 
 ## Description
 
-**ft_tranceandance** is a real-time multiplayer web game inspired by Pokémon and Team Fight Tactics (TFT). Players build a team of monsters, explore a map, collect loot, and battle other players in turn-based combat — all directly in the browser.
-
-## Architecture
-
-![Alt text](./architecture_diagram.svg)
-
+**ft_transcendence** is a sandbox project built by a team of five, with one challenge in mind: *if we already know a technology, we're not allowed to use it.* The goal was to design and ship a full multiplayer web game in a professional-style working environment with real deadlines, task ownership, and cross-team coordination while every team member picked up a new stack along the way.
+ 
+Concretely, the project combines:
+- A custom **multiplayer game** built with the **Godot** engine, featuring monsters, skills, maps, and an AI opponent to fill unbalanced lobbies.
+- A **web platform** (React frontend, NestJS backend) handling authentication, user profiles, friends, real-time chat, notifications, and lobby/matchmaking.
+- A **self-hosted infrastructure** running on **Docker Swarm**, spread across multiple school computers, with a full monitoring and logging stack.
 ### Key Features
-
-- **Lobby & Social** — friends system, general chat, group invitations
-- **Map Exploration** — choose a map by upvote, collect loot, gain XP, evolve your team
-- **Turn-Based Combat** — real-time multiplayer battles with attack, item use, and monster switching
-- **Matchmaking** — automated queue with AI fill if a player is missing
-- **Post-Match** — statistics update, match history, end-of-game chat
-- **Microservices Architecture** — independent, scalable services communicating via a message broker
-- **Progressive Web App** — installable with offline support
-
-### Game Flow Overview
-
-```
-Phase 0 — Launch       →   Login, profile, lobby, social features
-Phase 1 — Preparation  →   Map selection, starter pick, exploration, loot, XP
-Phase 2 — Matchmaking  →   Queue, lobby creation, AI fill, team lock
-Phase 3 — Combat       →   Turn-based battle until one side has no monsters left
-Phase 4 — Post-Match   →   Stats calculation, profile update, end-game chat
-```
-
+ 
+- 🔐 Authentication via the 42 OAuth API + classic account creation, secured with JWT
+- 👥 Friends system, invitations, and real-time notifications
+- 💬 Real-time chat
+- 🎮 Custom multiplayer game (Godot) with an AI opponent, monsters, skills, and explorable maps, inventory system
+- 🕹️ Lobby system backed by Redis
+- 🎨 Custom, responsive frontend (React + TypeScript + Tailwind CSS)
+- 🐳 Distributed deployment via Docker Swarm across multiple nodes
 ---
-
+ 
 ## Team Information
+ 
+| Login | Role | Responsibilities |
+|---|---|---|
+| **bertrmar** | Product Owner | Defines and prioritizes tasks according to the project's requirements, with respect for the "no known tech" rule as the top priority; keeps the team on track for deadlines. |
+| **dbajeux** | Project Manager | Organizes the project's progress, leads and schedules meetings, and follows up on each member's advancement. |
+| **kprist** | Full-Stack Developer | Owns the frontend, the user-facing backend services (auth, chat), and the database setup. |
+| **stempels** | Infrastructure Engineer | Designs and operates the self-hosted infrastructure: VM provisioning, Docker Swarm orchestration, networking, monitoring and logging. |
+| **agaland**  | Developer  Game/Backend Liaison | Handles the WebSocket bridge between the Godot game client and the backend: sends/receives game events, manages connection and disconnection. |
 
-| Member | Role(s) | Responsibilities |
-|--------|---------|-----------------|
-| [Member 1] | Product Owner / Developer | Backlog management, feature prioritization, [assigned services] |
-| [Member 2] | Project Manager / Developer | Sprint planning, meeting facilitation, [assigned services] |
-| [Member 3] | Tech Lead / Developer | Architecture decisions, code review, [assigned services] |
-| [Member 4] | Developer | [Assigned features/services] |
-| [Member 5] | Developer | [Assigned features/services] |
-
-> ℹ️ Individual assignments will be updated as the project progresses.
-
+### Detailed Responsibilities
+ 
+**bertrmar: Product Owner**
+Chooses the priorities and drives task execution according to the subject's requirements for this project, that primarily meant respecting the "no known technology" rule and hitting deadlines. Worked on the game itself, the networking layer between the game client and the game service, the game service, and Redis.
+*Main challenge:* figuring out what to prioritize, and when solved with a weekly review meeting, plus getting a custom game engine (Godot) to talk to a custom server, which required a lot of documentation and video research before the first successful connection test, and finding/creating visual assets for the game with the help of AI tools.
+ 
+**dbajeux: Project Manager**
+Organizes the project's advancement and leads meetings to keep the team moving forward. Beyond PM duties, worked hands-on on the game's exploration mode in Godot, the level design conception, and the implementation of in-game skins. Also built the lobby backend, AI system, the README, and contributed to some of the frontend design. Main challenge: a difficult merge conflict between the game's core business logic and the AI bot logic resolved through close pair-programming with Agaland
+ 
+**kprist: Full-Stack Developer**
+Primarily responsible for the frontend, along with the backend logic for user management, the chat service, and setting up both databases. Worked on authentication and account creation, 42 OAuth, chat, the friends system, the notification/invitation system, user settings, and JWT handling.
+*Main challenge:* the project initially used 42 OAuth as the only authentication method; retrofitting classic email/password accounts on top of that turned out to be very difficult. The user service was ultimately rebuilt from scratch, along with the user database schema.
+ 
+**stempels: Infrastructure Engineer**
+Built and maintained a stable, reproducible environment for the project (VMs) and made a multi-node Docker Swarm deployment possible on the school's computers, ensuring the swarm had enough compute power and remained resilient.
+*Main challenge:* not explicitly detailed infrastructure work centered on building a repeatable `make`-driven provisioning flow for both leader and worker nodes (see [Instructions](#instructions)).
+ 
+TO-DO agaland 
 ---
-
+## Individual Contributions
+ 
+| Scope | Team | Main Features |
+|---|---|---|
+| **Infrastructure / Docker** | stempels | Docker Swarm deployment across multiple school computers, VM provisioning, container-to-container networking, monitoring & logging stack |
+| **Frontend** | kprist | User management UI, friends UI, chat UI, general design (React, HTML, Tailwind) |
+| **Game** | bertrmar, dbajeux, agaland | Multiplayer mode, AI opponent, map exploration, game visuals/assets, core gameplay/design |
+| **Game ↔ Web Liaison** | agaland, dbajeux, bertrmar | WebSocket bridge between Godot and the backend, lobby management (Redis), connection/disconnection handling |
+| **Database** | kprist, bertrmar | Design and setup of both databases; storage and retrieval logic for user data and game/stats data |
+ 
 ## Project Management
-
-### Methodology
-
-The team follows an **Agile Scrum** approach:
-
-- Work is split into **sprints**, each scoped between two team meetings
-- Tasks are prioritized at the start of each sprint to ensure continuous progress and avoid delays
-- Roles are assigned to simulate a professional environment: **Product Owner**, **Project Manager**, and **Tech Lead**
-
-### Meetings
-
-- **Frequency**: 2 to 4 times per month, depending on the complexity of ongoing tasks
-- **Purpose**: sprint reviews, planning, unblocking issues, and alignment
-
-### Tools
-
-| Tool | Usage |
-|------|-------|
-| **GitHub** | Version control, code review, issue tracking |
-| **[Trello / GitHub Projects / Notion — TBD]** | Task board and sprint tracking |
-
-### Communication Channels
-
-| Channel | Usage |
-|---------|-------|
-| **Slack** | Day-to-day team communication |
-| **Discord** | Documentation sharing and remote collaboration |
-| **GitHub** | Pull requests, code reviews, project tracking |
-
+ 
+- **Task distribution:** work was split first by feature, then by module, and finally refined at the individual-requirement level as the project progressed.
+- **Meetings:** the team started with one meeting per week, and switched to a daily meeting during the final crunch period.
+- **Project management tooling:** GitHub (repository + version control) was the main tool. The team initially intended to also use GitHub Issues more formally, but in practice quickly fell back to coordinating through Slack alongside Git for versioning.
+- **Communication:** Slack was used throughout the project as the main communication channel, alongside live/in-person meetings.
 ---
+
+### Team Wellbeing & Cohesion
+
+Beyond task tracking, the team made a deliberate effort to protect group cohesion throughout the project.
+
+- **Check-in at the start of every meeting:** each meeting opened with a quick round where any team member could raise concerns, friction points, or discomfort within the group, before moving on to the technical agenda. This was treated as a fixed part of the meeting structure, not an afterthought.
+- **Why:** with five people learning mostly unfamiliar technologies under real deadlines, tension and frustration were expected. Surfacing it early, on a regular cadence, was intended to prevent small frictions from turning into larger conflicts and to keep communication open across the team.
 
 ## Technical Stack
-
+ 
 ### Frontend
-
-| Technology | Justification |
-|------------|--------------|
-| [Framework — TBD] | [e.g., React / Vue / Svelte — chosen for component reusability and ecosystem] |
-| Custom Design System | 10+ reusable components, consistent color palette, typography, and icons |
-| PWA (Progressive Web App) | Offline support, installability, improved mobile experience |
-
+- **React** with **TypeScript**
+- **Tailwind CSS** for styling
+- **Godot** (engine) for the game client itself
 ### Backend
-
-| Technology | Justification |
-|------------|--------------|
-| [Framework — TBD] | [e.g., NestJS / FastAPI / Django — chosen for...] |
-| Microservices Architecture | Separation of concerns, independent scalability per domain |
-| WebSockets | Real-time features: combat updates, notifications, chat |
-| API Gateway | Single entry point — JWT validation, routing, rate limiting |
-| Kafka / RabbitMQ | Async communication between services (e.g., combat result → post-match trigger) |
-
+- **NestJS** (TypeScript)
+- **Redis**  in-memory store for active game rooms, lobby state (players per room), and general key-value caching
 ### Database
-
-| Technology | Justification |
-|------------|--------------|
-| [DB — TBD] | [e.g., PostgreSQL — relational model fits user/game data structure] |
-| ORM | [e.g., Prisma / TypeORM / SQLAlchemy] — simplifies queries and schema management |
-
-### Infrastructure & DevOps
-
-| Technology | Usage |
-|------------|-------|
-| Docker / Docker Compose | Containerization of all microservices |
-| ELK Stack (Elasticsearch, Logstash, Kibana) | Centralized log management and monitoring |
-
+- **PostgreSQL**, split across two databases (`users_db` and `game_db`)
+- Chosen for its performance and its native support for storing JSON/JSONB data (used for flexible fields such as user settings)
+### Infrastructure & Deployment
+- **Docker** & **Docker Swarm**  containerization and multi-node orchestration
+- **Docker Bake**  streamlined builds for a project with many images
+- **Tailscale / Headscale**  self-hosted VPN for secure inter-node communication
+- **Nginx**  reverse proxy, HTTP/HTTPS termination
+- **OpenSSL**  self-signed certificates
+- **Private Docker Registry**  self-hosted image storage
+- **Prometheus**, **Loki**, **Grafana**, **Alloy**  metrics collection, log aggregation, and unified dashboards
+- **Bash / Makefile / YAML**  scripting, orchestration, and configuration
+### Other Key Technologies
+- **WebSocket**  real-time communication between the game client, the backend, and connected players
+- **TypeORM**  ORM layer for NestJS/PostgreSQL
+- **42 OAuth API** + **JWT**  authentication
+### Technical Choices  Justification
+ 
+| Choice | Why |
+|---|---|
+| Redis | In-memory data store, ideal for the fast, ephemeral reads/writes needed to track active rooms and lobby membership in real time, without the overhead of a relational DB for transient state. |
+| Docker Swarm | The team was constrained by the limited resources of individual school computers, so workloads needed to be distributed and orchestrated across several machines. |
+| WebSocket | Required for low-latency, bidirectional communication between players in a real-time multiplayer game. |
+| 42 API (OAuth) | The project is built for the 42 school, so authenticating through the school's own identity provider was a natural fit. |
+| Godot | A game engine that is powerful enough for the project's needs without being overly complex  approachable for a team without prior game-dev experience, yet capable enough for a "real" game, and it was selected after a testing/comparison phase against other engines. |
+| React & NestJS | Both are widely adopted in the web ecosystem, meaning abundant documentation and community support  valuable for a team learning most of the stack from scratch. |
+| PostgreSQL | Strong performance combined with native JSON/JSONB support, avoiding the need for a second, separate document store. |
+ 
 ---
+ 
 
-## Project Structure
-
-```
-transcendance/
-│
-├── docker-compose.yml          # Orchestrates all services
-├── .env                        # Environment variables (never commit this)
-├── .gitignore
-│
-├── base/                       # Shared base Docker image
-│   └── Dockerfile              # All microservice Dockerfiles inherit from this
-│
-├── services/                   # All microservices
-│   │
-│   ├── nginx/                  # Reverse proxy — single entry point for all traffic
-│   │   ├── Dockerfile
-│   │   └── nginx.conf
-│   │
-│   ├── auth/                   # Authentication service (JWT, sessions)
-│   │   ├── Dockerfile          # FROM transcendance-base
-│   │   ├── src/                # Service source code
-│   │   └── .dockerignore
-│   │
-│   ├── api/                    # Main API service
-│   │   ├── Dockerfile          # FROM transcendance-base
-│   │   ├── src/
-│   │   └── .dockerignore
-│   │
-│   └── game/                   # Game logic service
-│       ├── Dockerfile          # FROM transcendance-base
-│       ├── src/
-│       └── .dockerignore
-│
-└── volumes/                    # Persistent data (never commit this)
-    ├── postgres/               # Database files
-    └── redis/                  # Cache files
-```
-
-### Key Rules
-
-- **One microservice = one autonomous folder.** Deleting `services/auth/` must not break anything else.
-- **Global files live at the root.** `docker-compose.yml`, `.env`, `.gitignore` concern the whole project.
-- **`volumes/` and `.env` are never committed to Git** — they contain sensitive data and are auto-generated.
-
----
-
-## Docker Architecture
-
-### Concept
-
-All services share a common **base Docker image** (`transcendance-base`). Each microservice Dockerfile starts with `FROM transcendance-base` and only adds what it specifically needs (runtime, dependencies, source code).
-
-```
-base/Dockerfile          →  builds image  transcendance-base
-                                  ↑
-                    FROM transcendance-base
-                    ┌─────────────┼─────────────┐
-         services/auth/    services/api/    services/game/
-         Dockerfile         Dockerfile       Dockerfile
-```
-
-### Base Image — `base/Dockerfile`
-
-The base image provides a minimal, shared foundation for all microservices.
-
-```dockerfile
-# Image de base partagée par tous les microservices de Transcendance.
-# Chaque service commence son Dockerfile avec : FROM transcendance-base
-
-# OS de base — Debian slim = version allégée sans outils inutiles (~30MB)
-FROM debian:12-slim
-
-# Métadonnées de l'image (identification, documentation)
-LABEL   org.opencontainers.image.title="transcendance-base" \
-        org.opencontainers.image.description="Base image for all Transcendance microservices"
-
-# TZ              : fuseau horaire pour les logs
-# DEBIAN_FRONTEND : empêche apt de poser des questions interactives pendant le build
-ENV TZ=Europe/Brussels \
-    DEBIAN_FRONTEND=noninteractive
-
-# Installation des outils système communs à tous les services
-# --no-install-recommends : installe uniquement le strict nécessaire (image plus légère)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      tzdata \          # données des fuseaux horaires (requis pour TZ)
-      ca-certificates \ # certificats SSL/TLS pour les requêtes HTTPS
-      curl \            # requêtes HTTP (debug réseau, healthchecks)
-      bash \            # shell complet (debian utilise sh par défaut)
-      dumb-init \       # gestionnaire PID 1 — arrêt propre des containers
-    && apt-get clean \                    # vide le cache apt
-    && rm -rf /var/lib/apt/lists/*        # supprime les listes de paquets inutiles
-
-# dumb-init devient le PID 1 du container.
-# Il reçoit les signaux Docker (SIGTERM...) et les transmet proprement à l'application.
-# Le "--" sépare les arguments de dumb-init de la commande du service.
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-```
-
-### What Each Tool Does
-
-| Tool | Purpose |
-|------|---------|
-| `debian:12-slim` | Lightweight OS base (~30MB) |
-| `tzdata` | Timezone data — required for `TZ=Europe/Brussels` to work |
-| `ca-certificates` | SSL/TLS certificates for outbound HTTPS requests |
-| `curl` | HTTP requests — used for healthchecks and network debugging |
-| `bash` | Full shell (Debian defaults to `sh`, which is too limited) |
-| `dumb-init` | PID 1 manager — ensures clean container shutdown on `docker stop` |
-
-### Building the Base Image
-
-The base image must be built before any service. This will be handled automatically by `docker-compose`, but can also be done manually:
-
-```bash
-docker build -t transcendance-base ./base
-```
-
----
-
+ 
 ## Database Schema
+ 
+The project uses **two separate PostgreSQL databases**: `users_db` (accounts, social features, stats) and `game_db` (game content: maps, monsters, skills, items).
+ 
+### `users_db`
+ 
+Handles authentication, social features (friends), and player statistics.
+ 
+![users_db ERD](db_users_graph.png)
+ 
+- **`users`**  core account table (email, username, password hash, avatar, coalition, settings as JSONB, roles).
+- **`accounts`**  linked auth providers per user (**One-to-Many** with `users`), supporting both classic and OAuth login.
+- **`users_stats`**  gameplay statistics per user (**One-to-One** with `users`): games played/won/lost, monsters and endings discovered, achievements.
+- **`relationships`**  friendships between users (**Many-to-Many** on `users`, via `requester_id` / `accepter_id`), with a `status` field (e.g. pending/accepted).
+### `game_db`
+ 
+Holds all game content: maps, tiles, monsters, skills, and items.
+ 
+![game_db ERD](db_game_graph.png)
+ 
+- **`maps`** ↔ **`tiles`**  **Many-to-Many** via `maps_tiles`.
+- **`tiles`** ↔ **`monsters`**  **Many-to-Many** via `tiles_monsters`.
+- **`monsters`** ↔ **`skills`**  **Many-to-Many** via `monsters_skills`.
+- **`items`**  standalone table of usable objects (potions, boosts, etc.), not related to the other tables.
 
-> ⚠️ Schema is a work in progress — will be updated as services are implemented.
-
-### Planned Tables / Collections
-
-```
-users
-  - id, username, email, password_hash, avatar_url, created_at
-
-profiles
-  - id, user_id (FK), wins, losses, rank, level, xp
-
-matches
-  - id, started_at, ended_at, map_id, mode
-
-match_participants
-  - id, match_id (FK), user_id (FK), result (win/loss), team_snapshot
-
-friendships
-  - id, requester_id (FK), receiver_id (FK), status (pending/accepted/blocked)
-
-messages
-  - id, sender_id (FK), channel, content, sent_at
-
-monsters
-  - id, name, base_stats, evolution_chain
-
-items
-  - id, name, effect_type, value
-```
-
-### Relationships
-
-- A **user** has one **profile**
-- A **match** has many **participants** (users)
-- A **user** can have many **friendships** and **messages**
-- A **team** is composed of **monsters**, each optionally holding **items**
-
----
-
-## Features List
-
-| Feature | Description | Team Member(s) |
-|---------|-------------|----------------|
-  Major: Use a framework for both the frontend and backend.
-◦ Use a frontend framework (React, Vue, Angular, Svelte, etc.).
-◦ Use a backend framework (Express, NestJS, Django, Flask, Ruby on Rails,
-etc.).
-◦ Full-stack frameworks (Next.js, Nuxt.js, SvelteKit) count as both if you use
-both their frontend and backend capabilities
-
-Major: Implement real-time features using WebSockets or similar technology.
-
-Minor: Use an ORM for the database.
-
-Minor: Custom-made design system with reusable components, including a proper
-color palette, typography, and icons (minimum: 10 reusable components).
-
-Minor: Support for additional browsers.
-
-Minor: Implement remote authentication with OAuth 2.0 (Google, GitHub, 42,
-etc.).
-
-Major: Introduce an AI Opponent for games.
-
-Major: Implement a complete web-based game where users can play against each
-other.
-
-Major: Multiplayer game (more than two players).
-◦ Support for three or more players simultaneously.
-◦ Fair gameplay mechanics for all participants.
-◦ Proper synchronization across all clients.
-
-Minor: Game customization options
-
- Major: Backend as microservices
-
- Major swarm 
- major godot game engine  a check 
+ 
  
 ---
 
+## Game Workflow
+
+The diagram below traces the full lifecycle of a game session, from the initial WebSocket connection to the end of a match, across the three main phases: **Map**, **Team Setup**, and **Combat**. It also shows how each event flows between the Godot client, the game service, and the database.
+
+![Game Workflow](game_dev.png)
+
+### Phases Overview
+
+- **Connect**  the client establishes the WebSocket connection with the game service.
+- **Map**  on first connection, the map and user info are fetched from the DB. From there, players can manage their inventory (request/delete items), and trigger monster encounters, which branch into a **capture** sub-flow (try to catch, or use an item) resolving in success, failure, or a fleeing monster.
+- **Team Setup**  once a monster roster is ready, players build their battle team, drawing enemy data from the DB, before moving into combat.
+- **Combat**  turn-based phase (`action_battle`) where each player can change monster, use an item, attack, or pass. Results are broadcast each round (`new_round`) until a battle team is fully defeated, triggering win/lose banners, and either progressing to the next map or, on the final battle, a tournament win screen.
+
+---
 ## Modules
 
-### Point System: Major = 2 pts · Minor = 1 pt
+### Standard Modules
 
-| # | Module | Type | Points | Justification | Member(s) |
-|---|--------|------|--------|---------------|-----------|
-| 1 | Framework for frontend + backend | Major | 2 | Consistency and scalability across the stack | TBD |
-| 2 | Real-time features (WebSockets) | Major | 2 | Required for live combat, chat, and notifications | TBD |
-| 3 | User interaction (chat, profiles, friends) | Major | 2 | Core social experience of the platform | TBD |
-| 4 | Public secured API | Major | 2 | External access and integration capability | TBD |
-| 5 | WCAG 2.1 AA Accessibility | Major | 2 | Inclusion and regulatory compliance | TBD |
-| 6 | Standard user management & auth | Major | 2 | Foundation of the entire application | TBD |
-| 7 | AI Opponent | Major | 2 | Enables solo play and fills incomplete lobbies | TBD |
-| 8 | Complete web-based game (PvP) | Major | 2 | Core deliverable of the project | TBD |
-| 9 | Remote players (real-time multiplayer) | Major | 2 | Central gameplay experience | TBD |
-| 10 | Multiplayer (3+ players) | Major | 2 | TFT-style multi-team format | TBD |
-| 11 | Second game + history + matchmaking | Major | 2 | Extends the platform's game offering | TBD |
-| 12 | ELK log management | Major | 2 | Production-grade monitoring and debugging | TBD |
-| 13 | Backend as microservices | Major | 2 | Scalability, fault isolation, independent deployment | TBD |
-| 14 | ORM for database | Minor | 1 | Safer queries, easier migrations | TBD |
-| 15 | PWA with offline support | Minor | 1 | Better UX on mobile and poor connections | TBD |
-| 16 | Custom design system (≥ 10 components) | Minor | 1 | Consistent UI and faster frontend development | TBD |
-| 17 | Multi-browser support | Minor | 1 | Broader accessibility across user environments | TBD |
-| 18 | Game statistics & match history | Minor | 1 | Player progression and engagement | TBD |
-| 19 | User activity analytics dashboard | Minor | 1 | Insights for both players and administrators | TBD |
-| 20 | Advanced chat features | Minor | 1 | Richer social experience | TBD |
-| 21 | Tournament system | Minor | 1 | Competitive layer on top of the base game | TBD |
-| 22 | Game customization options | Minor | 1 | Replayability and player agency | TBD |
-| 23 | Gamification system | Minor | 1 | Long-term player retention | TBD |
-| 24 | Spectator mode | Minor | 1 | Community and learning tool | TBD |
-| 25 | GDPR compliance | Minor | 1 | Legal requirement for EU users | TBD |
+| # | Module | Type | Points | Implementation |
+|---|---|---|---|---|
+| 1 | Framework (frontend + backend) | Major | 2 | NestJS (backend) + React (frontend), used from the very start of the project. |
+| 2 | Real-time features (WebSockets) | Major | 2 | WebSocket bridge between Godot, the backend, and connected players; also powers live chat. |
+| 3 | User interaction | Major | 2 | Friends system, invitations, real-time chat, notifications. |
+| 4 | ORM | Minor | 1 | TypeORM integrated with NestJS across both databases. |
+| 5 | Multi-browser support | Minor | 1 | Manually tested on Chrome, Brave, Firefox, and Edge. |
+| 6 | Standard user management & authentication | Major | 2 | Profile, avatar, friends with online status, dedicated profile page. |
+| 7 | Remote authentication (OAuth 2.0) | Minor | 1 | Implemented via the 42 API. |
+| 8 | AI Opponent | Major | 2 | Custom AI implemented in the backend to fill unbalanced lobbies. |
+| 9 | Web-based multiplayer game | Major | 2 | Built from scratch using Godot; players compete against each other. |
+| 10 | Multiplayer game (3+ players) | Major | 2 | Built with Godot, WebSocket, and Redis. |
+| 11 | Game customization options | Minor | 1 | *(à préciser : power-ups, skins, maps  tu mentionnes déjà "in-game skins" ailleurs dans le README, à relier ici)* |
+| 12 | Backend as microservices | Major | 2 | Structured progressively into loosely-coupled services (game, user, chat, AI). |
 
-**Total: 38 points** — a final selection and prioritization will be made during sprint planning.
+**Standard modules subtotal: 8 Major (16 pts) + 4 Minor (4 pts) = 20 points**
 
 ---
 
-## Individual Contributions
+### Modules of Choice (Custom)
 
-> ⚠️ This section will be filled in progressively as the project advances.
+> Per the subject's requirements, each custom module below must justify: **why chosen**, **what technical challenge it addresses**, **how it adds value**, and **why it deserves its point status**. These will also need to be defended live during evaluation.
 
-### [Member 1] — Product Owner / Developer
-- Responsibilities: TBD
-- Features implemented: TBD
-- Challenges: TBD
+| Module | Type | Points | Why We Chose It | Technical Challenge | Value Added | Why This Status |
+|---|---|---|---|---|---|---|
+| **Custom game & site assets/graphics** | Minor | 1 | *(à compléter)* | Most assets and graphics  for the whole site plus the combat phase  were created in-house rather than sourced. | Gives the project visual coherence and a distinct identity rather than relying on generic/stock assets. | *(à compléter  pourquoi Minor et pas Major : justifier la portée limitée par rapport à Godot)* |
+| **Godot engine integration** | Major | 2 | *(à compléter)* | Integrating a real, standalone game engine (not a web-native framework) into a browser-based platform, including bridging it to a custom NestJS backend over WebSocket. | Enables a genuine game-engine-grade experience (physics, scenes, rendering) inside a web product, which a JS-only game library couldn't match. | *(à compléter  mets en avant la complexité de la connexion Godot ↔ serveur custom, mentionnée comme un vrai défi ailleurs dans le README)* |
+| **Redis optimization** | Minor | 1 | *(à compléter)* | Used to optimize database load  offloading fast-changing, ephemeral state (active rooms, lobby membership) from PostgreSQL. | *(à compléter  quantifie si possible : latence réduite, moins de requêtes DB, etc.)* | *(à compléter)* |
+| **Docker Swarm orchestrator** | Major | 2 | The team was constrained by the limited resources of individual school computers. | Distributing and orchestrating containerized workloads across multiple physical machines reliably. | Pools compute power across nodes, making the full stack (monitoring, multiple services, DBs) viable on school hardware. | *(à compléter  insiste sur le côté "contrainte technique réelle" plutôt que choix de confort)* |
+| **VM automation & sysadmin environment** | Minor | 1 | *(à compléter)* | Building a repeatable, `make`-driven provisioning flow for leader and worker nodes. | Makes onboarding/deployment reproducible across the team instead of manual, error-prone setup per machine. | *(à compléter)* |
 
-### [Member 2] — Project Manager / Developer
-- Responsibilities: TBD
-- Features implemented: TBD
-- Challenges: TBD
-
-### [Member 3] — Tech Lead / Developer
-- Responsibilities: TBD
-- Features implemented: TBD
-- Challenges: TBD
-
-### [Member 4] — Developer
-- Responsibilities: TBD
-- Features implemented: TBD
-- Challenges: TBD
-
-### [Member 5] — Developer
-- Responsibilities: TBD
-- Features implemented: TBD
-- Challenges: TBD
+**Custom modules subtotal: 2 Major (4 pts) + 3 Minor (3 pts) = 7 points**
 
 ---
+
+### Total Points
+
+| Category | Points |
+|---|---|
+| Standard modules | 20 |
+| Modules of choice (custom) | 7 |
+| **Total** | **27** |
+
 
 ## Instructions
-
+ 
 ### Prerequisites
-
-Before running the project, make sure you have the following installed:
-
-| Tool | Version |
-|------|---------|
-| Docker | ≥ 24.x |
-| Docker Compose | ≥ 2.x |
-| Git | Latest stable |
-
-### Environment Setup
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/[org]/ft_tranceandance.git
-   cd ft_tranceandance
-   ```
-
-2. Copy the environment template and configure it:
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Fill in the required variables in `.env`:
-   ```env
-   # Auth
-   JWT_SECRET=your_jwt_secret
-
-   # Database
-   DB_HOST=postgres
-   DB_PORT=5432
-   DB_NAME=tranceandance
-   DB_USER=your_user
-   DB_PASSWORD=your_password
-
-   # API
-   API_KEY=your_api_key
-   ```
-
+ 
+- A Linux distribution (developed and tested on **Ubuntu 22.04.4 LTS**  check with `lsb_release -a`)
+- **VirtualBox** (tested with version 7.0.26r168464  check with `vboxmanage --version`)
+- **npm** (tested with version 10.7.0  check with `npm --version`)
+- **bash** (tested with version 5.1.16(1)  check with `bash --version`)
+- An **Alpine Linux** VM ISO (version 3.23.4  check with `cat /etc/alpine-release`), with `alpine-setup` already run (default options) and **Docker** installed (version 29.5.2  check with `docker --version`)
+### Environment Configuration
+ 
+Two `.env` files are required, based on the provided templates:
+ 
+- **`root_of_project/.env_vm`**  configuration for the VM environment
+- **`infra/.env_infra`**  configuration for the Swarm/infrastructure environment
+If a `.env_vm` file is missing (and a `template_env_vm` exists), the `Makefile` will automatically create one and open it in `vim`  fill in every field, then save and quit (`:wq` or `:x`). The same mechanism applies to `.env_infra`.
+ 
+**`.env_vm` variables:**
+ 
+| Variable | Description |
+|---|---|
+| `BASE_DIR` | Directory containing the VM ISO |
+| `BASE_IMG` | Name of the VM ISO file |
+| `VM_DIR` | Directory in which the VM will be created |
+| `p_root_password` | Root password for the Alpine VM's root account |
+| `p_user_password` | Password for the user created by the setup script (the username is `$(USER)` from the shell running `make`) |
+ 
+**`.env_infra` variables:**
+ 
+- User-defined values can be anything you choose.
+- API 42 values must match the credentials from your 42 API application page.
+- `p_node_<login>` refers to another node that may join the swarm  replace `<login>` with that node's user login. Its value must match the `p_user_password` configured on that node.
 ### Running the Project
-
+ 
+**As the leader node of the Docker Swarm**, from the project root:
+ 
 ```bash
-# Build the base image first
-docker build -t transcendance-base ./base
-
-# Start all services
-docker compose up --build
-
-# Stop all services
-docker compose down
+make
 ```
-
-> The application will be available at `http://localhost:[PORT — TBD]`
-
-### Running Tests
-
+ 
+That's the only command needed to bring up the leader node.
+ 
+**To add another node to the swarm**, from the project root on the new machine:
+ 
 ```bash
-# TBD — test commands will be added as the project progresses
+make worker
 ```
-
+ 
+`.env_vm` configuration works the same way as for the leader node; `.env_infra` is not used on worker nodes.
+ 
+> A worker node is only auto-connected to the swarm if it is on the school network, running on a desktop (not a laptop), and its user's login is pre-registered in `infra/swarm_utils/config/launch_swarm`. Nodes can also be added later by running `make addnode` from the `infra` directory on the leader node.
+ 
+### Verifying the Deployment
+ 
+- Watch the console output  you should see a stream of setup logs.
+- If nothing failed, run `docker service ls`  this should list all the running services.
+- From your host machine's browser, go to `http://<machine_ip>:8080/` or `https://<machine_ip>:8443` (HTTP will redirect to HTTPS).
+- Your browser will warn about an insecure/self-signed certificate  this is expected; accept the connection.
+- The project's home page should load.
 ---
 
+## Ideas for Future Evolution
+ 
+These features were discussed during the project's design phase, and the architecture was often built with them in mind so they could be added later  but they couldn't be implemented in time.
+ 
+### 🎮 Gameplay & Game Content
+ 
+- **Starting boost**  a temporary advantage granted to players at the very beginning of a match.
+- **Expanded map pool**  creating additional maps, ready to be plugged in beyond the ones currently shipped.
+- **Extensible monster database**  the schema was designed so new monsters and items could be added easily, without a rework.
+### 🗄️ Database Extensibility
+ 
+- **Multi-provider authentication**  the tables were designed to support authentication methods other than the 42 API.
+- **Custom usernames for 42 accounts**  allowing a user logged in via the 42 API to pick a username different from their 42 login.
+- **Extended relationship statuses**  the `relationships` schema was designed to support additional statuses, such as "blocked".
+### 🎨 Frontend
+ 
+- **Reusable component library**  the React/Tailwind component library was built so components could be reused if the frontend needed to grow further.
+### 🐳 Infrastructure & Observability
+ 
+- **Better load balancing across containers**  improving how workloads are distributed across the swarm's nodes.
+- **Deeper metrics**  making fuller use of the Grafana stack already in place.
+- **Redis-backed reconnection handling**  allowing a player to reconnect to an ongoing match after a disconnect, using state stored in Redis.
 ## Resources
+ 
+### Official Documentation
+ 
+- [NestJS  Caching](https://docs.nestjs.com/techniques/caching)
+- [NestJS](https://nestjs.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Godot Engine Docs](https://docs.godotengine.org/)
+- [Docker](https://docs.docker.com/)
+- [Docker Swarm](https://docs.docker.com/engine/swarm/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [Docker Bake](https://docs.docker.com/build/bake/)
+- [Tailscale](https://tailscale.com/docs)
+- [Headscale](https://headscale.net/stable/)
+- [OpenSSL](https://docs.openssl.org/)
+- [Nginx](https://nginx.org/en/docs/)
+- [Distribution (Docker Registry)](https://distribution.github.io/distribution/)
+- [Grafana Alloy](https://grafana.com/docs/alloy/latest/)
+- [Prometheus](https://prometheus.io/docs/)
+- [Grafana Loki](https://grafana.com/docs/loki/latest/)
+- [Grafana](https://grafana.com/docs/grafana/latest/)
+- [Bash Manual](https://www.gnu.org/software/bash/manual/)
+- [POSIX Shell Command Language](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
+- [GNU Make Manual](https://www.gnu.org/software/make/manual/)
+- [YAML Spec 1.2.2](https://yaml.org/spec/1.2.2/)
+### Tutorials & Articles
+ 
+- Udemy  *NestJS: The Complete Developer's Guide* by Stephen Grider
+- [CSS-Tricks](https://css-tricks.com/)
+- YouTube  *Tailwind CSS v4 Full Course 2026 | Master Tailwind in One Hour*, by JavaScript Mastery
+- [Tailwind CSS Cheat Sheet](https://nerdcave.com/tailwind-cheat-sheet)
+- YouTube  *A New Approach to Game Design and User Tools with Godot* (used for map/scene creation)
+### AI Usage
+ 
+AI tools (primarily Gemini) were used throughout the project for:
+ 
+- **Learning new technologies:** acquiring foundational knowledge of Godot and TypeScript for team members without prior experience in either.
+- **Design assistance:** brainstorming and refining approaches for the Godot game and TypeScript backend/frontend code.
+- **Asset creation:** generating visual assets for the game (creatures, scenes) where no suitable existing assets were available.
+- **Debugging & optimization:** helping diagnose bugs, optimize code, and improve backend logging.
+- **Infrastructure work:** assisting with basic YAML configuration, acting as a "rubber duck" for troubleshooting, and writing small, repetitive utility scripts.
 
-### Documentation
-
-- [WebSocket API — MDN](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
-- [Progressive Web Apps — web.dev](https://web.dev/progressive-web-apps/)
-- [WCAG 2.1 Guidelines](https://www.w3.org/TR/WCAG21/)
-- [Elasticsearch Documentation](https://www.elastic.co/guide/index.html)
-- [Docker Documentation](https://docs.docker.com/)
-- [Kafka Documentation](https://kafka.apache.org/documentation/)
-
-### Articles & Tutorials
-
-- [Microservices Architecture Patterns](https://microservices.io/patterns/)
-- [JWT Best Practices](https://auth0.com/blog/a-look-at-the-latest-draft-for-jwt-bcp/)
-- [Designing a Turn-Based Game Engine](https://www.gamedev.net/) *(to be refined)*
 
 
-## Microservice Overview
-![Microservice architecture](data/image/image.png)
+
+
+
+
+
+
+
