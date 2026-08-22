@@ -4,22 +4,23 @@ Readme · MD
 *This project has been created as part of the 42 curriculum by Bertrmar, Stempels, Dbajeux, Kprist, Agaland.*
  
 
-# ft_transcendence - Free Assets <img src="./icon_project.png" width="40" align="left" alt="ft_transcendence mascot"/>
+# ft_transcendence - Free Assets <img src="./Readme/icon_project.png" width="40" align="left" alt="ft_transcendence mascot"/>
  
 ## Table of Contents
- 
+
 1. [Description](#description)
 2. [Team Information](#team-information)
-3. [Project Management](#project-management)
-4. [Technical Stack](#technical-stack)
-5. [Database Schema](#database-schema)
-6. [Features List](#features-list)
-7. [Modules](#modules)
-8. [Individual Contributions](#individual-contributions)
-9. [Instructions](#instructions)
-10. [Resources](#resources)
+3. [Individual Contributions](#individual-contributions)
+4. [Project Management](#project-management)
+5. [Technical Stack](#technical-stack)
+6. [Database Schema](#database-schema)
+7. [Game Workflow](#game-workflow)
+8. [Features List](#features-list)
+9. [Modules](#modules)
+10. [Instructions](#instructions)
 11. [Ideas for Future Evolution](#ideas-for-future-evolution)
-12. [Credits](#credits)
+12. [Resources](#resources)
+
 ---
  
 ## Description
@@ -144,7 +145,7 @@ The project uses **two separate PostgreSQL databases**: `users_db` (accounts, so
  
 Handles authentication, social features (friends), and player statistics.
  
-![users_db ERD](db_users_graph.png)
+![users_db ERD](./Readme/db_users_graph.png)
  
 - **`users`**  core account table (email, username, password hash, avatar, coalition, settings as JSONB, roles).
 - **`accounts`**  linked auth providers per user (**One-to-Many** with `users`), supporting both classic and OAuth login.
@@ -154,7 +155,7 @@ Handles authentication, social features (friends), and player statistics.
  
 Holds all game content: maps, tiles, monsters, skills, and items.
  
-![game_db ERD](db_game_graph.png)
+![game_db ERD](./Readme/db_game_graph.png)
  
 - **`maps`** ↔ **`tiles`**  **Many-to-Many** via `maps_tiles`.
 - **`tiles`** ↔ **`monsters`**  **Many-to-Many** via `tiles_monsters`.
@@ -169,7 +170,7 @@ Holds all game content: maps, tiles, monsters, skills, and items.
 
 The diagram below traces the full lifecycle of a game session, from the initial WebSocket connection to the end of a match, across the three main phases: **Map**, **Team Setup**, and **Combat**. It also shows how each event flows between the Godot client, the game service, and the database.
 
-![Game Workflow](game_dev.png)
+![Game Workflow](./Readme/game_dev.png)
 
 ### Phases Overview
 
@@ -179,6 +180,61 @@ The diagram below traces the full lifecycle of a game session, from the initial 
 - **Combat**  turn-based phase (`action_battle`) where each player can change monster, use an item, attack, or pass. Results are broadcast each round (`new_round`) until a battle team is fully defeated, triggering win/lose banners, and either progressing to the next map or, on the final battle, a tournament win screen.
 
 ---
+## Features List
+
+### 🔐 Authentication & User Management
+
+| Feature | Description | Contributor(s) |
+|---|---|---|
+| 42 OAuth login | Authentication via the 42 school's own OAuth 2.0 identity provider. | kprist |
+| Classic account creation | Email/password signup and login, added on top of the initial OAuth-only system. | kprist |
+| JWT session handling | Secures user sessions across the platform after login. | kprist |
+| User profile & avatar | Dedicated profile page; users can edit their info and upload/change their avatar. | kprist |
+
+### 👥 Social
+
+| Feature | Description | Contributor(s) |
+|---|---|---|
+| Friends system | Add/remove friends and view their online status. | kprist |
+| Invitations & notifications | Real-time notifications for friend requests and game invitations. | kprist |
+| Real-time chat | Live messaging between users, backed by WebSocket. | kprist |
+
+### 🎮 Game
+
+| Feature | Description | Contributor(s) |
+|---|---|---|
+| Lobby & matchmaking | Redis-backed system tracking active rooms and players per room. | dbajeux (lobby backend), bertrmar (Redis integration) |
+| Map exploration | Explorable maps where players move around and encounter monsters. | dbajeux, bertrmar |
+| Monster capture | Encounter, try-catch, and item-based capture flow, with success/fail/flee outcomes. | bertrmar, dbajeux, agaland |
+| Inventory system | Request, use, and delete items collected during exploration. | bertrmar, dbajeux, agaland |
+| Team setup | Players build their battle team from captured monsters before combat. | bertrmar, agaland |
+| Turn-based combat | Action-based battle phase (attack, change monster, use item, pass), resolved round by round. | bertrmar, agaland |
+| AI opponent | Custom AI bot that fills lobbies when not enough human players are available. | dbajeux,agaland |
+| In-game skins | Cosmetic customization options for monsters/characters. | dbajeux |
+| Tournament progression | Win/lose banners and map-to-map progression up to a final tournament win screen. | bertrmar, agaland |
+| Godot ↔ backend bridge | WebSocket bridge sending/receiving game events, handling connect/disconnect between the Godot client and the backend. | agaland, bertrmar  |
+
+### 🎨 Frontend
+
+| Feature | Description | Contributor(s) |
+|---|---|---|
+| Responsive web UI | Full frontend built with React, TypeScript, and Tailwind CSS. | kprist |
+
+### 🗄️ Database
+
+| Feature | Description | Contributor(s) |
+|---|---|---|
+| Dual PostgreSQL setup | Two separate databases (`users_db`, `game_db`) designed and set up for social/account data vs. game content. | kprist, bertrmar |
+
+### 🐳 Infrastructure
+
+| Feature | Description | Contributor(s) |
+|---|---|---|
+| Docker Swarm deployment | Multi-node container orchestration across several school computers. | stempels |
+| Monitoring & logging stack | Prometheus, Loki, Grafana, and Alloy for metrics collection, log aggregation, and dashboards. | stempels |
+
+---
+
 ## Modules
 
 ### Standard Modules
