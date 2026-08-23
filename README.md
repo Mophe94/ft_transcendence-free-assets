@@ -172,7 +172,7 @@ Holds all game content: maps, tiles, monsters, skills, and items.
 
 The diagram below traces the full lifecycle of a game session, from the initial WebSocket connection to the end of a match, across the three main phases: **Map**, **Team Setup**, and **Combat**. It also shows how each event flows between the Godot client, the game service, and the database.
 
-![Game Workflow](./Readme/game_dev.png)
+![Game Workflow](./Readme/communication_game_backendtrue.png)
 
 ### Phases Overview
 
