@@ -1,0 +1,144 @@
+[gd_scene format=3 uid="uid://dr4ms2waudha3"]
+
+[ext_resource type="Script" uid="uid://bbcc40gotcnme" path="res://Script/Combat/Win/particule.gd" id="1_o7wwc"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="2_2q87e"]
+[ext_resource type="Script" uid="uid://cjj54byny2m2j" path="res://Script/Combat/Win/Victory.gd" id="2_u16ar"]
+
+[sub_resource type="Animation" id="Animation_alpnb"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../ColorRect/Win:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../ColorRect/Win:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_1710l"]
+resource_name = "shiny"
+length = 1.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../ColorRect/Win:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.7, 1.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 0, 1), Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../ColorRect/Win:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.7, 1.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.1, 1.1), Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hn1mg"]
+_data = {
+&"RESET": SubResource("Animation_alpnb"),
+&"shiny": SubResource("Animation_1710l")
+}
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_alpnb"]
+lifetime_randomness = 0.5
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 57.0
+direction = Vector3(0, -1, 0)
+initial_velocity_min = 128.56999
+initial_velocity_max = 192.84999
+gravity = Vector3(0, 98, 0)
+scale_min = 2.0
+scale_max = 8.76
+color = Color(1, 0.83137256, 0, 1)
+hue_variation_min = -0.43
+hue_variation_max = 0.29999998
+
+[node name="Win" type="Control" unique_id=1014018583]
+clip_contents = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_o7wwc")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=62763564]
+custom_minimum_size = Vector2(960, 320)
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.3
+anchor_right = 1.0
+anchor_bottom = 0.7
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.21568628, 1, 0.9411765, 0.5137255)
+
+[node name="Win" type="Label" parent="ColorRect" unique_id=1957792852]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -131.0
+offset_top = -38.5
+offset_right = 131.0
+offset_bottom = 38.5
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(131, 38.5)
+theme_override_fonts/font = ExtResource("2_2q87e")
+theme_override_font_sizes/font_size = 56
+text = "VICTORY !"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("2_u16ar")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="ColorRect" unique_id=1494610416]
+libraries/ = SubResource("AnimationLibrary_hn1mg")
+autoplay = &"shiny"
+
+[node name="Spawn1" type="GPUParticles2D" parent="." unique_id=775712502]
+position = Vector2(288, 320)
+amount = 25
+lifetime = 3.88
+randomness = 0.7
+fixed_fps = 25
+process_material = SubResource("ParticleProcessMaterial_alpnb")
+
+[node name="Spawn2" type="GPUParticles2D" parent="." unique_id=1497526009]
+position = Vector2(672, 320)
+amount = 25
+lifetime = 3.88
+randomness = 0.7
+fixed_fps = 25
+process_material = SubResource("ParticleProcessMaterial_alpnb")

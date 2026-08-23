@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://cbunnb3ac4cuq"]
+
+[ext_resource type="Texture2D" uid="uid://cu6275im77ymt" path="res://Assets/Monster/spritesheet/Pigeonne/sprite-1-1.png" id="1_u28c1"]
+[ext_resource type="Texture2D" uid="uid://cwvwdw4mphnmx" path="res://Assets/Monster/spritesheet/Pigeonne/sprite-1-2.png" id="2_bft3i"]
+[ext_resource type="Texture2D" uid="uid://boo1udg4rgpb8" path="res://Assets/Monster/spritesheet/Pigeonne/sprite-1-3.png" id="3_bf0y7"]
+[ext_resource type="Texture2D" uid="uid://ctq23xhosfye4" path="res://Assets/Monster/spritesheet/Pigeonne/sprite-2-2.png" id="4_dr0ii"]
+[ext_resource type="Texture2D" uid="uid://orehxlme5xls" path="res://Assets/Monster/spritesheet/Pigeonne/sprite-2-3.png" id="5_864ae"]
+[ext_resource type="Texture2D" uid="uid://d14rxoyw81b5h" path="res://Assets/Monster/spritesheet/Pigeonne/sprite-2-5.png" id="6_e6w30"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xj1e2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_u28c1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_bft3i")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_bf0y7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_dr0ii")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_864ae")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_e6w30")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Pigeonne" type="Node2D" unique_id=946707859]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1986798403]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D" unique_id=1259142096]
+position = Vector2(9.536743e-07, -1.0728836e-06)
+scale = Vector2(0.28368795, 0.28368795)
+sprite_frames = SubResource("SpriteFrames_xj1e2")
+autoplay = "default"
+frame_progress = 0.7832831

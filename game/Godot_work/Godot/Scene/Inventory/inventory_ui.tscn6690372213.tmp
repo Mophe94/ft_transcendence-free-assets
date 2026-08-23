@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://dv78rxpyp687i"]
+
+[ext_resource type="Script" uid="uid://c7epgoogmht33" path="res://Script/Inventory/inventory_ui.gd" id="1_oy36q"]
+[ext_resource type="Texture2D" uid="uid://caxk8ic5mqi6f" path="res://Assets/Inventory/menu_panel (2).png" id="2_47e8f"]
+[ext_resource type="PackedScene" uid="uid://bk8mkrekusx3p" path="res://Scene/Inventory/inventory_ui_slot.tscn" id="3_dm835"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="4_bfugl"]
+[ext_resource type="Texture2D" uid="uid://c0aoeiu5e0fub" path="res://Assets/Inventory/Icon_09.png" id="5_750jp"]
+[ext_resource type="Script" uid="uid://bfycr4h00qqn2" path="res://Scene/Inventory/button.gd" id="6_g7rln"]
+
+[node name="Inventory_UI" type="Control" unique_id=260175515]
+custom_minimum_size = Vector2(416, 520)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -544.0
+offset_bottom = -120.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_oy36q")
+
+[node name="NinePatchRect" type="NinePatchRect" parent="." unique_id=606246237]
+z_index = 15
+layout_mode = 0
+offset_right = 2944.0
+offset_bottom = 2368.0
+texture = ExtResource("2_47e8f")
+
+[node name="GridContainer" type="GridContainer" parent="NinePatchRect" unique_id=1476809910]
+layout_mode = 0
+offset_left = 144.0
+offset_top = 136.0
+offset_right = 448.0
+offset_bottom = 300.0
+columns = 3
+
+[node name="inventory_UI_slot" parent="NinePatchRect/GridContainer" unique_id=1201840829 instance=ExtResource("3_dm835")]
+layout_mode = 2
+
+[node name="inventory_UI_slot2" parent="NinePatchRect/GridContainer" unique_id=1520321189 instance=ExtResource("3_dm835")]
+layout_mode = 2
+
+[node name="inventory_UI_slot3" parent="NinePatchRect/GridContainer" unique_id=731781500 instance=ExtResource("3_dm835")]
+layout_mode = 2
+
+[node name="inventory_UI_slot4" parent="NinePatchRect/GridContainer" unique_id=712622593 instance=ExtResource("3_dm835")]
+layout_mode = 2
+
+[node name="inventory_UI_slot5" parent="NinePatchRect/GridContainer" unique_id=1159671243 instance=ExtResource("3_dm835")]
+layout_mode = 2
+
+[node name="inventory_UI_slot6" parent="NinePatchRect/GridContainer" unique_id=761995041 instance=ExtResource("3_dm835")]
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="NinePatchRect" unique_id=1946183562]
+layout_mode = 0
+offset_left = 96.0
+offset_top = 96.0
+offset_right = 392.0
+offset_bottom = 136.0
+theme_override_fonts/normal_font = ExtResource("4_bfugl")
+theme_override_font_sizes/normal_font_size = 30
+text = "Monsters"
+horizontal_alignment = 1
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="NinePatchRect" unique_id=1484446056]
+layout_mode = 0
+offset_left = 96.0
+offset_top = 296.0
+offset_right = 392.0
+offset_bottom = 336.0
+theme_override_fonts/normal_font = ExtResource("4_bfugl")
+theme_override_font_sizes/normal_font_size = 30
+text = "Objects"
+horizontal_alignment = 1
+
+[node name="GridContainer2" type="GridContainer" parent="NinePatchRect" unique_id=443843550]
+layout_mode = 0
+offset_left = 144.0
+offset_top = 336.0
+offset_right = 449.0
+offset_bottom = 500.0
+columns = 3
+
+[node name="inventory_UI_slot" parent="NinePatchRect/GridContainer2" unique_id=1367965405 instance=ExtResource("3_dm835")]
+layout_mode = 2
+
+[node name="inventory_UI_slot2" parent="NinePatchRect/GridContainer2" unique_id=1663885802 instance=ExtResource("3_dm835")]
+layout_mode = 2
+
+[node name="inventory_UI_slot3" parent="NinePatchRect/GridContainer2" unique_id=1857206049 instance=ExtResource("3_dm835")]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="." unique_id=295561470]
+z_index = 15
+layout_mode = 0
+offset_left = 336.0
+offset_top = 424.0
+offset_right = 376.0
+offset_bottom = 464.0
+icon = ExtResource("5_750jp")
+flat = true
+script = ExtResource("6_g7rln")

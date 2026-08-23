@@ -1,0 +1,147 @@
+[gd_scene format=3 uid="uid://b3wokw8n0gxhc"]
+
+[ext_resource type="Script" uid="uid://brpxfet53sr8k" path="res://Script/Combat/Menus/combat_menus_script.gd" id="1_idpst"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="2_dimms"]
+[ext_resource type="Script" uid="uid://rk3tokfreolp" path="res://Script/Combat/Menus/text.gd" id="2_hsiif"]
+[ext_resource type="Script" uid="uid://bc0a1v7x7lv30" path="res://Script/Combat/Menus/Button/button1.gd" id="3_h412s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_re7nl"]
+bg_color = Color(0, 0.627, 0.988, 0.8)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0, 0, 0, 1)
+border_blend = true
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3jeak"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0.9861415, 0.7965759, 0.850991, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 10
+shadow_size = 4
+
+[node name="CombatMenus" type="Panel" unique_id=1186040270]
+anchors_preset = -1
+anchor_left = 0.2
+anchor_top = 0.75
+anchor_right = 0.8
+anchor_bottom = 0.95
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_re7nl")
+script = ExtResource("1_idpst")
+
+[node name="Text" type="Label" parent="." unique_id=419320735]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.1
+anchor_right = 0.85
+anchor_bottom = 0.5
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+text_direction = 1
+script = ExtResource("2_hsiif")
+
+[node name="Button" type="Button" parent="." unique_id=1319362089]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.1
+anchor_right = 0.41
+anchor_bottom = 0.43
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
+theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
+action_mode = 0
+autowrap_trim_flags = 192
+clip_text = true
+script = ExtResource("3_h412s")
+
+[node name="Button2" type="Button" parent="." unique_id=947961164]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.44
+anchor_top = 0.1
+anchor_right = 0.8
+anchor_bottom = 0.43
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
+theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
+action_mode = 0
+autowrap_trim_flags = 192
+clip_text = true
+script = ExtResource("3_h412s")
+
+[node name="Button3" type="Button" parent="." unique_id=1801507858]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.57
+anchor_right = 0.41
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
+theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
+action_mode = 0
+autowrap_trim_flags = 192
+clip_text = true
+script = ExtResource("3_h412s")
+
+[node name="Button4" type="Button" parent="." unique_id=522886939]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.44
+anchor_top = 0.57
+anchor_right = 0.8
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
+theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
+action_mode = 0
+autowrap_trim_flags = 192
+clip_text = true
+script = ExtResource("3_h412s")
+
+[node name="Button5" type="Button" parent="." unique_id=805332695]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.85
+anchor_top = 0.1
+anchor_right = 0.96
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_dimms")
+theme_override_styles/normal = SubResource("StyleBoxFlat_3jeak")
+action_mode = 0
+text = "X"
+autowrap_trim_flags = 192
+clip_text = true
+script = ExtResource("3_h412s")

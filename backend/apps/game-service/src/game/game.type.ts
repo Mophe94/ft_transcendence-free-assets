@@ -13,11 +13,13 @@ export interface RoomAcces {
   skin: string;
 }
 
+export type PlayerPhase = 'map' | 'team_choice' | 'combat';
+
 export const PHASE_DURATIONS = {
-  lobby: 10,
-  map: 20,
-  team_setup: 15,
-  choose_action: 20,
+  lobby: 30,
+  map: 185,
+  team_setup: 25,
+  choose_action: 25,
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;

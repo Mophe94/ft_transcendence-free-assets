@@ -1,11 +1,10 @@
 import {
   Inventory,
-  Skill,
-  Life,
   CurrentMonster,
   CurrentActions,
 } from 'apps/game-service/src/game/player/player.interfaces';
 import { emptyCurrentMonster } from './player.interfaces';
+import { PlayerPhase } from '../game.type';
 
 export class Player {
   readonly id: string = '';
@@ -263,7 +262,7 @@ export class Player {
       ],
     },
   ];
-  team: string[] = ['pisciner', 'gigantomakia', 'burpy', '', '', ''];
+  team: string[] = ['', '', '', '', '', ''];
   inventory: Inventory[] = [
     {
       name: '',
@@ -302,6 +301,7 @@ export class Player {
     actionType: undefined,
     data: undefined,
   };
+  currentPhase: PlayerPhase = 'map'; 
   roundsRemaining: number = 0;
   status: string = 'default';
   teamReady: boolean = false;
@@ -312,6 +312,8 @@ export class Player {
   current_monster: string = '';
   current_monster_rarity: string = '';
   current_item: string = '';
+  
+  /* for stats */
   text: string = '';
   monsterCatch: string[] = [];
   playerDefeated: number = 0;
@@ -335,5 +337,6 @@ export class Player {
     this.text = '';
     this.battle_team = [];
     this.currentMonster = emptyCurrentMonster();
+    this.currentPhase = 'map';
   }
 }

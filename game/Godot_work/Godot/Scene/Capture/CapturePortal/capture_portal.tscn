@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://bdkbvfeqwr73"]
+
+[ext_resource type="Texture2D" uid="uid://bhekjnjspcxhl" path="res://Assets/Capture/Portal/potal01.png" id="1_ef1sa"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a6sh7"]
+atlas = ExtResource("1_ef1sa")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jed0p"]
+atlas = ExtResource("1_ef1sa")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uam5k"]
+atlas = ExtResource("1_ef1sa")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_dcggu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a6sh7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jed0p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uam5k")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="MonsterAppearsPortal" type="Node2D" unique_id=151104345]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1699201584]
+sprite_frames = SubResource("SpriteFrames_dcggu")
+autoplay = "default"
+frame_progress = 0.32191315

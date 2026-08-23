@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Player } from '../player/player';
-import { BOT_TEAM_TIERS, BOT_NAMES, BOT_SKIN_PAIRS, MONSTER_TYPES, BOT_ITEMS, BOT_ITEM_COUNTS, BotTeamTier } from './bot.data';
+import { BOT_TEAM_TIERS, BOT_NAMES, BOT_SKINS, MONSTER_TYPES, BOT_ITEMS, BOT_ITEM_COUNTS, BotTeamTier } from './bot.data';
 import { GameData } from '../game.type';
 
 export type BotMode = 'hardcoded' | 'takeover';
@@ -32,8 +32,8 @@ export class AiService {
    * aux noms, pas besoin d'éviter les doublons : deux bots avec le même
    * skin dans une room, ce n'est pas gênant.
    */
-  pickBotSkin(): { lobby: string; game: string } {
-    return BOT_SKIN_PAIRS[Math.floor(Math.random() * BOT_SKIN_PAIRS.length)];
+  pickBotSkin(): string {
+  return BOT_SKINS[Math.floor(Math.random() * BOT_SKINS.length)];
   }
 
   /**
@@ -43,8 +43,7 @@ export class AiService {
    * bot dans Redis pour l'écran d'attente.
    */
   getLobbySkin(gameSkin: string): string {
-    const pair = BOT_SKIN_PAIRS.find((p) => p.game === gameSkin);
-    return pair?.lobby ?? BOT_SKIN_PAIRS[0].lobby;
+    return BOT_SKINS.includes(gameSkin) ? gameSkin : BOT_SKINS[0];
   }
 
   /**
@@ -68,25 +67,26 @@ export class AiService {
    * adverses ; on garde les 3 meilleurs.
    */
   chooseBattleTeam(botTeam: string[], enemyTeam: string[]): string[] {
+    console.log(botTeam);
     const enemyTypes = enemyTeam
-      .filter((name) => name !== '')
-      .map((name) => MONSTER_TYPES[name])
-      .filter((type): type is string => !!type);
-
+    .filter((name) => name !== '')
+    .map((name) => MONSTER_TYPES[name])
+    .filter((type): type is string => !!type);
+    
     const scored = botTeam
-      .filter((name) => name !== '')
-      .map((name) => {
-        const type = MONSTER_TYPES[name];
-        const score =
-          enemyTypes.length === 0
-            ? 1
-            : enemyTypes.reduce(
-                (sum, enemyType) => sum + (this.typeChart[type]?.[enemyType] ?? 1),
-                0,
-              ) / enemyTypes.length;
-        return { name, score };
-      });
-
+    .filter((name) => name !== '')
+    .map((name) => {
+      const type = MONSTER_TYPES[name];
+      const score =
+      enemyTypes.length === 0
+      ? 1
+      : enemyTypes.reduce(
+        (sum, enemyType) => sum + (this.typeChart[type]?.[enemyType] ?? 1),
+        0,
+      ) / enemyTypes.length;
+      return { name, score };
+    });
+    
     scored.sort((a, b) => b.score - a.score);
     return scored.slice(0, 3).map((entry) => entry.name);
   }
@@ -210,13 +210,8 @@ export class AiService {
    * @param totalRounds  Nombre total de rounds du bracket (Math.log2(FULL))
    */
   private pickTierName(round: number, totalRounds: number): BotTeamTier {
-    if (totalRounds <= 0) return 'faible';
-
-    const progress = round / totalRounds; // 0 (1er round) -> 1 (finale)
-
-    if (progress <= 1 / 3) return 'faible';
-    if (progress <= 2 / 3) return 'moyen';
-    return 'fort';
+    if (totalRounds <= 1) return 'fort'; // tournoi à 1 round = direct la finale
+    return round > totalRounds / 2 ? 'fort' : 'faible';
   }
 
   /**
@@ -251,6 +246,12 @@ export class AiService {
     }
   }
 
+  public refreshBotLoadout(bot: Player, round: number, totalRounds: number): void {
+  const tier = this.pickTierName(round, totalRounds);
+  bot.team = [...this.pickTeamFromTier(tier)];
+  this.equipBotItems(bot, tier);
+  }
+
   /**
    * Construit un nouveau bot ou transforme un joueur humain déconnecté en bot.
    *
@@ -281,30 +282,24 @@ export class AiService {
         `[AiService] Prise de contrôle du joueur ${humanToReplace.id} par l'IA (déconnexion)`,
       );
       humanToReplace.isBot = true;
-
-      // Le joueur peut avoir une équipe faible ou incomplète (peu de
-      // monstres attrapés avant la déconnexion). On lui donne une équipe
-      // du palier correspondant au round courant pour qu'il reste
-      // compétitif pour la suite du bracket. On ne touche pas à
-      // battle_team : si un combat est déjà en cours, il continue tel
-      // quel, seul le prochain team_setup profitera de la mise à jour.
-      humanToReplace.team = [...this.pickTeamFromTier(tier)];
-      this.equipBotItems(humanToReplace, tier);
-
+      if (humanToReplace.currentPhase == 'map') {
+        humanToReplace.team = [...this.pickTeamFromTier(tier)];
+        this.equipBotItems(humanToReplace,tier)
+      }
       return humanToReplace;
     }
-
+    
     const team = this.pickTeamFromTier(tier);
     const id = botId ?? this.generateBotId();
-    const skinPair = this.pickBotSkin();
+    const skin = this.pickBotSkin();
 
-    const bot = new Player(id, botName ?? 'Bot IA', "-1", skinPair.game);
+    const bot = new Player(id, botName ?? 'Bot IA', "-1", skin);
     bot.isBot = true;
     bot.team = [...team];
     this.equipBotItems(bot, tier);
 
     this.logger.log(
-      `[AiService] Instanciation du bot ${id} (round ${round}/${totalRounds}, palier ${tier}, skin ${skinPair.lobby}), équipe: ${team.join(', ')}`,
+      `[AiService] Instanciation du bot ${id} (round ${round}/${totalRounds}, palier ${tier}, skin ${skin}), équipe: ${team.join(', ')}`,
     );
 
     return bot;

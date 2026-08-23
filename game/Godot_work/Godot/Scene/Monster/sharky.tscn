@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://dy634fjmhlc7p"]
+
+[ext_resource type="Texture2D" uid="uid://mqqnrtcjgif1" path="res://Assets/Monster/spritesheet/Sharky/sprite-1-1 (1).png" id="1_05r72"]
+[ext_resource type="Texture2D" uid="uid://ds4syiobaiyxa" path="res://Assets/Monster/spritesheet/Sharky/sprite-1-2 (1).png" id="2_ct0ct"]
+[ext_resource type="Texture2D" uid="uid://b37peygqbhxcb" path="res://Assets/Monster/spritesheet/Sharky/sprite-1-4 (1).png" id="3_toyhk"]
+[ext_resource type="Texture2D" uid="uid://buvdvfede17a0" path="res://Assets/Monster/spritesheet/Sharky/sprite-2-1 (1).png" id="4_46n1f"]
+[ext_resource type="Texture2D" uid="uid://dw3d2cr4ghnkw" path="res://Assets/Monster/spritesheet/Sharky/sprite-2-6.png" id="5_h2a8x"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_46n1f"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_05r72")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_ct0ct")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_toyhk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_ct0ct")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_46n1f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_h2a8x")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Sharky" type="Node2D" unique_id=859276490]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=522039097]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D" unique_id=1875392158]
+position = Vector2(0.14642787, 9.536743e-07)
+scale = Vector2(0.2847264, 0.25157234)
+sprite_frames = SubResource("SpriteFrames_46n1f")
+autoplay = "default"
+frame_progress = 0.42205325
+flip_h = true

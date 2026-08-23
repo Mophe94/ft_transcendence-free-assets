@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SkinData" format=3 uid="uid://bf63qmd86qqki"]
+
+[ext_resource type="Script" uid="uid://brt0iiv638g4g" path="res://Script/PlayerCharacter/Skindata.gd" id="1_li8tj"]
+[ext_resource type="SpriteFrames" uid="uid://c1qjmtohkabrk" path="res://Scene/PlayerCharacter/Skin/Satyr02/satyr02SpriteSheet.tres" id="2_akuue"]
+
+[resource]
+script = ExtResource("1_li8tj")
+skin_id = "satyr02"
+display_name = "satyr02"
+sprite_frames = ExtResource("2_akuue")
+scale = Vector2(0.219, 0.201)
+metadata/_custom_type_script = "uid://brt0iiv638g4g"

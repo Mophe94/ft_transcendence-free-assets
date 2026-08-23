@@ -1,0 +1,120 @@
+[gd_scene format=3 uid="uid://yshscl5383ux"]
+
+[ext_resource type="Script" uid="uid://dedf3uk1uxvpr" path="res://Script/Combat/Lose/text.gd" id="1_7w4gb"]
+[ext_resource type="Script" uid="uid://cjuiuam7a8dka" path="res://Script/Combat/Lose/pliue_particule.gd" id="1_fhdb4"]
+[ext_resource type="FontFile" uid="uid://cr4i61qj3riij" path="res://Assets/Font/Peaberry-Base.otf" id="2_b0w2r"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_vaksa"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(480, 128, 200)
+angle_min = -149.09999
+angle_max = 216.00002
+gravity = Vector3(48, 98, 0)
+linear_accel_min = -32.86
+linear_accel_max = 44.999996
+radial_accel_min = -47.14
+radial_accel_max = 53.719997
+scale_min = 5.12
+scale_max = 7.4199996
+color = Color(0, 1, 1, 1)
+
+[sub_resource type="Animation" id="Animation_vaksa"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/CenterContainer/Lose:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_swtfl"]
+resource_name = "rotation"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/CenterContainer/Lose:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0001, 0.0002, 0.5, 1, 1.5, 1.5001, 1.5002, 2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 0.0, 0.13962634015954636, 0.0, -0.13962634015954636, -0.17453292, -0.13962634015954636, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_dcvbm"]
+_data = {
+&"RESET": SubResource("Animation_vaksa"),
+&"rotation": SubResource("Animation_swtfl")
+}
+
+[node name="Loose" type="Control" unique_id=647063903]
+clip_contents = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=428179872]
+position = Vector2(480, 128)
+amount = 50
+lifetime = 6.0
+speed_scale = 1.5
+randomness = 1.0
+visibility_rect = Rect2(0, 0, 0, 0)
+local_coords = true
+trail_lifetime = 0.05
+trail_sections = 6
+trail_section_subdivisions = 1
+process_material = SubResource("ParticleProcessMaterial_vaksa")
+script = ExtResource("1_fhdb4")
+
+[node name="Control" type="Control" parent="." unique_id=1103557546]
+layout_mode = 1
+anchor_top = 0.3
+anchor_right = 1.0
+anchor_bottom = 0.7
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="Control" unique_id=1364077225]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.28627452, 0.019607844, 0.40784314, 0.37254903)
+
+[node name="CenterContainer" type="CenterContainer" parent="Control" unique_id=794607287]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Lose" type="Label" parent="Control/CenterContainer" unique_id=1006893142]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_b0w2r")
+theme_override_font_sizes/font_size = 56
+text = "YOU LOSE"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("1_7w4gb")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Control/CenterContainer" unique_id=599412664]
+root_node = NodePath("../../..")
+libraries/ = SubResource("AnimationLibrary_dcvbm")
+autoplay = &"rotation"
