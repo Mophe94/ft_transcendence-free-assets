@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useCallback, useRef, useState, type ReactNode } from "react";
 import { NotificationContext, type NotificationType, type Notification, type Invite } from "./NotifContext";
 import NotificationBar from "../components/notification/NotificationBar";
 import InviteBar from "../components/notification/InviteBar";
@@ -7,28 +7,29 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notification, setNotification] = useState<Notification | null>(null);
   const [invite, setInvite] = useState<Invite | null>(null);
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const notificationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inviteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const showNotification = (message: string, type: NotificationType, duration = 3000) => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  const showNotification = useCallback((message: string, type: NotificationType, duration = 3000) => {
+    if (notificationTimeoutRef.current) clearTimeout(notificationTimeoutRef.current);
     
     setNotification({ message, type });
     
-    timeoutRef.current = setTimeout(() => {
+    notificationTimeoutRef.current = setTimeout(() => {
       setNotification(null);
-      timeoutRef.current = null;
+      notificationTimeoutRef.current = null;
     }, duration);
-  };
+  }, []);
 
-  const showInvite = (username: string, roomId: string, duration = 5000) => {
-    if(timeoutRef.current) clearTimeout(timeoutRef.current);
+  const showInvite = useCallback((username: string, roomId: string, duration = 5000) => {
+    if(inviteTimeoutRef.current) clearTimeout(inviteTimeoutRef.current);
 
     setInvite({username, roomId});
-    timeoutRef.current = setTimeout(() => {
+    inviteTimeoutRef.current = setTimeout(() => {
       setInvite(null);
-      timeoutRef.current = null;
+      inviteTimeoutRef.current = null;
     }, duration);
-  }
+  }, []);
 
   return (
     <NotificationContext.Provider value={{ showNotification, showInvite }}>
