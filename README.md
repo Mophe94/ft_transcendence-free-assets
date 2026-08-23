@@ -244,7 +244,7 @@ The diagram below traces the full lifecycle of a game session, from the initial 
 | 2 | Real-time features (WebSockets) | Major | 2 | WebSocket bridge between Godot, the backend, and connected players; also powers live chat. |
 | 3 | User interaction | Major | 2 | Friends system, invitations, real-time chat, notifications. |
 | 4 | ORM | Minor | 1 | TypeORM integrated with NestJS across both databases. |
-| 5 | Multi-browser support | Minor | 1 | Manually tested on Chrome, Brave, Firefox, and Edge. |
+| 5 | Support for additional browsers | Minor | 1 | Manually tested on Chrome, Brave, Firefox, and Edge. |
 | 6 | Standard user management & authentication | Major | 2 | Profile, avatar, friends with online status, dedicated profile page. |
 | 7 | Remote authentication (OAuth 2.0) | Minor | 1 | Implemented via the 42 API. |
 | 8 | AI Opponent | Major | 2 | Custom AI implemented in the backend to fill unbalanced lobbies. |

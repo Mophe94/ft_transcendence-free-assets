@@ -13,17 +13,15 @@
  * toujours la même composition.
  */
 export const BOT_TEAM_TIERS = {
-  // faible: [
-  //   ['pisciner', 'squirel', 'burpy'],
-  // ],
-  // fort: [
-  //    ['fishet', 'squirel', 'leafs', 'burpy', 'papate', 'gigantomakia'],
-  // ],
-   faible: [
-    ['pisciner', 'pisciner', 'pisciner'],
+  faible: [
+    ['pisciner', 'squirel', 'burpy', 'leafs'],
+    ['pisciner', 'fishet', 'papate', 'fishet'],
+    ['pisciner', 'squirel', 'fishet', 'leafs'],
   ],
   fort: [
-     ['pisciner', 'pisciner', 'pisciner', 'pisciner', 'pisciner', 'pisciner'],
+     ['squirel', 'squirel', 'leafs', 'fishet', 'papate', 'gigantomakia'],
+     ['leafs', 'squirel', 'leafs', 'fishet', 'monkel', 'pigeonne'],
+     ['fishet', 'squirel', 'leafs', 'burpy', 'fishet', 'sharky'],
   ],
 } as const;
 
@@ -61,8 +59,8 @@ export const BOT_ITEMS: Record<string, { scene: string; type: string; value: num
  * aux objets) : plus on avance dans le bracket, plus le bot est équipé.
  */
 export const BOT_ITEM_COUNTS: Record<BotTeamTier, { potion: number; bomb: number }> = {
-  faible: { potion: 1, bomb: 1 },
-  fort: { potion: 2, bomb: 2 },
+  faible: { potion: 1, bomb: 0 },
+  fort: { potion: 2, bomb: 1 },
 };
 
 /**
