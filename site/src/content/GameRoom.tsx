@@ -54,12 +54,15 @@ export default function GameRoom({ roomName, players, roomCapacity = 4, endTime 
   
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error while Loading.</div>;
+  const nbHumanPlayers = players.reduce((count, player) => {
+    return player.isBot ? count : count + 1;
+  }, 0);
 
   return (
     <SpecialBG>
       <Heading size='m' text={roomName}/>
       <div className='grid grid-cols-2 w-full mb-4'>
-        <span className='text-center text-2xl font-bold'>{`Players: ${players.length}/${roomCapacity == 0 ? '∞' : roomCapacity}`}</span>
+        <span className='text-center text-2xl font-bold'>{`Players: ${nbHumanPlayers}/${roomCapacity == 0 ? '∞' : roomCapacity}`}</span>
         <span className='text-center text-2xl font-bold'>{`Time Left: ${timeLeft >= 0 ? timeLeft : '∞'}`}</span>
 
       </div>

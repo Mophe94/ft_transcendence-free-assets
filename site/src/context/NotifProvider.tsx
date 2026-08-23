@@ -10,16 +10,21 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const notificationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inviteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const closeInvite = useCallback(() => {
+    if (inviteTimeoutRef.current) clearTimeout(inviteTimeoutRef.current);
+    setInvite(null);
+  }, []);
+
   const showNotification = useCallback((message: string, type: NotificationType, duration = 3000) => {
     if (notificationTimeoutRef.current) clearTimeout(notificationTimeoutRef.current);
-    
+    closeInvite();
     setNotification({ message, type });
     
     notificationTimeoutRef.current = setTimeout(() => {
       setNotification(null);
       notificationTimeoutRef.current = null;
     }, duration);
-  }, []);
+  }, [closeInvite]);
 
   const showInvite = useCallback((username: string, roomId: string, duration = 5000) => {
     if(inviteTimeoutRef.current) clearTimeout(inviteTimeoutRef.current);
@@ -32,7 +37,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <NotificationContext.Provider value={{ showNotification, showInvite }}>
+    <NotificationContext.Provider value={{ showNotification, showInvite, closeInvite }}>
       {children}
       {notification && (
         <NotificationBar message={notification.message} type={notification.type} />

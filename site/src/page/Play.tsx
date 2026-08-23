@@ -10,7 +10,6 @@ export default function Play() {
   const navigate = useNavigate();
   const [isCountDownFinished, setIsCountDownFinished] = useState(false);
 
-
   useEffect(() => {
     if (!roomId) navigate('/home');
   }, [roomId, navigate]);

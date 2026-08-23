@@ -11,7 +11,6 @@ import { Loading } from './content/Loading';
 import Test from './page/Test';
 import AboutUs from './page/AboutUs';
 import ErrorDisplay from './content/Error';
-import Readme from './page/Readme';
 import HowToPlay from './page/HowTo';
 import CookiesPolicy from './page/CookiesPolicy';
 import PrivacyPolity from './page/PrivacyPolity';
@@ -41,7 +40,6 @@ function App() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path='/loading' element={<Loading />} />
           <Route path="/howto" element={<HowToPlay/>} />
-          <Route path='/readme' element={<Readme />} />
           <Route path='/aboutus' element={<AboutUs />} />
 		      <Route path='/cookies_policy' element={<CookiesPolicy />} />
 		      <Route path='/private_policy' element={<PrivacyPolity />} />
