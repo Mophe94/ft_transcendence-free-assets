@@ -4,10 +4,8 @@ export default function CookiePolicy() {
   return (
 	<RegularBG>
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      {/* On a retiré le fond blanc, les bordures et les ombres ici */}
       <div className="max-w-4xl mx-auto space-y-8">
         
-        {/* En-tête */}
         <header className="border-b border-slate-900/10 pb-6">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 uppercase">
             Cookie Policy
@@ -31,7 +29,6 @@ export default function CookiePolicy() {
 		    </a>
 		  </div>
 
-        {/* Contenu principal */}
         <div className="space-y-6 text-base leading-relaxed text-slate-800">
           
           <p>
@@ -51,7 +48,6 @@ export default function CookiePolicy() {
             In some cases we may use cookies to collect personal information, or that becomes personal information if we combine it with other information.
           </p>
 
-          {/* Section 1 */}
           <section className="space-y-3 pt-4">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
               What are cookies?
@@ -64,7 +60,6 @@ export default function CookiePolicy() {
             </p>
           </section>
 
-          {/* Section 2 */}
           <section className="space-y-3 pt-4">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
               Why do we use cookies?
@@ -74,7 +69,6 @@ export default function CookiePolicy() {
             </p>
           </section>
 
-          {/* Section 3 */}
           <section className="space-y-3 pt-4">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
               How can I control cookies?
@@ -90,7 +84,6 @@ export default function CookiePolicy() {
             </p>
           </section>
 
-          {/* Section 4 */}
           <section className="space-y-3 pt-4">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
               How can I control cookies on my browser?
@@ -198,7 +191,6 @@ export default function CookiePolicy() {
             </ul>
           </section>
 
-          {/* Section 5 */}
           <section className="space-y-3 pt-4">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
               What about other tracking technologies, like web beacons?
@@ -208,7 +200,6 @@ export default function CookiePolicy() {
             </p>
           </section>
 
-          {/* Section 6 */}
           <section className="space-y-3 pt-4">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
               Do you use Flash cookies or Local Shared Objects?
@@ -241,7 +232,6 @@ export default function CookiePolicy() {
             </p>
           </section>
 
-          {/* Section 7 */}
           <section className="space-y-3 pt-4">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
               Do you serve targeted advertising?
@@ -251,7 +241,6 @@ export default function CookiePolicy() {
             </p>
           </section>
 
-          {/* Section 8 */}
           <section className="space-y-3 pt-4">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
               How often will you update this Cookie Policy?
@@ -264,7 +253,6 @@ export default function CookiePolicy() {
             </p>
           </section>
 
-          {/* Section 9 */}
           <section className="space-y-3 pt-4 border-t border-slate-900/10">
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
               Where can I get further information?
