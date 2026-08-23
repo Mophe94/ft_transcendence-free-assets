@@ -239,7 +239,7 @@ read -p "[$SCRIPT_NAME] Do you want to add preconfigured nodes (y/N): " \
     -t 5 \
     answer || {
         echo
-        answer="no"
+        answer="yes"
     }
 
 case "${answer,,}" in
