@@ -13,26 +13,15 @@
  * toujours la même composition.
  */
 export const BOT_TEAM_TIERS = {
-  // Round(s) de début : 0 ou 1 rare max
   faible: [
-    ['fishet', 'squirel', 'leafs', 'burpy', 'papate', 'monkel'], // aucun rare
-    ['sharky', 'squirel', 'leafs', 'burpy', 'papate', 'monkel'], // variante eau
-    ['fishet', 'squirel', 'leafs', 'burpy', 'papate', 'gigantomakia'], // variante terre
-    ['fishet', 'squirel', 'leafs', 'burpy', 'pigeonne', 'monkel'], // variante air
+    ['pisciner', 'squirel', 'burpy', 'leafs'],
+    ['pisciner', 'fishet', 'papate', 'fishet'],
+    ['pisciner', 'squirel', 'fishet', 'leafs'],
   ],
-
-  // Round(s) intermédiaires : 2 rares
-  moyen: [
-    ['pisciner',], // full uncommon+rare
-    ['pisciner',], // full common+rare
-    ['pisciner',],
-  ],
-
-  // Round(s) de fin : les 3 rares
   fort: [
-    ['pisciner',], // full uncommon+rare
-    ['pisciner',], // full common+rare
-    ['pisciner',], // mix
+     ['squirel', 'squirel', 'leafs', 'fishet', 'papate', 'gigantomakia'],
+     ['leafs', 'squirel', 'leafs', 'fishet', 'monkel', 'pigeonne'],
+     ['fishet', 'squirel', 'leafs', 'burpy', 'fishet', 'sharky'],
   ],
 } as const;
 
@@ -70,9 +59,8 @@ export const BOT_ITEMS: Record<string, { scene: string; type: string; value: num
  * aux objets) : plus on avance dans le bracket, plus le bot est équipé.
  */
 export const BOT_ITEM_COUNTS: Record<BotTeamTier, { potion: number; bomb: number }> = {
-  faible: { potion: 1, bomb: 1 },
-  moyen: { potion: 2, bomb: 2 },
-  fort: { potion: 3, bomb: 3 },
+  faible: { potion: 1, bomb: 0 },
+  fort: { potion: 2, bomb: 1 },
 };
 
 /**
@@ -98,15 +86,15 @@ export const BOT_NAMES = [
  * pioche un au hasard à sa création, pour ne pas toujours afficher le
  * même sprite.
  */
-export const BOT_SKIN_PAIRS: ReadonlyArray<{ lobby: string; game: string }> = [
-  { lobby: 'DinoGreen', game: 'dinogreen' },
-  { lobby: 'DinoBlue', game: 'dinoblue' },
-  { lobby: 'DinoRed', game: 'dinored' },
-  { lobby: 'DinoYellow', game: 'dinoyellow' },
-  { lobby: 'Ghost', game: 'ghost' },
-  { lobby: 'Ghost02', game: 'ghost02' },
-  { lobby: 'Ghost03', game: 'ghost03' },
-  { lobby: 'Satyr01', game: 'satyr01' },
-  { lobby: 'Satyr02', game: 'satyr02' },
-  { lobby: 'Satyr03', game: 'satyr03' },
+export const BOT_SKINS: ReadonlyArray<string> = [
+  'dinoGreen',
+  'dinoBlue',
+  'dinoRed',
+  'dinoYellow',
+  'ghost',
+  'ghost02',
+  'ghost03',
+  'satyr01',
+  'satyr02',
+  'satyr03',
 ];
