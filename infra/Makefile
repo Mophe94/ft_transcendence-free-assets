@@ -26,6 +26,7 @@ CONFIG_SCRIPTS := $(LOCATION)/swarm_utils/config
 TOOLS_SCRIPTS := $(LOCATION)/swarm_utils/tools
 CONTAINER_FILES := $(LOCATION)/containers
 TEAM_CONTAINER := $(shell dirname "$(LOCATION)")
+LOGS_LOCATION := $(LOCATION)/logs
 
 # ---------------------------------------------------------------------------
 # Environment variables
