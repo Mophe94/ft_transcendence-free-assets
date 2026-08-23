@@ -16,10 +16,10 @@ export interface RoomAcces {
 export type PlayerPhase = 'map' | 'team_choice' | 'combat';
 
 export const PHASE_DURATIONS = {
-  lobby: 30,
-  map: 185,
-  team_setup: 25,
-  choose_action: 25,
+  lobby: 10,
+  map: 5,
+  team_setup: 15,
+  choose_action: 15,
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;
