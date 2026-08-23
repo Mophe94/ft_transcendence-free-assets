@@ -40,6 +40,8 @@ func _lose():
 	hide_timer.emit()
 	Received.action_finished.emit()
 	Send.send_message(Send.SEND_TAB[Send.SEND_NAME.SAFE_TO_CONTINUE])
+	await get_tree().create_timer(3.0).timeout
+	await text_show("You'll do better next time.")
 	
 func _win():
 	await text_show("YOU WIN!")

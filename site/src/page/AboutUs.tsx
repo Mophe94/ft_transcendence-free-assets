@@ -132,7 +132,7 @@ Concluding this part of our curriculum on a project we're genuinely proud of fee
           <div className="text-justify">
             I got into programming in 2025 after a career path that was as varied as it was unpredictable, followed by a forced break that turned out to be beneficial. As a huge fan of video games and geek culture in general, this career change was a natural extension of my interests.
             When we launched this project, we had only two rules: if we already knew how to use a technology, we wouldn’t use it, and we weren’t allowed to buy asset packs. Needless to say, we had a lot of fun!
-            I’m very proud of the final result: it really looks like the kind of game I’d love to spend my free time playing. The fact that we designed a scalable architecture is a real plus—which means, in a way, that the adventure will never end.
+             I’m very proud of the final result: it really feels like the kind of game I’d love to spend my free time playing. The fact that we designed a scalable architecture is a real advantage, which means, in a way, that the adventure will never end.
 
           </div>
         </div>
