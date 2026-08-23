@@ -15,9 +15,10 @@ import type { GameMessage, GameData } from './game.type';
 import { ClientData } from 'apps/game-service/src/shared/clients.map';
 import { IncomingMessage } from 'http';
 import { OnEvent } from '@nestjs/event-emitter';
-import { RedisService } from '../redis/redis.service';
 import { RedisStateService } from '../redis/redis_state.service';
 import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
+import { validateGamePayload } from './dto/game-payload.dto';
+
 
 @WebSocketGateway(8082, { cors: { origin: true }, path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -141,6 +142,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     const userId = clientData.userId;
+
+    const validated = validateGamePayload(payload);
+    if (!validated) {
+      console.log(`[GameGateway] Invalid payload from ${userId}, dropped:`, payload);
+      return; // on ignore silencieusement — pas de close(), pas de crash
+    }
 
     try {
       await this.gameService.handleMessage(userId, payload);
