@@ -1,29 +1,120 @@
-#! /bin/bash
-SCRIPT_NAME="${0##*/}"
+#!/bin/bash
 
-# Safeguard
-script_help() {
-    echo "[INFO] Usage: ${SCRIPT_NAME} <Target number of managers>"
+SCRIPT_NAME="${0##*/}"
+SCRIPT_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOGS_LOCATION="${LOGS_LOCATION:-"."}/${SCRIPT_NAME%.sh}"
+LOG_FILE="${LOGS_LOCATION}/${SCRIPT_NAME%.sh}_$(date '+%Y-%m-%d_%H-%M-%S').log"
+
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+
+COLOR_RESET='\033[0m'
+COLOR_GREEN='\033[32m'
+COLOR_ORANGE='\033[38;5;208m'
+COLOR_RED='\033[31m'
+
+mkdir -p "$LOGS_LOCATION"
+mkdir -p "$(dirname "$LOG_FILE")"
+
+# File descriptor 3: log file
+exec 3>>"$LOG_FILE"
+
+# File descriptor 4: terminal
+exec 4>&1
+
+# Log command output to both the terminal and log file
+exec > >(tee -a "$LOG_FILE") 2>&1
+
+log_info() {
+    local message="$*"
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
+    printf '%b[INFO]%b[%s] %s\n' \
+        "$COLOR_GREEN" \
+        "$COLOR_RESET" \
+        "$SCRIPT_NAME" \
+        "$message" >&4
+
+    printf '[INFO][%s][%s] %s\n' \
+        "$timestamp" \
+        "$SCRIPT_NAME" \
+        "$message" >&3
 }
+
+log_warn() {
+    local message="$*"
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
+    printf '%b[WARN]%b[%s] %s\n' \
+        "$COLOR_ORANGE" \
+        "$COLOR_RESET" \
+        "$SCRIPT_NAME" \
+        "$message" >&4
+
+    printf '[WARN][%s][%s] %s\n' \
+        "$timestamp" \
+        "$SCRIPT_NAME" \
+        "$message" >&3
+}
+
+log_error() {
+    local message="$*"
+    local timestamp
+    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
+
+    printf '%b[ERROR]%b[%s] %s\n' \
+        "$COLOR_RED" \
+        "$COLOR_RESET" \
+        "$SCRIPT_NAME" \
+        "$message" >&4
+
+    printf '[ERROR][%s][%s] %s\n' \
+        "$timestamp" \
+        "$SCRIPT_NAME" \
+        "$message" >&3
+}
+
+
+# ---------------------------------------------------------------------------
+# Validation
+# ---------------------------------------------------------------------------
+
+script_help() {
+    log_info "Usage: ${SCRIPT_NAME} <Target number of managers>"
+}
+
+set -euo pipefail
 
 if [ $# -ne 1 ]; then
     script_help
     exit 1
 elif [ "$1" -lt 1 ]; then
-    echo "[ERROR][$SCRIPT_NAME] TARGET_MANAGERS must be >= 1"
+    log_error "TARGET_MANAGERS must be >= 1"
     exit 1
 elif [ "$(($1 % 2))" -eq 0 ]; then
-    echo "[ERROR][$SCRIPT_NAME] TARGET_MANAGERS must be an odd number: "$1""
+    log_error "TARGET_MANAGERS must be an odd number: $1"
     exit 1
 else
     TARGET_MANAGERS="$1"
 fi
 
-# Variables
+
+# ---------------------------------------------------------------------------
+# Configuration
+# ---------------------------------------------------------------------------
+
 PROMOTE_TIMEOUT=120
 NODE_PROMOTE_TIMEOUT=30
 
-# Helpers
+
+# ---------------------------------------------------------------------------
+# Docker Swarm Helpers
+# ---------------------------------------------------------------------------
+
 current_managers() {
     docker node ls --format '{{.ManagerStatus}}' |
         grep -Ec 'Leader|Reachable'
@@ -50,88 +141,130 @@ wait_for_manager() {
     local role
     local reachability
 
-    start_time=$(date +%s)
+    start_time="$(date +%s)"
+
+    log_info "Waiting for node $node_id to become a reachable manager"
+
     while :; do
         role=$(docker node inspect "$node_id" \
             --format '{{.Spec.Role}}' 2>/dev/null)
+
         if [ "$role" != "manager" ]; then
             elapsed=$(( $(date +%s) - start_time ))
+
             if [ "$elapsed" -ge "$NODE_PROMOTE_TIMEOUT" ]; then
-                echo "[ERROR][$SCRIPT_NAME] Timeout waiting for node $node_id to become a manager (role: ${role:-unknown})"
+                log_error "Timeout waiting for node $node_id to become a manager (role: ${role:-unknown})"
                 return 1
             fi
+
             sleep 1
             continue
         fi
+
         reachability=$(docker node inspect "$node_id" \
             --format '{{.ManagerStatus.Reachability}}' 2>/dev/null)
+
         case "${reachability,,}" in
-            reachable|leader) return 0;;
-            "");;
-            *) echo "[ERROR][$SCRIPT_NAME] Unexpected status for node $node_id: $reachability"
-               return 1;;
+            reachable|leader)
+                return 0
+                ;;
+            "")
+                ;;
+            *)
+                log_error "Unexpected manager status for node $node_id: $reachability"
+                return 1
+                ;;
         esac
+
         elapsed=$(( $(date +%s) - start_time ))
+
         if [ "$elapsed" -ge "$NODE_PROMOTE_TIMEOUT" ]; then
-            echo "[ERROR][$SCRIPT_NAME] Timeout waiting for node $node_id to become reachable (status: ${reachability:-unknown})"
+            log_error "Timeout waiting for node $node_id to become reachable (status: ${reachability:-unknown})"
             return 1
         fi
+
         sleep 1
     done
 }
 
-# Promoting
-start_time=$(date +%s)
-managers=$(current_managers)
+
+# ---------------------------------------------------------------------------
+# Manager Promotion
+# ---------------------------------------------------------------------------
+
+log_info "Checking current Swarm manager state"
+
+start_time="$(date +%s)"
+managers="$(current_managers)"
+
 while [ "$managers" -lt "$TARGET_MANAGERS" ]; do
-    workers=$(available_workers)
-    echo "[INFO][$SCRIPT_NAME] Managers: $managers, available workers: $workers, target: $TARGET_MANAGERS"
+    workers="$(available_workers)"
+
+    log_info "Managers: $managers, available workers: $workers, target: $TARGET_MANAGERS"
+
     if [ "$managers" -ge "$TARGET_MANAGERS" ]; then
-        echo "[INFO][$SCRIPT_NAME] Manager target reached: $managers/$TARGET_MANAGERS"
+        log_info "Manager target reached: $managers/$TARGET_MANAGERS"
         exit 0
     fi
+
     max_reachable=$((managers + workers))
+
+    # Swarm manager quorum requires an odd number of managers.
     if [ "$((max_reachable % 2))" -eq 0 ]; then
         max_reachable=$((max_reachable - 1))
     fi
+
     if [ "$max_reachable" -gt "$TARGET_MANAGERS" ]; then
         max_reachable="$TARGET_MANAGERS"
     fi
+
     if [ "$max_reachable" -le "$managers" ]; then
-        echo "[WARNING][$SCRIPT_NAME] Not enough workers to reach the next manager quorum"
-        echo "[WARNING][$SCRIPT_NAME] Current managers: $managers"
-        echo "[WARNING][$SCRIPT_NAME] Available workers: $workers"
-        echo "[WARNING][$SCRIPT_NAME] Target: $TARGET_MANAGERS"
+        log_warn "Not enough workers to reach the next manager quorum"
+        log_warn "Current managers: $managers"
+        log_warn "Available workers: $workers"
+        log_warn "Target: $TARGET_MANAGERS"
         exit 1
     fi
-    echo "[INFO][$SCRIPT_NAME] Will promote up to $max_reachable managers"
+
+    log_info "Will promote up to $max_reachable managers"
+
     elapsed=$(( $(date +%s) - start_time ))
+
     if [ "$elapsed" -ge "$PROMOTE_TIMEOUT" ]; then
-        echo "[ERROR][$SCRIPT_NAME] Promotion timeout"
-        echo "[ERROR][$SCRIPT_NAME] Current managers: $managers/$TARGET_MANAGERS"
+        log_error "Manager promotion timeout"
+        log_error "Current managers: $managers/$TARGET_MANAGERS"
         exit 1
     fi
+
     worker=$(
-	docker node ls \
-	    --filter role=worker \
-	    --format '{{.ID}} {{.Status}} {{.Availability}}' |
-	awk '$2 == "Ready" && $3 == "Active" { print $1; exit }'
+        docker node ls \
+            --filter role=worker \
+            --format '{{.ID}} {{.Status}} {{.Availability}}' |
+        awk '$2 == "Ready" && $3 == "Active" { print $1; exit }'
     )
+
     if [ -z "$worker" ]; then
-        echo "[WARNING][$SCRIPT_NAME] No available worker to promote"
+        log_warn "No available worker to promote"
         break
     fi
+
+    log_info "Promoting worker $worker to manager"
+
     if ! docker node promote "$worker"; then
-        echo "[ERROR][$SCRIPT_NAME] Failed to promote node $worker"
+        log_error "Failed to promote node $worker"
         exit 1
-    else
-      echo "[INFO][$SCRIPT_NAME] Node promoted $worker"
     fi
+
+    log_info "Node $worker promotion requested"
+
     if ! wait_for_manager "$worker"; then
         exit 1
     fi
-    echo "[INFO][$SCRIPT_NAME] Node $worker is now a manager"
+
+    log_info "Node $worker is now a reachable manager"
+
     sleep 1
-    managers=$(current_managers)
+    managers="$(current_managers)"
 done
-echo "[INFO][$SCRIPT_NAME] Managers: $managers/$TARGET_MANAGERS"
+
+log_info "Manager promotion completed: $managers/$TARGET_MANAGERS"
