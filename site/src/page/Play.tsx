@@ -23,7 +23,7 @@ export default function Play() {
   if (!roomId) return null;
 
   if (gameStarted && isCountDownFinished) {
-    return <GameIframe userToken="game" roomToken={roomId} />;
+    return <GameIframe roomToken={roomId} />;
   }
 
   return (

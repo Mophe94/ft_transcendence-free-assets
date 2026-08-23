@@ -1,11 +1,10 @@
 import { useRef } from 'react';
 
 interface GameIframeProps {
-  userToken: string;
   roomToken: string;
 }
 
-export default function GameIframe({ userToken, roomToken }: GameIframeProps) {
+export default function GameIframe({ roomToken }: GameIframeProps) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const sendTokenToGame = () => {
@@ -13,7 +12,7 @@ export default function GameIframe({ userToken, roomToken }: GameIframeProps) {
       iframeRef.current.contentWindow?.postMessage(
         {
           type: 'SET_GAME_TOKEN',
-          token: { user_token: userToken, room_token: roomToken , domain_token: `${import.meta.env.VITE_DOMAIN_NAME}`},
+          token: {room_token: roomToken , domain_token: `${import.meta.env.VITE_DOMAIN_NAME}`},
         },
         `${import.meta.env.VITE_IFRAME_SERVICE}`,
       );

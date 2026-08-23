@@ -32,7 +32,6 @@ signal finish
 
 func handle_message_receive(msg):
 	#VERIF GOOD MESSAGE
-	print("-------- MSG RECEIVED -------- :")
 	if not msg.has("event"):
 		return
 	if msg["event"] != "game":
@@ -44,7 +43,6 @@ func handle_message_receive(msg):
 	var data = msg["data"]
 	if data.has("state"):
 		var state = data["state"]
-		print("state: " + state)
 		match state:
 			"start_game": 
 				_start_game(data)
@@ -78,10 +76,6 @@ func handle_message_receive(msg):
 				await _next_map(data)
 			"finish":
 				emit_signal("finish")
-			_:
-				print("data match with nothing")
-	else:
-		print("func handle_message_receive STATE missing")
 
 
 func _finish():
