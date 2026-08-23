@@ -222,7 +222,7 @@ for network in "${networks[@]}"; do
             --driver overlay \
             --attachable \
             --internal \
-            --opt "com.docker.network.driver.mtu=1250" \
+            --opt "com.docker.network.driver.mtu=1200" \
             "$network" >/dev/null 2>&1
 
         log_info "Created overlay network: $network"

@@ -285,10 +285,10 @@ swarm-status:
 	fi
 
 where:
-       @for stack in $$(docker stack ls --format '{{.Name}}'); do \
+	@for stack in $$(docker stack ls --format '{{.Name}}'); do \
                 echo "=== $$stack ==="; \
                 docker stack ps "$$stack"; \
-       done
+	done
 
 
 # ---------------------------------------------------------------------------
