@@ -20,7 +20,7 @@ import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
 import { validateGamePayload } from './dto/game-payload.dto';
 
 
-@WebSocketGateway(8082, { cors: { origin: true }, path: '/game' })
+@WebSocketGateway(8082, { path: '/game' })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
