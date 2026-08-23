@@ -630,6 +630,10 @@ export class GameService {
 
   async handleMessage(userId: string, payload: GameData): Promise<void> {
     const player = this.playerService.getPlayer(userId)!;
+    if (!player) {
+      console.log(`[GameService]: handleMessage -> unknown/already removed player ${userId}, ignoring`);
+      return;
+    }
     const userId2 = this.combatService.getOpponentId(userId);
     const roomId = this.roomIdByPlayer.get(userId)!;
     const state = payload?.state;

@@ -145,7 +145,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const validated = validateGamePayload(payload);
     if (!validated) {
       console.log(`[GameGateway] Invalid payload from ${userId}, dropped:`, payload);
-      return; // on ignore silencieusement — pas de close(), pas de crash
+      return;
     }
 
     try {
@@ -156,10 +156,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     /////////////////////////////////* REDIS STATE : UPDATE STATE */////////////////////////////////
     const playerState = this.playerService.getPlayer(userId)!;
-    await this.redisStateService.updateStatePlayer(
-      userId.toString(),
-      playerState,
-    );
+    if (playerState) {
+      await this.redisStateService.updateStatePlayer(
+        userId.toString(),
+        playerState,
+      );
+  }
     /////////////////////////////////* END */////////////////////////////////
   }
 
