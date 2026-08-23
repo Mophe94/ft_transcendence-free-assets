@@ -21,8 +21,8 @@ export default function AddFriend() {
       credentials: 'include',
       })
       
-    } catch (e) {
-      console.log("error: ", e);
+    } catch {
+      return;
     }
   }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -20,5 +20,5 @@ app.use(express.static(__dirname));
 
 const PORT = process.env.GAME_PORT || 8060;
 app.listen(PORT, () => {
-  console.log(`🎮 Game Server ready on: http://localhost:${PORT}/Export_test.html`);
+  console.log(`🎮 Game Server ready on: http://localhost:${PORT}/Export.html`);
 });

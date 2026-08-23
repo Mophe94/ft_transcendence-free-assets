@@ -120,8 +120,6 @@ body {
             window.roomToken = tokenData.room_token || "";
             window.domainToken = tokenData.domain_token || "";
 
-            console.log("Tokens stockés dans window :", window.userToken, window.roomToken, window.domainToken);
-
             if (typeof Godot !== 'undefined' && Godot.Instance) {
                 const nodeJeu = Godot.Instance.get_main_loop().get_root().get_node("MonNodeJeu");
                 if (nodeJeu && typeof nodeJeu.set_token === 'function') {

@@ -161,7 +161,8 @@ export class AuthService {
     const tokenExchangeUrl = this.configService.get<string>(
       'FORTYTWO_API_TOKENEXCHANGE',
     );
-    const client_id = getSecret('fortytwo_client_id');
+    const client_id = this.configService.get<string>('FORTYTWO_CLIENT_ID');
+    // const client_id = getSecret('fortytwo_client_id');
     const client_secret = getSecret('fortytwo_client_secret');
 
     try {

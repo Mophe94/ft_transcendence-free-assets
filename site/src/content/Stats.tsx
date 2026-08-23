@@ -20,7 +20,7 @@ export default function Stats({ user, stats }: StatsProps) {
   const statistics = {
     'Games played': stats.gamesPlayed,
     'PvP win': stats.gamesWon,
-    'PvPlost': stats.gamesLost,
+    'PvP lost': stats.gamesLost,
     'Total players defeated': stats.totalPlayerDefeated,
     'Discovered monsters': stats.nbMonstersDiscovered,
     'Discovered endings': stats.nbEndingsDiscovered,
@@ -113,7 +113,7 @@ export default function Stats({ user, stats }: StatsProps) {
               </div>
               <div className="
                 text-[clamp(0.6rem,3vw,3rem)]
-                xl:text-[2rem] xl:m-0 xl:justify-self-start
+                xl:text-[2rem] xl:ml-20 xl:justify-self-start
               ">
                 {value}
               </div>

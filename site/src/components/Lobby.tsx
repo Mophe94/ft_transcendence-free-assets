@@ -34,7 +34,7 @@ export function Lobby() {
         .then((data) => {
           if (data?.rooms) setListGames(data.rooms);
         })
-        .catch((e) => console.log(e));
+        .catch(() => {});
     };
 
     fetchRooms();
@@ -52,7 +52,7 @@ export function Lobby() {
       .then((data) => {
         if (data?.skin) setSkin(data.skin);
       })
-      .catch((e) => console.log(e));
+      .catch(() => {})
   }, [user?.username]);
 
   useEffect(() => {
