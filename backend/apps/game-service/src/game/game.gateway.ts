@@ -134,7 +134,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: WebSocket,
     @MessageBody() payload: GameData,
   ): Promise<void> {
-    // create a GamePayload interface to avoid 'any'?
     const clientData = this.clients.get(client);
     if (!clientData) {
       client.close();

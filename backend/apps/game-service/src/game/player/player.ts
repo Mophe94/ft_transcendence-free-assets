@@ -307,12 +307,14 @@ export class Player {
   teamReady: boolean = false;
   forceChooseMonster: boolean = false;
   duelFinished: boolean = false;
+  double_auto_pass: number = 0;
   timer: number = 0;
   current_map: string = '';
   current_monster: string = '';
   current_monster_rarity: string = '';
   current_item: string = '';
   text: string = '';
+  /* Stats */
   monsterCatch: string[] = [];
   playerDefeated: number = 0;
   win: boolean = false;

@@ -17,7 +17,7 @@ export const PHASE_DURATIONS = {
   lobby: 10,
   map: 20,
   team_setup: 15,
-  choose_action: 20,
+  choose_action: 10,
 };
 
 export type PhaseName = keyof typeof PHASE_DURATIONS;
