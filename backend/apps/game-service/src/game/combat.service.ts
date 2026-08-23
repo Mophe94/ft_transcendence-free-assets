@@ -707,7 +707,7 @@ export class CombatService {
         return;
     }
 
-    current_item['current'] -= 1;
+    //current_item['current'] -= 1;
     if (current_item['current'] === 0) {
       current_item['name'] = '';
       current_item['scene'] = '';

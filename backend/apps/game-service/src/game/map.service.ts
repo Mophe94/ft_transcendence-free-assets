@@ -248,6 +248,7 @@ export class MapService {
     for (let i = 0; i < player.team.length; ++i) {
       if (player.team[i] === '') {
         player.team[i] = player.current_monster;
+        
         break;
       }
     }
