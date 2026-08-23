@@ -134,7 +134,7 @@ get_42_token() {
     local client_id
     local client_secret
 
-    client_id="$(get_env_value s_fortytwo_client_id)" || return 1
+    client_id="$(get_env_value API_42_CLIENT_ID)" || return 1
     client_secret="$(get_env_value s_fortytwo_client_secret)" || return 1
 
     curl -fsS \

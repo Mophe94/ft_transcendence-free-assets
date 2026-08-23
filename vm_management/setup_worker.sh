@@ -97,7 +97,7 @@ log_wait() {
 # ---------------------------------------------------------------------------
 # Safeguard
 # ---------------------------------------------------------------------------
-set -eux
+set -eu
 
 if [ $# -ne 3 ]; then
     log_error "Usage: ${SCRIPT_NAME} <node new username> <host ip> <flag resize>"

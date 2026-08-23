@@ -199,7 +199,7 @@ base:
 	@$(MAKE) image TARGET=$@
 
 # ---------------------------------------------------------------------------
-# Website stack
+# Stacks
 # ---------------------------------------------------------------------------
 
 website:
@@ -212,10 +212,6 @@ website:
 		-c "$(DEPLOY_FILES)/$@_deploy.yml" \
 		$@
 
-# ---------------------------------------------------------------------------
-# Game stack
-# ---------------------------------------------------------------------------
-
 game:
 	@doas mkdir -p "/var/lib/postgresql/data"
 	@$(MAKE) image TARGET=$@
@@ -225,10 +221,6 @@ game:
 		--detach=true \
 		-c "$(DEPLOY_FILES)/$@_deploy.yml" \
 		$@
-
-# ---------------------------------------------------------------------------
-# Observability stack
-# ---------------------------------------------------------------------------
 
 observ:
 	@mkdir -p "/nfs-storage/grafana/dashboards"
@@ -275,17 +267,13 @@ down:
 	fi
 
 # ---------------------------------------------------------------------------
-# Swarm shutdown
+# Swarm Management
 # ---------------------------------------------------------------------------
 
 swarm_down: down
 	@chmod +x "$(CONFIG_SCRIPTS)/end_swarm.sh"
 	@"$(CONFIG_SCRIPTS)/end_swarm.sh"
 	@docker swarm leave --force
-
-# ---------------------------------------------------------------------------
-# Swarm status
-# ---------------------------------------------------------------------------
 
 swarm-status:
 	@if ! docker info >/dev/null 2>&1; then \
@@ -295,6 +283,13 @@ swarm-status:
 	else \
 		echo "Swarm status: inactive"; \
 	fi
+
+where:
+       @for stack in $$(docker stack ls --format '{{.Name}}'); do \
+                echo "=== $$stack ==="; \
+                docker stack ps "$$stack"; \
+       done
+
 
 # ---------------------------------------------------------------------------
 # Node management
