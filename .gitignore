@@ -2,3 +2,5 @@
 .php
 infra/*.php
 infra/*.html
+.secrets
+.env.docker
