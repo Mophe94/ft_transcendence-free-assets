@@ -13,14 +13,12 @@ const swordStyle = {
 
 const publicLinks = {
   Home: '/Home',
-  Readme: '/readme',
   'About us': '/aboutus',
 }
 
 const privateLinks = {
   Home: '/Home',
   'How to play': '/howto',
-  Readme: '/readme',
   'About us': '/aboutus',
 };
 
