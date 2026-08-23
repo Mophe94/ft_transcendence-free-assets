@@ -8,7 +8,6 @@ import Play from './page/Play';
 import Profile from './page/Profile';
 import { useAuth } from './context/AuthContext';
 import { Loading } from './content/Loading';
-import Test from './page/Test';
 import AboutUs from './page/AboutUs';
 import ErrorDisplay from './content/Error';
 import HowToPlay from './page/HowTo';
@@ -47,7 +46,6 @@ function App() {
         </Route>
         
         <Route element={<AppLayout />}>
-          <Route path='/test' element={<Test />} />
           <Route path="*" element={<ErrorDisplay msg="Page not found" code={404} />} />
         </Route>
       </Routes>

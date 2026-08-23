@@ -29,7 +29,6 @@ export default function PrivacyPolity() {
 		    </a>
 		  </div>
 
-          {/* Contenu principal */}
           <div className="space-y-6 text-base leading-relaxed text-slate-800">
             
             <p>
@@ -66,7 +65,6 @@ export default function PrivacyPolity() {
 
             <hr className="border-slate-900/10 my-8" />
 
-            {/* SUMMARY OF KEY POINTS */}
             <section className="space-y-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-wide">
                 Summary of Key Points
@@ -88,7 +86,6 @@ export default function PrivacyPolity() {
 
             <hr className="border-slate-900/10 my-8" />
 
-            {/* TABLE OF CONTENTS */}
             <section className="space-y-4 bg-slate-50/50 p-6 rounded-xl border border-slate-900/5">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 uppercase tracking-wide">
                 Table of Contents
@@ -112,7 +109,6 @@ export default function PrivacyPolity() {
 
             <hr className="border-slate-900/10 my-8" />
 
-            {/* SECTION 1 */}
             <section id="section-1" className="space-y-4 pt-2">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 1. WHAT INFORMATION DO WE COLLECT?
@@ -150,7 +146,6 @@ export default function PrivacyPolity() {
               </div>
             </section>
 
-            {/* SECTION 2 */}
             <section id="section-2" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 2. HOW DO WE PROCESS YOUR INFORMATION?
@@ -172,7 +167,6 @@ export default function PrivacyPolity() {
               </ul>
             </section>
 
-            {/* SECTION 3 */}
             <section id="section-3" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 3. WHAT LEGAL BASES DO WE RELY ON TO PROCESS YOUR INFORMATION?
@@ -191,7 +185,6 @@ export default function PrivacyPolity() {
               </ul>
             </section>
 
-            {/* SECTION 4 */}
             <section id="section-4" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 4. WHEN AND WITH WHOM DO WE SHARE YOUR PERSONAL INFORMATION?
@@ -207,7 +200,6 @@ export default function PrivacyPolity() {
               </ul>
             </section>
 
-            {/* SECTION 5 */}
             <section id="section-5" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 5. DO WE USE COOKIES AND OTHER TRACKING TECHNOLOGIES?
@@ -220,7 +212,6 @@ export default function PrivacyPolity() {
               </p>
             </section>
 
-            {/* SECTION 6 */}
             <section id="section-6" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 6. HOW DO WE HANDLE YOUR SOCIAL LOGINS?
@@ -233,7 +224,6 @@ export default function PrivacyPolity() {
               </p>
             </section>
 
-            {/* SECTION 7 */}
             <section id="section-7" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 7. HOW LONG DO WE KEEP YOUR INFORMATION?
@@ -243,7 +233,6 @@ export default function PrivacyPolity() {
               </p>
             </section>
 
-            {/* SECTION 8 */}
             <section id="section-8" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 8. HOW DO WE KEEP YOUR INFORMATION SAFE?
@@ -253,7 +242,6 @@ export default function PrivacyPolity() {
               </p>
             </section>
 
-            {/* SECTION 9 */}
             <section id="section-9" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 9. WHAT ARE YOUR PRIVACY RIGHTS?
@@ -275,7 +263,6 @@ export default function PrivacyPolity() {
               </p>
             </section>
 
-            {/* SECTION 10 */}
             <section id="section-10" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 10. CONTROLS FOR DO-NOT-TRACK FEATURES
@@ -285,7 +272,6 @@ export default function PrivacyPolity() {
               </p>
             </section>
 
-            {/* SECTION 11 */}
             <section id="section-11" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 11. DO WE MAKE UPDATES TO THIS NOTICE?
@@ -295,7 +281,6 @@ export default function PrivacyPolity() {
               </p>
             </section>
 
-            {/* SECTION 12 */}
             <section id="section-12" className="space-y-3 pt-4">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 12. HOW CAN YOU CONTACT US ABOUT THIS NOTICE?
@@ -318,7 +303,6 @@ export default function PrivacyPolity() {
               </address>
             </section>
 
-            {/* SECTION 13 */}
             <section id="section-13" className="space-y-3 pt-4 border-t border-slate-900/10">
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
                 13. HOW CAN YOU REVIEW, UPDATE, OR DELETE THE DATA WE COLLECT FROM YOU?

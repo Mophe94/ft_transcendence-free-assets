@@ -135,6 +135,16 @@ func set_menus_capture():
 func set_menus_catch(object):
 	hide_button()
 	if object == "yes":
+		var count = 0
+		var team = GeneralData.player["team"]
+		for i in range(team.size()):
+			if team[i] != "":
+				count += 1
+		if count == 6:
+			await text_show("Your team is already full!")
+			back_button.show()
+			return
+
 		emit_signal("try_catch")
 		await text_show("You try to catch " + GeneralData.monster_encounter)
 		var success = await _result_catch()
