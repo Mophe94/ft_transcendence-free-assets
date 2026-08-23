@@ -219,7 +219,7 @@ Concluding this part of our curriculum on a project we're genuinely proud of fee
           "
         >
           <div className="text-justify">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut porttitor pharetra accumsan. Etiam ipsum sapien, finibus at sagittis nec, sagittis in quam. Fusce eu facilisis augue. Mauris eleifend, lectus a ultrices luctus, dui dolor pharetra turpis, ac vehicula neque elit at dui. Donec accumsan diam sed ipsum pretium, non sollicitudin mi sagittis. Quisque laoreet lorem eu mi volutpat efficitur. Pellentesque a ipsum augue. Ut quis enim eu diam viverra pulvinar. Fusce mi quam, molestie non elit eget, faucibus accumsan mi. Phasellus neque massa, viverra vitae arcu non, dictum vehicula augue.
+            Choosing to pivot into IT was a risky decision, but one that has proven more than worthwhile over time. I love thinking through problems and learning new technologies. Through this project, I learned a great deal about system administration, DevOps, and networking, as well as scripting and VM deployment. That said, if we hadn't had a deadline, I would have loved to push the project even further.
           </div>
         </div>
       </div>

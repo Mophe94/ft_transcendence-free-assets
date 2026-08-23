@@ -20,3 +20,4 @@ wiq
 logs
 **/*.log*
 *.vdi
+.env*
