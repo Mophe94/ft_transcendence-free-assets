@@ -32,7 +32,7 @@ export default function Play() {
         roomName={roomId}
         players={players}
         roomCapacity={roomCapacity}
-        endTime={timer}
+        endTime={gameStarted ?  0 : timer}
       />
       {gameStarted && <CountDown initialTime={3} onComplete={() => setIsCountDownFinished(true)}/>}
     </div>
