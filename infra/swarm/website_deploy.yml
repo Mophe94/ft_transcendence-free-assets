@@ -1,0 +1,204 @@
+services:
+
+    frontend:
+        image: ${IP}:${REGISTRY_PORT}/frontend:latest
+#        env_file:
+#          - "site/FrontEnd/.env"
+
+        networks:
+            - games_net
+
+        configs:
+          - source: load_secrets
+            target: /load_secrets.sh
+            mode: 0555
+
+        secrets:
+          - VITE_API_BASE_URL
+          - VITE_42_OAUTH_API
+          - VITE_42_OAUTH_CLIENT_ID
+          - VITE_42_OAUTH_REDIRECT_URI
+          - VITE_42_OAUTH_API_LINK
+
+        entrypoint:
+          - /load_secrets.sh
+
+        command:
+          - npm
+          - run
+          - dev
+
+        deploy:
+            replicas: 1
+
+    backend:
+        image: ${IP}:${REGISTRY_PORT}/backend:latest
+#        env_file:
+#          - "site/BackEnd/.env"
+
+        networks:
+            - games_net
+
+        configs:
+          - source: load_secrets
+            target: /load_secrets.sh
+            mode: 0555
+
+        environment:
+          - DB_HOST=website_users_db
+          - FRONT_END_URL=http://localhost:5173/
+
+        secrets:
+          - FORTYTWO_CLIENT_ID
+          - FORTYTWO_CLIENT_SECRET
+          - FORTYTWO_REDIRECT_URI
+          - FORTYTWO_API_TOKENEXCHANGE
+          - FORTYTWO_API_GETUSER
+          - JWT_SECRET
+
+
+        entrypoint:
+          - /load_secrets.sh
+
+        command:
+          - npm
+          - run
+          - start
+
+        deploy:
+            replicas: 1
+
+    game:
+        image: ${IP}:${REGISTRY_PORT}/game:latest
+
+        networks:
+            - games_net
+
+#        configs:
+#        entrypoint:
+        command:
+          - node
+          - server.js
+
+        deploy:
+            replicas: 1
+
+    users_db:
+        image: ${IP}:${REGISTRY_PORT}/users_db:latest
+#        env_file:
+#          - "site/databases/user_db/.env"
+
+        volumes:
+          - users_data:/var/lib/postgresql/
+
+        networks:
+            - games_net
+
+        configs:
+          - source: load_secrets
+            target: /load_secrets.sh
+            mode: 0555
+
+        secrets:
+          - POSTGRES_USER
+          - POSTGRES_PASSWORD
+          - USERS_DB_NAME
+          - USERS_DB_USER
+          - USERS_DB_PASSWORD
+
+        entrypoint:
+          - /load_secrets.sh
+
+        command:
+          - /usr/local/bin/docker-entrypoint.sh 
+          - postgres
+
+        deploy:
+            replicas: 1
+
+    game_db:
+        image: ${IP}:${REGISTRY_PORT}/game_db:latest
+#        env_file:
+#          - "site/databases/game_db/.env"
+
+        volumes:
+          - game_data:/var/lib/postgresql/
+
+        networks:
+            - games_net
+
+        configs:
+          - source: load_secrets
+            target: /load_secrets.sh
+            mode: 0555
+
+        secrets:
+          - POSTGRES_USER
+          - POSTGRES_PASSWORD
+          - GAME_DB_NAME
+          - GAME_DB_USER
+          - GAME_DB_PASSWORD
+
+        entrypoint:
+          - /load_secrets.sh
+
+        command:
+          - /usr/local/bin/docker-entrypoint.sh 
+          - postgres
+
+        deploy:
+            replicas: 1
+
+networks:
+    games_net:
+        external: true
+    swarm_net:
+        external: true
+
+volumes:
+  users_data:
+  game_data:
+
+configs:
+  load_secrets:
+    file: "$HOME/infra/swarm/scripts/load_secrets.sh"
+
+secrets:
+    POSTGRES_USER:
+      external: true
+    POSTGRES_PASSWORD:
+      external: true
+    USERS_DB_NAME:
+      external: true
+    USERS_DB_USER:
+      external: true
+    USERS_DB_PASSWORD:
+      external: true
+    GAME_DB_NAME:
+      external: true
+    GAME_DB_USER:
+      external: true
+    GAME_DB_PASSWORD:
+      external: true
+    FORTYTWO_CLIENT_ID:
+      external: true
+    FORTYTWO_CLIENT_SECRET:
+      external: true
+    FORTYTWO_REDIRECT_URI:
+      external: true
+    FORTYTWO_API_TOKENEXCHANGE:
+      external: true
+    FORTYTWO_API_GETUSER:
+      external: true
+    VITE_API_BASE_URL:
+      external: true
+    VITE_42_OAUTH_API:
+      external: true
+    VITE_42_OAUTH_CLIENT_ID:
+      external: true
+    VITE_42_OAUTH_REDIRECT_URI:
+      external: true
+    VITE_42_OAUTH_API_LINK:
+      external: true
+    JWT_SECRET:
+      external: true

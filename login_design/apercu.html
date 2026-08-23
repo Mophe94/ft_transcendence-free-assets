@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail du Royaume - Assets RPG</title>
+    
+    <!-- Polices Pixel Art / RPG -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================
+           RESET & BASE
+        ========================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0c0a1d;
+            font-family: 'MedievalSharp', cursive;
+            color: #2b1d0c;
+        }
+
+        /* ==========================================
+           STRUCTURE PRINCIPALE
+        ========================================== */
+        .viewport {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ==========================================
+           FONDS : VIDÉO / IMAGE
+        ========================================== */
+        .map-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            transition: filter 0.4s ease, transform 0.4s ease;
+        }
+
+        .map-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('image_0.png') center/cover no-repeat #0c0a1d;
+            image-rendering: pixelated;
+            z-index: 1;
+            transition: filter 0.4s ease, transform 0.4s ease;
+        }
+
+        .viewport.open .map-video,
+        .viewport.open .map-background {
+            filter: brightness(0.5) blur(2px);
+            transform: scale(1.02);
+        }
+
+        /* Overlay d'assombrissement */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(8, 6, 20, 0.65);
+            backdrop-filter: blur(2px);
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .viewport.open .overlay {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .top-login-link {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: #ffffff;
+            font-size: 20px;
+            text-decoration: underline;
+            cursor: pointer;
+            z-index: 5;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        .top-login-link:hover { color: #f5b041; }
+
+        /* ==========================================
+           BOUTON ENTER PRINCIPAL
+        ========================================== */
+        .enter-btn-container {
+            position: absolute;
+            bottom: 40px;
+            z-index: 5;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .img-btn-enter {
+            width: 180px;
+            height: auto;
+            cursor: pointer;
+            image-rendering: pixelated;
+            transition: transform 0.15s ease, filter 0.15s ease;
+            filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+        }
+
+        .img-btn-enter:hover {
+            transform: scale(1.08);
+            filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.8)) brightness(1.1);
+        }
+
+        .img-btn-enter:active {
+            transform: scale(0.95);
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+        }
+
+        .viewport.open .enter-btn-container {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+        }
+
+        /* ==========================================
+           MODALE PARCHEMIN
+        ========================================== */
+        .parchment-modal {
+            position: relative;
+            z-index: 20;
+            width: 440px;
+            background: #e5cd9d;
+            border: 5px solid #4a341e;
+            box-shadow: 0 0 0 3px #8c6639, inset 0 0 15px #b89968, 0 15px 30px rgba(0,0,0,0.8);
+            border-radius: 4px;
+            image-rendering: pixelated;
+            
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .viewport.open .parchment-modal {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-tabs {
+            display: flex;
+            background: #2b1d0c;
+            border-bottom: 4px solid #4a341e;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 10px;
+            background: #1a1107;
+            color: #8c7356;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: #e5cd9d;
+            color: #2b1d0c;
+            box-shadow: inset 0 3px 0 #fff;
+        }
+
+        .modal-body {
+            padding: 25px 35px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 22px;
+            color: #3b2816;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+
+        .pixel-input {
+            width: 100%;
+            padding: 8px 12px;
+            font-family: 'MedievalSharp', cursive;
+            font-size: 20px;
+            background: #c9b183;
+            border: 3px solid #7a5833;
+            color: #1a1107;
+            outline: none;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
+            border-radius: 2px;
+        }
+
+        .pixel-input:focus {
+            border-color: #a82828;
+            background: #d8c297;
+        }
+
+        /* ==========================================
+           BOUTONS DE FORMULAIRE (CÔTE À CÔTE)
+        ========================================== */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .submit-btn-img {
+            flex: 1;
+            max-width: 140px; /* Taille contenue pour éviter de faire grossir la fenêtre */
+            height: auto;
+            cursor: pointer;
+            image-rendering: pixelated;
+            transition: transform 0.15s ease, filter 0.15s ease;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+        }
+
+        .submit-btn-img:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.7)) brightness(1.1);
+        }
+
+        .submit-btn-img:active {
+            transform: scale(0.97);
+            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+        }
+
+        .submit-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            font-family: 'MedievalSharp', cursive;
+            font-size: 24px;
+            font-weight: bold;
+            background: #a82828;
+            color: #fce8a6;
+            border: 4px solid #f5b041;
+            box-shadow: 0 5px 0 #5c1414, 0 8px 15px rgba(0,0,0,0.4);
+            cursor: pointer;
+            text-shadow: 1px 1px 2px #000;
+            border-radius: 4px;
+        }
+
+        .form-content { display: none; }
+        .form-content.active { display: block; }
+    </style>
+</head>
+<body>
+
+<div class="viewport" id="viewport">
+
+    <video autoplay loop muted playsinline class="map-video">
+        <source src="video_banner_web.mp4" type="video/mp4">
+    </video>
+
+    <div class="top-login-link" onclick="openModal('login')">Login</div>
+
+    <div class="enter-btn-container">
+        <img src="enter_button_text.png" alt="Enter" class="img-btn-enter" onclick="openModal('login')">
+    </div>
+
+    <div class="overlay" onclick="closeModal()"></div>
+
+    <div class="parchment-modal">    
+        <div class="modal-tabs">
+            <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">CONNEXION</button>
+            <button class="tab-btn" id="tabJoin" onclick="switchTab('join')">INSCRIPTION</button>
+        </div>
+
+        <div class="modal-body">
+            
+            <form id="formLogin" class="form-content active" onsubmit="handleSubmit(event, 'Connexion')">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" class="pixel-input" placeholder="hero@royaume.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-pass">Mot de Passe</label>
+                    <input type="password" id="login-pass" class="pixel-input" placeholder="••••••••" required>
+                </div>
+                
+                <!-- BOUTONS CÔTE À CÔTE -->
+                <div class="button-group">
+                    <input type="image" src="enter_button_text.png" alt="Enter" class="submit-btn-img">
+                    <input type="image" src="background.png" alt="Invité" class="submit-btn-img" onclick="handleGuestLogin(event)">
+                </div>
+            </form>
+
+            <form id="formJoin" class="form-content" onsubmit="handleSubmit(event, 'Inscription')">
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" class="pixel-input" placeholder="hero@royaume.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-pass">Mot de Passe</label>
+                    <input type="password" id="reg-pass" class="pixel-input" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-pass">Confirmer Mot de Passe</label>
+                    <input type="password" id="reg-pass" class="pixel-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="submit-btn">Join the Battle</button>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const viewport = document.getElementById('viewport');
+    const tabJoin = document.getElementById('tabJoin');
+    const tabLogin = document.getElementById('tabLogin');
+    const formJoin = document.getElementById('formJoin');
+    const formLogin = document.getElementById('formLogin');
+
+    function openModal(defaultTab = 'login') {
+        switchTab(defaultTab);
+        viewport.classList.add('open');
+    }
+
+    function closeModal() {
+        viewport.classList.remove('open');
+    }
+
+    function switchTab(tab) {
+        if (tab === 'login') {
+            tabLogin.classList.add('active');
+            tabJoin.classList.remove('active');
+            formLogin.classList.add('active');
+            formJoin.classList.remove('active');
+        } else {
+            tabJoin.classList.add('active');
+            tabLogin.classList.remove('active');
+            formJoin.classList.add('active');
+            formLogin.classList.remove('active');
+        }
+    }
+
+    function handleSubmit(e, type) {
+        e.preventDefault();
+        alert(`${type} validée !`);
+    }
+
+    function handleGuestLogin(e) {
+        e.preventDefault();
+        alert("Connexion en mode Invité !");
+    }
+</script>
+
+</body>
+</html>
