@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="SkinData" format=3 uid="uid://bokwlk6fda4h"]
+
+[ext_resource type="Script" uid="uid://brt0iiv638g4g" path="res://Script/PlayerCharacter/Skindata.gd" id="1_3dwqr"]
+[ext_resource type="SpriteFrames" uid="uid://dhl5c4fluvjp1" path="res://Scene/PlayerCharacter/Skin/Ghost02/ghost02SpriteSheet.tres" id="2_0nt0k"]
+
+[resource]
+script = ExtResource("1_3dwqr")
+skin_id = "ghost02"
+display_name = "ghost02"
+sprite_frames = ExtResource("2_0nt0k")
+scale = Vector2(0.219, 0.201)
+metadata/_custom_type_script = "uid://brt0iiv638g4g"

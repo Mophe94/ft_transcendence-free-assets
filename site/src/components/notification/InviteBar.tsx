@@ -1,8 +1,9 @@
 
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLobbySocket } from '../../context/LobbySocketContext';
 import { useEffect, useState } from 'react';
+import { useNotification } from '../../context/NotifContext';
 
 interface InviteBarProps {
   username: string;
@@ -13,6 +14,8 @@ export default function InviteBar({ username, roomId }: InviteBarProps) {
 
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { showNotification } = useNotification();
   const { joinRoom } = useLobbySocket()
   const [isLeaving, setIsLeaving] = useState(false);
 
@@ -25,7 +28,16 @@ export default function InviteBar({ username, roomId }: InviteBarProps) {
   }, []);
 
   const acceptInvite = async () => {
+
+    const isAlreadyInGame = location.pathname.startsWith('/play');
     if (!user || isLeaving) return;
+    if (isAlreadyInGame) {
+      setIsLeaving(true);
+      console.log(location.pathname)
+      showNotification('You are already in a lobby or a game', 'error');
+      return;
+    }
+
     setIsLeaving(true);
     let userSkin = 'DinoGreen';
 

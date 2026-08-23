@@ -10,6 +10,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const { showNotification, showInvite } = useNotification();
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [isUnread, setIsUnread] = useState<boolean>(false);
+  const [chatConnectionActive, setChatConnectionActive] = useState<boolean>(false);
   const wsRef = useRef<WebSocket | null>(null);
   const userColorsRef = useRef<Map<string, ChatColor>>(new Map());
 
@@ -21,10 +22,10 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const socket = new WebSocket(`${import.meta.env.VITE_CHAT_SERVICE}`);
     wsRef.current = socket;
-    socket.onclose = () => {
-      return;
-    }
 
+    socket.onopen = () => {
+      setChatConnectionActive(true);
+    }
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       switch (data.type) {
@@ -56,7 +57,12 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
-    socket.onclose = () => wsRef.current = null;
+    socket.onclose = () => {
+      if (wsRef.current === socket) {
+        wsRef.current = null;
+      }
+      setChatConnectionActive(false);
+    };
     return () => {
       socket.close();
     }
@@ -69,6 +75,6 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Socket not connected.');
     }
   };
-  const chat: Chat = { messages, sendMessage, isUnread, setIsUnread };
+  const chat: Chat = { messages, sendMessage, isUnread, setIsUnread, chatConnectionActive };
   return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;
 };

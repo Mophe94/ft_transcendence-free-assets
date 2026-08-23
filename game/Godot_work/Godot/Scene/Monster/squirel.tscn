@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://d1rccpg77uer8"]
+
+[ext_resource type="Texture2D" uid="uid://bc5fpb466y88e" path="res://Assets/Monster/spritesheet/Squirel/sprite-1-1 (2).png" id="1_yv5j1"]
+[ext_resource type="Texture2D" uid="uid://bubocj8pre57d" path="res://Assets/Monster/spritesheet/Squirel/sprite-1-2 (2).png" id="2_i4swo"]
+[ext_resource type="Texture2D" uid="uid://cjefrokhmowu" path="res://Assets/Monster/spritesheet/Squirel/sprite-1-4 (2).png" id="3_knv05"]
+[ext_resource type="Texture2D" uid="uid://xttqxjxy3c6b" path="res://Assets/Monster/spritesheet/Squirel/sprite-2-1 (2).png" id="4_ictgl"]
+[ext_resource type="Texture2D" uid="uid://xctc8snxohio" path="res://Assets/Monster/spritesheet/Squirel/sprite-2-2 (1).png" id="5_78eel"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ictgl"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_yv5j1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_i4swo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_knv05")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ictgl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_78eel")
+}],
+"loop": true,
+"name": &"default",
+"speed": 4.0
+}]
+
+[node name="Squirel" type="Node2D" unique_id=1129627068]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="." unique_id=1637582322]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D" unique_id=138195492]
+position = Vector2(-1.5497208e-06, 5.9604645e-07)
+scale = Vector2(0.2777778, 0.28169015)
+sprite_frames = SubResource("SpriteFrames_ictgl")
+autoplay = "default"
+frame_progress = 0.5367769

@@ -38,11 +38,12 @@ export class GameService {
   // roomId -> active players
   private activePlayersByRoom = new Map<string, Set<string>>();
 
+
+  /*  GAME ROOMS */
+
   getRoomById(userId: string) {
     return this.roomIdByPlayer.get(userId);
   }
-
-  /*  GAME ROOMS */
 
   async verifyRoomAccess(userId: string, roomId: string): Promise<RoomAcces | null> {
     const [isActive, players, capacity] = await Promise.all([
@@ -179,25 +180,20 @@ export class GameService {
         return;
       } const opponentId = this.combatService.getOpponentId(userId);
       const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
-
-      ///////////////////// TEST //////////////////////////////
-      // if (enemy) {
-      //   if (!player.teamReady) {
-      //     const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy);
-      //     void this.handleMessage(userId, { state: 'team_choice', battle_team: chosenTeam });
-      //   } else if (!player.currentActions?.actionType) {
-      //     this.triggerBotCombatTurn(userId, player, enemy);
-      //   }
-      // }
-      /////////////////////////////////////////////////////////
-
+      if (!enemy) {
+        console.log('[GameService] enemy is undefined');
+        return;
+      }
       const totalRounds = Math.log2(DEFAULT.CAPACITY);
       const round = totalRounds - player.roundsRemaining + 1;
-      this.aiOrchestrator.takeoverPlayer(round, totalRounds, player);
 
-      console.log(
-        `[GameService] Player ${userId} disconnected while still in the running -> replaced by AI`,
-      );
+      this.aiOrchestrator.takeoverPlayer(round, totalRounds, player, enemy);
+      if (player.currentPhase === 'team_choice' && !player.teamReady) {
+        const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy);
+        void this.handleMessage(player.id, { state: 'team_choice', battle_team: chosenTeam });
+      } else if (player.currentPhase === 'combat') {
+        this.triggerBotCombatTurn(player.id, player, enemy);
+      }
       return;
     }
     // --- end AI takeover ---
@@ -221,7 +217,6 @@ export class GameService {
     this.activePlayersByRoom.get(roomId)?.delete(userId);
     this.roomIdByPlayer.delete(userId);
     this.playerService.removePlayer(userId);
-
     if (player) this.startNextRound(roomId);
     else {
       // useless with AI? 
@@ -236,54 +231,6 @@ export class GameService {
     this.eventEmitter.emit('send_to_player', { userId, payload });
   }
 
-  // startNextRound(roomId: string): void {
-  //   const active = this.activePlayersByRoom.get(roomId);
-  //   const connected = this.gameRooms.get(roomId);
-  //   if (!active || !connected) return;
-
-  //   console.log(
-  //     `[GameService] activePlayersByRoom=${this.activePlayersByRoom.get(roomId)?.size}, connected=${this.gameRooms.get(roomId)?.size}`,
-  //   );
-
-  //   const allCombatsFinished = connected.size === active.size;
-  //   const canPairEveryone = active.size >= 2 && active.size % 2 === 0;
-
-  //   console.log('Active Players in startNextRound ', active);
-  //   console.log('Connected Players in startNextRound ', connected);
-  //   console.log('*********************************************');
-  //   if (allCombatsFinished && canPairEveryone) {
-  //     console.log(
-  //       'Active Players allCombatsFinished && canPairEveryone: ',
-  //       active,
-  //     );
-  //     console.log(
-  //       'Connected Players allCombatsFinished && canPairEveryone: ',
-  //       connected,
-  //     );
-  //     console.log('*********************************************');
-  //     this.combatService.matchmake(connected);
-
-  //     // // --- AI (bot-vs-bot instant resolve) ---
-  //     const resolvedPairs = this.resolveBotVsBotPairs(roomId, connected);
-  //     const playersForMapPhase =
-  //       resolvedPairs.size > 0
-  //         ? new Set([...connected].filter((id) => !resolvedPairs.has(id)))
-  //         : connected;
-  //     this.startMapPhase(roomId, playersForMapPhase, true);
-  //     if (resolvedPairs.size > 0) this.startNextRound(roomId);
-  //     // // --- end AI ---
-  //   } else if (allCombatsFinished && active.size === 1) {
-  //     console.log('*********************************************');
-  //     const winnerId = [...active][0];
-  //     if (winnerId) {
-  //       this.deleteEndGame(roomId, winnerId);
-  //       this.combatService.playerCombatRoom.delete(winnerId);
-  //     }
-  //     console.log('Game rooms end game: ', this.gameRooms);
-  //     //console.log(`End of game: everything should be cleanup at this point!`);
-  //     return;
-  //   }
-  // }
   async startNextRound(roomId: string): Promise<void> {
     const active = this.activePlayersByRoom.get(roomId);
     //const connected = this.gameRooms.get(roomId);
@@ -310,6 +257,16 @@ export class GameService {
       console.log('Game rooms end game: ', this.gameRooms);
       //console.log(`End of game: everything should be cleanup at this point!`);
       return;
+    } else if (allCombatsFinished && active.size % 2 !== 0 && active.size > 1) {
+    // Filet de sécurité : nombre impair de joueurs actifs (≠ 1), tous
+    // ont fini leur duel, donc impossible de les repairer 2 par 2. Ne
+    // devrait jamais arriver en théorie -> signe d'un joueur non
+    // retiré correctement ailleurs. Sans ce cas, la room reste
+    // bloquée indéfiniment en "Ongoing" (voir bug room fantôme).
+      console.log(
+        `[GameService] startNextRound: état incohérent, ${active.size} joueurs actifs (impair) dans room ${roomId} -> nettoyage forcé`,
+      );
+      await this.cleanupAbandonedRoom(roomId);
     }
   }
 
@@ -328,48 +285,49 @@ export class GameService {
   }
 
   // Big cleaning -> see with IA
-  private async deleteAbortedGame(roomId: string, disconnectedUserId: string): Promise<void> {
-    const remaining = this.gameRooms.get(roomId);
-    const allInvolved = new Set(remaining ?? []);
-    allInvolved.add(disconnectedUserId);
+  // private async deleteAbortedGame(roomId: string, disconnectedUserId: string): Promise<void> {
+  //   const remaining = this.gameRooms.get(roomId);
+  //   const allInvolved = new Set(remaining ?? []);
+  //   allInvolved.add(disconnectedUserId);
 
-    for (const id of allInvolved) {
-      const combatRoomId = this.combatService.playerCombatRoom.get(id);
-      if (combatRoomId) {
-        this.combatService.combatRooms.delete(combatRoomId);
-        this.phaseTimer.clear(`combat: ${combatRoomId}`);
-      }
-      this.combatService.playerCombatRoom.delete(id);
-      this.roomIdByPlayer.delete(id);
-      if (id !== disconnectedUserId)
-        this.eventEmitter.emit('close_player_socket', { userId: id });
-      const player = this.playerService.getPlayer(id);
+  //   for (const id of allInvolved) {
+  //     const combatRoomId = this.combatService.playerCombatRoom.get(id);
+  //     if (combatRoomId) {
+  //       this.combatService.combatRooms.delete(combatRoomId);
+  //       this.clearPendingBotAction(id); // FOR AVOID LEAKS
+  //       this.phaseTimer.clear(`combat: ${combatRoomId}`);
+  //     }
+  //     this.combatService.playerCombatRoom.delete(id);
+  //     this.roomIdByPlayer.delete(id);
+  //     if (id !== disconnectedUserId)
+  //       this.eventEmitter.emit('close_player_socket', { userId: id });
+  //     const player = this.playerService.getPlayer(id);
 
-      /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
-      console.log("ABORTED GAME");
-      if (player && !player.isBot) {
-        const playerState = await this.redisStateService.getStatePlayer(id);
-        if (playerState) {
-          const monsterCatch = playerState.monsterCatch;
-          const win = playerState.win;
-          const lose = playerState.lose;
-          const playerDefeated = playerState.playerDefeated;
-          const asset = playerState.asset;
-          console.log("monsterCatch: ", monsterCatch, "win: ", win, "lose: ", lose, "playerDefeated: ", playerDefeated, "asset: ", asset);
-          await this.userStatsClient.allUpdate(playerState.uid, { monsterCatch, win, lose, playerDefeated, asset });
-        }
-        await this.redisStateService.removePlayer(id);
-      }
-      /////////////////////////////////* END */////////////////////////////////
-    }
-    this.combatService.playerCombatRoom.delete(disconnectedUserId);
-    this.roomIdByPlayer.delete(disconnectedUserId);
+  //     /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
+  //     console.log("ABORTED GAME");
+  //     if (player && !player.isBot) {
+  //       const playerState = await this.redisStateService.getStatePlayer(id);
+  //       if (playerState) {
+  //         const monsterCatch = playerState.monsterCatch;
+  //         const win = playerState.win;
+  //         const lose = playerState.lose;
+  //         const playerDefeated = playerState.playerDefeated;
+  //         const asset = playerState.asset;
+  //         console.log("monsterCatch: ", monsterCatch, "win: ", win, "lose: ", lose, "playerDefeated: ", playerDefeated, "asset: ", asset);
+  //         await this.userStatsClient.allUpdate(playerState.uid, { monsterCatch, win, lose, playerDefeated, asset });
+  //       }
+  //       await this.redisStateService.removePlayer(id);
+  //     }
+  //     /////////////////////////////////* END */////////////////////////////////
+  //   }
+  //   this.combatService.playerCombatRoom.delete(disconnectedUserId);
+  //   this.roomIdByPlayer.delete(disconnectedUserId);
 
-    this.phaseTimer.clear(`game: ${roomId}`);
+  //   this.phaseTimer.clear(`game: ${roomId}`);
 
-    this.gameRooms.delete(roomId);
-    this.activePlayersByRoom.delete(roomId);
-  }
+  //   this.gameRooms.delete(roomId);
+  //   this.activePlayersByRoom.delete(roomId);
+  // }
 
   private async deleteEndGame(roomId: string, winnerId: string): Promise<void> {
     this.phaseTimer.clear(`game: ${roomId}`);
@@ -405,6 +363,58 @@ export class GameService {
     );
   }
 
+
+  private async deleteAbortedGame(roomId: string, disconnectedUserId: string): Promise<void> {
+  const remaining = this.gameRooms.get(roomId);
+  const allInvolved = new Set(remaining ?? []);
+  allInvolved.add(disconnectedUserId);
+
+  for (const id of allInvolved) {
+    const combatRoomId = this.combatService.playerCombatRoom.get(id);
+    if (combatRoomId) {
+      this.combatService.combatRooms.delete(combatRoomId);
+      this.phaseTimer.clear(`combat: ${combatRoomId}`);
+    }
+    this.combatService.playerCombatRoom.delete(id);
+    this.clearPendingBotAction(id); // FOR AVOID LEAKS
+    this.roomIdByPlayer.delete(id);
+    if (id !== disconnectedUserId)
+      this.eventEmitter.emit('close_player_socket', { userId: id });
+    const player = this.playerService.getPlayer(id);
+
+    /////////////////////////////////* REDIS STATE : REMOVE PLAYER */////////////////////////////////
+    console.log("ABORTED GAME");
+    if (player && !player.isBot) {
+      const playerState = await this.redisStateService.getStatePlayer(id);
+      if (playerState) {
+        const monsterCatch = playerState.monsterCatch;
+        const win = playerState.win;
+        const lose = playerState.lose;
+        const playerDefeated = playerState.playerDefeated;
+        const asset = playerState.asset;
+        console.log("monsterCatch: ", monsterCatch, "win: ", win, "lose: ", lose, "playerDefeated: ", playerDefeated, "asset: ", asset);
+        await this.userStatsClient.allUpdate(playerState.uid, { monsterCatch, win, lose, playerDefeated, asset });
+      }
+      await this.redisStateService.removePlayer(id);
+    }
+    /////////////////////////////////* END */////////////////////////////////
+    this.playerService.removePlayer(id); // FOR AVOID LEAKS
+  }
+  this.combatService.playerCombatRoom.delete(disconnectedUserId);
+  this.roomIdByPlayer.delete(disconnectedUserId);
+
+  this.phaseTimer.clear(`game: ${roomId}`);
+
+  this.gameRooms.delete(roomId);
+  this.activePlayersByRoom.delete(roomId);
+
+  await Promise.all([ // FOR AVOID LEAKS
+    this.redisService.deleteRoom(roomId),
+    this.redisService.removeActiveRoom(roomId),
+  ]).catch((err) =>
+    console.log(`[GameService] deleteAbortedGame: failed cleaning redis for ${roomId}`, err),
+  );
+}
   /* Start Phases */
 
   private startMapPhase(
@@ -428,62 +438,112 @@ export class GameService {
       } else return { userId, payload: this.mapService.start_game(player) };
     });
 
-    payloads.forEach(({ userId, payload }) =>
-      this.sendToPlayer(userId, payload),
-    );
+    payloads.forEach(({ userId, payload }) => {
+      this.playerService.getPlayer(userId)!.currentPhase = 'map';
+      console.log(`${this.playerService.getPlayer(userId)!.id}: CURRENT PHASE -> ${this.playerService.getPlayer(userId)!.currentPhase}`);
+      this.sendToPlayer(userId, payload);
+    });
     console.log(
       `[GameService]: startMapPhase -> start_game sent to ${roomPlayers.size} players of ${roomId}`,
     );
   }
 
-  private startTeamSetupPhase(roomId: string, roomPlayers: Set<string>) {
-    this.phaseTimer.start(`game: ${roomId}`, 'team_setup', () => {
-      console.log(`Room ${roomId} team_setup phase timeout`);
-    });
-    const teamSetupTimer =
-      this.phaseTimer.startTimes.get(`game: ${roomId}`)! +
-      PHASE_DURATIONS.team_setup;
+  // private startTeamSetupPhase(roomId: string, roomPlayers: Set<string>) {
+  //   this.phaseTimer.start(`game: ${roomId}`, 'team_setup', () => {
+  //     console.log(`Room ${roomId} team_setup phase timeout`);
+  //   });
+  //   const teamSetupTimer =
+  //     this.phaseTimer.startTimes.get(`game: ${roomId}`)! +
+  //     PHASE_DURATIONS.team_setup;
 
-    for (const userId of roomPlayers) {
-      const player = this.playerService.getPlayer(userId)!;
-      player.timer = teamSetupTimer;
-      player.teamReady = false;
+    
+  //   const totalRounds = Math.log2(DEFAULT.CAPACITY);
+  //   for (const userId of roomPlayers) {
+  //     const player = this.playerService.getPlayer(userId)!;
+  //     player.currentPhase = 'team_choice';
+  //     player.timer = teamSetupTimer;
+  //     player.teamReady = false;
 
-      const opponentId = this.combatService.getOpponentId(userId);
-      const enemy = opponentId
-        ? this.playerService.getPlayer(opponentId)
-        : undefined;
-      if (!enemy) {
-        console.log(
-          `[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`,
-        );
-      }
+  //     console.log(`${player.id}: CURRENT PHASE -> ${player.currentPhase}`);
 
-      // TEST MATCHMAKING //
-      console.log(
-        'USER ID: ',
-        userId /* ': ', this.team_setup(player, enemy ?? player) */,
-      );
-      console.log('OPONNENT ID: ', opponentId);
-      console.log('******************');
-      //******************************//
+  //     const opponentId = this.combatService.getOpponentId(userId);
+  //     const enemy = opponentId
+  //       ? this.playerService.getPlayer(opponentId)
+  //       : undefined;
+  //     if (!enemy) {
+  //       console.log(
+  //         `[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`,
+  //       );
+  //     }
+  //     this.sendToPlayer(
+  //       userId,
+  //       this.mapService.team_setup(player, enemy ?? player),
+  //     );
+  //     // --- AI team_setup (feature 4a) ---
+  //     // Un bot ne peut pas répondre lui-même à ce payload (pas de
+  //     // websocket), donc on déclenche sa décision tout de suite en
+  //     // rappelant handleMessage exactement comme si le message venait
+  //     // du client — aucune logique dupliquée.
+  //     if (player.isBot) {
+  //       const round = totalRounds - player.roundsRemaining + 1;
+  //       this.aiOrchestrator.refreshBotForRound(player, round, totalRounds);
+  //       const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy ?? player);
+  //       void this.handleMessage(userId, { state: 'team_choice', battle_team: chosenTeam });
+  //     }
+  //     // --- end AI team_setup ---
+  //   }
+  // }
 
-      this.sendToPlayer(
-        userId,
-        this.mapService.team_setup(player, enemy ?? player),
-      );
-      // --- AI team_setup (feature 4a) ---
-      // Un bot ne peut pas répondre lui-même à ce payload (pas de
-      // websocket), donc on déclenche sa décision tout de suite en
-      // rappelant handleMessage exactement comme si le message venait
-      // du client — aucune logique dupliquée.
-      if (player.isBot) {
-        const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy ?? player);
-        void this.handleMessage(userId, { state: 'team_choice', battle_team: chosenTeam });
-      }
-      // --- end AI team_setup ---
-    }
+  private async startTeamSetupPhase(roomId: string, roomPlayers: Set<string>) {
+  this.phaseTimer.start(`game: ${roomId}`, 'team_setup', () => {
+    console.log(`Room ${roomId} team_setup phase timeout`);
+  });
+  const teamSetupTimer =
+    this.phaseTimer.startTimes.get(`game: ${roomId}`)! +
+    PHASE_DURATIONS.team_setup;
+
+  const totalRounds = Math.log2(DEFAULT.CAPACITY);
+
+  // --- Pass 1 : init phase/timer pour tout le monde ---
+  for (const userId of roomPlayers) {
+    const player = this.playerService.getPlayer(userId)!;
+    player.currentPhase = 'team_choice';
+    player.timer = teamSetupTimer;
+    player.teamReady = false;
   }
+
+  // --- Pass 2 : les bots choisissent (et appliquent) leur équipe AVANT tout envoi ---
+  for (const userId of roomPlayers) {
+    const player = this.playerService.getPlayer(userId)!;
+    if (!player.isBot) continue;
+
+    const opponentId = this.combatService.getOpponentId(userId);
+    const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
+
+    const round = totalRounds - player.roundsRemaining + 1;
+    this.aiOrchestrator.refreshBotForRound(player, round, totalRounds);
+    const chosenTeam = this.aiOrchestrator.decideBattleTeam(player, enemy ?? player);
+
+    // IMPORTANT : on attend que la battle_team soit vraiment appliquée
+    // avant de passer au pass 3, sinon on retombe dans le même bug.
+    await this.handleMessage(userId, { state: 'team_choice', battle_team: chosenTeam });
+  }
+
+  // --- Pass 3 : on envoie team_setup à TOUT LE MONDE, une fois les bots à jour ---
+  for (const userId of roomPlayers) {
+    const player = this.playerService.getPlayer(userId)!;
+    console.log(`${player.id}: CURRENT PHASE -> ${player.currentPhase}`);
+
+    const opponentId = this.combatService.getOpponentId(userId);
+    const enemy = opponentId ? this.playerService.getPlayer(opponentId) : undefined;
+    if (!enemy) {
+      console.log(
+        `[GameService]: No opponent for ${userId} (room ${roomId}) - using player as placeholder`,
+      );
+    }
+    this.sendToPlayer(userId, this.mapService.team_setup(player, enemy ?? player));
+  }
+}
 
   private startCombatPhase(roomId: string, roomPlayers: Set<string>) {
     const handled = new Set<string>();
@@ -493,9 +553,9 @@ export class GameService {
 
       const opponentId = this.combatService.getOpponentId(userId);
       const combatRoomId = this.combatService.playerCombatRoom.get(userId);
-      if (!combatRoomId) {
+      if (!combatRoomId || !opponentId) {
         console.log(
-          `[GameService]: start CombatPhase -> missing combatRoomId for ${userId}`,
+          `[GameService]: start CombatPhase -> missing combatRoomId or opponent for ${userId}`,
         );
         continue;
       }
@@ -511,12 +571,17 @@ export class GameService {
         this.phaseTimer.startTimes.get(timerKey)! +
         PHASE_DURATIONS.choose_action;
 
-      this.playerService.getPlayer(userId)!.timer = combatTimer;
+      const player = this.playerService.getPlayer(userId)!;
+      player.currentPhase = 'combat';
+      player.timer = combatTimer;
       handled.add(userId);
-      if (opponentId) {
-        this.playerService.getPlayer(opponentId)!.timer = combatTimer;
-        handled.add(opponentId);
-      }
+
+      const player2 = this.playerService.getPlayer(opponentId)!;
+      player2.currentPhase = 'combat';
+      player2.timer = combatTimer;
+      handled.add(opponentId);
+      console.log(`${player.id}: CURRENT PHASE -> ${player.currentPhase}`);
+      console.log(`${player2.id}: CURRENT PHASE -> ${player2.currentPhase}`);
     }
     console.log('Combat timer started');
   }
@@ -945,9 +1010,11 @@ export class GameService {
 
     await this.redisStateService.updateStatePlayer(loser.id, loser);
     await this.redisStateService.updateStatePlayer(winner.id, winner);
+    // reinitialize winner
+    winner.resetAfterRound();
+    if (winner.isBot) winner.duelFinished = true;
     
     loser.duelFinished = true;
-    if (winner.isBot) winner.duelFinished = true;
 
     if (loser.isBot) {
       const loserBotRoomId = this.roomIdByPlayer.get(loser.id);
@@ -958,8 +1025,7 @@ export class GameService {
       }
     }
 
-    // reinitialize winner
-    winner.resetAfterRound();
+
 
     // --- AI (bot loser cleanup) ---
     // Un joueur humain qui perd déclenche sa propre élimination via

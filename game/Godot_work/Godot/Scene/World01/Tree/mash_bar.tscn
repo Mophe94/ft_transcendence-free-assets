@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dm3rb1i3bq0kw"]
+
+[ext_resource type="Script" uid="uid://faf3vbxt4tbh" path="res://Script/World/Tree/mash_bar.gd" id="1_2d4cg"]
+[ext_resource type="Texture2D" uid="uid://bsaghdqh68u5e" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Bars/bar_assembled.png" id="2_wogc6"]
+[ext_resource type="Texture2D" uid="uid://cc3w2mtvs74d7" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/UI Elements/UI Elements/Bars/bar_fill.png" id="3_2d4cg"]
+
+[node name="MashBar" type="Node2D" unique_id=1315619967]
+z_index = 15
+script = ExtResource("1_2d4cg")
+max_presses = 10
+
+[node name="ProgressBar" type="TextureProgressBar" parent="." unique_id=1411591372]
+offset_right = 240.0
+offset_bottom = 51.0
+texture_under = ExtResource("2_wogc6")
+texture_progress = ExtResource("3_2d4cg")

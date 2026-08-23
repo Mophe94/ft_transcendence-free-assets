@@ -11,7 +11,7 @@ import { WebSocket, Server } from 'ws';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { LobbyService } from 'apps/game-service/src/lobby/lobby.service';
-import { RoomService } from 'apps/game-service/src/shared/room.service';
+//import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { RedisService } from '../redis/redis.service';
 import { IncomingMessage } from 'http';
 import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
@@ -23,7 +23,7 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
     private lobbyService: LobbyService,
-    private roomService: RoomService,
+    //private roomService: RoomService,
     private redisService: RedisService,
     private readonly wsAuthService: SharedAuthService,
   ) {}
@@ -53,29 +53,20 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('[LobbyGateway]: Client disconnected');
   }
 
-  /**
-   * roomService.leaveRoom retire le client de l'état in-memory + de
-   * Redis, et renvoie :
-   *  - null si la room vient d'être supprimée (plus aucun vrai
-   *    joueur) -> rien à faire de plus.
-   *  - le Set des clients restants sinon -> on demande à LobbyService
-   *    de remettre un bot à la place du joueur parti. handlePlayerLeave
-   *    ne fait rien si la room est déjà à capacité (ex: déconnexion
-   *    tardive d'un socket /lobby après le lancement de la partie).
+/**
+   * Point d'entrée unique pour un départ de room : passe entièrement
+   * par LobbyService.leaveRoom, qui gère lui-même le verrou par
+   * roomId (RoomMutexService) englobant à la fois le retrait du
+   * client (roomService.leaveRoom) ET le remplacement éventuel par un
+   * bot (handlePlayerLeaveLocked). Ça évite qu'un join concurrent sur
+   * la même room ne s'intercale au milieu de ce départ.
    */
   private async notifyRoomOnLeave(
     client: WebSocket,
     roomId: string,
     userId: string,
   ): Promise<void> {
-    const remainingClients = await this.roomService.leaveRoom(
-      client,
-      roomId,
-      userId,
-    );
-    if (remainingClients) {
-      await this.lobbyService.handlePlayerLeave(roomId, remainingClients);
-    }
+    await this.lobbyService.leaveRoom(client, roomId, userId);
   }
 
   private broadcast(clients: Set<WebSocket>, message: object) {
@@ -85,23 +76,54 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+  // @SubscribeMessage('create_room')
+  // async handleCreateRoom(
+  //   @ConnectedSocket() client: WebSocket,
+  //   @MessageBody() payload: { username: string; skin: string },
+  // ): Promise<void> {
+  //   const clientData = clientsMap.get(client);
+  //   if (!clientData) {
+  //     client.close();
+  //     return;
+  //   }
+  //   await this.lobbyService.createRoomAndJoin(
+  //     client,
+  //     clientData.userId,
+  //     payload.username,
+  //     payload.skin,
+  //   );
+  // }
+
   @SubscribeMessage('create_room')
-  async handleCreateRoom(
-    @ConnectedSocket() client: WebSocket,
-    @MessageBody() payload: { username: string; skin: string },
-  ): Promise<void> {
-    const clientData = clientsMap.get(client);
-    if (!clientData) {
-      client.close();
-      return;
-    }
+async handleCreateRoom(
+  @ConnectedSocket() client: WebSocket,
+  @MessageBody() payload: { username: string; skin: string },
+): Promise<void> {
+  const clientData = clientsMap.get(client);
+  if (!clientData) {
+    client.close();
+    return;
+  }
+
+  // Verrou synchrone, posé AVANT tout await : bloque tout spam,
+  // même si le premier create_room est encore en train de traiter
+  // (latence Redis, etc.).
+  if (clientData.roomId || clientData.pendingJoin) {
+    return;
+  }
+  clientData.pendingJoin = true;
+
+  try {
     await this.lobbyService.createRoomAndJoin(
       client,
       clientData.userId,
       payload.username,
       payload.skin,
     );
+  } finally {
+    clientData.pendingJoin = false;
   }
+}
 
   @SubscribeMessage('quick_pairing')
   async handleQuickPairing(

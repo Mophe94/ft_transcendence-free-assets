@@ -16,7 +16,7 @@ export class Item {
   @Column({
     type: 'enum',
     enum: ItemType,
-    name: 'type',
+    name: 'target',
     nullable: true,
   })
   target!: MonsterStat;

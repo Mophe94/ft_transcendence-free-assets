@@ -13,6 +13,7 @@ export interface Chat {
   sendMessage: (text: string) => Promise<void>;
   isUnread: boolean;
   setIsUnread: React.Dispatch<React.SetStateAction<boolean>>
+  chatConnectionActive: boolean;
 }
 
 export const ChatContext = createContext<Chat | null>(null);

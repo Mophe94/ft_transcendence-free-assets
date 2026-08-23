@@ -19,7 +19,7 @@ export function LobbySocketProvider({ children }: { children: ReactNode }) {
       skin: string,
       targetRoomId?: string,
     ) => {
-      if (wsRef.current, !username) return;
+      if (wsRef.current || !username) return;
 
       setIsConnecting(true);
       setJoinError(null);

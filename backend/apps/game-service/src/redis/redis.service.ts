@@ -110,8 +110,20 @@ export class RedisService {
   async getPlayersFromRoom(
     roomId: string,
   ): Promise<Array<{ username: string; skin: string; isBot: boolean }>> {
-    const entries = await this.redis.hvals(LOBBY_KEYS.ROOM_PLAYERS(roomId));
-    return entries.map((entry) => JSON.parse(entry));
+    const rawPlayersMap = await this.redis.hgetall(
+      LOBBY_KEYS.ROOM_PLAYERS(roomId),
+    );
+    return Object.entries(rawPlayersMap).map(([playerId, jsonValue]) => {
+      const playerData = JSON.parse(jsonValue) as {
+        username: string;
+        skin: string;
+      };
+      return {
+        username: playerData.username,
+        skin: playerData.skin,
+        isBot: playerId.startsWith('bot-'),
+      };
+    });
   }
 
   async countPlayersInRoom(roomId: string): Promise<number> {

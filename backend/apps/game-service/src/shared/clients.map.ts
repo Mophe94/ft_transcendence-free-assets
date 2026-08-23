@@ -5,6 +5,7 @@ export interface ClientData {
   userId: string;
   roomId?: string;
   isAlive: boolean;
+  pendingJoin?: boolean;
 }
 
 export const clientsMap = new Map<WebSocket, ClientData>();

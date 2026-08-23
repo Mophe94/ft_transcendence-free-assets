@@ -42,6 +42,16 @@ export function MessagesWindow() {
     return null;
   }
 
+  if(!chatContext.chatConnectionActive) {
+    return (
+      <div className="h-full w-full overflow-y-auto overflow-x-hidden min-w-0 scrollbar-none [&::-webkit-scrollbar]:hidden">
+        <div className='break-all min-w-0 w-full text-pastel-red font-bold' >
+          You are disconnected
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="h-full w-full overflow-y-auto overflow-x-hidden min-w-0 scrollbar-none [&::-webkit-scrollbar]:hidden">
       {messages.length === 0 && <p>Start discussion...</p>}

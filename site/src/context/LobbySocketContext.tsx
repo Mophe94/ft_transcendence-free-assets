@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 export interface LobbyPlayer {
   username: string;
   skin: string;
+  isBot: boolean;
 }
 
 interface LobbySocketState {

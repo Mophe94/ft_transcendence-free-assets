@@ -2,6 +2,7 @@ import RegularBG from '../background/RegularBg';
 import ImgFrame from '../components/ImgFrame';
 
 import dylan from '../assets/others/dylan.png';
+import aurore from '../assets/others/agaland.png';
 import Heading from '../components/heading/Heading';
 
 export default function AboutUs() {
@@ -73,9 +74,9 @@ What I'm proudest of is exactly that: not settling for a minimum viable product,
           "
         >
           <ImgFrame
-            imgSrc="https://cdn.intra.42.fr/users/4a2a9f9dce90eeef627c357ee393a346/agaland.jpg"
+            imgSrc={aurore}
             imgAlt="picture Aurore"
-            color="blue"
+            color="spartan"
           />
         </div>
         <div
@@ -85,7 +86,9 @@ What I'm proudest of is exactly that: not settling for a minimum viable product,
           "
         >
           <div className="text-justify">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut porttitor pharetra accumsan. Etiam ipsum sapien, finibus at sagittis nec, sagittis in quam. Fusce eu facilisis augue. Mauris eleifend, lectus a ultrices luctus, dui dolor pharetra turpis, ac vehicula neque elit at dui. Donec accumsan diam sed ipsum pretium, non sollicitudin mi sagittis. Quisque laoreet lorem eu mi volutpat efficitur. Pellentesque a ipsum augue. Ut quis enim eu diam viverra pulvinar. Fusce mi quam, molestie non elit eget, faucibus accumsan mi. Phasellus neque massa, viverra vitae arcu non, dictum vehicula augue.
+           Like pretty much everyone on this team, I'm a career-changer. I saw a light and decided to follow it! Joining this project was the perfect excuse to finally get our hands dirty, and somehow we all collectively decided that a huge, over-the-top project was a totally reasonable place to start.
+This project was challenging and pushed our limits. But there's something incredibly satisfying about watching it slowly take shape from promising ideas to something that not only works, but is also a really fun and well-designed game.
+Concluding this part of our curriculum on a project we're genuinely proud of feels like exactly the right way to close this chapter.
           </div>
         </div>
       </div>
@@ -129,7 +132,7 @@ What I'm proudest of is exactly that: not settling for a minimum viable product,
           <div className="text-justify">
             I got into programming in 2025 after a career path that was as varied as it was unpredictable, followed by a forced break that turned out to be beneficial. As a huge fan of video games and geek culture in general, this career change was a natural extension of my interests.
             When we launched this project, we had only two rules: if we already knew how to use a technology, we wouldn’t use it, and we weren’t allowed to buy asset packs. Needless to say, we had a lot of fun!
-            I’m very proud of the final result: it really looks like the kind of game I’d love to spend my free time playing. The fact that we designed a scalable architecture is a real plus—which means, in a way, that the adventure will never end.
+             I’m very proud of the final result: it really feels like the kind of game I’d love to spend my free time playing. The fact that we designed a scalable architecture is a real advantage, which means, in a way, that the adventure will never end.
 
           </div>
         </div>

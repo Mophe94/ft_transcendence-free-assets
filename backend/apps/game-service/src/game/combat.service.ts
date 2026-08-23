@@ -605,7 +605,6 @@ export class CombatService {
     const type = current_item.type;
     switch (type) {
       case 'heal':
-        console.log('3 type: ', type);
         let result_heal = current_item.value;
         let temp_life_heal = player.currentMonster.life.current;
         player.currentMonster.life.current += current_item.value;
@@ -627,7 +626,6 @@ export class CombatService {
         break;
 
       case 'damage':
-        console.log('3 type: ', type);
         let result_damage = current_item.value;
         let temp_life_damage = enemy.currentMonster.life.current;
         enemy.currentMonster.life.current -= current_item.value;
@@ -647,9 +645,6 @@ export class CombatService {
         break;
 
       case 'stat_down':
-        console.log('3 type: ', type);
-		console.log('stat_up: ', current_item.name);
-		console.log('target: ', current_item.target);
 		const target = current_item.target;
         switch (target) {
           case 'attack':
@@ -679,7 +674,6 @@ export class CombatService {
         break;
 
       case 'stat_up':
-        console.log('3 type: ', type);
         switch (current_item.target) {
           case 'attack':
             player.currentMonster.attack += current_item.value;

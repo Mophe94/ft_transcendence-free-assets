@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://d1g565g5jp42x"]
+
+[ext_resource type="Script" uid="uid://c7lwfik1e6ox0" path="res://Script/World/Collectible/CollectibleSpot.gd" id="1_8orai"]
+[ext_resource type="Texture2D" uid="uid://cu2shbunnkxvv" path="res://Assets/World01/Tiny Swords/Tiny Swords (Free Pack)/Terrain/Resources/Gold/Gold Stones/Gold Stone 6_Highlight.png" id="2_yciwo"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h1l3x"]
+atlas = ExtResource("2_yciwo")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oc26g"]
+atlas = ExtResource("2_yciwo")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mr1af"]
+atlas = ExtResource("2_yciwo")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wammx"]
+atlas = ExtResource("2_yciwo")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q0msd"]
+atlas = ExtResource("2_yciwo")
+region = Rect2(512, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u844p"]
+atlas = ExtResource("2_yciwo")
+region = Rect2(640, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uv4g3"]
+atlas = ExtResource("2_yciwo")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_u1gic"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h1l3x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oc26g")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mr1af")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wammx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q0msd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u844p")
+}],
+"loop": true,
+"name": &"active",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uv4g3")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8orai"]
+radius = 40.0
+height = 80.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ufjs1"]
+radius = 48.0
+
+[node name="Collectible_spot" type="Node2D" unique_id=1961863223 groups=["trigger_zone"]]
+z_index = 7
+script = ExtResource("1_8orai")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1199411539]
+sprite_frames = SubResource("SpriteFrames_u1gic")
+animation = &"active"
+frame = 1
+frame_progress = 0.6392326
+
+[node name="StaticBody2D" type="StaticBody2D" parent="AnimatedSprite2D" unique_id=56947735]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatedSprite2D/StaticBody2D" unique_id=341442799]
+position = Vector2(0, -8)
+shape = SubResource("CapsuleShape2D_8orai")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=468380548 groups=["trigger_zone"]]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=824516114 groups=["trigger_zone"]]
+position = Vector2(0, -8)
+shape = SubResource("CircleShape2D_ufjs1")
