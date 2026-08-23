@@ -66,10 +66,7 @@ func send_message(event, value = null):
 		"safe_to_continue":
 			_safe_to_continue(packet)
 	if Network.wsSate != WebSocketPeer.STATE_CLOSED:
-		print("-------- MSG SEND --------  :\n", JSON.stringify(packet))
 		Network.ws.send_text(JSON.stringify(packet))
-	else:
-		print("-------- WEBSOCKET CLOSE--------  :\n", JSON.stringify(packet))
 
 
 func _safe_to_continue(packet):

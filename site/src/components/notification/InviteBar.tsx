@@ -33,7 +33,6 @@ export default function InviteBar({ username, roomId }: InviteBarProps) {
     if (!user || isLeaving) return;
     if (isAlreadyInGame) {
       setIsLeaving(true);
-      console.log(location.pathname)
       showNotification('You are already in a lobby or a game', 'error');
       return;
     }

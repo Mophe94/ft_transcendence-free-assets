@@ -3,6 +3,8 @@ import ImgFrame from '../components/ImgFrame';
 
 import dylan from '../assets/others/dylan.png';
 import aurore from '../assets/others/agaland.png';
+import bertrand from '../assets/others/bertrmar.png';
+import stemples from '../assets/others/stemples.png';
 import Heading from '../components/heading/Heading';
 
 export default function AboutUs() {
@@ -118,7 +120,7 @@ Concluding this part of our curriculum on a project we're genuinely proud of fee
           "
         >
           <ImgFrame
-            imgSrc="https://cdn.intra.42.fr/users/c10b1c69a639cdd5414f6f163518be60/bertrmar.jpg"
+            imgSrc= {bertrand}
             imgAlt="picture Bertrand"
             color="toxic"
           />
@@ -205,9 +207,9 @@ Concluding this part of our curriculum on a project we're genuinely proud of fee
           "
         >
           <ImgFrame
-            imgSrc="https://cdn.intra.42.fr/users/631cec4de555931d34960f24f1b8bfc9/stempels.jpg"
+            imgSrc={stemples}
             imgAlt="picture Dylan"
-            color="yellow"
+            color="purple"
           />
         </div>
         <div
