@@ -25,11 +25,11 @@ services:
           - FORTYTWO_API_TOKENEXCHANGE=http://nginx:420/fortytwoapi/oauth/token
           - FORTYTWO_REDIRECT_URI=https://${HOST_IP}:8443/auth/callback
           - FORTYTWO_API=http://nginx:420/fortytwoapi/v2
+          - FORTYTWO_CLIENT_ID=${API_42_CLIENT_ID}
         secrets:
           - db_users_db_name
           - db_users_username
           - db_users_password
-          - fortytwo_client_id
           - fortytwo_client_secret
           - jwt_secret_key
         networks:
@@ -88,8 +88,6 @@ secrets:
     db_users_password:
       external: true
     db_users_postgres_password:
-      external: true
-    fortytwo_client_id:
       external: true
     fortytwo_client_secret:
       external: true
