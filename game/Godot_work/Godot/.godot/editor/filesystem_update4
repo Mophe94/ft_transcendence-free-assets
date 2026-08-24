@@ -1,8 +1,4 @@
-res://Script/General/Received.gd
-res://Script/General/Network.gd
-res://Script/General/GeneralProcess.gd
-res://Script/General/Send.gd
-res://Scene/Combat/CombatMenus/combat_menus.tscn
+res://Scene/Capture/capture.tscn
 res://Scene/PlayerCharacter/Skin/DinoBlue/dinoBlueSpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/DinoYellow/dinoYellowSpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/DinoGreen/dinoGreenSpriteSheet.tres
@@ -13,3 +9,6 @@ res://Scene/PlayerCharacter/Skin/Ghost03/ghost03SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr01/satyr01SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr02/satyr02SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr03/satyr03SpriteSheet.tres
+res://Script/Capture/Menus/capture_menus.gd
+res://Script/General/GeneralData.gd
+res://Script/Timer/timer.gd

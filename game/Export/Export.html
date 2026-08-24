@@ -104,7 +104,7 @@ body {
 		</noscript>
 
 		<div id="status">
-			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="DinoYellow.gif" alt="">
+			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="Export.png" alt="">
 			<progress id="status-progress"></progress>
 			<div id="status-notice"></div>
 		</div>
@@ -116,8 +116,11 @@ body {
         const tokenData = event.data.token;
 
         if (tokenData) {
+            window.userToken = tokenData.user_token || "";
             window.roomToken = tokenData.room_token || "";
             window.domainToken = tokenData.domain_token || "";
+
+            console.log("Tokens stockés dans window :", window.userToken, window.roomToken, window.domainToken);
 
             if (typeof Godot !== 'undefined' && Godot.Instance) {
                 const nodeJeu = Godot.Instance.get_main_loop().get_root().get_node("MonNodeJeu");
