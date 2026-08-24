@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/08/24 09:23:05 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/24 10:29:33 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,6 +47,9 @@ services:
           - games_net
         deploy:
           replicas: 1
+          placement:
+            constraints:
+              - node.labels.leader == true
         healthcheck:
           test: ["CMD-SHELL", "/app/healthcheck.sh"]
           interval: 15s
@@ -63,6 +66,9 @@ services:
           - server.js
         deploy:
           replicas: 1
+          placement:
+            constraints:
+              - node.labels.leader == true
         healthcheck:
           test: ["CMD", "node", "/app/healthcheck.js"]
           interval: 5s
