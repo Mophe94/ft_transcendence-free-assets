@@ -218,7 +218,10 @@ export class GameService {
     if (!active) return;
 
     ///////////// FIX TEST INFRA ////////////
-    const winners = [...active].filter( (id) => this.playerService.getPlayer(id)?.status !== 'loser');
+    const winners = [...active].filter( (id) => {
+	this.playerService.getPlayer(id);
+	return !!p && p.status !== 'loser';
+    });
     ////////////////////////////////////////
 
     const canPairEveryone = winners.length >= 2 && winners.length % 2 === 0;
@@ -432,12 +435,12 @@ export class GameService {
     payloads.forEach(({ userId, payload }) => {
       const player = this.playerService.getPlayer(userId);
       if (player) {
-	this.playerService.getPlayer(userId).currentPhase = 'map';
+	player.currentPhase = 'map';
+	console.log(`${player.id}: CURRENT PHASE -> ${player.currentPhase}`);
       }
       else {
 	  console.log('[Start Map Phase] Player undefined')
       }
-      console.log(`${this.playerService.getPlayer(userId)!.id}: CURRENT PHASE -> ${this.playerService.getPlayer(userId)!.currentPhase}`);
       this.sendToPlayer(userId, payload);
     });
     console.log(
@@ -1286,6 +1289,7 @@ export class GameService {
       await this.redisStateService.removePlayer(id.toString());
       this.playerService.removePlayer(id);
       this.roomIdByPlayer.delete(id);
+      this.leaveGameRoom(roomId, id);
     }
     
 
