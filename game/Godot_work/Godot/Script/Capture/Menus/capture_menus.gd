@@ -184,6 +184,7 @@ func set_menus_use(object):
 				if stop_event == false:
 					await transi_close()
 					get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
+					return
 			else:
 				emit_signal("catch_fail")
 				await text_show("You failed to capture " + GeneralData.monster_encounter)
