@@ -29,7 +29,6 @@ import { UserStatsModule } from './stats/stats.module';
         password: getSecret('db_users_password'),
         database: getSecret('db_users_db_name'),
         entities: [User, Account, Relationship, UserStats],
-        synchronize: true, // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Only for dev, remove for prod.
       }),
     }),
     UsersModule,

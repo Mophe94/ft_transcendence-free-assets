@@ -13,11 +13,18 @@ import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
 import { ChatService } from './chat.service';
 import { randomUUID } from 'crypto';
 import { MessageEvent } from './const/messageEvent';
-import { Logger } from '@nestjs/common';
+import { Logger, UsePipes, ValidationPipe } from '@nestjs/common';
+import { MessageDto } from './dto/message.dto';
 
 type HeartbeatSocket = AuthenticatedSocket & { isAlive?: boolean };
 
-@WebSocketGateway({ cors: { origin: '*' }, path: '/chat' })
+@WebSocketGateway({
+  cors: { origin: '*' },
+  path: '/chat',
+  options: {
+    maxPayload: 4 * 1024,
+  },
+})
 export class ChatGateway
   implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
@@ -108,7 +115,8 @@ export class ChatGateway
   }
 
   @SubscribeMessage('message')
-  handleMessage(client: AuthenticatedSocket, content: string) {
+  @UsePipes(new ValidationPipe({ transform: true }))
+  handleMessage(client: AuthenticatedSocket, msgDto: MessageDto) {
     this.logger.log(
       `[WS MESSAGE] Received from User: ${client.user?.username} (${client.user?.id}) - Socket: ${client.id}`,
     );
@@ -119,7 +127,7 @@ export class ChatGateway
       type: MessageEvent.CHAT_MESSAGE,
       time: date,
       username: sender,
-      content,
+      content: msgDto.content,
     };
     this.broadcast(message);
   }

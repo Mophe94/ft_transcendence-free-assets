@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { AuthService } from './auth.service';
-import type { Response, Request } from 'express';
+import type { Response } from 'express';
 import { JwtHttpGuard } from 'libs/shared/src/auth/guards/jwt-http.guard';
 import type { AuthenticatedRequest } from 'libs/shared/src/types/authentication.interface';
 
