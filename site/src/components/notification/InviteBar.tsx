@@ -18,6 +18,7 @@ export default function InviteBar({ username, roomId }: InviteBarProps) {
   const { showNotification } = useNotification();
   const { joinRoom } = useLobbySocket()
   const [isLeaving, setIsLeaving] = useState(false);
+  const [isHandlingClick, setIsHandlingClick] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -30,9 +31,9 @@ export default function InviteBar({ username, roomId }: InviteBarProps) {
   const acceptInvite = async () => {
 
     const isAlreadyInGame = location.pathname.startsWith('/play');
-    if (!user || isLeaving) return;
+    if (!user || isHandlingClick) return;
     if (isAlreadyInGame) {
-      setIsLeaving(true);
+      setIsHandlingClick(true);
       showNotification('You are already in a lobby or a game', 'error');
       return;
     }
