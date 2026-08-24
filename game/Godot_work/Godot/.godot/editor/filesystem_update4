@@ -10,5 +10,3 @@ res://Scene/PlayerCharacter/Skin/Satyr01/satyr01SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr02/satyr02SpriteSheet.tres
 res://Scene/PlayerCharacter/Skin/Satyr03/satyr03SpriteSheet.tres
 res://Script/Capture/Menus/capture_menus.gd
-res://Script/General/GeneralData.gd
-res://Script/Timer/timer.gd

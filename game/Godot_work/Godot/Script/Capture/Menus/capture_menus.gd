@@ -188,6 +188,7 @@ func set_menus_use(object):
 				emit_signal("catch_fail")
 				await text_show("You failed to capture " + GeneralData.monster_encounter)
 				_back()
+				return
 	await text_show("Your team is already full!")
 	back_button.show()
 
