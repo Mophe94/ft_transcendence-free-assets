@@ -35,8 +35,6 @@ export class GameService {
   private gameRooms = new Map<string, Set<string>>();
   // userId -> roomId
   private roomIdByPlayer = new Map<string, string>();
-  // roomId -> active players
-  private activePlayersByRoom = new Map<string, Set<string>>();
 
 
   /*  GAME ROOMS */
@@ -214,11 +212,15 @@ export class GameService {
   }
 
   async startNextRound(roomId: string): Promise<void> {
-    const active = this.activePlayersByRoom.get(roomId);
+    const active = this.gameRooms.get(roomId); // identical to activeRoom ? 
     if (!active) return;
 
-    const canPairEveryone = active.size >= 2 && active.size % 2 === 0;
-    const allCombatsFinished = [...active].every(
+    ///////////// FIX TEST INFRA ////////////
+    const winners = [...active].filter( (id) => this.playerService.getPlayer(id)?.status !== 'loser');
+    ////////////////////////////////////////
+
+    const canPairEveryone = winners.length >= 2 && winners.length % 2 === 0;
+    const allCombatsFinished = [...winners].every(
       (id) => this.playerService.getPlayer(id)?.duelFinished === true);
 
     if (allCombatsFinished && canPairEveryone) {
@@ -227,17 +229,24 @@ export class GameService {
         active,
       );
       console.log('*********************************************');
-      this.combatService.matchmake(active);
-      this.startMapPhase(roomId, active, true);
+
+      ////////////////FIX TEST INFRA ////////////////
+      for (const id of winners) {
+        this.playerService.getPlayer(id)?.resetAfterRound();
+      }
+      /////////////////////////////////////////////
+
+      this.combatService.matchmake(new Set(winners));
+      this.startMapPhase(roomId, new Set(winners), true);
     } else if (active.size === 1) {
       const winnerId = [...active][0];
       if (winnerId) {
-        const player = this.playerService.getPlayer(winnerId);
+        //const player = this.playerService.getPlayer(winnerId);
         await this.deleteEndGame(roomId, winnerId);
       }
       console.log('Game rooms end game: ', this.gameRooms);
       return;
-    } else if (allCombatsFinished && active.size % 2 !== 0 && active.size > 1) {
+    } else if (allCombatsFinished && winners.length % 2 !== 0 && winners.length  > 1) {
     // Filet de sécurité : nombre impair de joueurs actifs (≠ 1), tous
     // ont fini leur duel, donc impossible de les repairer 2 par 2. Ne
     // devrait jamais arriver en théorie -> signe d'un joueur non
@@ -1081,11 +1090,12 @@ export class GameService {
 
     await this.redisStateService.updateStatePlayer(loser.id, loser);
     await this.redisStateService.updateStatePlayer(winner.id, winner);
+
     // reinitialize winner
-    winner.resetAfterRound();
+   // winner.resetAfterRound();
     if (winner.isBot) winner.duelFinished = true;
     
-    loser.duelFinished = true;
+    //loser.duelFinished = true;
 
     if (loser.isBot) {
       const loserBotRoomId = this.roomIdByPlayer.get(loser.id);
@@ -1095,7 +1105,6 @@ export class GameService {
         )
       }
     }
-
 
 
     // --- AI (bot loser cleanup) ---
