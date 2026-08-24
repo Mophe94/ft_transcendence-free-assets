@@ -6,7 +6,7 @@
 #    By: stempels <stempels@student.42belgium.be>   +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/29 11:23:25 by stempels          #+#    #+#              #
-#    Updated: 2026/08/21 18:31:26 by stempels         ###   ########.fr        #
+#    Updated: 2026/08/24 09:23:05 by stempels         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,6 +29,9 @@ services:
           - dist/apps/game-service/main.js
         deploy:
           replicas: 1
+          placement:
+            constraints:
+              - node.labels.leader == true
         healthcheck:
           test: ["CMD", "/app/healthcheck.sh"]
           interval: 15s
