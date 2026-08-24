@@ -11,7 +11,6 @@ import { WebSocket, Server } from 'ws';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { clientsMap } from 'apps/game-service/src/shared/clients.map';
 import { LobbyService } from 'apps/game-service/src/lobby/lobby.service';
-//import { RoomService } from 'apps/game-service/src/shared/room.service';
 import { RedisService } from '../redis/redis.service';
 import { IncomingMessage } from 'http';
 import { SharedAuthService } from 'libs/shared/src/auth/shared-auth.service';
@@ -23,7 +22,6 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
     private lobbyService: LobbyService,
-    //private roomService: RoomService,
     private redisService: RedisService,
     private readonly wsAuthService: SharedAuthService,
   ) {}
@@ -53,14 +51,6 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('[LobbyGateway]: Client disconnected');
   }
 
-/**
-   * Point d'entrée unique pour un départ de room : passe entièrement
-   * par LobbyService.leaveRoom, qui gère lui-même le verrou par
-   * roomId (RoomMutexService) englobant à la fois le retrait du
-   * client (roomService.leaveRoom) ET le remplacement éventuel par un
-   * bot (handlePlayerLeaveLocked). Ça évite qu'un join concurrent sur
-   * la même room ne s'intercale au milieu de ce départ.
-   */
   private async notifyRoomOnLeave(
     client: WebSocket,
     roomId: string,
@@ -76,23 +66,6 @@ export class LobbyGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  // @SubscribeMessage('create_room')
-  // async handleCreateRoom(
-  //   @ConnectedSocket() client: WebSocket,
-  //   @MessageBody() payload: { username: string; skin: string },
-  // ): Promise<void> {
-  //   const clientData = clientsMap.get(client);
-  //   if (!clientData) {
-  //     client.close();
-  //     return;
-  //   }
-  //   await this.lobbyService.createRoomAndJoin(
-  //     client,
-  //     clientData.userId,
-  //     payload.username,
-  //     payload.skin,
-  //   );
-  // }
 
   @SubscribeMessage('create_room')
 async handleCreateRoom(
@@ -105,9 +78,7 @@ async handleCreateRoom(
     return;
   }
 
-  // Verrou synchrone, posé AVANT tout await : bloque tout spam,
-  // même si le premier create_room est encore en train de traiter
-  // (latence Redis, etc.).
+ 
   if (clientData.roomId || clientData.pendingJoin) {
     return;
   }

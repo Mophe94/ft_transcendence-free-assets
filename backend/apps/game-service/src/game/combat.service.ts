@@ -76,14 +76,6 @@ export class CombatService {
       return player1.currentActions.actionType === 'pass' ? player1 : player2;
     }
 
-    // if (
-    //   player1.currentActions.actionType === 'change_current_monster' ||
-    //   player2.currentActions.actionType === 'change_current_monster'
-    // ) {
-    //   return player1.currentActions.actionType === 'change_current_monster'
-    //     ? player1
-    //     : player2;
-    // }
 
     if (
       player1.currentActions.actionType === 'use_item_combat' ||

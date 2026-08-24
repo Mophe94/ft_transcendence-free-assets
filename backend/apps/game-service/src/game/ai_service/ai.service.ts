@@ -10,47 +10,22 @@ export type BotMode = 'hardcoded' | 'takeover';
 export class AiService {
   private readonly logger = new Logger(AiService.name);
 
-  /**
-   * Picks a bot name that isn't already taken in the caller's set.
-   * `usedNames` is owned by the caller (typically one room's worth of
-   * bots created in the same loop) and gets mutated here, so calling
-   * this several times in a row never returns the same name twice.
-   */
   pickBotName(usedNames: Set<string>): string {
     const available = BOT_NAMES.filter((name) => !usedNames.has(name));
-    // Fallback: if somehow every name in the pool is already taken
-    // (shouldn't happen given room sizes), just allow a repeat rather
-    // than crash.
     const pool = available.length > 0 ? available : BOT_NAMES;
     const name = pool[Math.floor(Math.random() * pool.length)];
     usedNames.add(name);
     return name;
   }
 
-  /**
-   * Pioche un skin au hasard parmi ceux dispo côté Godot. Contrairement
-   * aux noms, pas besoin d'éviter les doublons : deux bots avec le même
-   * skin dans une room, ce n'est pas gênant.
-   */
   pickBotSkin(): string {
   return BOT_SKINS[Math.floor(Math.random() * BOT_SKINS.length)];
   }
 
-  /**
-   * Retrouve l'équivalent "lobby" (casse attendue par GameRoom.tsx)
-   * d'un skin "jeu" (casse attendue par Godot, stockée dans
-   * bot.asset). Utilisé par LobbyService au moment d'enregistrer le
-   * bot dans Redis pour l'écran d'attente.
-   */
   getLobbySkin(gameSkin: string): string {
     return BOT_SKINS.includes(gameSkin) ? gameSkin : BOT_SKINS[0];
   }
 
-  /**
-   * Copie exacte du typeChart de combat.service.ts : attaquant -> cible -> multiplicateur.
-   * Dupliqué ici volontairement pour ne pas faire dépendre AiService de
-   * CombatService juste pour ces quelques valeurs fixes.
-   */
   private readonly typeChart: Record<string, Record<string, number>> = {
     fire: { plant: 2, water: 0.5, neutral: 1, earth: 1, fly: 1 },
     water: { fire: 2, plant: 0.5, earth: 0.5, neutral: 1, fly: 1 },
@@ -60,12 +35,6 @@ export class AiService {
     fly: { water: 1, fire: 1, plant: 2, earth: 0.5, neutral: 1 },
   };
 
-  /**
-   * Choisit les 3 meilleurs monstres du pool du bot (6 max) contre
-   * l'équipe visible de l'adversaire (feature 4a). Chaque monstre du bot
-   * reçoit un score = efficacité moyenne de son type contre les types
-   * adverses ; on garde les 3 meilleurs.
-   */
   chooseBattleTeam(botTeam: string[], enemyTeam: string[]): string[] {
     console.log(botTeam);
     const enemyTypes = enemyTeam
@@ -91,15 +60,6 @@ export class AiService {
     return scored.slice(0, 3).map((entry) => entry.name);
   }
 
-  /**
-   * Décide de l'action de combat d'un bot pour ce tour (feature 4b).
-   * Retourne directement le payload attendu par handleMessage/CombatService.
-   *
-   * - si le bot n'a pas de monstre actif (début de combat, ou le
-   *   précédent vient de mourir) : il en envoie un nouveau
-   * - sinon : il attaque avec la meilleure compétence dispo contre le
-   *   monstre adverse actuel, ou passe s'il n'a plus rien d'utilisable
-   */
   decideCombatAction(bot: Player, enemy: Player): GameData {
     if (bot.currentMonster.name === '' || bot.currentMonster.life.current <= 0) {
       const slot = this.pickBestMonsterSlot(bot, enemy);
@@ -118,12 +78,6 @@ export class AiService {
     return { state: 'try_attack', skill: skillName };
   }
 
-  /**
-   * Décide si le bot doit utiliser un objet plutôt qu'attaquer :
-   * - une potion si son monstre actif est sous 50% de PV
-   * - une bombe si elle suffit à achever le monstre adverse actuel
-   * (rien d'autre : golden ticket et rage ne sont pas gérés par l'IA)
-   */
   private pickUsefulItem(bot: Player, enemy: Player): GameData | undefined {
     const lifeRatio = bot.currentMonster.life.current / bot.currentMonster.life.max;
     const potion = bot.inventory.find((item) => item.name === 'potion' && item.current > 0);
@@ -140,12 +94,6 @@ export class AiService {
     return undefined;
   }
 
-  /**
-   * Choisit, parmi les monstres vivants du battle_team, celui qui a le
-   * meilleur avantage de type contre le monstre adverse actuel. Si
-   * l'adversaire n'a pas encore de monstre actif, on prend juste celui
-   * avec la meilleure attaque brute.
-   */
   private pickBestMonsterSlot(bot: Player, enemy: Player): number {
     const enemyType = enemy.currentMonster?.name ? enemy.currentMonster.type : undefined;
 
@@ -163,13 +111,9 @@ export class AiService {
       }
     });
 
-    return bestSlot; // -1 en dernier recours : received_change_current_monster gère déjà ce cas (1er monstre vivant trouvé)
+    return bestSlot;
   }
 
-  /**
-   * Choisit la compétence de dégâts (avec des PP restants) la plus
-   * efficace contre le type du monstre adverse actuel.
-   */
   private pickBestSkill(bot: Player, enemy: Player): string | undefined {
     const enemyType = enemy.currentMonster.type;
 
@@ -193,10 +137,6 @@ export class AiService {
     return best.name;
   }
 
-  /**
-   * ID unique pour un bot "hardcoded" (feature 1).
-   * Un joueur "takeover" (feature 2) garde son propre id, il n'en a pas besoin.
-   */
   generateBotId(): string {
     return `bot-${randomUUID()}`;
   }
@@ -214,17 +154,12 @@ export class AiService {
     return round > totalRounds / 2 ? 'fort' : 'faible';
   }
 
-  /**
-   * Tire une équipe au hasard dans le pool du palier donné.
-   */
   private pickTeamFromTier(tier: BotTeamTier): readonly string[] {
     const pool = BOT_TEAM_TIERS[tier];
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  /**
-   * Remplit l'inventaire du bot (potion/bomb) selon le palier du round.
-   */
+
   private equipBotItems(bot: Player, tier: BotTeamTier): void {
     const counts = BOT_ITEM_COUNTS[tier];
     let slot = 0;
@@ -252,21 +187,6 @@ export class AiService {
   this.equipBotItems(bot, tier);
   }
 
-  /**
-   * Construit un nouveau bot ou transforme un joueur humain déconnecté en bot.
-   *
-   * - mode 'hardcoded' : nouveau bot créé pour compléter une room qui ne se
-   *   remplit pas à temps (feature 1). `team` est pré-rempli avec un palier
-   *   de 6 monstres ; `received_team_choice` (map.service.ts) se chargera
-   *   plus tard d'aller chercher les vraies stats en DB, exactement comme
-   *   pour un joueur humain.
-   *
-   * - mode 'takeover' : un joueur humain qui se déconnecte en pleine partie
-   *   est transformé en bot in-place (feature 2). On mute `isBot = true`
-   *   et on lui attribue une équipe + un inventaire du palier du round
-   *   courant (feature 3) pour qu'il reste compétitif ; le reste
-   *   (battle_team en cours...) n'est pas touché.
-   */
   createBotPlayer(
     mode: BotMode,
     round: number,
