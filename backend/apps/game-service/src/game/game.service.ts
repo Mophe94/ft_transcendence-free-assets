@@ -430,7 +430,13 @@ export class GameService {
     });
 
     payloads.forEach(({ userId, payload }) => {
-      this.playerService.getPlayer(userId)!.currentPhase = 'map';
+      const player = this.playerService.getPlayer(userId);
+      if (player) {
+	this.playerService.getPlayer(userId).currentPhase = 'map';
+      }
+      else {
+	  console.log('[Start Map Phase] Player undefined')
+      }
       console.log(`${this.playerService.getPlayer(userId)!.id}: CURRENT PHASE -> ${this.playerService.getPlayer(userId)!.currentPhase}`);
       this.sendToPlayer(userId, payload);
     });
@@ -498,9 +504,14 @@ export class GameService {
   // --- Pass 1 : init phase/timer pour tout le monde ---
   for (const userId of roomPlayers) {
     const player = this.playerService.getPlayer(userId)!;
-    player.currentPhase = 'team_choice';
-    player.timer = teamSetupTimer;
-    player.teamReady = false;
+    if (player) {
+	player.currentPhase = 'team_choice';
+	player.timer = teamSetupTimer;
+	player.teamReady = false;
+    }
+    else {
+	console.log('[Start Team Setup] Player undefined')
+    }
   }
 
   // --- Pass 2 : les bots choisissent (et appliquent) leur équipe AVANT tout envoi ---
