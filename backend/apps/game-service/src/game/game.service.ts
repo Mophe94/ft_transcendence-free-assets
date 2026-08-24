@@ -36,6 +36,8 @@ export class GameService {
   // userId -> roomId
   private roomIdByPlayer = new Map<string, string>();
 
+  private activePlayersByRoom = new Map<string, Set<string>>();
+
 
   /*  GAME ROOMS */
 
@@ -694,6 +696,8 @@ export class GameService {
     await new Promise<void>((resolve) => setTimeout(resolve, 5000));
     await this.cleanupEliminatedPlayer(koPlayer.id, roomId);
 
+    await this.startNextRound(roomId);
+
 
     if (!koPlayer.isBot) {
       setTimeout(() => {
@@ -892,6 +896,7 @@ export class GameService {
 
     if (!result)
       result = { event: 'game', data: { state: 'waiting_for_opponent' } };
+    return;
   }
 
   private applyPlayerAction(player: Player, payload: GameData): void {

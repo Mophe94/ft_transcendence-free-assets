@@ -334,6 +334,7 @@ export class Player {
   resetAfterRound(): void {
     this.forceChooseMonster = false;
     this.duelFinished = false;
+    this.status = 'default';
     this.currentActions.actionType = undefined;
     this.currentActions.data = '';
     this.text = '';
