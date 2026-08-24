@@ -135,16 +135,6 @@ func set_menus_capture():
 func set_menus_catch(object):
 	hide_button()
 	if object == "yes":
-		var count = 0
-		var team = GeneralData.player["team"]
-		for i in range(team.size()):
-			if team[i] != "":
-				count += 1
-		if count == 6:
-			await text_show("Your team is already full!")
-			back_button.show()
-			return
-
 		emit_signal("try_catch")
 		await text_show("You try to catch " + GeneralData.monster_encounter)
 		var success = await _result_catch()
@@ -181,19 +171,25 @@ func set_menus_catch(object):
 func set_menus_use(object):
 	hide_button()
 	await text_show("You use " + object)
-	emit_signal("try_catch")
-	var success = await _result_item(object)
-		
-	if success >= 0:
-		emit_signal("catch_ok")
-		await text_show("The capture of " + GeneralData.monster_encounter + " was successful!")
-		if stop_event == false:
-			await transi_close()
-			get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
-	else:
-		emit_signal("catch_fail")
-		await text_show("You failed to capture " + GeneralData.monster_encounter)
-		_back()
+	var team = GeneralData.player["team"]
+	for i in range(team.size()):
+		if team[i] == "":
+			await text_show("Your team is already full!")
+			emit_signal("try_catch")
+			var success = await _result_item(object)
+				
+			if success >= 0:
+				emit_signal("catch_ok")
+				await text_show("The capture of " + GeneralData.monster_encounter + " was successful!")
+				if stop_event == false:
+					await transi_close()
+					get_tree().change_scene_to_file(GeneralData.map[GeneralData.current_map])
+			else:
+				emit_signal("catch_fail")
+				await text_show("You failed to capture " + GeneralData.monster_encounter)
+				_back()
+	await text_show("Your team is already full!")
+	back_button.show()
 
 func set_menus_items():
 	hide_button()
