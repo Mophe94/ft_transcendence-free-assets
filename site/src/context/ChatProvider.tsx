@@ -70,7 +70,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
   const sendMessage = async (content: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ event: 'message', data: content }));
+      wsRef.current.send(JSON.stringify({ event: 'message', data: { content } }));
     } else {
       console.error('Socket not connected.');
     }
