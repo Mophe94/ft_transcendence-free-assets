@@ -10,6 +10,7 @@ import cornULfocus from '../../assets/chat/corner_focus_UL.png';
 import cornURfocus from '../../assets/chat/corner_focus_UR.png';
 import cornBLfocus from '../../assets/chat/corner_focus_BL.png';
 import cornBRfocus from '../../assets/chat/corner_focus_BR.png';
+import { useNotification } from "../../context/NotifContext";
 
 
 const defaultInputStyles = {
@@ -28,6 +29,7 @@ const focusedInputStyles = {
 
 export function InputBar() {
   const chatContext = useContext(ChatContext);
+  const { showNotification } = useNotification();
   const [inputText, setInputText] = useState('');
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
@@ -39,12 +41,24 @@ export function InputBar() {
 
   const handleSending = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    if (inputText.length > 500) {
+      showNotification('Message too long', 'error');
+      return ;
+    }
     if (inputText.trim() === '') {
       return;
     }
     await sendMessage(inputText);
     setInputText('');
   };
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length > 500) {
+      showNotification('Maximum 500 chars', 'error');
+      setInputText(e.target.value.slice(0,500));
+      return ;
+    }
+    setInputText(e.target.value)
+  }
 
   return (
     <form
@@ -68,7 +82,7 @@ export function InputBar() {
             id="chat-input"
             type="text"
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={handleTextChange}
             autoComplete="off"
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
