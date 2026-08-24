@@ -16,3 +16,5 @@ node_modules
 tatusq
 wiq
 .env*
+logs
+*.vdi
